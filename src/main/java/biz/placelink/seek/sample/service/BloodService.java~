@@ -1,0 +1,397 @@
+package biz.placelink.aicas.analysis.service;
+
+import biz.placelink.aicas.analysis.util.CommonDataManager;
+import biz.placelink.aicas.analysis.vo.AnalysisResultItemVO;
+import biz.placelink.aicas.analysis.vo.AnalysisResultVO;
+import biz.placelink.aicas.com.constants.Constants;
+import biz.placelink.aicas.com.util.RestApiUtil;
+import biz.placelink.aicas.com.vo.ChartAnalysisVO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.s2.ext.util.S2Util;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+
+/**
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *
+ *  수정일                수정자        수정내용
+ *
+ *  ------------       --------    ---------------------------
+ *
+ *  2025. 01. 10.      s2          최초생성
+ * </pre>
+ */
+@Service
+@Transactional(readOnly = true)
+public class BloodService {
+
+    private final CommonDataManager commonDataManager;
+
+    public BloodService(CommonDataManager commonDataManager) {
+        this.commonDataManager = commonDataManager;
+    }
+
+    /**
+     * 분석 결과를 가져온다
+     *
+     * @param analysisId   분석 ID
+     * @param analysisJsonData 분석 데이터
+     * @return 분석 결과 정보
+     */
+    public AnalysisResultVO getAnalysisResult(String analysisId, JsonNode analysisJsonData) {
+        AnalysisResultVO analysisResult = commonDataManager.convertAnalysisResultData(analysisId, analysisJsonData);
+
+        String descriptionDetail = commonDataManager.getDescriptionDetail(analysisResult.getAnalysisResultDiseaseDetectionList(), null);
+
+        if (S2Util.isNotEmpty(descriptionDetail)) {
+            String analysisDiseaseCd = analysisResult.getAnalysisDiseaseCd();
+            String analysisResultCcd = analysisResult.getAnalysisResultCcd();
+
+            analysisResult.setGuide("본 분석은 양자컴퓨팅 기반 AI 모델을 포함한 7가지 고급 AI 알고리즘(Autoencoder, Correlation, MAE, Manhattan Distance, MLP, Random Forest, Similarity)을 활용하여 LC-MS 피크 패턴을 정밀 분석하였으며, 다종 암 유형과의 유사도를 정량적으로 평가하였습니다.<br/><br/>" +
+                    "특히, 양자 머신러닝 기법과 고성능 신경망 모델을 결합하여 고차원 데이터의 복잡한 패턴을 해석하며, 정밀한 군집 분석 및 패턴 비교를 수행하여 암 진단의 신뢰도를 향상시켰습니다.");
+
+            analysisResult.setDescriptionDetail(descriptionDetail);
+            analysisResult.setResultChartFileUrl(String.format("/compare_meta_cancer_result?user_id=%s", analysisId));
+
+            List<AnalysisResultItemVO> analysisResultItemList = new ArrayList<>();
+            int analysisItemSn = 0;
+
+            /* 다종 암 스크리닝 결과 (7개 차트) */
+            analysisResult.setGuide1("본 분석은 7가지 AI 모델을 활용하여 사용자 데이터와 다종 암 유형 간 유사도를 비교하고, 가장 높은 유사도를 보이는 암 유형을 도출하였습니다.<br/>" +
+                    "Autoencoder(AE), 상관분석(Correlation), MAE(Mean Absolute Error), Manhattan 거리(Manhattan Distance), MLP(Multi-Layer Perceptron), Random Forest(RF), 유사도 분석(Similarity) 7개의 AI 모델을 활용하여 서로 다른 분석 기법을 적용하고, 암 진단 정확도를 향상시켰습니다.<br/>" +
+                    "이러한 7가지 AI 분석 결과를 상호 비교 및 보완하여, 사용자 데이터가 특정 암 유형의 환자군과 가장 높은 유사도를 보이는지 정량적으로 평가하며, 암 진단을 위한 근거 기반 분석을 제공합니다.");
+
+            // 1. mctype_diagnosis_autoencoder
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I1,
+                    "Diagnosis Autoencoder",
+                    String.format(
+                            "Autoencoder 모델을 사용하여 사용자 데이터를 정규화한 후, 다종 암 유형의 정상(normal) 및 암 환자(tumor) 데이터와 비교 분석하였습니다.<br/>" +
+                                    "사용자 데이터와 각 암 유형별 normal 및 tumor 그룹을 활용하여 Autoencoder 모델을 학습하고, 사용자 데이터의 재구성 오차(Reconstruction Error)를 계산하여 해당 그룹과의 유사도를 평가하였습니다.<br/>" +
+                                    "Autoencoder는 입력 데이터를 압축한 후 다시 복원하는 신경망 모델로, 특정 그룹(normal 또는 tumor)에서 학습한 모델이 새로운 입력 데이터를 얼마나 잘 복원하는지를 측정할 수 있습니다.<br/>" +
+                                    "이 과정에서 재구성 오차가 낮을수록 해당 그룹과 유사한 데이터로 해석됩니다.<br/>" +
+                                    "차트는 각 암 유형별 재구성 오차를 시각적으로 표현하며, 파란색(정상)과 빨간색(암 환자) 으로 구분하여 사용자 데이터가 어느 그룹과 더 가까운지를 보여줍니다.<br/>" +
+                                    "재구성 오차 값이 0에 가까울수록 해당 그룹과 유사한 것으로 해석됩니다.<br/>" +
+                                    "Autoencoder 기반의 재구성 오차 분석을 종합하여 가장 높은 유사도를 보이는 암 유형을 최종 진단 결과로 제공하며, 분석 결과, 사용자 데이터는 %s(%s) %s군과 가장 높은 유사도를 보였습니다.",
+                            commonDataManager.getDiseaseCdNm(analysisDiseaseCd),
+                            analysisResultCcd,
+                            (Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd) ? "환자" : "정상")
+                    ),
+                    String.format("/mctype_diagnosis_autoencoder?user_id=%s", analysisId)
+            ));
+
+            // 2. mctype_diagnosis_euclidean
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I1,
+                    "Diagnosis Euclidean",
+                    String.format(
+                            "본 분석에서는 유클리드 거리(Euclidean Distance) 및 코사인 유사도(Cosine Similarity)를 활용하여 사용자 데이터와 다종 암 유형의 정상(normal) 및 암 환자(tumor) 데이터를 비교 분석하였습니다.<br/>" +
+                                    "각 암 유형별 normal 및 tumor 그룹의 평균 벡터를 생성한 후, 유클리드 거리를 통해 상대적인 거리를 측정하고, 코사인 유사도를 함께 계산하여 보다 정밀한 유사도 평가를 수행하였습니다. 이 과정에서 데이터 표준화(Standardization)를 적용하여 분석의 정확도를 높였습니다.<br/>" +
+                                    "차트는 각 암 유형별 유사도를 시각적으로 표현하며, 파란색(정상)과 주황색(암 환자)으로 구분하여 사용자 데이터가 어느 그룹과 더 가까운지를 보여줍니다.<br/>" +
+                                    "유사도 분석 결과를 종합하여 가장 높은 유사도를 보이는 암 유형을 최종 진단 결과로 제공하며, 분석 결과, 사용자 데이터는 %s(%s) %s군과 가장 높은 유사도를 보였습니다.<br/>" +
+                                    "또한, 유사도 값이 1에 가까울수록 해당 그룹과 높은 유사도를 의미하며, 0에 가까울수록 유사성이 낮은 것으로 해석됩니다. 이를 통해 사용자가 특정 암 환자 그룹 또는 정상 그룹과 얼마나 가까운지를 정량적으로 평가할 수 있습니다.",
+                            commonDataManager.getDiseaseCdNm(analysisDiseaseCd),
+                            analysisResultCcd,
+                            (Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd) ? "환자" : "정상")
+                    ),
+                    String.format("/mctype_diagnosis_euclidean?user_id=%s", analysisId)
+            ));
+
+            // 3. mctype_diagnosis_lda
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I1,
+                    "Diagnosis LDA",
+                    String.format(
+                            "본 분석에서는 선형판별분석(Linear Discriminant Analysis, LDA)을 활용하여 사용자 데이터와 다종 암 유형의 정상(normal) 및 암 환자(tumor) 데이터를 비교 분석하였습니다.<br/>" +
+                                    "각 암 유형별 normal 및 tumor 그룹의 평균 벡터를 생성한 후, LDA를 통해 데이터를 변환하고, 변환된 공간에서 사용자 데이터와 각 그룹의 중심점 간 거리를 측정하여 유사도를 평가하였습니다. 이 과정에서 데이터 표준화(Standardization)를 적용하여 분석의 정확도를 높였습니다.<br/>" +
+                                    "차트는 각 암 유형별 유사도를 시각적으로 표현하며, 파란색(정상)과 연한 빨간색(암 환자)으로 구분하여 사용자 데이터가 어느 그룹과 더 가까운지를 보여줍니다.<br/>" +
+                                    "유사도 분석 결과를 종합하여 가장 높은 유사도를 보이는 암 유형을 최종 진단 결과로 제공하며, 분석 결과, 사용자 데이터는 %s(%s) %s군과 가장 높은 유사도를 보였습니다.<br/>" +
+                                    "또한, 유사도 값이 0에 가까울수록 해당 그룹과 유사한 것으로 해석되며, 값이 작을수록 특정 암 환자 그룹 또는 정상 그룹과 더욱 높은 유사도를 갖는 것으로 판단됩니다.",
+                            commonDataManager.getDiseaseCdNm(analysisDiseaseCd),
+                            analysisResultCcd,
+                            (Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd) ? "환자" : "정상")
+                    ),
+                    String.format("/mctype_diagnosis_lda?user_id=%s", analysisId)
+            ));
+
+            // 4. mctype_diagnosis_mae
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I1,
+                    "Diagnosis MAE",
+                    String.format(
+                            "본 분석에서는 평균 절대 오차(Mean Absolute Error, MAE)를 활용하여 사용자 데이터와 다종 암 유형의 정상(normal) 및 암 환자(tumor) 데이터를 비교 분석하였습니다.<br/>" +
+                                    "각 암 유형별 normal 및 tumor 그룹의 평균 벡터를 생성한 후, MAE를 이용하여 사용자 데이터와의 차이를 계산하고, 값이 작을수록 해당 그룹과 유사함을 의미하도록 평가하였습니다. 이 과정에서 데이터 표준화(Standardization)를 적용하여 분석의 정확도를 높였습니다.<br/>" +
+                                    "차트는 각 암 유형별 유사도를 시각적으로 표현하며, 파란색(정상)과 연한 주황색(암 환자)으로 구분하여 사용자 데이터가 어느 그룹과 더 가까운지를 보여줍니다.<br/>" +
+                                    "유사도 값이 0에 가까울수록 해당 그룹과 유사한 것으로 해석됩니다.<br/>" +
+                                    "유사도 분석 결과를 종합하여 가장 높은 유사도를 보이는 암 유형을 최종 진단 결과로 제공하며, 분석 결과, 사용자 데이터는 %s(%s) %s군과 가장 높은 유사도를 보였습니다.",
+                            commonDataManager.getDiseaseCdNm(analysisDiseaseCd),
+                            analysisResultCcd,
+                            (Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd) ? "환자" : "정상")
+                    ),
+                    String.format("/mctype_diagnosis_mae?user_id=%s", analysisId)
+            ));
+
+            // 5. mctype_diagnosis_manhattan
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I1,
+                    "Diagnosis Manhattan",
+                    String.format(
+                            "본 분석에서는 맨해튼 거리(Manhattan Distance)를 활용하여 사용자 데이터와 다종 암 유형의 정상(normal) 및 암 환자(tumor) 데이터를 비교 분석하였습니다.<br/>" +
+                                    "각 암 유형별 normal 및 tumor 그룹의 평균 벡터를 생성한 후, 맨해튼 거리를 이용하여 사용자 데이터와의 차이를 계산하고, 값이 작을수록 해당 그룹과 유사함을 의미하도록 평가하였습니다. 이 과정에서 Min-Max 정규화(Min-Max Scaling)를 적용하여 분석의 정확도를 높였습니다.<br/>" +
+                                    "차트는 각 암 유형별 유사도를 시각적으로 표현하며, 파란색(정상)과 연한 녹색(암 환자)으로 구분하여 사용자 데이터가 어느 그룹과 더 가까운지를 보여줍니다.<br/>" +
+                                    "유사도 값이 1에 가까울수록 해당 그룹과 유사한 것으로 해석됩니다.<br/>" +
+                                    "유사도 분석 결과를 종합하여 가장 높은 유사도를 보이는 암 유형을 최종 진단 결과로 제공하며, 분석 결과, 사용자 데이터는 %s(%s) %s군과 가장 높은 유사도를 보였습니다.",
+                            commonDataManager.getDiseaseCdNm(analysisDiseaseCd),
+                            analysisResultCcd,
+                            (Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd) ? "환자" : "정상")
+                    ),
+                    String.format("/mctype_diagnosis_manhattan?user_id=%s", analysisId)
+            ));
+
+            // 6. mctype_diagnosis_rf
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I1,
+                    "Diagnosis RF",
+                    String.format(
+                            "Random Forest(RF) 모델을 사용하여 사용자 데이터를 분석한 후, 다종 암 유형의 정상(normal) 및 암 환자(tumor) 데이터와 비교 분석하였습니다.<br/>" +
+                                    "사용자 데이터와 각 암 유형별 normal 및 tumor 그룹을 활용하여 Random Forest 분류 모델을 학습하고, 사용자 데이터가 어느 그룹에 속할 가능성이 높은지를 예측하였습니다.<br/>" +
+                                    "추가적으로, 데이터 불균형 문제를 해결하기 위해 SMOTE 오버샘플링을 적용하여 모델의 학습 성능을 향상시켰으며, 클래스 가중치(Class Weight)를 반영한 최적화된 Random Forest 모델을 구축하였습니다.<br/>" +
+                                    "차트는 각 암 유형별 예측 확률을 시각적으로 표현하며, 파란색(정상)과 하늘색(암 환자) 로 구분하여 사용자 데이터가 어느 그룹과 더 가까운지를 보여줍니다.<br/>" +
+                                    "유사도 값이 0에 가까울수록 해당 그룹과 유사한 것으로 해석됩니다.<br/>" +
+                                    "Random Forest 확률 예측 결과를 종합하여 가장 높은 유사도를 보이는 암 유형을 최종 진단 결과로 제공하며, 분석 결과, 사용자 데이터는 %s(%s) %s군과 가장 높은 유사도를 보였습니다.",
+                            commonDataManager.getDiseaseCdNm(analysisDiseaseCd),
+                            analysisResultCcd,
+                            (Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd) ? "환자" : "정상")
+                    ),
+                    String.format("/mctype_diagnosis_rf?user_id=%s", analysisId)
+            ));
+
+            // 7. mctype_diagnosis_similarity
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I1,
+                    "Diagnosis Similarity",
+                    String.format(
+                            "코사인 유사도(Cosine Similarity) 분석을 사용하여 사용자 데이터를 정규화한 후, 다종 암 유형의 정상(normal) 및 암 환자(tumor) 데이터와 비교 분석하였습니다.<br/>" +
+                                    "사용자 데이터와 각 암 유형별 normal 및 tumor 그룹의 평균 벡터를 계산한 후, 코사인 유사도를 측정하여 사용자 데이터가 어느 그룹과 더 유사한지를 평가하였습니다.<br/>" +
+                                    "이 과정에서 이상치(Outlier)의 영향을 줄이기 위해 RobustScaler를 사용하여 데이터를 정규화하였습니다.<br/>" +
+                                    "차트는 각 암 유형별 유사도를 시각적으로 표현하며, 파란색(정상)과 보라색(암 환자) 로 구분하여 사용자 데이터가 어느 그룹과 더 가까운지를 보여줍니다. 유사도 값이 0에 가까울수록 해당 그룹과 유사한 것으로 해석됩니다.<br/>" +
+                                    "코사인 유사도 분석 결과를 종합하여 가장 높은 유사도를 보이는 암 유형을 최종 진단 결과로 제공하며, 분석 결과, 사용자 데이터는 %s(%s) %s군과 가장 높은 유사도를 보였습니다.",
+                            commonDataManager.getDiseaseCdNm(analysisDiseaseCd),
+                            analysisResultCcd,
+                            (Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd) ? "환자" : "정상")
+                    ),
+                    String.format("/mctype_diagnosis_similarity?user_id=%s", analysisId)
+            ));
+
+            /* 양성/음성 스크리닝 결과 (8개 차트) */
+            analysisResult.setGuide2("LC-MS 피크 데이터 기반 정밀 분석 결과<br/>" +
+                    "사용자의 LC-MS 피크 데이터와 정상군/환자군의 LC-MS 피크 데이터를 비교 분석하기 위해 8개의 고급 데이터 분석 알고리즘을 활용하였습니다.<br/>" +
+                    "본 분석에 사용된 8개의 알고리즘은 다양한 차트 및 머신러닝 기법을 적용하여 정밀한 군집 분석 및 패턴 비교를 수행하며, 정확한 진단 평가를 제공합니다.");
+
+            analysisResult.setAdditionalDescription(
+                    Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                            ?
+                            "8개의 분석 알고리즘을 적용한 결과, 사용자의 LC-MS 피크 패턴이 환자군과 높은 유사성을 보였습니다.<br/>" +
+                                    "PCA 분석 결과, 사용자의 데이터가 환자군 클러스터와 가까운 위치에 나타났으며, Heatmap Clustering에서도 사용자의 피크 패턴이 환자군과 같은 그룹으로 묶였습니다.<br/>" +
+                                    "Bubble Plot 및 Streamgraph 분석에서 사용자의 LC-MS 피크량이 환자군과 유사한 분포를 보이며, Polar Scatter Plot에서도 환자군과 동일한 피크 경향이 확인되었습니다.<br/>" +
+                                    "Surface Plot(3D 분석)에서는 특정 LC-MS 피크량이 환자군과 동일한 패턴을 보였으며, Biomarker Differences 분석 결과, 정상군과 차이가 큰 바이오마커가 사용자의 LC-MS 피크 값과 유사한 경향을 보였기 때문에 최종적으로 \"환자군\"으로 분류되었습니다."
+                            :
+                            "8개의 분석 알고리즘을 적용한 결과, 사용자의 LC-MS 피크 패턴이 정상군과 높은 유사성을 보였습니다.<br/>" +
+                                    "PCA 및 Heatmap 클러스터링에서 사용자의 데이터가 정상군과 같은 군(cluster)에 포함되었으며, 정상군 평균 피크값과의 차이가 매우 작아 정상군과 유사한 피크 패턴을 나타냈습니다.<br/>" +
+                                    "Bubble Plot 및 Streamgraph 분석에서 사용자의 LC-MS 피크량이 정상군과 유사한 분포를 보이며, Surface Plot(3D 분석)에서도 정상군과 일관된 패턴을 형성하는 것이 확인되었습니다.<br/>" +
+                                    "Biomarker Differences 분석 결과, 정상군에서 주요하게 피크되는 LC-MS 피크 값과 사용자의 LC-MS 피크 값이 유사한 범위 내에 위치하여, 최종적으로 \"정상군\"으로 분류되었습니다."
+            );
+
+            // 1. status_meta_bubble_plot_distribution
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I2,
+                    "Bubble Plot Distribution",
+                    "버블 차트는 LC-MS 피크량을 기준으로 정상군(파란색), 환자군(빨간색), 사용자(주황색) 데이터를 시각화하였으며, 버블 크기는 피크 강도(Intensity)에 비례합니다.<br/><br/>" + (
+                            Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                                    ?
+                                    "주황색(사용자) 버블이 빨간색(환자) 버블과 가까울수록, 환자군과 유사한 피크 패턴을 보입니다.<br/>" +
+                                            "버블 크기가 빨간색(환자)과 비슷할수록, 피크 강도(Intensity)도 유사하여 환자군과 높은 관련성을 가집니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 환자군 평균과의 차이가 작고, 정상군 평균과의 차이가 크다면, 환자군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 환자군의 데이터와 유사하게 분포하여 \"환자군\"으로 분류되었습니다."
+                                    :
+                                    "주황색(사용자) 버블이 파란색(정상) 버블과 가까울수록, 정상군과 유사한 피크 패턴을 보입니다.<br/>" +
+                                            "버블 크기가 파란색(정상)과 비슷할수록, 피크 강도(Intensity)도 유사하여 정상군에 속할 가능성이 높습니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 정상군 평균과의 차이가 작고, 환자군 평균과의 차이가 크다면, 정상군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 정상군의 데이터와 유사하게 분포하여 \"정상군\"으로 분류되었습니다."
+                    ),
+                    String.format("/status_meta_bubble_plot_distribution?user_id=%s", analysisId)
+            ));
+
+            // 2. status_meta_pca_analysis
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I2,
+                    "PCA Analysis",
+                    "PCA 차트는 LC-MS 피크량을 기준으로 정상군(파란색), 환자군(빨간색), 사용자(주황색) 데이터를 시각화였으며, PCA(주성분 분석, Principal Component Analysis)를 이용해 데이터의 주요 변동성을 반영하여 2차원 공간에 표현하였습니다.<br/><br/>" + (
+                            Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                                    ?
+                                    "주황색(사용자) 데이터가 빨간색(환자) 그룹과 가까울수록, 종양군과 유사한 피크 패턴을 보입니다.<br/>" +
+                                            "주황색(사용자) 데이터의 위치가 빨간색(환자)와 일치할수록, 종양군과 동일한 생물학적 특징을 나타낼 가능성이 높습니다.<br/>" +
+                                            "사용자의 LC-MS 피크 강도(Intensity)가 환자군 평균과의 차이가 작고, 정상군 평균과의 차이가 크다면, 종양군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 환자군의 데이터와 유사하게 분포하여 \"환자군\"으로 분류되었습니다."
+                                    :
+                                    "주황색(사용자) 데이터가 파란색(정상) 그룹과 가까울수록, 정상군과 유사한 피크 패턴을 보입니다.<br/>" +
+                                            "주황색(사용자) 데이터의 위치가 파란색(정상)과 일치할수록, 정상군과 동일한 생물학적 특징을 나타낼 가능성이 높습니다.<br/>" +
+                                            "사용자의 LC-MS 피크 강도(Intensity)가 정상군 평균과의 차이가 작고, 환자군 평균과의 차이가 크다면, 정상군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 정상군의 데이터와 유사하게 분포하여 \"정상군\"으로 분류되었습니다."
+                    ),
+                    String.format("/status_meta_pca_analysis?user_id=%s", analysisId)
+            ));
+
+            // 3. status_meta_streamgraph_distribution
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I2,
+                    "Streamgraph Distribution",
+                    "스트림그래프(Streamgraph)는 LC-MS 피크량을 기준으로 정상군(파란색), 환자군(빨간색), 사용자(주황색) 데이터를 시각화하였으며 각 색상의 영역 크기는 해당 군의 평균 피크 강도에 비례합니다.<br/><br/>" + (
+                            Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                                    ?
+                                    "주황색(사용자) 그래프가 빨간색(환자군) 그래프와 유사한 패턴을 보일수록, 환자군과 가까운 LC-MS 피크 경향을 가집니다.<br/>" +
+                                            "그래프 높이가 빨간색(환자군)과 비슷할수록, 피크 강도(Intensity)도 유사하여 환자군과 높은 관련성을 가집니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 환자군 평균과의 차이가 작고, 정상군 평균과의 차이가 크다면, 환자군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 환자군의 데이터와 유사하게 분포하여 \"환자군\"으로 분류되었습니다."
+                                    :
+                                    "주황색(사용자) 그래프가 파란색(정상군) 그래프와 유사한 패턴을 보일수록, 정상군과 가까운 LC-MS 피크 경향을 가집니다.<br/>" +
+                                            "그래프 높이가 파란색(정상군)과 비슷할수록, 피크 강도(Intensity)도 유사하여 정상군에 속할 가능성이 높습니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 정상군 평균과의 차이가 작고, 환자군 평균과의 차이가 크다면, 정상군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 정상군의 데이터와 유사하게 분포하여 \"정상군\"으로 분류되었습니다."
+                    ),
+                    String.format("/status_meta_streamgraph_distribution?user_id=%s", analysisId)
+            ));
+
+            // 4. status_meta_top_changes
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I2,
+                    "Top Changes",
+                    "Top Changes 차트는 LC-MS 피크량을 기준으로 정상군(파란색), 환자군(주황색), 사용자(녹색) 데이터를 시각화하였으며, 정상군과 환자군의 평균 피크값과 비교하여 사용자의 LC-MS 피크 패턴이 어떤 군과 가까운지를 분석합니다.<br/><br/>" + (
+                            Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                                    ?
+                                    "녹색(사용자) 선이 주황색(환자군) 선과 유사한 패턴을 보일수록, 환자군과 가까운 LC-MS 피크 경향을 가집니다.<br/>" +
+                                            "그래프의 기울기와 변화 패턴이 주황색(환자군)과 비슷할수록, 환자군과 높은 관련성을 가집니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 환자군 평균과의 차이가 작고, 정상군 평균과의 차이가 크다면, 환자군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 환자군의 데이터와 유사하게 분포하여 \"환자군\"으로 분류되었습니다."
+                                    :
+                                    "녹색(사용자) 선이 파란색(정상군) 선과 유사한 패턴을 보일수록, 정상군과 가까운 LC-MS 피크 경향을 가집니다.<br/>" +
+                                            "그래프의 기울기와 변화 패턴이 파란색(정상군)과 비슷할수록, 정상군과의 유사성이 높아집니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 정상군 평균과의 차이가 작고, 환자군 평균과의 차이가 크다면, 정상군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 정상군의 데이터와 유사하게 분포하여 \"정상군\"으로 분류되었습니다."
+                    ),
+                    String.format("/status_meta_top_changes?user_id=%s", analysisId)
+            ));
+
+            // 5. status_meta_polar_scatter_plot
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I2,
+                    "Polar Scatter Plot",
+                    "Polar Scatter Plot은 LC-MS 피크 ID별 피크 강도의 패턴과 위치를 원형 그래프로 표현하여, 사용자의 LC-MS 피크 패턴이 정상군과 유사한지, 환자군과 유사한지를 분석합니다.<br/><br/>" + (
+                            Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                                    ?
+                                    "녹색(사용자) 점이 빨간색(환자군) 점과 가까울수록, 환자군과 유사한 LC-MS 피크 패턴을 보입니다.<br/>" +
+                                            "반지름(피크 강도)이 빨간색(환자군)과 유사할수록, 환자군과의 생물학적 특성이 더 가깝다고 해석됩니다.<br/>" +
+                                            "LC-MS 피크 ID별 패턴이 환자군과 비슷하게 배치될수록, 환자군과의 유사성이 높아집니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 환자군 평균과의 차이가 작고, 정상군 평균과의 차이가 크다면, 환자군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 환자군 데이터와 유사하게 분포하여 \"환자군\"으로 분류되었습니다."
+                                    :
+                                    "녹색(사용자) 점이 파란색(정상군) 점과 가까울수록, 정상군과 유사한 LC-MS 피크 패턴을 보입니다.<br/>" +
+                                            "반지름(피크 강도)이 파란색(정상군)과 유사할수록, 정상군과의 생물학적 특성이 비슷하다고 볼 수 있습니다.<br/>" +
+                                            "LC-MS 피크 ID별 패턴이 정상군과 비슷하게 배치될수록, 정상군에 속할 가능성이 높습니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 정상군 평균과의 차이가 작고, 환자군 평균과의 차이가 크다면, 정상군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 정상군 데이터와 유사하게 분포하여 \"정상군\"으로 분류되었습니다."
+                    ),
+                    String.format("/status_meta_polar_scatter_plot?user_id=%s", analysisId)
+            ));
+
+            // 6. status_meta_surface_plot_colorbar
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I2,
+                    "Surface Plot Colorbar",
+                    "3D Surface Plot은 LC-MS 피크 ID별 피크 강도를 3차원 공간에서 시각화하여, 사용자 데이터가 정상군 또는 환자군과 유사한지를 평가합니다.<br/><br/>" + (
+                            Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                                    ?
+                                    "녹색(사용자) 표면이 빨간색(환자군) 표면과 높이(Z축)가 유사할수록, 환자군과 비슷한 피크 패턴을 보입니다.<br/>" +
+                                            "LC-MS 피크 ID별 환자군의 피크 강도(빨간색)와 사용자의 피크 강도(녹색)가 비슷할수록, 환자군과의 생물학적 유사성이 높다고 해석됩니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 환자군 평균과의 차이가 작고, 정상군 평균과의 차이가 크다면, 환자군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 환자군의 데이터와 유사하게 분포하여 \"환자군\"으로 분류되었습니다."
+                                    :
+                                    "녹색(사용자) 표면이 파란색(정상군) 표면과 높이(Z축)가 유사할수록, 정상군과 비슷한 피크 패턴을 보입니다.<br/>" +
+                                            "LC-MS 피크 ID별 정상군의 피크 강도(파란색)와 사용자의 피크 강도(녹색)가 비슷할수록, 정상군과의 생물학적 유사성이 높다고 볼 수 있습니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 정상군 평균과의 차이가 작고, 환자군 평균과의 차이가 크다면, 정상군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 정상군의 데이터와 유사하게 분포하여 \"정상군\"으로 분류되었습니다."
+                    ),
+                    String.format("/status_meta_surface_plot_colorbar?user_id=%s", analysisId)
+            ));
+
+            // 7. status_meta_biomarker_differences
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I2,
+                    "Biomarker Differences",
+                    "Biomarker Differences 그래프는 정상군과 환자군의 평균 피크량 차이가 큰 20개의 LC-MS 피크를 기준으로 사용자의 피크량을 비교하여, 정상군 또는 환자군에 가까운지를 분석합니다.<br/><br/>" + (
+                            Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                                    ?
+                                    "사용자의 LC-MS 피크량(주황색)이 환자군 평균(빨간색)과 가까울수록, 환자군과 유사한 피크 패턴을 보입니다.<br/>" +
+                                            "환자군의 LC-MS 피크 강도(빨간색)와 사용자의 강도가 비슷할수록, 종양성 변화와 높은 관련성이 있다고 해석됩니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 환자군 평균과의 차이가 작고, 정상군 평균과의 차이가 크다면, 환자군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 환자군의 데이터와 유사하게 분포하여 \"환자군\"으로 분류되었습니다."
+                                    :
+                                    "사용자의 LC-MS 피크량(주황색)이 정상군 평균(파란색)과 가까울수록, 정상군과 유사한 피크 패턴을 보입니다.<br/>" +
+                                            "정상군의 LC-MS 피크 강도(파란색)와 사용자의 강도가 비슷할수록, 정상 생리적 상태와 유사성이 높다고 해석됩니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 정상군 평균과의 차이가 작고, 환자군 평균과의 차이가 크다면, 정상군으로 판단됩니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 정상군의 데이터와 유사하게 분포하여 \"정상군\"으로 분류되었습니다."
+                    ),
+                    String.format("/status_meta_biomarker_differences?user_id=%s", analysisId)
+            ));
+
+            // 8. status_meta_heatmap_only
+            analysisResultItemList.add(new AnalysisResultItemVO(
+                    ++analysisItemSn,
+                    Constants.CD_ANALYSIS_ITEM_SE_I2,
+                    "Heatmap Only",
+                    "히트맵 클러스터링 차트는 정상군과 환자군의 발현량 차이가 큰 상위 10개의 miRNA를 선택하여 계층적 클러스터링(Hierarchical Clustering)을 수행하여, miRNA가 가지는 패턴을 기반으로 군집을 나눕니다. miRNA 발현량을 기준으로 정상군(파란색), 환자군(빨간색), 사용자(주황색) 데이터를 비교하여, 특정 miRNA의 발현 패턴이 정상군과 유사한지, 환자군과 유사한지를 분석합니다.<br/><br/>" + (
+                            Constants.CD_ANALYSIS_RESULT_TUMOR.equals(analysisResultCcd)
+                                    ?
+                                    "사용자의 LC-MS 피크량(주황색)이 환자군 평균(빨간색)과 가까울수록, 환자군과 유사한 패턴을 보입니다.<br/>" +
+                                            "계층적 클러스터링에서 사용자의 LC-MS 피크 값이 환자군 데이터와 같은 군(cluster)에 포함될수록, 종양성 변화와 높은 관련성이 있다고 해석됩니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 환자군 평균과의 차이가 작고, 정상군 평균과의 차이가 크다면, 환자군으로 판단됩니다.<br/>" +
+                                            "히트맵에서 사용자 샘플이 환자군과 유사한 색상 패턴을 가지며, 환자군 데이터와 가까운 위치에 배치되었다면, 환자군으로 분류될 가능성이 높습니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 환자군의 데이터와 유사하게 분포하여 \"환자군\"으로 분류되었습니다."
+                                    :
+                                    "사용자의 LC-MS 피크량(주황색)이 정상군 평균(파란색)과 가까울수록, 정상군과 유사한 패턴을 보입니다.<br/>" +
+                                            "계층적 클러스터링에서 사용자의 LC-MS 피크 값이 정상군 데이터와 같은 군(cluster)에 포함될수록, 정상 생리적 상태와 유사성이 높다고 해석됩니다.<br/>" +
+                                            "사용자의 LC-MS 피크 값이 정상군 평균과의 차이가 작고, 환자군 평균과의 차이가 크다면, 정상군으로 판단됩니다.<br/>" +
+                                            "히트맵에서 사용자 샘플이 정상군과 유사한 색상 패턴을 가지며, 정상군 데이터와 가까운 위치에 배치되었다면, 정상군으로 분류될 가능성이 높습니다.<br/>" +
+                                            "최종 분석 결과, 사용자의 LC-MS 피크 패턴이 정상군의 데이터와 유사하게 분포하여 \"정상군\"으로 분류되었습니다."
+                    ),
+                    String.format("/status_meta_heatmap_only?user_id=%s", analysisId)
+            ));
+
+            analysisResult.setAnalysisResultItemList(analysisResultItemList);
+        }
+
+        return analysisResult;
+    }
+
+}

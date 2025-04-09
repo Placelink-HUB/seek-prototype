@@ -1,0 +1,105 @@
+package biz.placelink.aicas.analysis.vo;
+
+import biz.placelink.aicas.system.file.vo.FileDetailVO;
+
+public class AnalysisResultItemVO extends FileDetailVO {
+
+    /* 분석 결과 공통코드 */
+    private String analysisId;
+    /* 분석 결과 순번 */
+    private Integer analysisResultSn;
+    /* 분석 항목 구분 공통코드 */
+    private String analysisItemSeCcd;
+    private String analysisItemSeCcdNm;
+    /* 분석 항목 순번 */
+    private Integer analysisItemSn;
+    /* 분석 항목 명 */
+    private String analysisItemName;
+    /* 설명 */
+    private String description;
+    /* 시스템 설명 */
+    private String systemDescription;
+    /* 원격 파일 경로 */
+    private String fileUrl;
+
+    public AnalysisResultItemVO(Integer analysisItemSn, String analysisItemSeCcd, String analysisItemName, String description, String fileUrl) {
+        this.analysisItemSn = analysisItemSn;
+        this.analysisItemSeCcd = analysisItemSeCcd;
+        this.analysisItemName = analysisItemName;
+        this.description = description;
+        this.fileUrl = fileUrl;
+    }
+
+    public String getAnalysisId() {
+        return analysisId;
+    }
+
+    public void setAnalysisId(String analysisId) {
+        this.analysisId = analysisId;
+    }
+
+    public Integer getAnalysisResultSn() {
+        return analysisResultSn;
+    }
+
+    public void setAnalysisResultSn(Integer analysisResultSn) {
+        this.analysisResultSn = analysisResultSn;
+    }
+
+    public Integer getAnalysisItemSn() {
+        return analysisItemSn;
+    }
+
+    public void setAnalysisItemSn(Integer analysisItemSn) {
+        this.analysisItemSn = analysisItemSn;
+    }
+
+    public String getAnalysisItemSeCcdNm() {
+        return analysisItemSeCcdNm;
+    }
+
+    public void setAnalysisItemSeCcdNm(String analysisItemSeCcdNm) {
+        this.analysisItemSeCcdNm = analysisItemSeCcdNm;
+    }
+
+    public String getAnalysisItemSeCcd() {
+        return analysisItemSeCcd;
+    }
+
+    public void setAnalysisItemSeCcd(String analysisItemSeCcd) {
+        this.analysisItemSeCcd = analysisItemSeCcd;
+    }
+
+    public String getAnalysisItemName() {
+        return analysisItemName;
+    }
+
+    public void setAnalysisItemName(String analysisItemName) {
+        this.analysisItemName = analysisItemName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getSystemDescription() {
+        return systemDescription;
+    }
+
+    public void setSystemDescription(String systemDescription) {
+        this.systemDescription = systemDescription;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
+}

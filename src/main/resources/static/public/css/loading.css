@@ -1,0 +1,263 @@
+/* ===================================================================================================
+    Loading
+=================================================================================================== */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 7777777;
+    width: 100%;
+    height: 100%;
+}
+#loading-overlay.background {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+.loader-container {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1060;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    outline: 0;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.hexagon-wrap {
+    display: flex;
+    height: 15%;
+    width: 15%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: rotate(-30deg);
+    opacity: 1;
+}
+.loader-container .hexagon {
+    position: relative;
+    width: 31px;
+    height: 26.6px;
+    background-color: rgba(255, 255, 255, 0);
+    margin: 13.3px 0;
+    border-left: solid 8px #b4b1b8;
+    border-right: solid 8px #b4b1b8;
+    float: left;
+    transition: all 0.3s ease-in-out;
+}
+
+.loader-container .hexagon.gray .inner-line:before,
+.loader-container .hexagon.blue .inner-line:before {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    width: 4.5px;
+    height: 6.3px;
+    -webkit-transform: scaleY(0.5774) rotate(-45deg);
+    -ms-transform: scaleY(0.5774) rotate(-45deg);
+    transform: scaleY(0.5774) rotate(-45deg);
+    background-color: rgba(255, 255, 255, 0);
+    border-radius: 5px;
+    opacity: 0.6;
+}
+
+.loader-container .hexagon.gray .inner-line:before {
+    bottom: 1px;
+    left: 9.9px;
+    border-bottom: solid 8px #e8e6eb;
+    border-left: solid 8px #e8e6eb;
+}
+.loader-container .hexagon.blue .inner-line:before {
+    top: 1px;
+    left: 9.9px;
+    border-top: solid 8px #e8e6eb;
+    border-right: solid 8px #e8e6eb;
+}
+
+.loader-container .hexagon .hexagon-line {
+    position: absolute;
+    background-color: #b4b1b8;
+    border-radius: 5px;
+}
+.loader-container .hexagon.hex2 .hexagon-line {
+    width: 9px;
+    height: 19px;
+    left: -14px;
+    bottom: -11px;
+    transform: rotate(59deg);
+}
+.loader-container .hexagon.hex3 .hexagon-line {
+    width: 9px;
+    height: 19px;
+    bottom: -11px;
+    left: -14px;
+    transform: rotate(60deg);
+}
+.loader-container .hexagon.hex4 .hexagon-line.line1 {
+    width: 9px;
+    height: 19px;
+    bottom: -25px;
+    left: 10px;
+}
+.loader-container .hexagon.hex4 .hexagon-line.line2 {
+    width: 19px;
+    height: 9px;
+    top: 23px;
+    right: -19px;
+    transform: rotate(30deg);
+}
+.loader-container .hexagon.hex4 .hexagon-line.line3 {
+    width: 19px;
+    height: 9px;
+    bottom: -6px;
+    left: -20px;
+    transform: rotate(-30deg);
+}
+.loader-container .hexagon .hexagon-line.blue {
+    background-color: #3488fc;
+}
+
+.loader-container .hexagon:before,
+.loader-container .hexagon:after {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    width: 21.5px;
+    height: 21.3px;
+    -webkit-transform: scaleY(0.5774) rotate(-45deg);
+    -ms-transform: scaleY(0.5774) rotate(-45deg);
+    transform: scaleY(0.5774) rotate(-45deg);
+    background-color: rgba(255, 255, 255, 0);
+    left: -1.1px;
+}
+
+.loader-container .hexagon:before {
+    top: -17px;
+    border-top: solid 12px #b4b1b8;
+    border-right: solid 12px #b4b1b8;
+}
+.loader-container .hexagon:after {
+    bottom: -17px;
+    border-bottom: solid 12px #b4b1b8;
+    border-left: solid 12px #b4b1b8;
+}
+
+.loader-container .hexagon.blue {
+    border-left: solid 8px #3488fc;
+    border-right: solid 8px #3488fc;
+    z-index: 2;
+}
+.loader-container .hexagon.blue:before {
+    border-top: solid 12px #3488fc;
+    border-right: solid 12px #3488fc;
+}
+.loader-container .hexagon.blue:after {
+    border-bottom: solid 12px #3488fc;
+    border-left: solid 12px #3488fc;
+}
+
+.loader-container .hexagon.hex1 {
+    -webkit-animation: hex1 4s ease 1.5s infinite both;
+    animation: hex1 4s ease 1.5s infinite;
+    opacity: 0;
+}
+.loader-container .hexagon.hex2 {
+    -webkit-animation: hex2 4s ease 0s infinite both;
+    animation: hex2 4s ease 0s infinite;
+    transform: rotate(60deg);
+    opacity: 0;
+}
+.loader-container .hexagon.hex3 {
+    margin-left: 20px;
+    -webkit-animation: hex3 4s ease 1s infinite both;
+    animation: hex3 4s ease 1s infinite;
+    transform: rotate(-120deg);
+}
+.loader-container .hexagon.hex4 {
+    -webkit-animation: hex4 4s ease 0.5s infinite both;
+    animation: hex4 4s ease 0.5s infinite;
+    opacity: 0;
+}
+
+@keyframes hex1 {
+    0%,
+    100% {
+        transform: translateY(-5px);
+        opacity: 0;
+    }
+    40%,
+    60% {
+        transform: translateY(20px);
+        opacity: 1;
+    }
+}
+
+@keyframes hex2 {
+    0%,
+    100% {
+        transform: translateX(-10px) rotate(60deg);
+        opacity: 0;
+    }
+    40.5%,
+    72.5% {
+        transform: translateX(13px) rotate(60deg);
+        opacity: 1;
+    }
+}
+
+@keyframes hex3 {
+    0%,
+    100% {
+        transform: translateX(0) rotate(-120deg);
+    }
+    30%,
+    65% {
+        transform: translateX(-13px) rotate(-120deg);
+    }
+}
+
+@keyframes hex4 {
+    0%,
+    100% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+    26%,
+    67% {
+        transform: translateY(-20px);
+        opacity: 1;
+    }
+}
+
+.loader-container .progress-wrap {
+    position: relative;
+    width: 250px;
+    height: 18px;
+    margin-top: 35px;
+    background-color: #b4b1b8;
+    border-radius: 10px;
+    overflow: hidden;
+    text-align: center;
+    color: #fff;
+    font-size: 11px;
+    line-height: 18px;
+}
+.loader-container .progress-wrap .progress-text {
+    position: absolute;
+    right: 9px;
+    /*top: 50%;*/
+    /*left: 50%;*/
+    /*transform: translate(-50%, -50%);*/
+}
+.loader-container .progress-wrap .progress-bar {
+    width: 0;
+    height: 100%;
+    background-color: #33d0ad;
+    /*animation: loading 10s infinite;*/
+}
+/*@keyframes loading {*/
+/*  0% { width: 0; }*/
+/*  100% { width: 100%; }*/
+/*}*/

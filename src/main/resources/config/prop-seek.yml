@@ -1,0 +1,10 @@
+analysis:
+  server:
+    url: http://43.200.240.163:8000 # 분석기 서버 URL
+  model-name: llama3_8b_seek_common_model
+  schedule:
+    enabled: true
+    request:
+      maxcnt: 3
+encryption:
+  password: PL408@fnw96

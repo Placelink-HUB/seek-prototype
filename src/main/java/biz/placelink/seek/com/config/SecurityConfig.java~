@@ -1,0 +1,87 @@
+package biz.placelink.seek.com.config;
+
+import biz.placelink.seek.com.security.CustomAccessDeniedHandler;
+import biz.placelink.seek.com.security.CustomAuthenticationEntryPoint;
+import biz.placelink.seek.com.security.CustomUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.security.config.annotation.web.configuration.UsernamePasswordAuthenticationFilter;
+import biz.placelink.seek.system.user.filter.MaskingFilter;
+
+/**
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *
+ *  수정일                수정자        수정내용
+ *
+ *  ------------       --------    ---------------------------
+ *
+ *  2025. 01. 17.      s2          최초생성
+ * </pre>
+ */
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig implements WebMvcConfigurer {
+
+    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
+
+    private final CustomAccessDeniedHandler accessDeniedHandler;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final MaskingFilter maskingFilter;
+
+    public SecurityConfig(CustomAccessDeniedHandler accessDeniedHandler, CustomAuthenticationEntryPoint authenticationEntryPoint, MaskingFilter maskingFilter) {
+        this.accessDeniedHandler = accessDeniedHandler;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.maskingFilter = maskingFilter;
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, CustomUserDetailsService userDetailsService) throws Exception {
+        http.addFilterBefore(maskingFilter, MaskingFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .accessDeniedHandler(accessDeniedHandler) // 권한이 없는 사용자 처리
+                        .authenticationEntryPoint(authenticationEntryPoint) // 미 인증 사용자 처리
+                )
+                .authorizeHttpRequests((authz) -> authz
+                        .requestMatchers("/", "/public/**", "/api/public/**", "/error").permitAll()
+                        .anyRequest().authenticated())
+
+                .userDetailsService(userDetailsService)
+                .formLogin((form) -> form.loginPage("/login").loginProcessingUrl("/login-process")
+                        .usernameParameter("id").passwordParameter("password")
+                        .defaultSuccessUrl("/", true)
+                        .failureHandler((request, response, exception) -> {
+                            logger.debug("로그인 실패 원인: {}", exception.getMessage());
+                            response.sendRedirect("/login?error=true");
+                        }).permitAll())
+                .logout(logout -> logout.logoutUrl("/logout") // 기본값이지만, 명시적으로 설정
+                        .logoutSuccessUrl("/?logout") // 로그아웃 성공 후 리다이렉트 URL
+                        .deleteCookies("JSESSIONID") // 로그아웃 시 삭제할 쿠키
+                        .invalidateHttpSession(true) // 세션 무효화
+                        .clearAuthentication(true) // 인증 정보 제거
+                        .permitAll() // 모든 사용자가 로그아웃 가능하도록 설정
+                )
+
+                .csrf(AbstractHttpConfigurer::disable) // POST 요청에 대한 CSRF 보호를 비활성화
+                //.csrf(csrf -> csrf.ignoringRequestMatchers("/api/url...")) //  특정 URL 만 POST 요청에 대한 CSRF 보호를 비활성화
+
+                //.httpBasic(Customizer.withDefaults());
+                .httpBasic(AbstractHttpConfigurer::disable); // Spring Security 의 기본 HTTP Basic 인증 팝업을 비활성화
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+}

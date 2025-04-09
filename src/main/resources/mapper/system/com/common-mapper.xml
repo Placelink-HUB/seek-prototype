@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common.sql">
+	
+	<sql id="orderBy">
+        <if test='orderByList neq null and orderByList.size > 0'>
+            <foreach collection="orderByList" item="orderBy" separator="," open="ORDER BY">
+                <choose>
+                    <when test='orderBy.column eq "CREATE_DT"'>
+                        CREATE_DT
+                    </when>
+                    <when test='orderBy.column eq "MODIFY_DT"'>
+                        MODIFY_DT
+                    </when>
+
+                    <!-- 기존 ORDER BY에 사용하지 않은 새로운 Column을 사용하는 경우 <otherwise> 앞에 <when>을 추가 -->
+                    <otherwise>
+                        #{orderBy.column}
+                    </otherwise>
+                </choose>
+                <choose>
+                    <when test='orderBy.sort neq null and orderBy.sort eq "DESC"'>
+                        DESC
+                    </when>
+                    <otherwise>
+                        ASC
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+	</sql>
+	
+	<sql id="paging_header">
+		SELECT pg_wp.*
+		FROM (
+	</sql>
+	
+	<sql id="paging_footer">
+		) pg_wp
+		<include refid="common.sql.orderBy"/>
+		<if test='schPageYn eq null or schPageYn neq "N"'>
+            LIMIT #{pageUnit} OFFSET #{firstIndex}
+		</if>
+	</sql>
+	
+	
+</mapper>

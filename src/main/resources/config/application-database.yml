@@ -1,0 +1,24 @@
+spring:
+#    datasource:
+#        url: jdbc:h2:mem:testdb
+#        driver-class-name: org.h2.Driver
+#        username: sa
+#        password:
+#    h2:
+#        console:
+#            enabled: true
+#    sql:
+#        init:
+#            mode: always
+#            schema-locations: classpath:db/sql/schema.h2.sql
+#            data-locations: classpath:db/sql/data.sql
+
+    datasource:
+        url: jdbc:postgresql://db.placelink.biz:5432/seek?currentSchema=seek&escapeSyntaxCallMode=call
+        username: placelink
+        password: placelink@408
+
+mybatis:
+    mapper-locations: classpath:mapper/**/*.xml
+    type-aliases-package: biz.placelink.seek.**.vo
+    config-location: classpath:config/mybatis-config.xml

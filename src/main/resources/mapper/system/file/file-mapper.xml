@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.system.file.service.FileMapper">
+
+	<select id="selectFileDetailList" resultType="fileDetailVO">
+		/** selectFileDetailList : 파일 상세 목록을 조회한다. */
+		SELECT
+			f.FILE_ID,
+			fd.FILE_DETAIL_ID,
+			f.FILE_SE_CCD,
+			cc1.COM_CD_NM AS FILE_SE_CCD_NM,
+			fd.FILE_NAME,
+			fd.FILE_EXT,
+			fd.FILE_SIZE,
+			fd.CONTENT_TYPE,
+			fd.SAVE_PATH,
+			fd.SAVE_NAME,
+			fd.SORT_SN,
+			f.CREATE_DT,
+			f.CREATE_UID,
+			f.MODIFY_DT,
+			f.MODIFY_UID
+		FROM TB_FILE f
+			JOIN TB_FILE_DETAIL fd
+			ON f.FILE_ID = fd.FILE_ID
+			LEFT JOIN TB_COM_CD cc1
+			ON f.FILE_SE_CCD = cc1.COM_CD
+			AND cc1.GROUP_CD = 'FILE_SE_CCD'
+		WHERE f.FILE_ID = #{fileId}
+			<if test='fileDetailId neq null and fileDetailId neq ""'>
+		    	AND fd.FILE_DETAIL_ID = #{fileDetailId}
+			</if>
+			<if test='sortSn neq null'>
+		    	AND fd.SORT_SN = #{sortSn}
+			</if>
+	</select>
+
+	<insert id="insertFile" parameterType="fileVO">
+		/** insertFile : 파일 정보를 등록한다. */
+		INSERT INTO TB_FILE (
+			FILE_ID,
+			FILE_SE_CCD,
+			CREATE_DT,
+			CREATE_UID,
+			MODIFY_DT,
+			MODIFY_UID
+		) VALUES (
+			#{fileId},
+			#{fileSeCcd},
+			NOW(),
+			#{createUid},
+			NOW(),
+			#{createUid}
+		)
+	</insert>
+
+	<insert id="insertFileDtl" parameterType="fileDetailVO">
+		/** insertFileDtl : 파일 상세 정보를 등록한다. */
+		<selectKey keyProperty="sortSn" resultType="integer" order="BEFORE">
+			SELECT COALESCE(MAX(SORT_SN), 0) + 1 AS SORT_SN
+			FROM TB_FILE_DETAIL
+			WHERE FILE_ID = #{fileId}
+		</selectKey>
+		INSERT INTO TB_FILE_DETAIL (
+			FILE_DETAIL_ID,
+			FILE_ID,
+			FILE_NAME,
+			FILE_EXT,
+			FILE_SIZE,
+			CONTENT_TYPE,
+			SAVE_PATH,
+			SAVE_NAME,
+			SORT_SN,
+			CREATE_DT,
+			CREATE_UID,
+			MODIFY_DT,
+			MODIFY_UID
+		) VALUES (
+			#{fileDetailId},
+			#{fileId},
+			#{fileName},
+			#{fileExt},
+			#{fileSize},
+			#{contentType},
+			#{savePath},
+			#{saveName},
+			#{sortSn},
+			NOW(),
+			#{createUid},
+			NOW(),
+			#{createUid}
+		)
+	</insert>
+
+	<insert id="insertFileList">
+		/** insertFileList : 파일 정보 목록을 등록한다.(중복 제거) */
+		<choose>
+			<when test='fileList neq null and fileList.size gt 0'>
+				INSERT INTO TB_FILE (
+					FILE_ID,
+					FILE_SE_CCD,
+					CREATE_DT,
+					CREATE_UID,
+					MODIFY_DT,
+					MODIFY_UID
+				)
+				SELECT DISTINCT
+					x.FILE_ID,
+					x.FILE_SE_CCD,
+					NOW(),
+					#{createUid},
+					NOW(),
+					#{createUid}
+				FROM (
+					<foreach collection="fileList" item="file" separator="UNION ALL">
+						SELECT
+							#{file.fileId} AS FILE_ID,
+							#{file.fileSeCcd} AS FILE_SE_CCD
+					</foreach>
+				) x
+			</when>
+			<otherwise>
+				SELECT 0
+			</otherwise>
+		</choose>
+	</insert>
+
+	<insert id="insertFileDetailList">
+		/** insertFileDetailList : 파일 상세 정보 목록을 등록한다. */
+		<choose>
+			<when test='fileDetailList neq null and fileDetailList.size > 0'>
+				INSERT INTO TB_FILE_DETAIL (
+					FILE_DETAIL_ID,
+					FILE_ID,
+					FILE_NAME,
+					FILE_EXT,
+					FILE_SIZE,
+					CONTENT_TYPE,
+					SAVE_PATH,
+					SAVE_NAME,
+					SORT_SN,
+					CREATE_DT,
+					CREATE_UID,
+					MODIFY_DT,
+					MODIFY_UID
+				) VALUES
+				<foreach collection="fileDetailList" item="file" separator=",">
+					(
+						#{file.fileDetailId},
+						#{file.fileId},
+						#{file.fileName},
+						#{file.fileExt},
+						#{file.fileSize},
+						#{file.contentType},
+						#{file.savePath},
+						#{file.saveName},
+						#{file.sortSn},
+						NOW(),
+						#{createUid},
+						NOW(),
+						#{createUid}
+						)
+				</foreach>
+			</when>
+			<otherwise>
+				SELECT 0
+			</otherwise>
+		</choose>
+	</insert>
+	
+</mapper>

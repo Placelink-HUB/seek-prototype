@@ -1,0 +1,78 @@
+package biz.placelink.aicas.analysis.controller;
+
+import biz.placelink.aicas.com.constants.Constants;
+import biz.placelink.aicas.analysis.service.TissueService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * <pre>
+ * << 개정이력(Modification Information) >>
+ *
+ *  수정일                수정자        수정내용
+ *
+ *  ------------       --------    ---------------------------
+ *
+ *  2025. 01. 09.      s2          최초생성
+ * </pre>
+ */
+@Controller
+public class TissueController {
+
+    private final TissueService tissueService;
+
+    public TissueController(TissueService tissueService) {
+        this.tissueService = tissueService;
+    }
+
+    /**
+     * Tissue 페이지
+     *
+     * @return Tissue 페이지 경로
+     */
+    @GetMapping(value = "/public/tissue")
+    public String tissue() {
+        return "analysis/tissue/tissue";
+    }
+
+    /**
+     * Tissue 페이지
+     *
+     * @return Tissue 페이지 경로
+     */
+    @GetMapping(value = "/public/tissue2")
+    public String tissue2() {
+        return "analysis/tissue/tissue2";
+    }
+
+    /**
+     * Tissue 파일 분석
+     *
+     * @return Tissue 분석 결과
+     */
+    @PostMapping(value = "/api/tissue/file/analysis")
+    public ResponseEntity<Map<String, Object>> fileAnalysis(@RequestParam("file") MultipartFile file) throws IOException {
+        Map<String, Object> response = new HashMap<>();
+
+        if (file.isEmpty()) {
+            response.put("message", "파일이 비어있습니다.");
+            return ResponseEntity.ok(response);
+        }
+
+        Map<String, Object> resultMap = null;
+
+        response.put("analysisData", resultMap);
+        response.put(Constants.RESULT_CODE, resultMap != null ? 1 : 0);
+
+        return ResponseEntity.ok(response);
+    }
+
+}

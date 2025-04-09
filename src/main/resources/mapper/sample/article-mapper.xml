@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.sample.service.ArticleMapper">
+
+    <sql id="sqlArticle">
+        SELECT
+            a.ARTICLE_ID,
+            a.ARTICLE_TYPE_CCD,
+            cc1.COM_CD_NM AS ARTICLE_TYPE_CCD_NM,
+            a.CONTENT,
+            a.FILE_ID,
+            a.CREATE_DT,
+            a.MODIFY_DT
+        FROM TB_ARTICLE a
+            LEFT JOIN SEEK_COM_CD cc1
+                ON a.ARTICLE_TYPE_CCD = cc1.COM_CD
+                AND cc1.GROUP_CD = 'ARTICLE_TYPE_CCD'
+        <where>
+            <if test='schArticleId neq null and schArticleId neq ""'>
+                AND a.ARTICLE_ID = #{schArticleId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectArticleList" parameterType="searchVO" resultType="articleVO">
+        /** selectArticleList : 게시글 목록을 조회한다. */
+        <include refid="common.sql.paging_header"/>
+        <include refid="sqlArticle"/>
+        <include refid="common.sql.paging_footer"/>
+    </select>
+
+    <select id="selectArticleListCount" parameterType="searchVO" resultType="integer">
+        /** selectArticleListCount : 게시글 목록 개수를 조회한다. */
+        SELECT COUNT(*)
+        FROM (
+            <include refid="sqlArticle"/>
+        )
+    </select>
+
+    <select id="selectArticle" resultType="articleVO">
+        /** selectArticle : 게시글을 조회한다. */
+        <include refid="sqlArticle"/>
+    </select>
+
+    <insert id="createArticle" parameterType="articleVO">
+        /** createArticle : 게시글을 등록한다. */
+        INSERT INTO TB_ARTICLE (
+            ARTICLE_ID,
+            ARTICLE_TYPE_CCD,
+            CONTENT,
+            FILE_ID,
+            CREATE_DT,
+            MODIFY_DT
+        ) VALUES (
+            #{articleId},
+            #{articleTypeCcd},
+            #{content},
+            #{fileId},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+</mapper>

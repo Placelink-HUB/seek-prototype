@@ -1,0 +1,38 @@
+package biz.placelink.aicas.analysis.vo;
+
+import biz.placelink.aicas.com.vo.SearchVO;
+
+public class SchAnalysisVO extends SearchVO {
+
+    /* 사용자 식별자 */
+    private String userUid;
+    /* 분석 구분 공통코드 */
+    private String analysisSeCcd;
+    /* 분석 상태 공통코드 */
+    private String analysisStatusCcd;
+
+    public String getUserUid() {
+        return userUid;
+    }
+
+    public void setUserUid(String userUid) {
+        this.userUid = userUid;
+    }
+
+    public String getAnalysisSeCcd() {
+        return analysisSeCcd;
+    }
+
+    public void setAnalysisSeCcd(String analysisSeCcd) {
+        this.analysisSeCcd = analysisSeCcd;
+    }
+
+    public String getAnalysisStatusCcd() {
+        return analysisStatusCcd;
+    }
+
+    public void setAnalysisStatusCcd(String analysisStatusCcd) {
+        this.analysisStatusCcd = analysisStatusCcd;
+    }
+
+}

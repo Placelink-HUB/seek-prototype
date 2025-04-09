@@ -1,0 +1,49 @@
+package biz.placelink.aicas.com.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
+
+import java.io.IOException;
+
+@Configuration
+public class SftpConfig {
+    @Value("${sftp.host}")
+    private String sftpHost;
+
+
+    private int sftpPort;
+
+    @Value("${sftp.user}")
+    private String sftpUser;
+
+
+    private String sftpPassword;
+
+
+    private String privateKeyPath;
+
+
+    private String privateKeyPassphrase;
+
+    @Bean
+    public DefaultSftpSessionFactory sftpSessionFactory() {
+        // ssh 키 생성시에는 PEM 형식으로 할 것
+        // ssh-keygen -p -m PEM -f /Users/eseun/.ssh/sftp_key
+        DefaultSftpSessionFactory factory = new DefaultSftpSessionFactory(true);
+        factory.setHost(sftpHost);
+        factory.setPort(sftpPort);
+        factory.setUser(sftpUser);
+        // factory.setPassword(sftpPassword); // 개인키 설정으로 사용할때는 개인키 확인을 위해 주석처리
+        factory.setAllowUnknownKeys(true);
+
+        // 개인키 설정
+        factory.setPrivateKey(new FileSystemResource(privateKeyPath));
+        // 개인키 암호 설정 (암호가 있는 경우)
+        factory.setPrivateKeyPassphrase(privateKeyPassphrase);
+
+        return factory;
+    }
+}

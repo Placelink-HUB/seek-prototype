@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.thymeleaf.org http://www.thymeleaf.org/xsd/thymeleaf-spring5.xsd"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>SEEK -Error</title>
+
+    <link rel="shortcut icon" th:href="@{/public/ico/favicon.ico}"/>
+    <link rel="stylesheet" th:href="@{/public/css/style.css}"/>
+    <link rel="stylesheet" th:href="@{/public/css/toast.css}"/>
+    <link rel="stylesheet" th:href="@{/public/css/loading.css}"/>
+    <link rel="stylesheet" th:href="@{/public/js/lib/flatpickr/flatpickr.min.css}"/>
+
+    <script th:src="@{/public/js/jquery-3.4.1.min.js}"></script>
+    <script th:src="@{/public/js/core.common.js}"></script>
+    <script th:src="@{/public/js/core.dropzone.js}"></script>
+    <script th:src="@{/public/js/s2.util.js}"></script>
+    <script th:src="@{/public/js/loading.js}"></script>
+    <script th:src="@{/public/js/lib/dayjs.min.js}"></script>
+    <script th:src="@{/public/js/lib/flatpickr/flatpickr.min.js}"></script>
+    <script th:src="@{/public/js/lib/flatpickr/ko.js}"></script>
+</head>
+<body class="hold-transition layout-fixed sidebar-collapse">
+    <div id="container">
+        <h1>오류가 발생했습니다.</h1>
+        <p>문제가 발생하여 요청을 처리할 수 없습니다.</p>
+        <p>오류 코드: <span th:text="${status}"></span></p>
+        <p>오류 메시지: <span th:text="${errorMessage}"></span></p>
+        <a href="/">홈으로 이동</a>
+    </div>
+</body>
+</html>

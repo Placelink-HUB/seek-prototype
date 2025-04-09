@@ -1,0 +1,23 @@
+spring:
+    config:
+        import:
+            - optional:classpath:config/@profiles.yml
+            - optional:classpath:config/application-database.yml
+            - optional:classpath:config/prop-seek.yml
+            - optional:classpath:config/prop-file.yml
+            - optional:classpath:config/prop-sftp.yml
+            - optional:classpath:config/fs.properties
+    application:
+        name: seek
+    thymeleaf:
+        prefix: classpath:/templates/
+        suffix: .html
+        mode: HTML
+        encoding: UTF-8
+        cache: false # Thymeleaf 템플릿 엔진의 캐싱 기능: 개발 중에는 false, 운영 중에는 true
+    servlet:
+        multipart:
+            max-file-size: 20MB # 개별 파일의 최대 크기
+            max-request-size: 50MB # 요청 전체의 최대 크기
+server:
+    port: 8887

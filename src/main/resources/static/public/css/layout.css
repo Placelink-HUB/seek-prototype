@@ -1,0 +1,105 @@
+/* ===================================================================================================
+    Scroll
+=================================================================================================== */
+::-webkit-scrollbar {
+	width: 0.438rem;
+	height: 0.438rem;
+}
+
+::-webkit-scrollbar-thumb {
+	/* background: #d9d9d9; 0110 */
+	background:#bfbfbf;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+a:active {
+	box-shadow: none !important;
+}
+
+/* ===================================================================================================
+     Wrapper
+=================================================================================================== */
+.content-wrapper {
+	min-height: calc(100% - 210px) !important;
+}
+.content-wrapper.contents-type2 {
+	background: #f2f5fa;
+}
+.wrapper {
+	max-width: 1920px;
+	margin: 0 auto;
+}
+
+.wrapper .content_wrap {
+	display: flex;
+	position: relative;
+	height: 100vh;
+	margin: 0 auto;
+	 box-sizing: border-box;
+	flex-direction: column;
+}
+
+/* ===================================================================================================
+    Header 영역
+=================================================================================================== */
+.header-wrapper {
+	position: sticky;
+	display: flex;
+	top: 0;
+	width: 100%;
+	flex-direction: column;
+	z-index: 2;
+}
+
+/* ===================================================================================================
+    Main 영역 
+=================================================================================================== */
+#main {
+	position: relative;
+    max-width: 1920px !important;
+    margin: 0 auto;
+	transition: .5s;
+	/*height: 100%;*/
+}
+/* ===================================================================================================
+    Sidebar 영역
+=================================================================================================== */
+.sidebar {
+	position: fixed;
+	display: flex;
+	top: 120px;
+	width: 170px;
+	height: 100%;
+	padding: 20px;
+	flex-direction: column;
+	background: #fff;
+	box-shadow:6px 0 6px -3px #0000000f;
+	transition: visibility 50ms ease-out;
+	visibility: hidden;
+	z-index: 1;
+}
+
+/* ===================================================================================================
+    Footer 영역
+=================================================================================================== */
+.footer-wrapper {
+	display: flex;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	height: 40px;
+	max-width: calc(1920px - 200px) !important;
+	padding: 25px 100px;
+	margin: 0 auto;
+	color: #a6a7aa;
+	background: #f2f5fa;
+	font-weight: 200;
+	align-items: center;
+}
+.footer-wrapper.full {
+	background: #aaa;
+	color: #fff;
+}

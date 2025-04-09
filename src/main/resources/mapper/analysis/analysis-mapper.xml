@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.analysis.service.AnalysisMapper">
+
+	<update id="updateAnalysis" parameterType="analysisVO">
+		/** updateAnalysis : 분석 정보를 수정한다. */
+		UPDATE SEEK_ANALYSIS
+		SET
+			<if test='analysisStatusCcd eq "COMPLETE" or analysisStatusCcd eq "ERROR"'>
+				ANALYSIS_END_DT = CASE
+					WHEN ANALYSIS_END_DT IS NULL THEN NOW()
+					ELSE ANALYSIS_END_DT
+				END,
+			</if>
+			ANALYSIS_STATUS_CCD = #{analysisStatusCcd},
+			ANALYSIS_MODEL = #{analysisModel},
+			ANALYSIS_CONTENT = #{analysisContent},
+			ANALYSIS_TIME = CASE WHEN #{analysisTime} THEN #{analysisTime} ELSE ANALYSIS_TIME END,
+			TOTAL_DETECTED_COUNT = #{totalDetectedCount}
+		WHERE ANALYSIS_ID = #{analysisId}
+	</update>
+
+	<update id="updateAnalysisTimeoutError">
+		/** updateAnalysisTimeoutError : 실행 시간이 초과된 분석을 오류 처리한다. */
+		UPDATE SEEK_ANALYSIS
+		SET
+			ANALYSIS_STATUS_CCD = 'ERROR',
+			ANALYSIS_END_DT = NOW()
+		WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
+			AND NOW() - MAKE_INTERVAL(MINS => #{maxMinutes}) > ANALYSIS_START_DT
+	</update>
+
+	<select id="selectAnalysisListToExecuted" parameterType="integer" resultType="analysisVO">
+		/** selectAnalysisListToExecuted : 실행하려는 분석 정보 목록을 조회한다. */
+		WITH PROCESSING AS (
+			/* 현재 진행중인 분석 요청을 포함하여 분석기 서버에 요청할 수 있는 최대(스레드) 수 만큼 조회 */
+			SELECT COALESCE(#{maxCount} - COUNT(1), 0) AS SEL_COUNT
+			FROM SEEK_ANALYSIS
+			WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
+		)
+		SELECT
+			ANALYSIS_ID,
+			ANALYSIS_TYPE_CCD,
+			ANALYSIS_STATUS_CCD,
+			TARGET_INFORMATION,
+			ANALYSIS_CONTENT,
+			ANALYSIS_START_DT,
+			ANALYSIS_END_DT,
+			ANALYSIS_TIME,
+			CREATE_DT
+		FROM SEEK_ANALYSIS
+		WHERE ANALYSIS_STATUS_CCD = 'WAIT'
+			AND ANALYSIS_TYPE_CCD = 'TEXT'
+		ORDER BY CREATE_DT
+		LIMIT (
+			SELECT
+				CASE
+					WHEN 0 > SEL_COUNT THEN 0
+					ELSE SEL_COUNT
+				END
+			FROM PROCESSING
+		)
+	</select>
+
+	<update id="updateAnalysisStatus">
+		/** updateAnalysisStatus : 분석 정보 상태를 수정한다. */
+		UPDATE SEEK_ANALYSIS
+		SET
+			<if test='analysisStatusCcd eq "PROCESSING"'>
+				ANALYSIS_START_DT = CASE
+					WHEN ANALYSIS_START_DT IS NULL THEN NOW()
+					ELSE ANALYSIS_START_DT
+				END,
+			</if>
+			<if test='analysisStatusCcd eq "COMPLETE" or analysisStatusCcd eq "ERROR"'>
+				ANALYSIS_END_DT = CASE
+					WHEN ANALYSIS_END_DT IS NULL THEN NOW()
+					ELSE ANALYSIS_END_DT
+				END,
+			</if>
+			ANALYSIS_STATUS_CCD = #{analysisStatusCcd}
+		WHERE ANALYSIS_ID = #{analysisId}
+	</update>
+
+	<insert id="insertAnalysisResultItems">
+		/** insertAnalysisResultItems : 분석 정보 상태를 수정한다. */
+		INSERT INTO SEEK_ANALYSIS_RESULT_ITEMS (
+			ANALYSIS_ID,
+			DETECTION_TYPE_CCD,
+			DETECTED_COUNT
+		) VALUES
+		<foreach collection="analysisResultItemList" item="item" separator=",">
+			(
+				#{item.analysisId},
+				#{item.detectionTypeCcd},
+				#{item.detectedCount}
+			)
+		</foreach>
+	</insert>
+
+</mapper>
