@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.s2.ext.util.S2EncryptionUtil;
+import kr.s2.ext.util.S2HashUtil;
 import kr.s2.ext.util.S2Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +137,7 @@ public class AnalysisService {
                                         String placeholder = item.path("placeholder").asText("");
                                         String targetText = pattern.matcher(placeholder).group(1);
                                         String escapeText = placeholder.replaceAll("[^\\p{Punct}]", "*"); // 특수문자를 제외한 모든 일반적인 문자를 *로 치환
-                                        String sensitiveInformationId = String.format("$PL{%s}", S2Util.getHashMD5(targetText));
+                                        String sensitiveInformationId = String.format("$PL{%s}", S2HashUtil.generateMD5(targetText));
                                         String severityCcd = item.path("severity").asText("");
                                         int hitCount = item.path("hit").asInt(0);
 
