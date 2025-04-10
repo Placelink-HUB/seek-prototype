@@ -160,9 +160,8 @@
                 if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_TEXT}]]') {
                     innerHtml = `<pre>${data.content}</pre>`;
                 } else if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_FILE}]]') {
-                    // innerHtml = `<img class="" th:src="@{{serverUrl}/file/image/view/{fileId}(serverUrl=${seekServerUrl},fileId=${data.fileId})}" alt="게시글 이미지"/>`;
-                    // innerHtml = `<img class="" src="/system/file/imageView.ar?fileId=${data.fileId})}" alt="게시글 이미지"/>`;
-                    innerHtml = `<img class="" src="/file/image/view/{fileId}(fileId=${data.fileId})}" alt="게시글 이미지"/>`;
+                    data.serverUrl = '';
+                    innerHtml = S2Util.s2Template('template_contents_file', data);
                 }
 
                 showModal(`
@@ -316,6 +315,11 @@
                 </div>
             </div>
         </div>
+
+        <script id="template_contents_file" type="text/template">
+            <img th:src="@{{{=serverUrl}}/file/image/view/{{=fileId}}}" alt="파일이미지"/>
+        </script>
+
     </div>
 </th:block>
 </html>
