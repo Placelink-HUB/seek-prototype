@@ -62,6 +62,24 @@
 		)
 	</select>
 
+	<select id="selectProcessingAnalysisList" parameterType="integer" resultType="analysisVO">
+		/** selectProcessingAnalysisList : 실행중인 분석 정보 목록을 조회한다. */
+		SELECT
+			ANALYSIS_ID,
+			ANALYSIS_TYPE_CCD,
+			ANALYSIS_STATUS_CCD,
+			TARGET_INFORMATION,
+			ANALYSIS_CONTENT,
+			ANALYSIS_START_DT,
+			ANALYSIS_END_DT,
+			ANALYSIS_TIME,
+			CREATE_DT
+		FROM SEEK_ANALYSIS
+		WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
+			AND ANALYSIS_TYPE_CCD = 'TEXT'
+		ORDER BY CREATE_DT
+	</select>
+
 	<update id="updateAnalysisStatus">
 		/** updateAnalysisStatus : 분석 정보 상태를 수정한다. */
 		UPDATE SEEK_ANALYSIS

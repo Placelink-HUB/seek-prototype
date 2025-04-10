@@ -42,30 +42,14 @@ public class AnalysisScheduler {
     @Value("${analysis.schedule.request.maxcnt}")
     private Integer analysisScheduleRequestMaxcnt;
 
-    @Value("${analysis.server.url}")
-    public String analyzerUrl;
-
     @Scheduled(fixedRate = 60000)
     public void analysis() {
         if (!analysisScheduleEnabled) {
             return;
         }
 
+        // 실행 시간이 초과된 분석을 오류 처리
         analysisService.updateAnalysisTimeoutError(30);
-
-        // 서버 상태 체크
-        /*
-        String resultStr = RestApiUtil.callApi(S2Util.joinPaths(analyzerUrl, "/page_check"), HttpMethod.GET);
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(resultStr);
-            if (jsonNode == null || !jsonNode.get("status").asText().equalsIgnoreCase("ok")) {
-                return;
-            }
-        } catch (JsonProcessingException e) {
-            return;
-        }
-        */
 
         // 스레드 풀 상태 체크
         int activeCount = analysisTaskExecutor.getActiveCount();
@@ -80,13 +64,21 @@ public class AnalysisScheduler {
             return;
         }
 
+        // 처리 중인 분석 목록 조회
+        List<AnalysisVO> processingAnalysisList = analysisService.selectProcessingAnalysisList();
+        if (processingAnalysisList != null) {
+            for (AnalysisVO analysis : processingAnalysisList) {
+                analysisService.asyncPollAnalysisResults(analysis.getAnalysisId());
+            }
+        }
+
         // 처리 가능한 만큼만 요청 조회
         int processableCount = Math.min(availableSlots, analysisScheduleRequestMaxcnt);
-        List<AnalysisVO> analysisList = analysisService.selectAnalysisListToExecuted(processableCount);
+        List<AnalysisVO> waitAnalysisList = analysisService.selectAnalysisListToExecuted(processableCount);
 
-        if (analysisList != null) {
-            for (AnalysisVO analysis : analysisList) {
-                analysisService.asyncContentAnalysis(analysis);
+        if (waitAnalysisList != null) {
+            for (AnalysisVO analysis : waitAnalysisList) {
+                analysisService.asyncAnalysisRequest(analysis);
             }
         }
     }

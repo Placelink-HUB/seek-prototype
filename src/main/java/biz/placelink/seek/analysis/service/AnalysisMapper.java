@@ -44,6 +44,13 @@ public interface AnalysisMapper {
     List<AnalysisVO> selectAnalysisListToExecuted(@Param("maxCount") int maxCount);
 
     /**
+     * 실행중인 분석 정보 목록을 조회한다.
+     *
+     * @return 분석 정보 목록
+     */
+    List<AnalysisVO> selectProcessingAnalysisList();
+
+    /**
      * 분석 정보 상태를 수정한다.
      *
      * @param analysisId        분석 ID
