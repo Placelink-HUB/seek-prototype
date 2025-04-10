@@ -15,7 +15,7 @@
 			ANALYSIS_STATUS_CCD = #{analysisStatusCcd},
 			ANALYSIS_MODEL = #{analysisModel},
 			ANALYSIS_CONTENT = #{analysisContent},
-			ANALYSIS_TIME = CASE WHEN #{analysisTime} THEN #{analysisTime} ELSE ANALYSIS_TIME END,
+			ANALYSIS_TIME = CASE WHEN #{analysisTime} IS NOT NULL THEN #{analysisTime} ELSE ANALYSIS_TIME END,
 			TOTAL_DETECTED_COUNT = #{totalDetectedCount}
 		WHERE ANALYSIS_ID = #{analysisId}
 	</update>
@@ -115,5 +115,37 @@
 			)
 		</foreach>
 	</insert>
+
+	<insert id="insertAnalysisError" parameterType="analysisErrorVO">
+		/** insertAnalysisError : 분석 오류 정보를 등록한다. */
+		<selectKey keyProperty="analysisErrorSn" resultType="integer" order="BEFORE">
+			SELECT COALESCE(MAX(ANALYSIS_ERROR_SN), 0) + 1 AS ANALYSIS_ERROR_SN
+			FROM SEEK_ANALYSIS_ERROR
+			WHERE ANALYSIS_ID = #{analysisId}
+		</selectKey>
+		INSERT INTO SEEK_ANALYSIS_ERROR (
+			ANALYSIS_ID,
+			ANALYSIS_ERROR_SN,
+			ANALYSIS_DATA,
+			ERROR_MESSAGE,
+			EXCLUSION_DT,
+			CREATE_DT
+		) VALUES (
+			#{analysisId},
+			#{analysisErrorSn},
+			#{analysisData},
+			#{errorMessage},
+			NULL,
+			NOW()
+		)
+	</insert>
+
+	<update id="updateAnalysisErrorExclusion">
+		/** updateAnalysisErrorExclusion : 분석 오류를 배제 처리한다. */
+		UPDATE SEEK_ANALYSIS_ERROR
+		SET EXCLUSION_DT = NOW()
+		WHERE ANALYSIS_ID = #{analysisId}
+			AND EXCLUSION_DT IS NULL
+	</update>
 
 </mapper>

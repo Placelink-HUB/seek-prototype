@@ -1,13 +1,17 @@
 package biz.placelink.seek.analysis.service;
 
+import biz.placelink.seek.analysis.vo.AnalysisErrorVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultItemVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.RestApiUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import kr.s2.ext.exception.S2Exception;
 import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2HashUtil;
 import kr.s2.ext.util.S2Util;
@@ -17,12 +21,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -117,18 +123,20 @@ public class AnalysisService {
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
     public void asyncPollAnalysisResults(String analysisId) {
         if (S2Util.isNotEmpty(analysisId)) {
+            String analysisData = "";
+
             try {
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisModelName));
 
                 JsonNode analysisJsonData = null;
 
-                String analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.GET, 6000000);
+                analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.GET, 6000000);
 
                 if (S2Util.isNotEmpty(analysisData)) {
                     logger.debug("[API 결과 호출 성공] url: {}, analysisId: {}, analysisData: {}", analysisSeServerUrl, analysisId, analysisData);
 
                     try {
-                        ObjectMapper objectMapper = new ObjectMapper();
+                        ObjectMapper objectMapper = JsonMapper.builder().enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS).build();
                         analysisJsonData = objectMapper.readTree(analysisData);
                     } catch (JsonProcessingException e) {
                         logger.error("[API 결과 호출 데이터 파싱오류] analysisId: {} analysisData: {}, message: {}", analysisId, analysisData, e.getMessage(), e);
@@ -136,7 +144,7 @@ public class AnalysisService {
                 }
 
                 if (analysisJsonData != null && analysisJsonData.path("status").asText("").equalsIgnoreCase("success")) {
-                    int totalHitCount = analysisJsonData.path("total-hit").asInt(0);
+                    int totalHitCount = analysisJsonData.path("total_hit").asInt(0);
                     if (totalHitCount > 0) {
                         String analysisContent = analysisJsonData.path("content").asText("");
                         long latency = analysisJsonData.path("latency").asLong(0);
@@ -151,8 +159,14 @@ public class AnalysisService {
                         if (items.isArray()) {
                             for (JsonNode item : items) {
                                 String placeholder = item.path("placeholder").asText("");
-                                String targetText = pattern.matcher(placeholder).group(1);
-                                String escapeText = placeholder.replaceAll("[^\\p{Punct}]", "*"); // 특수문자를 제외한 모든 일반적인 문자를 *로 치환
+
+                                Matcher matcher = pattern.matcher(placeholder);
+                                if (!matcher.find()) {
+                                    throw new S2Exception("대상 문자열을 찾을 수 없습니다. [" + placeholder + "]");
+                                }
+
+                                String targetText = matcher.group(1);
+                                String escapeText = targetText.replaceAll("[^\\p{Punct}]", "*"); // 특수문자를 제외한 모든 일반적인 문자를 *로 치환
                                 String sensitiveInformationId = String.format("$PL{%s}", S2HashUtil.generateMD5(targetText));
                                 String severityCcd = item.path("severity").asText("");
                                 int hitCount = item.path("hit").asInt(0);
@@ -222,6 +236,7 @@ public class AnalysisService {
                     }
                 }
             } catch (Exception e) {
+                this.insertAnalysisErrorWithNewTransaction(analysisId, analysisData, e.getMessage() + "\n" + S2Exception.getStackTrace(e));
                 logger.error("asyncPollAnalysisResults Error : {}", e.getMessage(), e);
             }
         }
@@ -265,6 +280,23 @@ public class AnalysisService {
      */
     public int updateAnalysisStatus(String analysisId, String analysisStatusCcd) {
         return analysisMapper.updateAnalysisStatus(analysisId, analysisStatusCcd);
+    }
+
+    /**
+     * 분석 오류를 등록한다.
+     *
+     * @param analysisId   분석 ID
+     * @param analysisData 분석 데이터
+     * @param errorMessage 오류 메시지
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void insertAnalysisErrorWithNewTransaction(String analysisId, String analysisData, String errorMessage) {
+        analysisMapper.updateAnalysisErrorExclusion(analysisId);
+        AnalysisErrorVO paramVO = new AnalysisErrorVO();
+        paramVO.setAnalysisId(analysisId);
+        paramVO.setAnalysisData(analysisData);
+        paramVO.setErrorMessage(errorMessage);
+        analysisMapper.insertAnalysisError(paramVO);
     }
 
 }

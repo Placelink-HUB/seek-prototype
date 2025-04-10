@@ -1,5 +1,6 @@
 package biz.placelink.seek.analysis.service;
 
+import biz.placelink.seek.analysis.vo.AnalysisErrorVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultItemVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -66,5 +67,20 @@ public interface AnalysisMapper {
      * @return 등록 개수
      */
     int insertAnalysisResultItems(@Param("analysisResultItemList") List<AnalysisResultItemVO> analysisResultItemList);
+
+    /**
+     * 분석 오류 정보를 등록한다.
+     *
+     * @param paramVO 오류 정보
+     */
+    void insertAnalysisError(AnalysisErrorVO paramVO);
+
+    /**
+     * 분석 오류를 배제 처리한다.
+     *
+     * @param analysisId 분석 ID
+     * @return 처리 개수
+     */
+    int updateAnalysisErrorExclusion(@Param("analysisId") String analysisId);
 
 }
