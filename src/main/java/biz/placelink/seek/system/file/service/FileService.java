@@ -88,6 +88,16 @@ public class FileService {
         return fileMapper.selectFileDetailList(fileId, null, sortSn);
     }
 
+    /**
+     * 파일 상세를 조회한다.
+     *
+     * @param fileId 파일 ID
+     * @return 파일 상세 정보
+     */
+    public FileDetailVO selectFileDetail(String fileId) {
+        return fileMapper.selectFileDetail(fileId);
+    }
+
 
     /**
      * 파일 정보를 등록한다.
