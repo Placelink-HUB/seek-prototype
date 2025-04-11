@@ -68,7 +68,7 @@ public class AnalysisScheduler {
         List<AnalysisVO> processingAnalysisList = analysisService.selectProcessingAnalysisList();
         if (processingAnalysisList != null) {
             for (AnalysisVO analysis : processingAnalysisList) {
-                analysisService.asyncPollAnalysisResults(analysis.getAnalysisId());
+                analysisService.asyncPollAnalysisResults(analysis);
             }
         }
 

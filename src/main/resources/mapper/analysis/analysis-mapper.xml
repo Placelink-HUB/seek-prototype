@@ -148,4 +148,11 @@
 			AND EXCLUSION_DT IS NULL
 	</update>
 
+	<update id="updateAnalysisTargetColumnDynamically">
+		/** updateAnalysisTargetColumnDynamically : 분석 대상 컬럼을 동적으로 수정한다. */
+		UPDATE ${tableName}
+		SET ${columnName} = #{newValue}
+		WHERE ${columnName} = #{oldValue}
+	</update>
+
 </mapper>

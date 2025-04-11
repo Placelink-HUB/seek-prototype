@@ -83,4 +83,15 @@ public interface AnalysisMapper {
      */
     int updateAnalysisErrorExclusion(@Param("analysisId") String analysisId);
 
+    /**
+     * 분석 대상 컬럼을 동적으로 수정한다.
+     *
+     * @param tableName  테이블 명
+     * @param columnName 컬럼 명
+     * @param oldValue   기존 값
+     * @param newValue   변경 값
+     * @return 처리 개수
+     */
+    int updateAnalysisTargetColumnDynamically(@Param("tableName") String tableName, @Param("columnName") String columnName, @Param("oldValue") String oldValue, @Param("newValue") String newValue);
+
 }
