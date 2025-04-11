@@ -180,6 +180,19 @@
             });
         }
 
+        function downloadFile(articleId) {
+            S2Util.fetch(
+                '/public/sample/downloadFile.ar',
+                {
+                    method: 'POST',
+                    responseType: 'blob',
+                    articleId: articleId,
+                },
+                function () {
+                    S2Util.toasts('다운로드 성공하였습니다.');
+                }
+            );
+        }
 
         let g_uploadFile = null;
         function initDropZone() {
@@ -298,7 +311,8 @@
                                 <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">파일 보기</button>
                             </td>
                             <td>
-                                <button class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">원본보기</button>
+                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">원본보기</button>
+                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
                             </td>
                         </tr>
                     </tbody>

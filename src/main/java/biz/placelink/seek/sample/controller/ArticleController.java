@@ -6,6 +6,10 @@ import biz.placelink.seek.com.vo.SearchVO;
 import biz.placelink.seek.sample.service.ArticleService;
 import biz.placelink.seek.sample.vo.ArticleVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
+import biz.placelink.seek.system.file.service.FileService;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
+import kr.s2.ext.exception.S2RuntimeException;
+import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2Util;
 import kr.s2.ext.util.vo.S2Field;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,9 +42,13 @@ import java.util.Map;
 public class ArticleController {
 
     private final ArticleService articleService;
+    private final FileService fileService;
+    private final FileManager fileManager;
 
-    public ArticleController(ArticleService articleService) {
+    public ArticleController(ArticleService articleService, FileService fileService, FileManager fileManager) {
         this.articleService = articleService;
+        this.fileService = fileService;
+        this.fileManager = fileManager;
     }
 
     @Value("${fs.file.ext}")
@@ -111,5 +119,29 @@ public class ArticleController {
         response.put("articleData", articleService.selectArticle(articleId));
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 게시글 파일 다운로드
+     *
+     * @param articleId 게시글 ID
+     * @param model      모델 맵
+     * @return 다운로드 뷰 이름
+     */
+    @PostMapping(value = "/public/sample/downloadFile.ar")
+    public String downloadFile(@RequestParam String articleId, ModelMap model) {
+        ArticleVO articleVO = articleService.selectArticle(articleId);
+
+        FileDetailVO fileInfo = fileService.selectFileDetail(articleVO.getFileId());
+        if (fileInfo == null) {
+            throw new S2RuntimeException("파일이 비어있습니다");
+        }
+
+        model.put("fileName", fileInfo.getFileFullNm());
+        model.put("fileData", fileManager.readFile(fileInfo.getSavePath(), fileInfo.getSaveName()));
+        model.put("fileExt", fileInfo.getFileExt());
+        model.put("contentType", fileInfo.getContentType());
+        model.addAttribute(Constants.RESULT_CODE, 1);
+        return "downloadView";
     }
 }

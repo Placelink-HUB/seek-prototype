@@ -23,7 +23,7 @@
 		FROM TB_FILE f
 			JOIN TB_FILE_DETAIL fd
 			ON f.FILE_ID = fd.FILE_ID
-			LEFT JOIN TB_COM_CD cc1
+			LEFT JOIN SEEK_COM_CD cc1
 			ON f.FILE_SE_CCD = cc1.COM_CD
 			AND cc1.GROUP_CD = 'FILE_SE_CCD'
 		WHERE f.FILE_ID = #{fileId}
@@ -33,6 +33,33 @@
 			<if test='sortSn neq null'>
 		    	AND fd.SORT_SN = #{sortSn}
 			</if>
+	</select>
+
+	<select id="selectFileDetail" resultType="fileDetailVO">
+		/** selectFileDetail : 파일 상세를 조회한다. */
+		SELECT
+			f.FILE_ID,
+			fd.FILE_DETAIL_ID,
+			f.FILE_SE_CCD,
+			cc1.COM_CD_NM AS FILE_SE_CCD_NM,
+			fd.FILE_NAME,
+			fd.FILE_EXT,
+			fd.FILE_SIZE,
+			fd.CONTENT_TYPE,
+			fd.SAVE_PATH,
+			fd.SAVE_NAME,
+			fd.SORT_SN,
+			f.CREATE_DT,
+			f.CREATE_UID,
+			f.MODIFY_DT,
+			f.MODIFY_UID
+		FROM TB_FILE f
+			JOIN TB_FILE_DETAIL fd
+				ON f.FILE_ID = fd.FILE_ID
+			LEFT JOIN SEEK_COM_CD cc1
+				ON f.FILE_SE_CCD = cc1.COM_CD
+				AND cc1.GROUP_CD = 'FILE_SE_CCD'
+		WHERE f.FILE_ID = #{fileId}
 	</select>
 
 	<insert id="insertFile" parameterType="fileVO">
