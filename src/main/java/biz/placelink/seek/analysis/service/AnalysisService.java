@@ -240,7 +240,7 @@ public class AnalysisService {
 
                             if (S2Util.isNotEmpty(targetInformation)) {
                                 String[] targetInformationArr = targetInformation.split("\\.");
-                                if (targetInformationArr.length == 2) {
+                                if (targetInformationArr.length >= 2) {
                                     // 대상 콘텐츠 테이블의 컬럼에 마스킹 정보가 반영된 콘텐츠를 동적으로 수정한다.
                                     this.updateAnalysisTargetColumnDynamically(targetInformationArr[0], targetInformationArr[1], String.format("$WT{%s}", analysisId), analysisContent);
                                 }
