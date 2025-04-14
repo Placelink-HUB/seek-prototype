@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -876.8215,
-    "scrollLeft": -721.7179,
+    "scrollTop": -677,
+    "scrollLeft": -406.7179,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -1673,18 +1673,18 @@
         "tableId": "qSoCBUoS4IKD1HkHLLfux",
         "name": "SENSITIVE_INFORMATION_ID",
         "comment": "민감_정보_ID",
-        "dataType": "VARCHAR(256)",
+        "dataType": "CHAR(37)",
         "default": "",
         "options": 10,
         "ui": {
           "keys": 1,
           "widthName": 157,
           "widthComment": 72,
-          "widthDataType": 81,
+          "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1743754069512,
+          "updateAt": 1744594972229,
           "createAt": 1743753882333
         }
       },
@@ -1893,18 +1893,18 @@
         "tableId": "RNWKiTMPrzg4A7LNeU9Pk",
         "name": "SENSITIVE_INFORMATION_ID",
         "comment": "민감_정보_ID",
-        "dataType": "VARCHAR(256)",
+        "dataType": "CHAR(37)",
         "default": "",
         "options": 10,
         "ui": {
           "keys": 3,
           "widthName": 157,
           "widthComment": 72,
-          "widthDataType": 81,
+          "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1744004977454,
+          "updateAt": 1744594972229,
           "createAt": 1744004519417
         }
       },
@@ -2304,7 +2304,7 @@
           "columnIds": [
             "nsKRSjk6hZzipC_IYb5Yf"
           ],
-          "x": 719.1276,
+          "x": 713.1276,
           "y": 1182.2127,
           "direction": 2
         },
@@ -3123,7 +3123,7 @@
       -1,
       {
         "name": 1743753904042,
-        "dataType": 1743754051701,
+        "dataType": 1744594972229,
         "options(notNull)": 1743754052779,
         "options(primaryKey)": 1743754057412,
         "comment": 1743754069511
@@ -3263,7 +3263,7 @@
       {
         "options(notNull)": 1744004519416,
         "name": 1744004519416,
-        "dataType": 1744004519416,
+        "dataType": 1744594972229,
         "default": 1744004519416,
         "comment": 1744004519416,
         "options(primaryKey)": 1744004977454
