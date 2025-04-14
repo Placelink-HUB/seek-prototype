@@ -177,6 +177,8 @@ public class AnalysisService {
                             String severityCcd = item.path("severity").asText("");
                             int hitCount = item.path("hit").asInt(0);
 
+                            analysisContent = analysisContent.replace(String.format("$PL{%s}", targetText), sensitiveInformationId);
+
                             JsonNode violations = item.get("violation");
                             if (violations.isArray()) {
                                 for (JsonNode violation : violations) {
