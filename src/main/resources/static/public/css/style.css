@@ -198,6 +198,18 @@ table caption {
     width: 100%;
     height: 35%;
 }
+.risk-inspection-wrap .detail_contents {
+    height: 100%;
+    font-size: 15px;
+    line-height: 22.4px;
+    letter-spacing: -0.02em;
+    text-align: left;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin: 3px;
+    white-space: pre-wrap;
+    font-family: 'Pretendard', sans-serif;
+}
 .risk-inspection-wrap .title {
     margin-bottom: 10px;
     font-size: 18px;
