@@ -147,11 +147,7 @@ public class AnalysisService {
 
                 if (analysisJsonData != null && analysisJsonData.path("status").asText("").equalsIgnoreCase("success")) {
                     int totalHitCount = analysisJsonData.path("total_hit").asInt(0);
-                    if (totalHitCount == 0) {
-                        // 완료처리
-                        return;
-                    }
-                    
+
                     String analysisContent = analysisJsonData.path("content").asText("");
                     long latency = analysisJsonData.path("latency").asLong(0);
                     JsonNode items = analysisJsonData.get("item");
@@ -206,16 +202,16 @@ public class AnalysisService {
                         }
                     }
 
-                    if (!sensitiveInformationList.isEmpty()) {
-                        AnalysisVO analysisResult = new AnalysisVO();
-                        analysisResult.setAnalysisId(analysisId);
-                        analysisResult.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_COMPLETE);
-                        analysisResult.setAnalysisModel(analysisModelName);
-                        analysisResult.setAnalysisContent(analysisContent);
-                        analysisResult.setAnalysisTime(latency);
-                        analysisResult.setTotalDetectedCount(totalHitCount);
+                    AnalysisVO analysisResult = new AnalysisVO();
+                    analysisResult.setAnalysisId(analysisId);
+                    analysisResult.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_COMPLETE);
+                    analysisResult.setAnalysisModel(analysisModelName);
+                    analysisResult.setAnalysisContent(analysisContent);
+                    analysisResult.setAnalysisTime(latency);
+                    analysisResult.setTotalDetectedCount(totalHitCount);
 
-                        if (analysisMapper.updateAnalysis(analysisResult) > 0) {
+                    if (analysisMapper.updateAnalysis(analysisResult) > 0) {
+                        if (!sensitiveInformationList.isEmpty()) {
                             List<AnalysisResultItemVO> analysisResultItemList = new ArrayList<>();
 
                             for (String key : analysisResultItemsMap.keySet()) {
@@ -239,13 +235,13 @@ public class AnalysisService {
                             if (!sensitiveInformationTypeList.isEmpty()) {
                                 sensitiveInformationService.insertSensitiveInformationTypes(sensitiveInformationTypeList);
                             }
+                        }
 
-                            if (S2Util.isNotEmpty(targetInformation)) {
-                                String[] targetInformationArr = targetInformation.split("\\.");
-                                if (targetInformationArr.length >= 2) {
-                                    // 대상 콘텐츠 테이블의 컬럼에 마스킹 정보가 반영된 콘텐츠를 동적으로 수정한다.
-                                    this.updateAnalysisTargetColumnDynamically(targetInformationArr[0], targetInformationArr[1], String.format("$WT{%s}", analysisId), analysisContent);
-                                }
+                        if (S2Util.isNotEmpty(targetInformation)) {
+                            String[] targetInformationArr = targetInformation.split("\\.");
+                            if (targetInformationArr.length >= 2) {
+                                // 대상 콘텐츠 테이블의 컬럼에 마스킹 정보가 반영된 콘텐츠를 동적으로 수정한다.
+                                this.updateAnalysisTargetColumnDynamically(targetInformationArr[0], targetInformationArr[1], String.format("$WT{%s}", analysisId), analysisContent);
                             }
                         }
                     }
