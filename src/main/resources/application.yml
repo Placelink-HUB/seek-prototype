@@ -20,4 +20,4 @@ spring:
             max-file-size: 20MB # 개별 파일의 최대 크기
             max-request-size: 50MB # 요청 전체의 최대 크기
 server:
-    port: 8887
+    port: 8080

@@ -33,6 +33,8 @@
 </th:block>
 <th:block layout:fragment="bodyScript">
     <script type="text/javascript">
+        let isRegistering = false;
+
         document.addEventListener('DOMContentLoaded', () => {
         });
 
@@ -117,7 +119,8 @@
 
                 // 등록 버튼 클릭 이벤트 처리
                 document.body.addEventListener('click', (event) => {
-                    if (event.target.classList.contains('create-article-btn')) {
+                    if (event.target.classList.contains('create-article-btn') && !isRegistering) {
+                        isRegistering = true;
                         const activeTab = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
                         if (activeTab === 'tab-text') { // 글 등록
                             const desc = document.querySelector(`${modalSelector} [name=desc]`);
@@ -148,8 +151,8 @@
             });
         }
 
-        function openModalArticleContents(articleId) {
-            S2Util.fetch(`/public/sample/article-info`, {
+        function openModalArticleContents(articleId, seekMode) {
+            S2Util.fetch(`/public/sample/article-info` + (seekMode ? `?seek_mode=${seekMode}` : ''), {
                 method: 'get',
                 dataType: 'json',
                 articleId: articleId
@@ -311,7 +314,7 @@
                                 <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
                             </td>
                             <td>
-                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">원본보기</button>
+                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], 'origin');">원본보기</button>
                                 <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
                             </td>
                         </tr>

@@ -47,7 +47,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                         .authenticationEntryPoint(authenticationEntryPoint) // 미 인증 사용자 처리
                 )
                 .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/", "/public/**", "/api/public/**", "/error").permitAll()
+                        .requestMatchers("/", "/console/**", "/public/**", "/api/public/**", "/error").permitAll()
                         .anyRequest().authenticated())
 
                 .userDetailsService(userDetailsService)
