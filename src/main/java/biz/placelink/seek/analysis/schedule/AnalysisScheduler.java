@@ -28,10 +28,12 @@ public class AnalysisScheduler {
 
     private static final Logger logger = LoggerFactory.getLogger(AnalysisScheduler.class);
 
+    private final AnalysisRequestStatus analysisRequestStatus;
     private final AnalysisService analysisService;
     private final ThreadPoolTaskExecutor analysisTaskExecutor;
 
-    public AnalysisScheduler(AnalysisService analysisService, @Qualifier("analysisTaskExecutor") ThreadPoolTaskExecutor analysisTaskExecutor) {
+    public AnalysisScheduler(AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, @Qualifier("analysisTaskExecutor") ThreadPoolTaskExecutor analysisTaskExecutor) {
+        this.analysisRequestStatus = analysisRequestStatus;
         this.analysisService = analysisService;
         this.analysisTaskExecutor = analysisTaskExecutor;
     }
@@ -43,7 +45,7 @@ public class AnalysisScheduler {
     private Integer analysisScheduleRequestMaxcnt;
 
     @Scheduled(fixedRate = 60000)
-    public void analysis() {
+    public void analysisRequest() {
         if (!analysisScheduleEnabled) {
             return;
         }
@@ -64,14 +66,6 @@ public class AnalysisScheduler {
             return;
         }
 
-        // 처리 중인 분석 목록 조회
-        List<AnalysisVO> processingAnalysisList = analysisService.selectProcessingAnalysisList();
-        if (processingAnalysisList != null) {
-            for (AnalysisVO analysis : processingAnalysisList) {
-                analysisService.asyncPollAnalysisResults(analysis);
-            }
-        }
-
         // 처리 가능한 만큼만 요청 조회
         int processableCount = Math.min(availableSlots, analysisScheduleRequestMaxcnt);
         List<AnalysisVO> waitAnalysisList = analysisService.selectAnalysisListToExecuted(processableCount);
@@ -81,6 +75,18 @@ public class AnalysisScheduler {
                 analysisService.asyncAnalysisRequest(analysis);
             }
         }
+
+        // 처리 중인 분석 목록 등록
+        analysisRequestStatus.add(analysisService.selectProcessingAnalysisList());
+    }
+
+    @Scheduled(fixedRate = 2000)
+    public void analysisResult() {
+        AnalysisVO analysis = null;
+        do {
+            analysis = analysisRequestStatus.get();
+            analysisService.asyncPollAnalysisResults(analysis);
+        } while (analysis != null);
     }
 
 }

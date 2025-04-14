@@ -29,6 +29,9 @@ public class AnalysisVO extends DefaultVO {
     /* 전체 검출 개수 */
     private Integer totalDetectedCount;
 
+    /* 요청 상태 */
+    private boolean isRequesting = false;
+
     public String getAnalysisId() {
         return analysisId;
     }
@@ -125,4 +128,11 @@ public class AnalysisVO extends DefaultVO {
         this.totalDetectedCount = totalDetectedCount;
     }
 
+    public boolean isRequesting() {
+        return isRequesting;
+    }
+
+    public void setRequesting(boolean requesting) {
+        isRequesting = requesting;
+    }
 }

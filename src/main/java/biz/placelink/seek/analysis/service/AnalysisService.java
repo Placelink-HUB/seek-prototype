@@ -1,5 +1,6 @@
 package biz.placelink.seek.analysis.service;
 
+import biz.placelink.seek.analysis.schedule.AnalysisRequestStatus;
 import biz.placelink.seek.analysis.vo.AnalysisErrorVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultItemVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
@@ -15,7 +16,6 @@ import kr.s2.ext.exception.S2Exception;
 import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2HashUtil;
 import kr.s2.ext.util.S2Util;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,11 +49,12 @@ public class AnalysisService {
 
     private static final Logger logger = LoggerFactory.getLogger(AnalysisService.class);
 
+    private final AnalysisRequestStatus analysisRequestStatus;
     private final AnalysisMapper analysisMapper;
-
     private final SensitiveInformationService sensitiveInformationService;
 
-    public AnalysisService(AnalysisMapper analysisMapper, SensitiveInformationService sensitiveInformationService) {
+    public AnalysisService(AnalysisRequestStatus analysisRequestStatus, AnalysisMapper analysisMapper, SensitiveInformationService sensitiveInformationService) {
+        this.analysisRequestStatus = analysisRequestStatus;
         this.analysisMapper = analysisMapper;
         this.sensitiveInformationService = sensitiveInformationService;
     }
@@ -118,7 +119,8 @@ public class AnalysisService {
     /**
      * 분석결과를 비동기 폴링하여 처리한다.
      *
-     * @param analysisRequest 분석      */
+     * @param analysisRequest 분석
+     */
     @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
     public void asyncPollAnalysisResults(AnalysisVO analysisRequest) {
@@ -126,6 +128,8 @@ public class AnalysisService {
             String analysisId = analysisRequest.getAnalysisId();
             String targetInformation = analysisRequest.getTargetInformation();
             String analysisData = "";
+
+            analysisRequestStatus.setRequestStatus(analysisId, true);
 
             try {
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisModelName));
@@ -244,7 +248,11 @@ public class AnalysisService {
                                 this.updateAnalysisTargetColumnDynamically(targetInformationArr[0], targetInformationArr[1], String.format("$WT{%s}", analysisId), analysisContent);
                             }
                         }
+
+                        analysisRequestStatus.remove(analysisId);
                     }
+                } else {
+                    analysisRequestStatus.setRequestStatus(analysisId, false);
                 }
             } catch (Exception e) {
                 this.insertAnalysisErrorWithNewTransaction(analysisId, analysisData, e.getMessage() + "\n" + S2Exception.getStackTrace(e));
