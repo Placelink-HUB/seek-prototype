@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.analysis.service.AnalysisMapper">
 
-	<update id="updateAnalysis" parameterType="analysisVO">
+	<update id="updateAnalysis" parameterType="analysisDetailVO">
 		/** updateAnalysis : 분석 정보를 수정한다. */
 		UPDATE SEEK_ANALYSIS
 		SET
@@ -14,9 +14,15 @@
 			</if>
 			ANALYSIS_STATUS_CCD = #{analysisStatusCcd},
 			ANALYSIS_MODEL = #{analysisModel},
-			ANALYSIS_CONTENT = #{analysisContent},
 			ANALYSIS_TIME = CASE WHEN #{analysisTime} IS NOT NULL THEN #{analysisTime} ELSE ANALYSIS_TIME END,
 			TOTAL_DETECTED_COUNT = #{totalDetectedCount}
+		WHERE ANALYSIS_ID = #{analysisId}
+	</update>
+
+	<update id="updateAnalysisDatabaseContent">
+		/** updateAnalysisDatabaseContent : 분석 데이터베이스 내용 정보를 수정한다. */
+		UPDATE SEEK_ANALYSIS_DATABASE
+		SET CONTENT = #{content}
 		WHERE ANALYSIS_ID = #{analysisId}
 	</update>
 
@@ -30,7 +36,35 @@
 			AND NOW() - MAKE_INTERVAL(MINS => #{maxMinutes}) > ANALYSIS_START_DT
 	</update>
 
-	<select id="selectAnalysisListToExecuted" parameterType="integer" resultType="analysisVO">
+	<sql id="sqlAnalysisDetail">
+		SELECT
+			a.ANALYSIS_ID,
+			a.ANALYSIS_TYPE_CCD,
+			a.ANALYSIS_STATUS_CCD,
+			a.ANALYSIS_MODEL,
+			a.ANALYSIS_START_DT,
+			a.ANALYSIS_END_DT,
+			a.ANALYSIS_TIME,
+			a.CREATE_DT,
+			ap.OPERATION_ID,
+			ap.OPERATION_TYPE_CCD,
+            ap.URL,
+            ap.HEADER,
+            ap.QUERY_STRING,
+            ap.BODY,
+            ap.FILE_ID,
+			ad.TARGET_INFORMATION,
+			ad.CONTENT
+		FROM SEEK_ANALYSIS a
+			LEFT JOIN SEEK_ANALYSIS_PROXY ap
+                ON a.ANALYSIS_ID = ap.ANALYSIS_ID
+				AND a.ANALYSIS_TYPE_CCD = 'PROXY'
+			LEFT JOIN SEEK_ANALYSIS_DATABASE ad
+				ON a.ANALYSIS_ID = ad.ANALYSIS_ID
+				AND a.ANALYSIS_TYPE_CCD = 'DATABASE'
+	</sql>
+
+	<select id="selectAnalysisListToExecuted" parameterType="integer" resultType="analysisDetailVO">
 		/** selectAnalysisListToExecuted : 실행하려는 분석 정보 목록을 조회한다. */
 		WITH PROCESSING AS (
 			/* 현재 진행중인 분석 요청을 포함하여 분석기 서버에 요청할 수 있는 최대(스레드) 수 만큼 조회 */
@@ -38,20 +72,9 @@
 			FROM SEEK_ANALYSIS
 			WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
 		)
-		SELECT
-			ANALYSIS_ID,
-			ANALYSIS_TYPE_CCD,
-			ANALYSIS_STATUS_CCD,
-			TARGET_INFORMATION,
-			ANALYSIS_CONTENT,
-			ANALYSIS_START_DT,
-			ANALYSIS_END_DT,
-			ANALYSIS_TIME,
-			CREATE_DT
-		FROM SEEK_ANALYSIS
-		WHERE ANALYSIS_STATUS_CCD = 'WAIT'
-			AND ANALYSIS_TYPE_CCD = 'TEXT'
-		ORDER BY CREATE_DT
+		<include refid="sqlAnalysisDetail"/>
+		WHERE a.ANALYSIS_STATUS_CCD = 'WAIT'
+		ORDER BY a.CREATE_DT
 		LIMIT (
 			SELECT
 				CASE
@@ -62,22 +85,11 @@
 		)
 	</select>
 
-	<select id="selectProcessingAnalysisList" parameterType="integer" resultType="analysisVO">
+	<select id="selectProcessingAnalysisList" parameterType="integer" resultType="analysisDetailVO">
 		/** selectProcessingAnalysisList : 실행중인 분석 정보 목록을 조회한다. */
-		SELECT
-			ANALYSIS_ID,
-			ANALYSIS_TYPE_CCD,
-			ANALYSIS_STATUS_CCD,
-			TARGET_INFORMATION,
-			ANALYSIS_CONTENT,
-			ANALYSIS_START_DT,
-			ANALYSIS_END_DT,
-			ANALYSIS_TIME,
-			CREATE_DT
-		FROM SEEK_ANALYSIS
-		WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
-			AND ANALYSIS_TYPE_CCD = 'TEXT'
-		ORDER BY CREATE_DT
+		<include refid="sqlAnalysisDetail"/>
+		WHERE a.ANALYSIS_STATUS_CCD = 'PROCESSING'
+		ORDER BY a.CREATE_DT
 	</select>
 
 	<update id="updateAnalysisStatus">

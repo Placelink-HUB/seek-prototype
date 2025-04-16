@@ -82,6 +82,15 @@ public class Constants {
 
 
     /**
+     * 분석_타입_공통코드 - 프록시
+     */
+    public static final String CD_ANALYSIS_TYPE_PROXY = "PROXY";
+    /**
+     * 분석_타입_공통코드 - 데이터베이스
+     */
+    public static final String CD_ANALYSIS_TYPE_DATABASE = "DATABASE";
+
+    /**
      * 분석_상태_공통코드 - 대기
      */
     public static final String CD_ANALYSIS_STATUS_WAIT = "WAIT";

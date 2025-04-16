@@ -16,12 +16,9 @@
 			fd.SAVE_PATH,
 			fd.SAVE_NAME,
 			fd.SORT_SN,
-			f.CREATE_DT,
-			f.CREATE_UID,
-			f.MODIFY_DT,
-			f.MODIFY_UID
-		FROM TB_FILE f
-			JOIN TB_FILE_DETAIL fd
+			f.CREATE_DT
+		FROM SEEK_FILE f
+			JOIN SEEK_FILE_DETAIL fd
 			ON f.FILE_ID = fd.FILE_ID
 			LEFT JOIN SEEK_COM_CD cc1
 			ON f.FILE_SE_CCD = cc1.COM_CD
@@ -49,12 +46,9 @@
 			fd.SAVE_PATH,
 			fd.SAVE_NAME,
 			fd.SORT_SN,
-			f.CREATE_DT,
-			f.CREATE_UID,
-			f.MODIFY_DT,
-			f.MODIFY_UID
-		FROM TB_FILE f
-			JOIN TB_FILE_DETAIL fd
+			f.CREATE_DT
+		FROM SEEK_FILE f
+			JOIN SEEK_FILE_DETAIL fd
 				ON f.FILE_ID = fd.FILE_ID
 			LEFT JOIN SEEK_COM_CD cc1
 				ON f.FILE_SE_CCD = cc1.COM_CD
@@ -64,20 +58,14 @@
 
 	<insert id="insertFile" parameterType="fileVO">
 		/** insertFile : 파일 정보를 등록한다. */
-		INSERT INTO TB_FILE (
+		INSERT INTO SEEK_FILE (
 			FILE_ID,
 			FILE_SE_CCD,
-			CREATE_DT,
-			CREATE_UID,
-			MODIFY_DT,
-			MODIFY_UID
+			CREATE_DT
 		) VALUES (
 			#{fileId},
 			#{fileSeCcd},
-			NOW(),
-			#{createUid},
-			NOW(),
-			#{createUid}
+			NOW()
 		)
 	</insert>
 
@@ -85,10 +73,10 @@
 		/** insertFileDtl : 파일 상세 정보를 등록한다. */
 		<selectKey keyProperty="sortSn" resultType="integer" order="BEFORE">
 			SELECT COALESCE(MAX(SORT_SN), 0) + 1 AS SORT_SN
-			FROM TB_FILE_DETAIL
+			FROM SEEK_FILE_DETAIL
 			WHERE FILE_ID = #{fileId}
 		</selectKey>
-		INSERT INTO TB_FILE_DETAIL (
+		INSERT INTO SEEK_FILE_DETAIL (
 			FILE_DETAIL_ID,
 			FILE_ID,
 			FILE_NAME,
@@ -98,10 +86,7 @@
 			SAVE_PATH,
 			SAVE_NAME,
 			SORT_SN,
-			CREATE_DT,
-			CREATE_UID,
-			MODIFY_DT,
-			MODIFY_UID
+			CREATE_DT
 		) VALUES (
 			#{fileDetailId},
 			#{fileId},
@@ -112,10 +97,7 @@
 			#{savePath},
 			#{saveName},
 			#{sortSn},
-			NOW(),
-			#{createUid},
-			NOW(),
-			#{createUid}
+			NOW()
 		)
 	</insert>
 
@@ -123,21 +105,15 @@
 		/** insertFileList : 파일 정보 목록을 등록한다.(중복 제거) */
 		<choose>
 			<when test='fileList neq null and fileList.size gt 0'>
-				INSERT INTO TB_FILE (
+				INSERT INTO SEEK_FILE (
 					FILE_ID,
 					FILE_SE_CCD,
-					CREATE_DT,
-					CREATE_UID,
-					MODIFY_DT,
-					MODIFY_UID
+					CREATE_DT
 				)
 				SELECT DISTINCT
 					x.FILE_ID,
 					x.FILE_SE_CCD,
-					NOW(),
-					#{createUid},
-					NOW(),
-					#{createUid}
+					NOW()
 				FROM (
 					<foreach collection="fileList" item="file" separator="UNION ALL">
 						SELECT
@@ -156,7 +132,7 @@
 		/** insertFileDetailList : 파일 상세 정보 목록을 등록한다. */
 		<choose>
 			<when test='fileDetailList neq null and fileDetailList.size > 0'>
-				INSERT INTO TB_FILE_DETAIL (
+				INSERT INTO SEEK_FILE_DETAIL (
 					FILE_DETAIL_ID,
 					FILE_ID,
 					FILE_NAME,
@@ -166,10 +142,7 @@
 					SAVE_PATH,
 					SAVE_NAME,
 					SORT_SN,
-					CREATE_DT,
-					CREATE_UID,
-					MODIFY_DT,
-					MODIFY_UID
+					CREATE_DT
 				) VALUES
 				<foreach collection="fileDetailList" item="file" separator=",">
 					(
@@ -182,10 +155,7 @@
 						#{file.savePath},
 						#{file.saveName},
 						#{file.sortSn},
-						NOW(),
-						#{createUid},
-						NOW(),
-						#{createUid}
+						NOW()
 						)
 				</foreach>
 			</when>

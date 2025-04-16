@@ -1,10 +1,7 @@
 package biz.placelink.seek.analysis.service;
 
 import biz.placelink.seek.analysis.schedule.AnalysisRequestStatus;
-import biz.placelink.seek.analysis.vo.AnalysisErrorVO;
-import biz.placelink.seek.analysis.vo.AnalysisResultItemVO;
-import biz.placelink.seek.analysis.vo.AnalysisVO;
-import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import biz.placelink.seek.analysis.vo.*;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.RestApiUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -75,14 +72,19 @@ public class AnalysisService {
      */
     @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
-    public void asyncAnalysisRequest(AnalysisVO analysisRequest) {
+    public void asyncAnalysisRequest(AnalysisDetailVO analysisRequest) {
         if (analysisRequest != null) {
             String analysisId = analysisRequest.getAnalysisId();
 
             try {
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
+                String analysisContent = "";
 
-                if (S2Util.isEmpty(analysisRequest.getAnalysisContent())) {
+                if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisRequest.getAnalysisTypeCcd())) {
+                    analysisContent = analysisRequest.getContent();
+                }
+
+                if (S2Util.isEmpty(analysisContent)) {
                     this.updateAnalysisStatus(analysisId, Constants.CD_ANALYSIS_STATUS_ERROR);
                     return;
                 }
@@ -92,7 +94,7 @@ public class AnalysisService {
                 String analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.POST, 6000000,
                         Map.entry("request_id", analysisId),
                         Map.entry("model_name", analysisModelName),
-                        Map.entry("user_input", analysisRequest.getAnalysisContent())
+                        Map.entry("user_input", analysisContent)
                 );
 
                 if (S2Util.isNotEmpty(analysisData)) {
@@ -123,7 +125,7 @@ public class AnalysisService {
      */
     @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
-    public void asyncPollAnalysisResults(AnalysisVO analysisRequest) {
+    public void asyncPollAnalysisResults(AnalysisDetailVO analysisRequest) {
         if (analysisRequest != null) {
             String analysisId = analysisRequest.getAnalysisId();
             String targetInformation = analysisRequest.getTargetInformation();
@@ -210,11 +212,14 @@ public class AnalysisService {
                     analysisResult.setAnalysisId(analysisId);
                     analysisResult.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_COMPLETE);
                     analysisResult.setAnalysisModel(analysisModelName);
-                    analysisResult.setAnalysisContent(analysisContent);
                     analysisResult.setAnalysisTime(latency);
                     analysisResult.setTotalDetectedCount(totalHitCount);
 
                     if (analysisMapper.updateAnalysis(analysisResult) > 0) {
+                        if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisRequest.getAnalysisTypeCcd())) {
+                            analysisMapper.updateAnalysisDatabaseContent(analysisId, sensitiveInformationList.isEmpty() ? null : analysisContent);
+                        }
+
                         if (!sensitiveInformationList.isEmpty()) {
                             List<AnalysisResultItemVO> analysisResultItemList = new ArrayList<>();
 
@@ -277,7 +282,7 @@ public class AnalysisService {
      * @param maxCount 분석기 서버에 요청할 수 있는 최대(스레드) 수
      * @return 분석 정보 목록
      */
-    public List<AnalysisVO> selectAnalysisListToExecuted(int maxCount) {
+    public List<AnalysisDetailVO> selectAnalysisListToExecuted(int maxCount) {
         return analysisMapper.selectAnalysisListToExecuted(maxCount);
     }
 
@@ -286,7 +291,7 @@ public class AnalysisService {
      *
      * @return 분석 정보 목록
      */
-    public List<AnalysisVO> selectProcessingAnalysisList() {
+    public List<AnalysisDetailVO> selectProcessingAnalysisList() {
         return analysisMapper.selectProcessingAnalysisList();
     }
 

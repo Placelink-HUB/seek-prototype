@@ -16,10 +16,6 @@ public class AnalysisVO extends DefaultVO {
     private String analysisStatusCcdNm;
     /* 분석 모델 */
     private String analysisModel;
-    /* 대상 정보 */
-    private String targetInformation;
-    /* 분석 내용 */
-    private String analysisContent;
     /* 분석 시작 일시 */
     private LocalDateTime analysisStartDt;
     /* 분석 종료 일시 */
@@ -78,22 +74,6 @@ public class AnalysisVO extends DefaultVO {
 
     public void setAnalysisStatusCcdNm(String analysisStatusCcdNm) {
         this.analysisStatusCcdNm = analysisStatusCcdNm;
-    }
-
-    public String getTargetInformation() {
-        return targetInformation;
-    }
-
-    public void setTargetInformation(String targetInformation) {
-        this.targetInformation = targetInformation;
-    }
-
-    public String getAnalysisContent() {
-        return analysisContent;
-    }
-
-    public void setAnalysisContent(String analysisContent) {
-        this.analysisContent = analysisContent;
     }
 
     public LocalDateTime getAnalysisStartDt() {

@@ -1,6 +1,7 @@
 package biz.placelink.seek.analysis.schedule;
 
 import biz.placelink.seek.analysis.service.AnalysisService;
+import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,10 +69,10 @@ public class AnalysisScheduler {
 
         // 처리 가능한 만큼만 요청 조회
         int processableCount = Math.min(availableSlots, analysisScheduleRequestMaxcnt);
-        List<AnalysisVO> waitAnalysisList = analysisService.selectAnalysisListToExecuted(processableCount);
+        List<AnalysisDetailVO> waitAnalysisList = analysisService.selectAnalysisListToExecuted(processableCount);
 
         if (waitAnalysisList != null) {
-            for (AnalysisVO analysis : waitAnalysisList) {
+            for (AnalysisDetailVO analysis : waitAnalysisList) {
                 analysisService.asyncAnalysisRequest(analysis);
             }
         }
@@ -82,7 +83,7 @@ public class AnalysisScheduler {
 
     @Scheduled(fixedRate = 2000)
     public void analysisResult() {
-        AnalysisVO analysis = null;
+        AnalysisDetailVO analysis = null;
         do {
             analysis = analysisRequestStatus.get();
             analysisService.asyncPollAnalysisResults(analysis);

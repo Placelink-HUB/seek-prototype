@@ -6,10 +6,11 @@ DECLARE
     column_name TEXT := TG_ARGV[1];           -- 대상 컬럼명
     pk_column_names TEXT := TG_ARGV[2];       -- 프라이머리 키 컬럼명들 (복합키인 경우 쉼표로 구분)
     type_column_name TEXT := TG_ARGV[3];      -- 타입 컬럼명
+    type_compare_value TEXT := TG_ARGV[4];    -- 타입 비교값 (타입 컬럼이 타입 비교값과 일치할때 등록한다.)
     pk_columns TEXT[] := STRING_TO_ARRAY(pk_column_names, ','); -- 프라이머리 키 컬럼 배열
     pk_values TEXT[] := '{}';                 -- 프라이머리 키 값 배열
     pk_combined TEXT;                         -- 합쳐진 프라이머리 키 값
-    analysis_type TEXT := 'TEXT';             -- 기본값 'TEXT'
+    column_type TEXT;                         -- 기본값 'TEXT'
     column_value TEXT;                        -- 대상 컬럼 값
     i INT;                                    -- 루프 인덱스
 BEGIN
@@ -44,36 +45,43 @@ BEGIN
     IF type_column_name IS NOT NULL THEN
         -- type_column_name 이 지정된 경우, NEW 에서 해당 컬럼 값 가져오기
         EXECUTE format('SELECT ($1).%I', type_column_name)
-            INTO analysis_type
+            INTO column_type
             USING NEW;
     END IF;
 
-    -- pk_combined 가 SEEK_ANALYSIS 의 TARGET_INFORMATION 에 없는 경우에만 삽입
+    -- pk_combined 가 SEEK_ANALYSIS_DATABASE 의 TARGET_INFORMATION 에 없는 경우에만 삽입
     IF NOT EXISTS (
         SELECT 1
-        FROM SEEK_ANALYSIS
+        FROM SEEK_ANALYSIS_DATABASE
         WHERE TARGET_INFORMATION = pk_combined
+            AND (type_compare_value IS NULL OR column_type = type_compare_value)
     ) THEN
         INSERT INTO SEEK_ANALYSIS (
             ANALYSIS_ID,
             ANALYSIS_TYPE_CCD,
             ANALYSIS_STATUS_CCD,
-            TARGET_INFORMATION,
-            ANALYSIS_CONTENT,
             ANALYSIS_START_DT,
             ANALYSIS_END_DT,
             ANALYSIS_TIME,
             CREATE_DT
         ) VALUES (
             analysis_uuid,
-            analysis_type,
+            'DATABASE',
             'WAIT',
-            pk_combined,
-            column_value,
             NULL,
             NULL,
             NULL,
             CLOCK_TIMESTAMP()
+        );
+
+        INSERT INTO SEEK_ANALYSIS_DATABASE (
+            ANALYSIS_ID,
+            TARGET_INFORMATION,
+            CONTENT
+        ) VALUES (
+            analysis_uuid,
+            pk_combined,
+            column_value
         );
 
         -- NEW 의 대상 컬럼에 UUID 반영

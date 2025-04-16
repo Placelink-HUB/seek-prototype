@@ -1,5 +1,6 @@
 package biz.placelink.seek.analysis.service;
 
+import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisErrorVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultItemVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
@@ -30,6 +31,14 @@ public interface AnalysisMapper {
     int updateAnalysis(AnalysisVO paramVO);
 
     /**
+     * 분석 데이터베이스 내용 정보를 수정한다.
+     *
+     * @param analysisId 분석 ID
+     * @param content 내용
+     */
+    int updateAnalysisDatabaseContent(@Param("analysisId") String analysisId, @Param("content") String content);
+
+    /**
      * 실행 시간이 초과된 분석을 오류 처리한다.
      *
      * @param maxMinutes 최대 허용 시간(분)
@@ -42,14 +51,14 @@ public interface AnalysisMapper {
      * @param maxCount 분석기 서버에 요청할 수 있는 최대(스레드) 수
      * @return 분석 정보 목록
      */
-    List<AnalysisVO> selectAnalysisListToExecuted(@Param("maxCount") int maxCount);
+    List<AnalysisDetailVO> selectAnalysisListToExecuted(@Param("maxCount") int maxCount);
 
     /**
      * 실행중인 분석 정보 목록을 조회한다.
      *
      * @return 분석 정보 목록
      */
-    List<AnalysisVO> selectProcessingAnalysisList();
+    List<AnalysisDetailVO> selectProcessingAnalysisList();
 
     /**
      * 분석 정보 상태를 수정한다.
