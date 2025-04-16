@@ -298,17 +298,22 @@
                         <tr>
                             <th>등록 일시</th>
                             <th>게시글 타입</th>
+                            <th>raw 보기</th>
                             <th>내용 보기</th>
                             <th>원본 보기</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${articleListPagination.isEmpty}">
-                            <td colspan="4">데이터가 없습니다.</td>
+                            <td colspan="5">데이터가 없습니다.</td>
                         </tr>
                         <tr th:each="article : ${articleListPagination.dataList}">
                             <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
                             <td th:text="${article.articleTypeCcdNm}"></td>
+                            <td>
+                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], 'raw');">내용 보기</button>
+                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
+                            </td>
                             <td>
                                 <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
                                 <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
