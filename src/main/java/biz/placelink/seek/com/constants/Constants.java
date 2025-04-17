@@ -108,6 +108,15 @@ public class Constants {
     public static final String CD_ANALYSIS_STATUS_ERROR = "ERROR";
 
     /**
+     * 작업_타입_공통코드 - 전처리
+     */
+    public static final String CD_OPERATION_TYPE_PRE = "PRE";
+    /**
+     * 작업_타입_공통코드 - 후처리
+     */
+    public static final String CD_OPERATION_TYPE_POST = "POST";
+
+    /**
      * 게시글_타입_공통코드
      */
     public static final String GRPCD_ARTICLE_TYPE = "ARTICLE_TYPE_CCD";

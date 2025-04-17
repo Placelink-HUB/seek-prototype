@@ -87,8 +87,8 @@ public class WildpathController {
     protected ResponseEntity<String> preprocess(HttpServletRequest request, HttpServletResponse response)
             throws IOException {
 
-        byte[] target = "멋쟁이 이승수".getBytes(StandardCharsets.UTF_8);
-        byte[] replacement = "이승수".getBytes(StandardCharsets.UTF_8);
+        byte[] target = "Sample".getBytes(StandardCharsets.UTF_8);
+        byte[] replacement = "샘플".getBytes(StandardCharsets.UTF_8);
 
         try (
                 BufferedInputStream input = new BufferedInputStream(request.getInputStream());
@@ -143,7 +143,7 @@ public class WildpathController {
         String contentType = request.getContentType();
         String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(contentType);
         String requestId = request.getHeader("X-Request-ID");
-        String requestType = "";
+        String requestType = "REPLY";
         String url = request.getRequestURL().toString();
         String header = S2ServletUtil.getHeadersAsJsonString(request);
         String queryString = S2ServletUtil.parameterToQueryString(request, true);
@@ -151,7 +151,6 @@ public class WildpathController {
 
         switch (documentTypeFromContentType) {
             case "text":
-                requestType = "TEXT";
                 body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
                 break;
             case "image":
