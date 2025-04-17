@@ -1,13 +1,12 @@
 package biz.placelink.seek.analysis.controller;
 
-import biz.placelink.seek.analysis.service.SensitiveInformationService;
-import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
-import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import biz.placelink.seek.analysis.service.WildpathAnalysisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.s2.ext.util.S2EncryptionUtil;
+import kr.s2.ext.util.S2ServletUtil;
 import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,24 +18,19 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/console")
 public class WildpathController {
 
-    private final SensitiveInformationService sensitiveInformationService;
+    private static final Logger logger = LoggerFactory.getLogger(WildpathController.class);
 
-    public WildpathController(SensitiveInformationService sensitiveInformationService) {
-        this.sensitiveInformationService = sensitiveInformationService;
+    private final WildpathAnalysisService wildpathAnalysisService;
+
+    public WildpathController(WildpathAnalysisService wildpathAnalysisService) {
+        this.wildpathAnalysisService = wildpathAnalysisService;
     }
-
-    @Value("${encryption.password}")
-    public String encryptionPassword;
 
     @RequestMapping("/request/async/**")
     protected ResponseEntity<String> onBeforePreprocess(HttpServletRequest request, HttpServletResponse response) {
@@ -48,7 +42,7 @@ public class WildpathController {
                 System.out.println("[WILD] Received Payload:\n" + payload);
             }
         } catch (Exception e) {
-            // e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return ResponseEntity.ok("");
@@ -108,12 +102,14 @@ public class WildpathController {
 
     @PostMapping("/postprocess/**")
     protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response, Map<String, String> headers) throws Exception {
-        if ("text".equals(this.getDocumentTypeFromContentType(request.getContentType()))) {
+        if ("text".equals(WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType()))) {
             String seekMode = request.getHeader("X-Seek-Mode");
             if (seekMode == null || seekMode.isEmpty()) {
                 seekMode = request.getParameter("seek_mode");
             }
+
             String payload = "";
+
             try {
                 // POST, PUT 같은 요청일 때만 body 읽기
                 if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
@@ -121,33 +117,10 @@ public class WildpathController {
                     System.out.println("[WILD] Received Payload:\n" + payload);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
 
-            List<String> patterns = new ArrayList<>();
-
-            if (Pattern.compile("(\\$WT\\{[^}]+\\})").matcher(payload).find()) {
-                payload = payload.replaceAll("\\$WT\\{[^}]+\\}", "감사중인 문서 입니다.");
-            } else if (!"raw".equals(seekMode)) {
-                Pattern pattern = Pattern.compile("(\\$PL\\{[^}]+\\})");
-                Matcher matcher = pattern.matcher(payload);
-
-                while (matcher.find()) {
-                    patterns.add(matcher.group(1));
-                }
-            }
-
-            if (!patterns.isEmpty()) {
-                SchSensitiveInformationVO searchVO = new SchSensitiveInformationVO();
-                searchVO.setSchSensitiveInformationIdList(patterns);
-                List<SensitiveInformationVO> sensitiveInformationList = sensitiveInformationService.selectSensitiveInformationList(searchVO);
-
-                if (sensitiveInformationList != null) {
-                    for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {
-                        payload = payload.replace(sensitiveInformation.getSensitiveInformationId(), "origin".equals(seekMode) ? S2EncryptionUtil.decrypt(sensitiveInformation.getTargetText(), encryptionPassword) : sensitiveInformation.getEscapeText());
-                    }
-                }
-            }
+            payload = wildpathAnalysisService.maskSensitiveInformation(payload, seekMode);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, request.getContentType())
@@ -159,64 +132,39 @@ public class WildpathController {
                 IOUtils.copy(inputStream, outputStream);
                 outputStream.flush();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
             return ResponseEntity.ok().build();
         }
     }
 
     @PostMapping(path = "/response/async/**")
-    protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) {
+    protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String contentType = request.getContentType();
+        String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(contentType);
+        String requestId = request.getHeader("X-Request-ID");
+        String requestType = "";
+        String url = request.getRequestURL().toString();
+        String header = S2ServletUtil.getHeadersAsJsonString(request);
+        String queryString = S2ServletUtil.parameterToQueryString(request, true);
+        String body = "";
 
-        switch (contentType) {
-            case "application/json":
-            case "text/html":
+        switch (documentTypeFromContentType) {
+            case "text":
+                requestType = "TEXT";
+                body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
+                break;
+            case "image":
+            case "pdf":
+            case "docx":
+            case "doc":
+            case "xlsx":
+            case "xls":
+            case "pptx":
+            case "ppt":
+            case "hwp":
                 break;
         }
-    }
-
-    private String getDocumentTypeFromContentType(String contentType) {
-        String documentType = "unknown";
-        if (contentType != null) {
-            String lowerContentType = contentType.toLowerCase();
-            if (lowerContentType.startsWith("text/") ||
-                    (lowerContentType.startsWith("application/") && (
-                            lowerContentType.contains("json") ||
-                                    lowerContentType.contains("xml") ||
-                                    lowerContentType.contains("xhtml") ||
-                                    lowerContentType.contains("javascript") ||
-                                    lowerContentType.contains("ecmascript") ||
-                                    lowerContentType.contains("graphql") ||
-                                    lowerContentType.contains("markdown") ||
-                                    lowerContentType.contains("yaml") ||
-                                    lowerContentType.contains("yml") ||
-                                    lowerContentType.contains("csv") ||
-                                    lowerContentType.contains("sql") ||
-                                    lowerContentType.contains("toml")
-                    )) ||
-                    (lowerContentType.startsWith("image/") && (
-                            lowerContentType.contains("svg")
-                    ))) {
-                documentType = "text";
-            } else if (lowerContentType.startsWith("image/")) {
-                documentType = "image";
-            } else {
-                documentType = switch (contentType) {
-                    case "application/pdf" -> "pdf";
-                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "docx";
-                    case "application/msword" -> "doc";
-                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "xlsx";
-                    case "application/vnd.ms-excel" -> "xls";
-                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> "pptx";
-                    case "application/vnd.ms-powerpoint" -> "ppt";
-                    case "application/x-hwp",
-                         "application/vnd.hancom.hwp" -> "hwp";
-                    default -> "unknown";
-                };
-            }
-        }
-        return documentType;
     }
 
 }
