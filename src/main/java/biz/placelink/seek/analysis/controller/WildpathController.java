@@ -107,58 +107,116 @@ public class WildpathController {
     }
 
     @PostMapping("/postprocess/**")
-    protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response,
-                                                 Map<String, String> headers) throws Exception {
-
-        String seekMode = request.getHeader("X-Seek-Mode");
-        if (seekMode == null || seekMode.isEmpty()) {
-            seekMode = request.getParameter("seek_mode");
-        }
-        String payload = "";
-        try {
-            // POST, PUT 같은 요청일 때만 body 읽기
-            if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
-                payload = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-                System.out.println("[WILD] Received Payload:\n" + payload);
+    protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response, Map<String, String> headers) throws Exception {
+        if ("text".equals(this.getDocumentTypeFromContentType(request.getContentType()))) {
+            String seekMode = request.getHeader("X-Seek-Mode");
+            if (seekMode == null || seekMode.isEmpty()) {
+                seekMode = request.getParameter("seek_mode");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        List<String> patterns = new ArrayList<>();
-
-        if (Pattern.compile("(\\$WT\\{[^}]+\\})").matcher(payload).find()) {
-            payload = payload.replaceAll("\\$WT\\{[^}]+\\}", "감사중인 문서 입니다.");
-        } else if (!"raw".equals(seekMode)) {
-            Pattern pattern = Pattern.compile("(\\$PL\\{[^}]+\\})");
-            Matcher matcher = pattern.matcher(payload);
-
-            while (matcher.find()) {
-                patterns.add(matcher.group(1));
+            String payload = "";
+            try {
+                // POST, PUT 같은 요청일 때만 body 읽기
+                if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
+                    payload = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
+                    System.out.println("[WILD] Received Payload:\n" + payload);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        }
 
-        if (!patterns.isEmpty()) {
-            SchSensitiveInformationVO searchVO = new SchSensitiveInformationVO();
-            searchVO.setSchSensitiveInformationIdList(patterns);
-            List<SensitiveInformationVO> sensitiveInformationList = sensitiveInformationService.selectSensitiveInformationList(searchVO);
+            List<String> patterns = new ArrayList<>();
 
-            if (sensitiveInformationList != null) {
-                for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {
-                    payload = payload.replace(sensitiveInformation.getSensitiveInformationId(), "origin".equals(seekMode) ? S2EncryptionUtil.decrypt(sensitiveInformation.getTargetText(), encryptionPassword) : sensitiveInformation.getEscapeText());
+            if (Pattern.compile("(\\$WT\\{[^}]+\\})").matcher(payload).find()) {
+                payload = payload.replaceAll("\\$WT\\{[^}]+\\}", "감사중인 문서 입니다.");
+            } else if (!"raw".equals(seekMode)) {
+                Pattern pattern = Pattern.compile("(\\$PL\\{[^}]+\\})");
+                Matcher matcher = pattern.matcher(payload);
+
+                while (matcher.find()) {
+                    patterns.add(matcher.group(1));
                 }
             }
+
+            if (!patterns.isEmpty()) {
+                SchSensitiveInformationVO searchVO = new SchSensitiveInformationVO();
+                searchVO.setSchSensitiveInformationIdList(patterns);
+                List<SensitiveInformationVO> sensitiveInformationList = sensitiveInformationService.selectSensitiveInformationList(searchVO);
+
+                if (sensitiveInformationList != null) {
+                    for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {
+                        payload = payload.replace(sensitiveInformation.getSensitiveInformationId(), "origin".equals(seekMode) ? S2EncryptionUtil.decrypt(sensitiveInformation.getTargetText(), encryptionPassword) : sensitiveInformation.getEscapeText());
+                    }
+                }
+            }
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, request.getContentType())
+                    .body(payload);
+        } else {
+            // 비 텍스트 타입의 경우, 원본 요청을 그대로 반환
+            try (InputStream inputStream = request.getInputStream();
+                 OutputStream outputStream = response.getOutputStream()) {
+                IOUtils.copy(inputStream, outputStream);
+                outputStream.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return ResponseEntity.ok().build();
         }
-
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, request.getContentType())
-                .body(payload);
     }
 
     @PostMapping(path = "/response/async/**")
     protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) {
+        String contentType = request.getContentType();
 
+        switch (contentType) {
+            case "application/json":
+            case "text/html":
+                break;
+        }
+    }
+
+    private String getDocumentTypeFromContentType(String contentType) {
+        String documentType = "unknown";
+        if (contentType != null) {
+            String lowerContentType = contentType.toLowerCase();
+            if (lowerContentType.startsWith("text/") ||
+                    (lowerContentType.startsWith("application/") && (
+                            lowerContentType.contains("json") ||
+                                    lowerContentType.contains("xml") ||
+                                    lowerContentType.contains("xhtml") ||
+                                    lowerContentType.contains("javascript") ||
+                                    lowerContentType.contains("ecmascript") ||
+                                    lowerContentType.contains("graphql") ||
+                                    lowerContentType.contains("markdown") ||
+                                    lowerContentType.contains("yaml") ||
+                                    lowerContentType.contains("yml") ||
+                                    lowerContentType.contains("csv") ||
+                                    lowerContentType.contains("sql") ||
+                                    lowerContentType.contains("toml")
+                    )) ||
+                    (lowerContentType.startsWith("image/") && (
+                            lowerContentType.contains("svg")
+                    ))) {
+                documentType = "text";
+            } else if (lowerContentType.startsWith("image/")) {
+                documentType = "image";
+            } else {
+                documentType = switch (contentType) {
+                    case "application/pdf" -> "pdf";
+                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "docx";
+                    case "application/msword" -> "doc";
+                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "xlsx";
+                    case "application/vnd.ms-excel" -> "xls";
+                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> "pptx";
+                    case "application/vnd.ms-powerpoint" -> "ppt";
+                    case "application/x-hwp",
+                         "application/vnd.hancom.hwp" -> "hwp";
+                    default -> "unknown";
+                };
+            }
+        }
+        return documentType;
     }
 
 }
