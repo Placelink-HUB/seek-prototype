@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1370,
-    "scrollLeft": -411,
+    "scrollTop": -760,
+    "scrollLeft": -855,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -1818,7 +1818,7 @@
         "tableId": "qSoCBUoS4IKD1HkHLLfux",
         "name": "SENSITIVE_INFORMATION_ID",
         "comment": "민감_정보_ID",
-        "dataType": "CHAR(37)",
+        "dataType": "CHAR(21)",
         "default": "",
         "options": 10,
         "ui": {
@@ -1829,7 +1829,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1744594972229,
+          "updateAt": 1744985734760,
           "createAt": 1743753882333
         }
       },
@@ -2038,7 +2038,7 @@
         "tableId": "RNWKiTMPrzg4A7LNeU9Pk",
         "name": "SENSITIVE_INFORMATION_ID",
         "comment": "민감_정보_ID",
-        "dataType": "CHAR(37)",
+        "dataType": "CHAR(21)",
         "default": "",
         "options": 10,
         "ui": {
@@ -2049,7 +2049,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1744594972229,
+          "updateAt": 1744985734760,
           "createAt": 1744004519417
         }
       },
@@ -3990,7 +3990,7 @@
       -1,
       {
         "name": 1743753904042,
-        "dataType": 1744594972229,
+        "dataType": 1744985734759,
         "options(notNull)": 1743754052779,
         "options(primaryKey)": 1743754057412,
         "comment": 1743754069511
@@ -4131,7 +4131,7 @@
       {
         "options(notNull)": 1744004519416,
         "name": 1744004519416,
-        "dataType": 1744594972229,
+        "dataType": 1744985734759,
         "default": 1744004519416,
         "comment": 1744004519416,
         "options(primaryKey)": 1744004977454

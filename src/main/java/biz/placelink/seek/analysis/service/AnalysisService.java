@@ -175,7 +175,7 @@ public class AnalysisService {
 
                             String targetText = matcher.group(1);
                             String escapeText = targetText.replaceAll("[^\\p{Punct}]", "*"); // 특수문자를 제외한 모든 일반적인 문자를 *로 치환
-                            String sensitiveInformationId = String.format("$PL{%s}", S2HashUtil.generateMD5(targetText));
+                            String sensitiveInformationId = String.format("$PL{%s}", S2HashUtil.generateXXHash64(targetText, 0));
                             String severityCcd = item.path("severity").asText("");
                             int hitCount = item.path("hit").asInt(0);
 
