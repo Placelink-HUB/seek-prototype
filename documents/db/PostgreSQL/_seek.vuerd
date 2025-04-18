@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1218,
-    "scrollLeft": -323,
+    "scrollTop": -1370,
+    "scrollLeft": -411,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -535,6 +535,7 @@
           "rS7ehjsy0JLFZONwb5adR",
           "L-CHc0ZaD6-JDPwfC0oeu",
           "D5k6uvyyb_MBLwndaZIn1",
+          "ApkOZbptdJNSH3HYyVFtM",
           "IKKttp7GZIQqRqbFSfkav",
           "d9JbLHiwVAeM0eypSBO6C",
           "4ISOLJ_a2m0Tx7LqfSWL4",
@@ -549,6 +550,7 @@
           "rS7ehjsy0JLFZONwb5adR",
           "L-CHc0ZaD6-JDPwfC0oeu",
           "D5k6uvyyb_MBLwndaZIn1",
+          "ApkOZbptdJNSH3HYyVFtM",
           "IKKttp7GZIQqRqbFSfkav",
           "d9JbLHiwVAeM0eypSBO6C",
           "4ISOLJ_a2m0Tx7LqfSWL4",
@@ -565,7 +567,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1744781493976,
+          "updateAt": 1744944522335,
           "createAt": 1744781054179
         }
       }
@@ -2910,6 +2912,26 @@
           "updateAt": 1744781457137,
           "createAt": 1744781446607
         }
+      },
+      "ApkOZbptdJNSH3HYyVFtM": {
+        "id": "ApkOZbptdJNSH3HYyVFtM",
+        "tableId": "GszrHp96dozH39hXraUUI",
+        "name": "FILE_HASH",
+        "comment": "파일_해시",
+        "dataType": "CHAR(64)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1744944520387,
+          "createAt": 1744944488493
+        }
       }
     },
     "relationshipEntities": {
@@ -3185,7 +3207,7 @@
             "10GpbHQTO6MA10w-uwU7p"
           ],
           "x": 908.5366,
-          "y": 1752.683,
+          "y": 1764.683,
           "direction": 1
         },
         "meta": {
@@ -4681,6 +4703,16 @@
         "comment": 1744781448288,
         "name": 1744781451495,
         "dataType": 1744781457137
+      }
+    ],
+    "ApkOZbptdJNSH3HYyVFtM": [
+      "tableColumnEntities",
+      1744944488491,
+      -1,
+      {
+        "name": 1744944498850,
+        "dataType": 1744944512810,
+        "comment": 1744944520387
       }
     ]
   }

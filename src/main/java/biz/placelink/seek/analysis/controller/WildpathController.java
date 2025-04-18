@@ -4,6 +4,7 @@ import biz.placelink.seek.analysis.service.WildpathAnalysisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.util.S2ServletUtil;
+import kr.s2.ext.util.S2Util;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,9 +105,6 @@ public class WildpathController {
     protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response, Map<String, String> headers) throws Exception {
         if ("text".equals(WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType()))) {
             String seekMode = request.getHeader("X-Seek-Mode");
-            if (seekMode == null || seekMode.isEmpty()) {
-                seekMode = request.getParameter("seek_mode");
-            }
 
             String payload = "";
 
@@ -140,18 +138,17 @@ public class WildpathController {
 
     @PostMapping(path = "/response/async/**")
     protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String requestId = request.getHeader("X-Request-ID");
         String contentType = request.getContentType();
         String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(contentType);
-        String requestId = request.getHeader("X-Request-ID");
-        String requestType = "REPLY";
         String url = request.getRequestURL().toString();
         String header = S2ServletUtil.getHeadersAsJsonString(request);
         String queryString = S2ServletUtil.parameterToQueryString(request, true);
-        String body = "";
 
         switch (documentTypeFromContentType) {
             case "text":
-                body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
+                String body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
+                wildpathAnalysisService.asyncPostAnalysis(requestId, url, header, queryString, body, null, null, null);
                 break;
             case "image":
             case "pdf":
@@ -162,6 +159,10 @@ public class WildpathController {
             case "pptx":
             case "ppt":
             case "hwp":
+                try (InputStream fileData = request.getInputStream()) {
+                    String fileName = S2ServletUtil.getFilenameFromHeader(request);
+                    wildpathAnalysisService.asyncPostAnalysis(requestId, url, header, queryString, null, contentType, fileData, fileName);
+                }
                 break;
         }
     }

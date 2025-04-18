@@ -34,7 +34,7 @@ public interface AnalysisMapper {
      * 분석 데이터베이스 내용 정보를 수정한다.
      *
      * @param analysisId 분석 ID
-     * @param content 내용
+     * @param content    내용
      */
     int updateAnalysisDatabaseContent(@Param("analysisId") String analysisId, @Param("content") String content);
 
@@ -59,6 +59,22 @@ public interface AnalysisMapper {
      * @return 분석 정보 목록
      */
     List<AnalysisDetailVO> selectProcessingAnalysisList();
+
+    /**
+     * 분석 정보를 등록한다.
+     *
+     * @param paramVO 분석 정보
+     * @return 등록 개수
+     */
+    int insertAnalysis(AnalysisVO paramVO);
+
+    /**
+     * 분석 프록시 정보를 등록한다.
+     *
+     * @param paramVO 분석 프록시 정보
+     * @return 등록 개수
+     */
+    int insertAnalysisProxy(AnalysisDetailVO paramVO);
 
     /**
      * 분석 정보 상태를 수정한다.

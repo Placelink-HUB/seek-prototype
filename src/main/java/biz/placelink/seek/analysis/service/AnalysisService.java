@@ -296,6 +296,26 @@ public class AnalysisService {
     }
 
     /**
+     * 분석 정보를 등록한다.
+     *
+     * @param paramVO 분석 정보
+     * @return 등록 개수
+     */
+    public int insertAnalysis(AnalysisVO paramVO) {
+        return analysisMapper.insertAnalysis(paramVO);
+    }
+
+    /**
+     * 분석 프록시 정보를 등록한다.
+     *
+     * @param paramVO 분석 프록시 정보
+     * @return 등록 개수
+     */
+    public int insertAnalysisProxy(AnalysisDetailVO paramVO) {
+        return analysisMapper.insertAnalysisProxy(paramVO);
+    }
+
+    /**
      * 분석 요청 정보 상태를 수정한다.
      *
      * @param analysisId        분석 ID

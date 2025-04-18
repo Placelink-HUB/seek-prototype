@@ -92,6 +92,46 @@
 		ORDER BY a.CREATE_DT
 	</select>
 
+	<insert id="insertAnalysis" parameterType="analysisVO">
+		/** insertAnalysis : 분석 정보를 등록한다. */
+		INSERT INTO SEEK_ANALYSIS (
+			ANALYSIS_ID,
+			ANALYSIS_TYPE_CCD,
+			ANALYSIS_STATUS_CCD,
+			ANALYSIS_MODEL,
+			CREATE_DT
+		) VALUES (
+			#{analysisId},
+			#{analysisTypeCcd},
+			#{analysisStatusCcd},
+			#{analysisModel},
+			NOW()
+		)
+	</insert>
+
+	<insert id="insertAnalysisProxy" parameterType="analysisDetailVO">
+		/** insertAnalysisProxy : 분석 프록시 정보를 등록한다. */
+		INSERT INTO SEEK_ANALYSIS_PROXY (
+			ANALYSIS_ID,
+			OPERATION_ID,
+			OPERATION_TYPE_CCD,
+			URL,
+			HEADER,
+			QUERY_STRING,
+			BODY,
+			FILE_ID
+		) VALUES (
+			#{analysisId},
+			#{operationId},
+			#{analysisStatusCcd},
+			#{url},
+			#{header},
+			#{queryString},
+			#{body},
+			#{fileId}
+		)
+	</insert>
+
 	<update id="updateAnalysisStatus">
 		/** updateAnalysisStatus : 분석 정보 상태를 수정한다. */
 		UPDATE SEEK_ANALYSIS

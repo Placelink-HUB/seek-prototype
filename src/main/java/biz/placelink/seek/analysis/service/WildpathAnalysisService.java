@@ -1,7 +1,12 @@
 package biz.placelink.seek.analysis.service;
 
+import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.system.file.service.FileService;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.util.S2EncryptionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,14 +45,47 @@ public class WildpathAnalysisService {
 
     private static final Logger logger = LoggerFactory.getLogger(WildpathAnalysisService.class);
 
+    private final AnalysisService analysisService;
     private final SensitiveInformationService sensitiveInformationService;
+    private final FileService fileService;
 
-    public WildpathAnalysisService(SensitiveInformationService sensitiveInformationService) {
+    public WildpathAnalysisService(AnalysisService analysisService, SensitiveInformationService sensitiveInformationService, FileService fileService) {
+        this.analysisService = analysisService;
         this.sensitiveInformationService = sensitiveInformationService;
+        this.fileService = fileService;
     }
 
     @Value("${encryption.password}")
     public String encryptionPassword;
+
+    public int asyncPostAnalysis(String requestId, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
+        int result = 0;
+        String analysisId = UUID.randomUUID().toString();
+
+        AnalysisVO analysis = new AnalysisVO();
+        analysis.setAnalysisId(analysisId);
+        analysis.setAnalysisTypeCcd(Constants.CD_ANALYSIS_TYPE_PROXY);
+        analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
+
+        if (analysisService.insertAnalysis(analysis) > 0) {
+            AnalysisDetailVO analysisDetail = new AnalysisDetailVO();
+            analysisDetail.setAnalysisId(analysisId);
+            analysisDetail.setOperationId(requestId);
+            analysisDetail.setOperationTypeCcd(Constants.CD_OPERATION_TYPE_POST);
+            analysisDetail.setUrl(url);
+            analysisDetail.setHeader(header);
+            analysisDetail.setQueryString(queryString);
+            analysisDetail.setBody(body);
+
+            if (fileData != null) {
+                FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisTypeCcd(), null);
+            }
+
+            result = analysisService.insertAnalysisProxy(analysisDetail);
+        }
+
+        return result;
+    }
 
     /**
      * 주어진 문자열 데이터에서 민감 정보를 마스킹한다.
@@ -57,16 +97,19 @@ public class WildpathAnalysisService {
         String resultText = textData;
         List<String> patterns = new ArrayList<>();
 
-        if (Pattern.compile("(\\$WT\\{[^}]+\\})").matcher(textData).find()) {
-            resultText = textData.replaceAll("\\$WT\\{[^}]+\\}", "감사중인 문서 입니다.");
-        } else if (!"raw".equals(seekMode)) {
-            Pattern pattern = Pattern.compile("(\\$PL\\{[^}]+\\})");
-            Matcher matcher = pattern.matcher(textData);
+        if (!"raw".equals(seekMode)) {
+            if (Pattern.compile("(\\$WT\\{[^}]+\\})").matcher(textData).find()) {
+                resultText = textData.replaceAll("\\$WT\\{[^}]+\\}", "감사중인 문서 입니다.");
+            } else {
+                Pattern pattern = Pattern.compile("(\\$PL\\{[^}]+\\})");
+                Matcher matcher = pattern.matcher(textData);
 
-            while (matcher.find()) {
-                patterns.add(matcher.group(1));
+                while (matcher.find()) {
+                    patterns.add(matcher.group(1));
+                }
             }
         }
+
 
         if (!patterns.isEmpty()) {
             SchSensitiveInformationVO searchVO = new SchSensitiveInformationVO();

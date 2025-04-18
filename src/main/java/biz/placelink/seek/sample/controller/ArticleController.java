@@ -8,6 +8,8 @@ import biz.placelink.seek.sample.vo.ArticleVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
 import biz.placelink.seek.system.file.service.FileService;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2Util;
@@ -60,11 +62,12 @@ public class ArticleController {
      * @return Sample 페이지 경로
      */
     @GetMapping(value = "/public/sample/test")
-    public String tissue(@RequestParam(required = false) Integer pageNo, Model model) {
+    public String tissue(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, Model model) {
         SchArticleVO searchVO = new SchArticleVO();
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("MODIFY_DT DESC");
         model.addAttribute("articleListPagination", articleService.selectArticleListWithPagination(searchVO));
+        response.setHeader("X-Seek-Mode", seekMode);
         return "sample/test";
     }
 
@@ -113,12 +116,14 @@ public class ArticleController {
      * @return 게시글 상세
      */
     @GetMapping(value = "/public/sample/article-info")
-    public ResponseEntity<Map<String, Object>> selectArticle(@RequestParam String articleId) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> selectArticle(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam String articleId) {
+        Map<String, Object> response1 = new HashMap<>();
 
-        response.put("articleData", articleService.selectArticle(articleId));
-        response.put(Constants.RESULT_CODE, 1);
-        return ResponseEntity.ok(response);
+        response.setHeader("X-Seek-Mode", seekMode);
+
+        response1.put("articleData", articleService.selectArticle(articleId));
+        response1.put(Constants.RESULT_CODE, 1);
+        return ResponseEntity.ok(response1);
     }
 
     /**
