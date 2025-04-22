@@ -1,6 +1,5 @@
 package biz.placelink.seek.analysis.schedule;
 
-import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import org.springframework.stereotype.Component;
 
@@ -22,15 +21,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class AnalysisRequestStatus {
 
-    private final Map<String, AnalysisDetailVO> processingAnalysisMap;
+    private final Map<String, AnalysisVO> processingAnalysisMap;
 
     AnalysisRequestStatus() {
         this.processingAnalysisMap = new ConcurrentHashMap<>();
     }
 
-    public void add(List<AnalysisDetailVO> analysisList) {
+    public void add(List<AnalysisVO> analysisList) {
         if (analysisList != null) {
-            for (AnalysisDetailVO analysis : analysisList) {
+            for (AnalysisVO analysis : analysisList) {
                 String analysisId = analysis.getAnalysisId();
                 if (!processingAnalysisMap.containsKey(analysisId)) {
                     processingAnalysisMap.put(analysisId, analysis);
@@ -39,11 +38,11 @@ public class AnalysisRequestStatus {
         }
     }
 
-    public AnalysisDetailVO get() {
-        AnalysisDetailVO result = null;
+    public AnalysisVO get() {
+        AnalysisVO result = null;
         if (!processingAnalysisMap.isEmpty()) {
-            for (Map.Entry<String, AnalysisDetailVO> entry : processingAnalysisMap.entrySet()) {
-                AnalysisDetailVO item = entry.getValue();
+            for (Map.Entry<String, AnalysisVO> entry : processingAnalysisMap.entrySet()) {
+                AnalysisVO item = entry.getValue();
                 if (item != null && !item.isRequesting()) {
                     result = item;
                     break;

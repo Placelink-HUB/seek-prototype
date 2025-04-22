@@ -1,8 +1,9 @@
 package biz.placelink.seek.analysis.schedule;
 
 import biz.placelink.seek.analysis.service.AnalysisService;
-import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.analysis.service.OperationService;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
+import biz.placelink.seek.analysis.vo.OperationDetailVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,11 +31,13 @@ public class AnalysisScheduler {
     private static final Logger logger = LoggerFactory.getLogger(AnalysisScheduler.class);
 
     private final AnalysisRequestStatus analysisRequestStatus;
+    private final OperationService operationService;
     private final AnalysisService analysisService;
     private final ThreadPoolTaskExecutor analysisTaskExecutor;
 
-    public AnalysisScheduler(AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, @Qualifier("analysisTaskExecutor") ThreadPoolTaskExecutor analysisTaskExecutor) {
+    public AnalysisScheduler(AnalysisRequestStatus analysisRequestStatus, OperationService operationService, AnalysisService analysisService, @Qualifier("analysisTaskExecutor") ThreadPoolTaskExecutor analysisTaskExecutor) {
         this.analysisRequestStatus = analysisRequestStatus;
+        this.operationService = operationService;
         this.analysisService = analysisService;
         this.analysisTaskExecutor = analysisTaskExecutor;
     }
@@ -69,11 +72,11 @@ public class AnalysisScheduler {
 
         // 처리 가능한 만큼만 요청 조회
         int processableCount = Math.min(availableSlots, analysisScheduleRequestMaxcnt);
-        List<AnalysisDetailVO> waitAnalysisList = analysisService.selectAnalysisListToExecuted(processableCount);
+        List<OperationDetailVO> waitOperationList = operationService.selectOperationHistListToExecuted(processableCount);
 
-        if (waitAnalysisList != null) {
-            for (AnalysisDetailVO analysis : waitAnalysisList) {
-                analysisService.asyncAnalysisRequest(analysis);
+        if (waitOperationList != null) {
+            for (OperationDetailVO operation : waitOperationList) {
+                analysisService.asyncAnalysisRequest(operation);
             }
         }
 
@@ -83,7 +86,7 @@ public class AnalysisScheduler {
 
     @Scheduled(fixedRate = 2000)
     public void analysisResult() {
-        AnalysisDetailVO analysis = null;
+        AnalysisVO analysis = null;
         do {
             analysis = analysisRequestStatus.get();
             analysisService.asyncPollAnalysisResults(analysis);

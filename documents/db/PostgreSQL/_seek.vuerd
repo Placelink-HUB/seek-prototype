@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1002,
-    "scrollLeft": -188,
+    "scrollTop": -466,
+    "scrollLeft": -1332.5,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -2981,7 +2981,7 @@
         "tableId": "GszrHp96dozH39hXraUUI",
         "name": "FILE_HASH",
         "comment": "파일_해시",
-        "dataType": "CHAR(64)",
+        "dataType": "CHAR(16)",
         "default": "",
         "options": 0,
         "ui": {
@@ -2992,7 +2992,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1744944520387,
+          "updateAt": 1745305368977,
           "createAt": 1744944488493
         }
       },
@@ -5079,7 +5079,7 @@
       -1,
       {
         "name": 1744944498850,
-        "dataType": 1744944512810,
+        "dataType": 1745305368977,
         "comment": 1744944520387
       }
     ],

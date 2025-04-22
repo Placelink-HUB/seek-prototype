@@ -4,28 +4,32 @@ import biz.placelink.seek.analysis.schedule.AnalysisRequestStatus;
 import biz.placelink.seek.analysis.vo.*;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.RestApiUtil;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import kr.s2.ext.exception.S2Exception;
+import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2HashUtil;
+import kr.s2.ext.util.S2StreamUtil;
 import kr.s2.ext.util.S2Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,12 +52,16 @@ public class AnalysisService {
 
     private final AnalysisRequestStatus analysisRequestStatus;
     private final AnalysisMapper analysisMapper;
+    private final OperationService operationService;
     private final SensitiveInformationService sensitiveInformationService;
+    private final FileManager fileManager;
 
-    public AnalysisService(AnalysisRequestStatus analysisRequestStatus, AnalysisMapper analysisMapper, SensitiveInformationService sensitiveInformationService) {
+    public AnalysisService(AnalysisRequestStatus analysisRequestStatus, AnalysisMapper analysisMapper, OperationService operationService, SensitiveInformationService sensitiveInformationService, FileManager fileManager) {
         this.analysisRequestStatus = analysisRequestStatus;
         this.analysisMapper = analysisMapper;
+        this.operationService = operationService;
         this.sensitiveInformationService = sensitiveInformationService;
+        this.fileManager = fileManager;
     }
 
     @Value("${analysis.server.url}")
@@ -65,37 +73,96 @@ public class AnalysisService {
     @Value("${encryption.password}")
     public String encryptionPassword;
 
+    private long hashSeed = 0;
+
     /**
      * 비동기 분석 요청한다.
      *
-     * @param analysisRequest 분석 요청 정보
+     * @param operationDetail 작업 상세 정보
      */
     @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
-    public void asyncAnalysisRequest(AnalysisDetailVO analysisRequest) {
-        if (analysisRequest != null) {
-            String analysisId = analysisRequest.getAnalysisId();
+    public void asyncAnalysisRequest(OperationDetailVO operationDetail) {
+        if (operationDetail != null && S2Util.isEmpty(operationDetail.getAnalysisId())) {
+            String analysisId = UUID.randomUUID().toString();
 
             try {
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
-                String analysisContent = "";
+                String analysisData = "";
 
-                if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisRequest.getAnalysisTypeCcd())) {
-                    analysisContent = analysisRequest.getContent();
-                }
+                if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(operationDetail.getOperationTypeCcd())) {
+                    String analysisContent = operationDetail.getContent();
+                    String analysisHash = S2HashUtil.generateXXHash64(hashSeed, analysisContent);
 
-                if (S2Util.isEmpty(analysisContent)) {
-                    this.updateAnalysisStatus(analysisId, Constants.CD_ANALYSIS_STATUS_ERROR);
-                    return;
+                    if (analysisMapper.selectAnalysisHashCount(analysisHash) == 0) {
+                        analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.POST, 6000000,
+                                Map.entry("request_id", analysisId),
+                                Map.entry("model_name", analysisModelName),
+                                Map.entry("user_input", analysisContent)
+                        );
+                    }
+                } else {
+                    List<InputStream> dataStreamList = new ArrayList<>();
+
+                    try {
+                        String body = operationDetail.getBody();
+                        FileDetailVO fileDetail = S2Util.isNotEmpty(operationDetail.getFileId()) ? operationDetail.getFileDetail() : null;
+
+                        if (S2Util.isNotEmpty(body)) {
+                            dataStreamList.add(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
+                        }
+
+                        if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
+                            /*
+                             * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
+                             * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 아래의 InputStream 과 같이 사용할 것을 검토해야만 한다.
+                             */
+                            dataStreamList.add(fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName()));
+                        }
+
+                        String analysisHash = S2HashUtil.generateXXHash64(hashSeed, true, dataStreamList.toArray(new InputStream[0]));
+
+                        if (analysisMapper.selectAnalysisHashCount(analysisHash) == 0) {
+                            List<Map.Entry<String, Object>> paramList = new ArrayList<>();
+                            paramList.add(Map.entry("request_id", analysisId));
+                            paramList.add(Map.entry("model_name", analysisModelName));
+                            paramList.add(Map.entry("user_input", body));
+
+                            if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
+                                /*
+                                 * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
+                                 * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 위의 InputStream 과 같이 사용할 것을 검토해야만 한다.
+                                 */
+                                paramList.add(Map.entry("file", new InputStreamResource(fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName())) {
+                                    @Override
+                                    public String getFilename() {
+                                        return fileDetail.getFileName();
+                                    }
+                                }));
+                            }
+
+                            analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.POST, 6000000,
+                                    Map.entry("request_id", analysisId),
+                                    Map.entry("model_name", analysisModelName),
+                                    Map.entry("user_input", body),
+                                    fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())
+                                            ?
+                                            Map.entry("file", new InputStreamResource(fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName())) {
+                                                @Override
+                                                public String getFilename() {
+                                                    return fileDetail.getFileName();
+                                                }
+                                            }) : null
+                            );
+                        }
+                    } catch (Exception e) {
+                        for (InputStream dataStream : dataStreamList) {
+                            S2StreamUtil.closeStream(dataStream);
+                        }
+                    }
                 }
 
                 JsonNode analysisJsonData = null;
-
-                String analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.POST, 6000000,
-                        Map.entry("request_id", analysisId),
-                        Map.entry("model_name", analysisModelName),
-                        Map.entry("user_input", analysisContent)
-                );
 
                 if (S2Util.isNotEmpty(analysisData)) {
                     logger.debug("[API 요청 호출 성공] url: {}, analysisId: {}, analysisData: {}", analysisSeServerUrl, analysisId, analysisData);
@@ -109,6 +176,7 @@ public class AnalysisService {
                 }
 
                 if (analysisJsonData != null && analysisJsonData.path("request_id").asText("").equals(analysisId)) {
+                    /// /////////////// 분석 정보 등록으로 변경한다.
                     this.updateAnalysisStatus(analysisId, Constants.CD_ANALYSIS_STATUS_PROCESSING);
                 }
             } catch (Exception e) {
@@ -125,7 +193,7 @@ public class AnalysisService {
      */
     @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
-    public void asyncPollAnalysisResults(AnalysisDetailVO analysisRequest) {
+    public void asyncPollAnalysisResults(AnalysisVO analysisRequest) {
         if (analysisRequest != null) {
             String analysisId = analysisRequest.getAnalysisId();
             String targetInformation = analysisRequest.getTargetInformation();
@@ -175,7 +243,7 @@ public class AnalysisService {
 
                             String targetText = matcher.group(1);
                             String escapeText = targetText.replaceAll("[^\\p{Punct}]", "*"); // 특수문자를 제외한 모든 일반적인 문자를 *로 치환
-                            String sensitiveInformationId = String.format("$PL{%s}", S2HashUtil.generateXXHash64(targetText, 0));
+                            String sensitiveInformationId = String.format("$PL{%s}", S2HashUtil.generateXXHash64(hashSeed, targetText));
                             String severityCcd = item.path("severity").asText("");
                             int hitCount = item.path("hit").asInt(0);
 
@@ -217,7 +285,7 @@ public class AnalysisService {
 
                     if (analysisMapper.updateAnalysis(analysisResult) > 0) {
                         if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisRequest.getAnalysisTypeCcd())) {
-                            analysisMapper.updateAnalysisDatabaseContent(analysisId, sensitiveInformationList.isEmpty() ? null : analysisContent);
+                            operationService.updateDatabaseOperationContent(analysisId, sensitiveInformationList.isEmpty() ? null : analysisContent);
                         }
 
                         if (!sensitiveInformationList.isEmpty()) {
@@ -277,21 +345,11 @@ public class AnalysisService {
     }
 
     /**
-     * 실행하려는 분석 정보 목록을 조회한다.
-     *
-     * @param maxCount 분석기 서버에 요청할 수 있는 최대(스레드) 수
-     * @return 분석 정보 목록
-     */
-    public List<AnalysisDetailVO> selectAnalysisListToExecuted(int maxCount) {
-        return analysisMapper.selectAnalysisListToExecuted(maxCount);
-    }
-
-    /**
      * 실행중인 분석 정보 목록을 조회한다.
      *
      * @return 분석 정보 목록
      */
-    public List<AnalysisDetailVO> selectProcessingAnalysisList() {
+    public List<AnalysisVO> selectProcessingAnalysisList() {
         return analysisMapper.selectProcessingAnalysisList();
     }
 
@@ -303,16 +361,6 @@ public class AnalysisService {
      */
     public int insertAnalysis(AnalysisVO paramVO) {
         return analysisMapper.insertAnalysis(paramVO);
-    }
-
-    /**
-     * 분석 프록시 정보를 등록한다.
-     *
-     * @param paramVO 분석 프록시 정보
-     * @return 등록 개수
-     */
-    public int insertAnalysisProxy(AnalysisDetailVO paramVO) {
-        return analysisMapper.insertAnalysisProxy(paramVO);
     }
 
     /**

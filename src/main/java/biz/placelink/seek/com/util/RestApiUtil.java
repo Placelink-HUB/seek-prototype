@@ -50,7 +50,9 @@ public class RestApiUtil {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         if (params != null) {
             for (Map.Entry<String, Object> param : params) {
-                body.add(param.getKey(), param.getValue());
+                if (param != null) {
+                    body.add(param.getKey(), param.getValue());
+                }
             }
         }
 

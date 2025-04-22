@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.analysis.service.AnalysisMapper">
 
-	<update id="updateAnalysis" parameterType="analysisDetailVO">
+	<update id="updateAnalysis" parameterType="analysisVO">
 		/** updateAnalysis : 분석 정보를 수정한다. */
 		UPDATE SEEK_ANALYSIS
 		SET
@@ -19,13 +19,6 @@
 		WHERE ANALYSIS_ID = #{analysisId}
 	</update>
 
-	<update id="updateAnalysisDatabaseContent">
-		/** updateAnalysisDatabaseContent : 분석 데이터베이스 내용 정보를 수정한다. */
-		UPDATE SEEK_ANALYSIS_DATABASE
-		SET CONTENT = #{content}
-		WHERE ANALYSIS_ID = #{analysisId}
-	</update>
-
 	<update id="updateAnalysisTimeoutError">
 		/** updateAnalysisTimeoutError : 실행 시간이 초과된 분석을 오류 처리한다. */
 		UPDATE SEEK_ANALYSIS
@@ -36,60 +29,27 @@
 			AND NOW() - MAKE_INTERVAL(MINS => #{maxMinutes}) > ANALYSIS_START_DT
 	</update>
 
-	<sql id="sqlAnalysisDetail">
+	<select id="selectProcessingAnalysisList" parameterType="integer" resultType="analysisVO">
+		/** selectProcessingAnalysisList : 실행중인 분석 정보 목록을 조회한다. */
 		SELECT
-			a.ANALYSIS_ID,
-			a.ANALYSIS_TYPE_CCD,
-			a.ANALYSIS_STATUS_CCD,
-			a.ANALYSIS_MODEL,
-			a.ANALYSIS_START_DT,
-			a.ANALYSIS_END_DT,
-			a.ANALYSIS_TIME,
-			a.CREATE_DT,
-			ap.OPERATION_ID,
-			ap.OPERATION_TYPE_CCD,
-            ap.URL,
-            ap.HEADER,
-            ap.QUERY_STRING,
-            ap.BODY,
-            ap.FILE_ID,
-			ad.TARGET_INFORMATION,
-			ad.CONTENT
-		FROM SEEK_ANALYSIS a
-			LEFT JOIN SEEK_ANALYSIS_PROXY ap
-                ON a.ANALYSIS_ID = ap.ANALYSIS_ID
-				AND a.ANALYSIS_TYPE_CCD = 'PROXY'
-			LEFT JOIN SEEK_ANALYSIS_DATABASE ad
-				ON a.ANALYSIS_ID = ad.ANALYSIS_ID
-				AND a.ANALYSIS_TYPE_CCD = 'DATABASE'
-	</sql>
-
-	<select id="selectAnalysisListToExecuted" parameterType="integer" resultType="analysisDetailVO">
-		/** selectAnalysisListToExecuted : 실행하려는 분석 정보 목록을 조회한다. */
-		WITH PROCESSING AS (
-			/* 현재 진행중인 분석 요청을 포함하여 분석기 서버에 요청할 수 있는 최대(스레드) 수 만큼 조회 */
-			SELECT COALESCE(#{maxCount} - COUNT(1), 0) AS SEL_COUNT
-			FROM SEEK_ANALYSIS
-			WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
-		)
-		<include refid="sqlAnalysisDetail"/>
-		WHERE a.ANALYSIS_STATUS_CCD = 'WAIT'
-		ORDER BY a.CREATE_DT
-		LIMIT (
-			SELECT
-				CASE
-					WHEN 0 > SEL_COUNT THEN 0
-					ELSE SEL_COUNT
-				END
-			FROM PROCESSING
-		)
+			ANALYSIS_ID,
+			ANALYSIS_TYPE_CCD,
+			ANALYSIS_STATUS_CCD,
+			ANALYSIS_MODEL,
+			ANALYSIS_START_DT,
+			ANALYSIS_END_DT,
+			ANALYSIS_TIME,
+			CREATE_DT
+		FROM SEEK_ANALYSIS
+		WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
+		ORDER BY CREATE_DT
 	</select>
 
-	<select id="selectProcessingAnalysisList" parameterType="integer" resultType="analysisDetailVO">
-		/** selectProcessingAnalysisList : 실행중인 분석 정보 목록을 조회한다. */
-		<include refid="sqlAnalysisDetail"/>
-		WHERE a.ANALYSIS_STATUS_CCD = 'PROCESSING'
-		ORDER BY a.CREATE_DT
+	<select id="selectAnalysisHashCount" resultType="integer">
+		/** selectAnalysisHashCount : 분석 해시값의 개수를 조회한다. */
+		SELECT COUNT(1)
+		FROM SEEK_ANALYSIS
+		WHERE ANALYSIS_HASH = #{analysisHash}
 	</select>
 
 	<insert id="insertAnalysis" parameterType="analysisVO">
@@ -106,29 +66,6 @@
 			#{analysisStatusCcd},
 			#{analysisModel},
 			NOW()
-		)
-	</insert>
-
-	<insert id="insertAnalysisProxy" parameterType="analysisDetailVO">
-		/** insertAnalysisProxy : 분석 프록시 정보를 등록한다. */
-		INSERT INTO SEEK_ANALYSIS_PROXY (
-			ANALYSIS_ID,
-			OPERATION_ID,
-			OPERATION_TYPE_CCD,
-			URL,
-			HEADER,
-			QUERY_STRING,
-			BODY,
-			FILE_ID
-		) VALUES (
-			#{analysisId},
-			#{operationId},
-			#{analysisStatusCcd},
-			#{url},
-			#{header},
-			#{queryString},
-			#{body},
-			#{fileId}
 		)
 	</insert>
 

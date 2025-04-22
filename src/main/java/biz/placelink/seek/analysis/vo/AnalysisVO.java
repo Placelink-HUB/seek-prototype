@@ -1,10 +1,8 @@
 package biz.placelink.seek.analysis.vo;
 
-import biz.placelink.seek.com.vo.DefaultVO;
-
 import java.time.LocalDateTime;
 
-public class AnalysisVO extends DefaultVO {
+public class AnalysisVO extends OperationDetailVO {
 
     /* 분석 id */
     private String analysisId;
@@ -16,6 +14,8 @@ public class AnalysisVO extends DefaultVO {
     private String analysisStatusCcdNm;
     /* 분석 모델 */
     private String analysisModel;
+    /* 분석 해시 */
+    private String analysisHash;
     /* 분석 시작 일시 */
     private LocalDateTime analysisStartDt;
     /* 분석 종료 일시 */
@@ -60,6 +60,14 @@ public class AnalysisVO extends DefaultVO {
         this.analysisStatusCcd = analysisStatusCcd;
     }
 
+    public String getAnalysisStatusCcdNm() {
+        return analysisStatusCcdNm;
+    }
+
+    public void setAnalysisStatusCcdNm(String analysisStatusCcdNm) {
+        this.analysisStatusCcdNm = analysisStatusCcdNm;
+    }
+
     public String getAnalysisModel() {
         return analysisModel;
     }
@@ -68,12 +76,12 @@ public class AnalysisVO extends DefaultVO {
         this.analysisModel = analysisModel;
     }
 
-    public String getAnalysisStatusCcdNm() {
-        return analysisStatusCcdNm;
+    public String getAnalysisHash() {
+        return analysisHash;
     }
 
-    public void setAnalysisStatusCcdNm(String analysisStatusCcdNm) {
-        this.analysisStatusCcdNm = analysisStatusCcdNm;
+    public void setAnalysisHash(String analysisHash) {
+        this.analysisHash = analysisHash;
     }
 
     public LocalDateTime getAnalysisStartDt() {
