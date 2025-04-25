@@ -43,6 +43,7 @@
     <script th:src="@{/public/js/lib/dayjs.min.js}"></script>
     <script th:src="@{/public/js/lib/flatpickr/flatpickr.min.js}"></script>
     <script th:src="@{/public/js/lib/flatpickr/ko.js}"></script>
+    <script th:src="@{/public/js/echarts.min.js}"></script>
 
     <th:block layout:fragment="bodyScript"></th:block>
     <script type="text/javascript">
@@ -58,8 +59,11 @@
             <th:block th:replace="~{_layout/basic/header :: headerFragment}"></th:block>
         </header>
 
-        <section class="content-wrapper contents-type2">
+        <section class="content-wrapper">
             <div id="main">
+                <div class="sidebar-wrapper">
+                    <th:block th:replace="~{_layout/basic/sidebar :: sidebarFragment}"></th:block>
+                </div>
                 <div class="main-contents">
                     <th:block layout:fragment="bodyFragment"></th:block>
                 </div>
