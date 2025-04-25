@@ -3,54 +3,94 @@
     <profile kind="CodeFormatterProfile" name="Standard-s2" version="21">
         <!-- 줄 바꿈 관련 설정 -->
         <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="9999"/>
+        <!-- 한 줄의 최대 길이 설정 (9999로 설정 시 줄 바꿈 없음) -->
         <setting id="org.eclipse.jdt.core.formatter.comment.line_length" value="9999"/>
+        <!-- 주석의 최대 줄 길이 설정 (9999로 설정 시 줄 바꿈 없음) -->
         <setting id="org.eclipse.jdt.core.formatter.join_wrapped_lines" value="false"/>
+        <!-- 이미 줄 바꿈된 코드를 한 줄로 합칠지 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.join_lines_in_comments" value="false"/>
+        <!-- 주석에서 줄 바꿈된 텍스트를 한 줄로 합칠지 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.wrap_before_binary_operator" value="false"/>
+        <!-- 줄 바꿈 시 이진 연산자를 다음 줄의 앞에 배치할지 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.wrap_outer_expressions_when_nested" value="false"/>
+        <!-- 중첩된 표현식에서 외부 표현식을 줄 바꿈할지 여부 -->
 
         <!-- if, for 문 괄호 () 포맷팅 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_if" value="insert"/>
+        <!-- if 문에서 여는 괄호 '(' 앞에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_if" value="do not insert"/>
+        <!-- if 문에서 여는 괄호 '(' 뒤에 공백 삽입 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_closing_paren_in_if" value="do not insert"/>
+        <!-- if 문에서 닫는 괄호 ')' 앞에 공백 삽입 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_for" value="insert"/>
+        <!-- for 문에서 여는 괄호 '(' 앞에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_for" value="do not insert"/>
+        <!-- for 문에서 여는 괄호 '(' 뒤에 공백 삽입 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_closing_paren_in_for" value="do not insert"/>
+        <!-- for 문에서 닫는 괄호 ')' 앞에 공백 삽입 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_semicolon_in_for" value="insert"/>
+        <!-- for 문에서 세미콜론 ';' 뒤에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_semicolon_in_for" value="do not insert"/>
+        <!-- for 문에서 세미콜론 ';' 앞에 공백 삽입 여부 -->
 
         <!-- 중괄호 {} 포맷팅 -->
         <setting id="org.eclipse.jdt.core.formatter.brace_position_for_block" value="end_of_line"/>
+        <!-- 블록 중괄호 '{' 위치 설정 (end_of_line: 같은 줄에 배치) -->
         <setting id="org.eclipse.jdt.core.formatter.brace_position_for_method_declaration" value="end_of_line"/>
+        <!-- 메서드 선언 중괄호 '{' 위치 설정 -->
         <setting id="org.eclipse.jdt.core.formatter.brace_position_for_type_declaration" value="end_of_line"/>
+        <!-- 클래스/인터페이스 선언 중괄호 '{' 위치 설정 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_block" value="insert"/>
+        <!-- 블록 중괄호 '{' 앞에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_method_declaration" value="insert"/>
+        <!-- 메서드 선언 중괄호 '{' 앞에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_type_declaration" value="insert"/>
+        <!-- 클래스/인터페이스 선언 중괄호 '{' 앞에 공백 삽입 -->
 
         <!-- IntelliJ 스타일 공백 설정 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_comma_in_method_invocation_arguments" value="do not insert"/>
+        <!-- 메서드 호출 인수에서 쉼표 ',' 앞에 공백 삽입 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_method_invocation_arguments" value="insert"/>
+        <!-- 메서드 호출 인수에서 쉼표 ',' 뒤에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_comma_in_method_declaration_parameters" value="do not insert"/>
+        <!-- 메서드 선언 매개변수에서 쉼표 ',' 앞에 공백 삽입 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_comma_in_method_declaration_parameters" value="insert"/>
+        <!-- 메서드 선언 매개변수에서 쉼표 ',' 뒤에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_binary_operator" value="insert"/>
+        <!-- 이진 연산자 앞에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_binary_operator" value="insert"/>
+        <!-- 이진 연산자 뒤에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_before_assignment_operator" value="insert"/>
+        <!-- 할당 연산자 '=' 앞에 공백 삽입 -->
         <setting id="org.eclipse.jdt.core.formatter.insert_space_after_assignment_operator" value="insert"/>
+        <!-- 할당 연산자 '=' 뒤에 공백 삽입 -->
 
         <!-- IntelliJ 스타일 들여쓰기 및 정렬 -->
         <setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="space"/>
+        <!-- 탭 대신 공백 사용 -->
         <setting id="org.eclipse.jdt.core.formatter.tabulation.size" value="4"/>
+        <!-- 탭 크기 설정 (공백 4칸) -->
         <setting id="org.eclipse.jdt.core.formatter.indentation.size" value="4"/>
+        <!-- 들여쓰기 크기 설정 (공백 4칸) -->
         <setting id="org.eclipse.jdt.core.formatter.indent_statements_compare_to_block" value="true"/>
+        <!-- 블록과 비교하여 문장을 들여쓰기 -->
         <setting id="org.eclipse.jdt.core.formatter.indent_statements_compare_to_body" value="true"/>
+        <!-- 본문과 비교하여 문장을 들여쓰기 -->
         <setting id="org.eclipse.jdt.core.formatter.alignment_for_arguments_in_method_invocation" value="0"/>
+        <!-- 메서드 호출 인수 정렬 설정 -->
         <setting id="org.eclipse.jdt.core.formatter.alignment_for_parameters_in_method_declaration" value="0"/>
+        <!-- 메서드 선언 매개변수 정렬 설정 -->
 
         <!-- 기타 IntelliJ 스타일 설정 -->
         <setting id="org.eclipse.jdt.core.formatter.blank_lines_before_method" value="1"/>
+        <!-- 메서드 선언 전 빈 줄 개수 -->
         <setting id="org.eclipse.jdt.core.formatter.blank_lines_after_method" value="1"/>
+        <!-- 메서드 선언 후 빈 줄 개수 -->
         <setting id="org.eclipse.jdt.core.formatter.keep_simple_if_on_one_line" value="false"/>
+        <!-- 간단한 if 문을 한 줄에 유지할지 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.keep_then_statement_on_same_line" value="false"/>
+        <!-- then 문을 같은 줄에 유지할지 여부 -->
         <setting id="org.eclipse.jdt.core.formatter.keep_else_statement_on_same_line" value="false"/>
+        <!-- else 문을 같은 줄에 유지할지 여부 -->
     </profile>
 </profiles>
