@@ -127,8 +127,10 @@ public class WildpathAnalysisService {
             if (sensitiveInformationList != null) {
                 for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {
                     resultText = resultText.replace(sensitiveInformation.getSensitiveInformationId(), "origin"
-                            .equals(seekMode) ? S2EncryptionUtil.decrypt(sensitiveInformation
-                                    .getTargetText(), encryptionPassword) : sensitiveInformation.getEscapeText());
+                            .equals(seekMode)
+                                    ? S2EncryptionUtil.decrypt(sensitiveInformation
+                                            .getTargetText(), encryptionPassword)
+                                    : sensitiveInformation.getEscapeText());
                 }
             }
         }
@@ -150,18 +152,21 @@ public class WildpathAnalysisService {
         if (contentType != null) {
             String lowerContentType = contentType.toLowerCase();
             if (lowerContentType.startsWith("text/") ||
-                    (lowerContentType.startsWith("application/") && (lowerContentType.contains("json") || lowerContentType.contains("xml") ||
-                            lowerContentType.contains("xhtml") ||
-                            lowerContentType.contains("javascript") ||
-                            lowerContentType.contains("ecmascript") ||
-                            lowerContentType.contains("graphql") ||
-                            lowerContentType.contains("markdown") ||
-                            lowerContentType.contains("yaml") ||
-                            lowerContentType.contains("yml") ||
-                            lowerContentType.contains("csv") ||
-                            lowerContentType.contains("sql") ||
-                            lowerContentType.contains("toml"))) ||
-                    (lowerContentType.startsWith("image/") && (lowerContentType.contains("svg")))) {
+                    (lowerContentType.startsWith("application/") &&
+                            (lowerContentType.contains("json") ||
+                                    lowerContentType.contains("xml") ||
+                                    lowerContentType.contains("xhtml") ||
+                                    lowerContentType.contains("javascript") ||
+                                    lowerContentType.contains("ecmascript") ||
+                                    lowerContentType.contains("graphql") ||
+                                    lowerContentType.contains("markdown") ||
+                                    lowerContentType.contains("yaml") ||
+                                    lowerContentType.contains("yml") ||
+                                    lowerContentType.contains("csv") ||
+                                    lowerContentType.contains("sql") ||
+                                    lowerContentType.contains("toml"))) ||
+                    (lowerContentType.startsWith("image/") &&
+                            (lowerContentType.contains("svg")))) {
                 documentType = "text";
             } else if (lowerContentType.startsWith("image/")) {
                 documentType = "image";
