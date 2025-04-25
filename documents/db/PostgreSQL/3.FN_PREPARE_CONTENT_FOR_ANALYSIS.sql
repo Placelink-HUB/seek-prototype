@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION FN_PREPARE_TEXT_CONTENT_FOR_ANALYSIS()
     RETURNS TRIGGER AS $$
 DECLARE
-    analysis_uuid UUID := GEN_RANDOM_UUID();
+    operation_hist_id UUID := GEN_RANDOM_UUID();
     table_name TEXT := TG_ARGV[0];            -- 대상 테이블명
     column_name TEXT := TG_ARGV[1];           -- 대상 컬럼명
     pk_column_names TEXT := TG_ARGV[2];       -- 프라이머리 키 컬럼명들 (복합키인 경우 쉼표로 구분)
@@ -52,40 +52,34 @@ BEGIN
     -- pk_combined 가 SEEK_ANALYSIS_DATABASE 의 TARGET_INFORMATION 에 없는 경우에만 삽입
     IF NOT EXISTS (
         SELECT 1
-        FROM SEEK_ANALYSIS_DATABASE
+        FROM SEEK_DATABASE_OPERATION
         WHERE TARGET_INFORMATION = pk_combined
             AND (type_compare_value IS NULL OR column_type = type_compare_value)
     ) THEN
-        INSERT INTO SEEK_ANALYSIS (
+        INSERT INTO SEEK_OPERATION_HIST (
+            OPERATION_HIST_ID,
+            OPERATION_TYPE_CCD,
             ANALYSIS_ID,
-            ANALYSIS_TYPE_CCD,
-            ANALYSIS_STATUS_CCD,
-            ANALYSIS_START_DT,
-            ANALYSIS_END_DT,
-            ANALYSIS_TIME,
             CREATE_DT
         ) VALUES (
-            analysis_uuid,
+            operation_hist_id,
             'DATABASE',
-            'WAIT',
-            NULL,
-            NULL,
             NULL,
             CLOCK_TIMESTAMP()
         );
 
-        INSERT INTO SEEK_ANALYSIS_DATABASE (
-            ANALYSIS_ID,
+        INSERT INTO SEEK_DATABASE_OPERATION (
+            OPERATION_HIST_ID,
             TARGET_INFORMATION,
             CONTENT
         ) VALUES (
-            analysis_uuid,
+            operation_hist_id,
             pk_combined,
             column_value
         );
 
         -- NEW 의 대상 컬럼에 UUID 반영
-        NEW := NEW #= hstore(column_name, '$WT{' || analysis_uuid || '}');
+        NEW := NEW #= hstore(column_name, '$WT{' || operation_hist_id || '}');
     END IF;
 
     RETURN NEW;

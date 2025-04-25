@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.analysis.service.OperationMapper">
+
+	<resultMap id="operationDetailMap" type="operationDetailVO">
+		<association property="fileDetail" javaType="fileDetailVO">
+		</association>
+	</resultMap>
+
+	<sql id="sqlOperationDetail">
+		SELECT
+			soh.OPERATION_HIST_ID,
+			soh.OPERATION_TYPE_CCD,
+			soh.ANALYSIS_ID,
+			spo.OPERATION_ID,
+			spo.URL,
+			spo.HEADER,
+			spo.QUERY_STRING,
+			spo.BODY,
+			spo.FILE_ID,
+			sfd.FILE_DETAIL_ID AS "fileDetail.FILE_DETAIL_ID",
+			sfd.FILE_ID AS "fileDetail.FILE_ID",
+			sfd.FILE_NAME AS "fileDetail.FILE_NAME",
+			sfd.FILE_EXT AS "fileDetail.FILE_EXT",
+			sfd.FILE_SIZE AS "fileDetail.FILE_SIZE",
+			sfd.FILE_HASH AS "fileDetail.FILE_HASH",
+			sfd.CONTENT_TYPE AS "fileDetail.CONTENT_TYPE",
+			sfd.SAVE_PATH AS "fileDetail.SAVE_PATH",
+			sfd.SAVE_NAME AS "fileDetail.SAVE_NAME",
+			soh.CREATE_DT
+		FROM SEEK_OPERATION_HIST soh
+		    LEFT JOIN SEEK_PROXY_OPERATION spo
+		    	ON soh.OPERATION_HIST_ID = spo.OPERATION_HIST_ID
+		    LEFT JOIN SEEK_FILE_DETAIL sfd
+		    	ON spo.FILE_ID = sfd.FILE_ID
+		    LEFT JOIN SEEK_DATABASE_OPERATION sdo
+				ON soh.OPERATION_HIST_ID = sdo.OPERATION_HIST_ID
+	</sql>
+
+	<select id="selectOperationHistListToExecuted" parameterType="integer" resultMap="operationDetailMap">
+		/** selectOperationHistListToExecuted : 실행하려는 분석 정보 목록을 조회한다. */
+		WITH PROCESSING AS (
+			/* 현재 진행중인 분석 요청을 포함하여 분석기 서버에 요청할 수 있는 최대(스레드) 수 만큼 조회 */
+			SELECT COALESCE(#{maxCount} - COUNT(1), 0) AS SEL_COUNT
+			FROM SEEK_ANALYSIS
+			WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
+		)
+		<include refid="sqlOperationDetail"/>
+		WHERE soh.ANALYSIS_ID IS NULL
+		ORDER BY soh.CREATE_DT
+		LIMIT (
+			SELECT
+				CASE
+					WHEN 0 > SEL_COUNT THEN 0
+					ELSE SEL_COUNT
+				END
+			FROM PROCESSING
+		)
+	</select>
+
+	<insert id="insertProxyOperation" parameterType="operationDetailVO">
+		/** insertProxyOperation : 프록시 작업 정보를 등록한다. */
+		INSERT INTO SEEK_PROXY_OPERATION (
+			OPERATION_HIST_ID,
+			OPERATION_ID,
+			URL,
+			HEADER,
+			QUERY_STRING,
+			BODY,
+			FILE_ID
+		) VALUES (
+			#{operationHistId},
+			#{operationId},
+			#{url},
+			#{header},
+			#{queryString},
+			#{body},
+			#{fileId}
+		)
+	</insert>
+
+	<update id="updateDatabaseOperationContent">
+		/** updateAnalysisDatabaseContent : 데이터베이스 작업 정보 내용을 수정한다. */
+		UPDATE SEEK_DATABASE_OPERATION
+		SET CONTENT = #{content}
+		WHERE OPERATION_HIST_ID = #{operationHistId}
+	</update>
+
+</mapper>

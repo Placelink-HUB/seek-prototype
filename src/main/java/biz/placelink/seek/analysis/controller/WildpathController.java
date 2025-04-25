@@ -4,7 +4,6 @@ import biz.placelink.seek.analysis.service.WildpathAnalysisService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.util.S2ServletUtil;
-import kr.s2.ext.util.S2Util;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,6 +1,6 @@
 package biz.placelink.seek.analysis.service;
 
-import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.analysis.vo.OperationDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
@@ -68,7 +68,7 @@ public class WildpathAnalysisService {
         analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
 
         if (analysisService.insertAnalysis(analysis) > 0) {
-            AnalysisDetailVO analysisDetail = new AnalysisDetailVO();
+            OperationDetailVO analysisDetail = new OperationDetailVO();
             analysisDetail.setAnalysisId(analysisId);
             analysisDetail.setOperationId(requestId);
             analysisDetail.setOperationTypeCcd(Constants.CD_OPERATION_TYPE_POST);
