@@ -2,7 +2,6 @@ package biz.placelink.seek.sample.controller;
 
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
-import biz.placelink.seek.com.vo.SearchVO;
 import biz.placelink.seek.sample.service.ArticleService;
 import biz.placelink.seek.sample.vo.ArticleVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -148,5 +146,16 @@ public class ArticleController {
         model.put("contentType", fileInfo.getContentType());
         model.addAttribute(Constants.RESULT_CODE, 1);
         return "downloadView";
+    }
+
+
+    /**
+     * 사이트별 현황 페이지
+     *
+     * @return Sample 페이지 경로
+     */
+    @GetMapping(value = "/public/sample/siteStatus")
+    public String statistics(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) Integer pageNo, Model model) {
+        return "sample/site_status";
     }
 }

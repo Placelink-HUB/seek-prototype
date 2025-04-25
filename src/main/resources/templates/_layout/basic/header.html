@@ -3,31 +3,35 @@
 <th:block th:fragment="headerFragment">
     <script type="text/javascript">
     </script>
-    <div class="header-box1">
-        <div class="header-wrap">
-            <a href="/" class="top-logo">
+    <div class="header-wrap">
+        <div class="header-box1">
+            <a href="/public/sample/siteStatus" class="top-logo">
                 <img id="logo" src="../images/SEEK_logo.png" alt="SEEK-logo"/>
             </a>
-            <nav class="top-nav">
-                <ul>
-                    <li class="active"><a href="public/sample/test.html">Sample</a></li>
-                </ul>
-            </nav>
-        </div>
-        <!--
-        <div class="login-info">
-            <div class="profile">
-                <div class="profile-img"><img src="../images/user_icon.png" alt="SEEK-logo"/></div>
-                <div class="profile-name"><span>사용자</span>님</div>
-                <div class="profile-btn">
-                    <div class="icon-drop"></div>
+            <div class="ma-l50">
+                <div class="custom-select">
+                    <select class="select-site">
+                        <option value="aicas">아이카스</option>
+                        <option value="goono">구노</option>
+                    </select>
                 </div>
             </div>
-            <div class="login-box">
-                <button class="btn-logout">로그아웃</button>
+        </div>
+        <div class="header-box2">
+            <div class="notice-box">
+                <div class="flex-sty01">
+                    <div class="bar"></div>
+                    <div class="back1"></div>
+                    <div class="contents"><span class="text-bold">AICAS</span>&nbsp;<span>-</span>&nbsp;<span>민감정보 800건 검출 증가</span></div>
+                </div>
+                <div>
+                    <div class="icon-move"></div>
+                </div>
             </div>
         </div>
-        -->
+        <div class="header-box3">
+            <span class="date">2025/04/24 10:32:12</span>
+        </div>
     </div>
 </th:block>
 </html>
