@@ -1,22 +1,5 @@
 package biz.placelink.seek.analysis.service;
 
-import biz.placelink.seek.analysis.vo.OperationDetailVO;
-import biz.placelink.seek.analysis.vo.AnalysisVO;
-import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
-import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
-import biz.placelink.seek.com.constants.Constants;
-import biz.placelink.seek.system.file.service.FileService;
-import biz.placelink.seek.system.file.vo.FileDetailVO;
-import kr.s2.ext.util.S2EncryptionUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -27,6 +10,25 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import biz.placelink.seek.analysis.vo.AnalysisVO;
+import biz.placelink.seek.analysis.vo.OperationDetailVO;
+import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
+import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.system.file.service.FileService;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
+import kr.s2.ext.util.S2EncryptionUtil;
 
 /**
  * <pre>
@@ -49,7 +51,8 @@ public class WildpathAnalysisService {
     private final SensitiveInformationService sensitiveInformationService;
     private final FileService fileService;
 
-    public WildpathAnalysisService(AnalysisService analysisService, SensitiveInformationService sensitiveInformationService, FileService fileService) {
+    public WildpathAnalysisService(AnalysisService analysisService,
+            SensitiveInformationService sensitiveInformationService, FileService fileService) {
         this.analysisService = analysisService;
         this.sensitiveInformationService = sensitiveInformationService;
         this.fileService = fileService;
@@ -67,6 +70,7 @@ public class WildpathAnalysisService {
         analysis.setAnalysisTypeCcd(Constants.CD_ANALYSIS_TYPE_PROXY);
         analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
 
+        /// ///// 작업 정보를 등록해야 한다.
         if (analysisService.insertAnalysis(analysis) > 0) {
             OperationDetailVO analysisDetail = new OperationDetailVO();
             analysisDetail.setAnalysisId(analysisId);
@@ -81,6 +85,7 @@ public class WildpathAnalysisService {
                 FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisTypeCcd(), null);
             }
 
+            /// //// 작업 상세 정보를 등록해야 한다.
             result = analysisService.insertAnalysisProxy(analysisDetail);
         }
 
@@ -89,11 +94,14 @@ public class WildpathAnalysisService {
 
     /**
      * 주어진 문자열 데이터에서 민감 정보를 마스킹한다.
+     *
      * @param textData 문자열 데이터
      * @param seekMode 마스킹 모드 (mask: 마스킹된 데이터, origin: 원본 데이터, raw: 저장된 실제 데이터)
      * @return 마스킹한 문자열
      */
-    public String maskSensitiveInformation(String textData, String seekMode) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException, BadPaddingException, InvalidKeyException {
+    public String maskSensitiveInformation(String textData, String seekMode) throws InvalidAlgorithmParameterException,
+            NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException,
+            BadPaddingException, InvalidKeyException {
         String resultText = textData;
         List<String> patterns = new ArrayList<>();
 
@@ -110,15 +118,17 @@ public class WildpathAnalysisService {
             }
         }
 
-
         if (!patterns.isEmpty()) {
             SchSensitiveInformationVO searchVO = new SchSensitiveInformationVO();
             searchVO.setSchSensitiveInformationIdList(patterns);
-            List<SensitiveInformationVO> sensitiveInformationList = sensitiveInformationService.selectSensitiveInformationList(searchVO);
+            List<SensitiveInformationVO> sensitiveInformationList = sensitiveInformationService
+                    .selectSensitiveInformationList(searchVO);
 
             if (sensitiveInformationList != null) {
                 for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {
-                    resultText = resultText.replace(sensitiveInformation.getSensitiveInformationId(), "origin".equals(seekMode) ? S2EncryptionUtil.decrypt(sensitiveInformation.getTargetText(), encryptionPassword) : sensitiveInformation.getEscapeText());
+                    resultText = resultText.replace(sensitiveInformation.getSensitiveInformationId(), "origin"
+                            .equals(seekMode) ? S2EncryptionUtil.decrypt(sensitiveInformation
+                                    .getTargetText(), encryptionPassword) : sensitiveInformation.getEscapeText());
                 }
             }
         }
@@ -133,45 +143,39 @@ public class WildpathAnalysisService {
      *
      * @param contentType HTTP 요청 또는 응답의 Content-Type 헤더 값. null이 허용됩니다.
      * @return 추론된 문서 타입 (예: "text", "image", "pdf", "docx", "unknown" 등).
-     * contentType 이 null 인 경우 "unknown"을 반환합니다.
+     *         contentType 이 null 인 경우 "unknown"을 반환합니다.
      */
     public static String getDocumentTypeFromContentType(String contentType) {
         String documentType = "unknown";
         if (contentType != null) {
             String lowerContentType = contentType.toLowerCase();
             if (lowerContentType.startsWith("text/") ||
-                    (lowerContentType.startsWith("application/") && (
-                            lowerContentType.contains("json") ||
-                                    lowerContentType.contains("xml") ||
-                                    lowerContentType.contains("xhtml") ||
-                                    lowerContentType.contains("javascript") ||
-                                    lowerContentType.contains("ecmascript") ||
-                                    lowerContentType.contains("graphql") ||
-                                    lowerContentType.contains("markdown") ||
-                                    lowerContentType.contains("yaml") ||
-                                    lowerContentType.contains("yml") ||
-                                    lowerContentType.contains("csv") ||
-                                    lowerContentType.contains("sql") ||
-                                    lowerContentType.contains("toml")
-                    )) ||
-                    (lowerContentType.startsWith("image/") && (
-                            lowerContentType.contains("svg")
-                    ))) {
+                    (lowerContentType.startsWith("application/") && (lowerContentType.contains("json") || lowerContentType.contains("xml") ||
+                            lowerContentType.contains("xhtml") ||
+                            lowerContentType.contains("javascript") ||
+                            lowerContentType.contains("ecmascript") ||
+                            lowerContentType.contains("graphql") ||
+                            lowerContentType.contains("markdown") ||
+                            lowerContentType.contains("yaml") ||
+                            lowerContentType.contains("yml") ||
+                            lowerContentType.contains("csv") ||
+                            lowerContentType.contains("sql") ||
+                            lowerContentType.contains("toml"))) ||
+                    (lowerContentType.startsWith("image/") && (lowerContentType.contains("svg")))) {
                 documentType = "text";
             } else if (lowerContentType.startsWith("image/")) {
                 documentType = "image";
             } else {
                 documentType = switch (contentType) {
-                    case "application/pdf" -> "pdf";
-                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "docx";
-                    case "application/msword" -> "doc";
-                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "xlsx";
-                    case "application/vnd.ms-excel" -> "xls";
-                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> "pptx";
-                    case "application/vnd.ms-powerpoint" -> "ppt";
-                    case "application/x-hwp",
-                         "application/vnd.hancom.hwp" -> "hwp";
-                    default -> "unknown";
+                case "application/pdf" -> "pdf";
+                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "docx";
+                case "application/msword" -> "doc";
+                case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "xlsx";
+                case "application/vnd.ms-excel" -> "xls";
+                case "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> "pptx";
+                case "application/vnd.ms-powerpoint" -> "ppt";
+                case "application/x-hwp", "application/vnd.hancom.hwp" -> "hwp";
+                default -> "unknown";
                 };
             }
         }
