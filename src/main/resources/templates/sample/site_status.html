@@ -11,6 +11,7 @@
             initLineChart();
             initBarChart();
             initBarChart2();
+
         });
 
         function initDoughnutChart() {
@@ -162,38 +163,71 @@
         function initLineChart() {
             const lineChart = echarts.init(document.getElementById('lineChart'));
 
-            const xAxisData = ['1', '2', '3', '4', '5']; // 데이터 개수만큼
-            const data1 = [0, 20, 40, 80];
-            const data2 = [0, 40, 70, 100, 140];
+            // x축을 time 타입으로 설정
+            const now = new Date();
+            // 예시: 1분 간격의 시간 데이터 5개 생성
+            const xAxisData = [];
+            for (let i = 0; i < 10; i++) {
+                // 9분 전부터 현재까지 1분 간격으로 생성
+                xAxisData.push(new Date(now.getTime() - (9 - i) * 60 * 1000));
+            }
 
-            // 첫 번째 그래프 마커와 점선 위치 (마지막 값)
+            // [시간, 값] 쌍으로 데이터 준비
+            const data1 = [
+                [xAxisData[0], 0],
+                [xAxisData[1], 20],
+                [xAxisData[2], 40],
+                [xAxisData[3], 70],
+                [xAxisData[4], 80],
+            ];
+            const data2 = [
+                [xAxisData[0], 0],
+                [xAxisData[1], 40],
+                [xAxisData[2], 70],
+                [xAxisData[3], 80],
+                [xAxisData[4], 90],
+                [xAxisData[5], 90],
+                [xAxisData[6], 100],
+                [xAxisData[7], 80],
+                [xAxisData[8], 120],
+                [xAxisData[9], 140]
+            ];
+
+            // 마커 인덱스 (마지막 값)
             const marker1Index = data1.length - 1;
-            const marker1Value = data1[marker1Index];
-
-            // 두 번째 그래프 마커와 점선 위치 (마지막 값)
             const marker2Index = data2.length - 1;
-            const marker2Value = data2[marker2Index];
 
-            // 마커 데이터 생성
+            // 마커 데이터 생성 (마지막 값만 표시)
             const markerData1 = Array(data1.length).fill(null);
-            markerData1[marker1Index] = marker1Value;
-
+            markerData1[marker1Index] = data1[marker1Index];
             const markerData2 = Array(data2.length).fill(null);
-            markerData2[marker2Index] = marker2Value;
+            markerData2[marker2Index] = data2[marker2Index];
 
-            option = {
+            const option = {
                 grid: { left: 50, right: 30, top: 20, bottom: 30 },
-
                 tooltip: {
-                    trigger: 'axis', // 마커 찍힌 부분만 보고 싶으면 item으로 변경
+                    trigger: 'axis',
+                    // axisPointer: { type: 'cross' },
                 },
                 xAxis: {
-                    type: 'category',
+                    type: 'time',
+                    max: now,
+                    // min: new Date(now.getTime() - 60 * 60 * 1000),
                     boundaryGap: false,
-                    data: xAxisData,
                     axisLine: { show: false },
                     axisTick: { show: false },
-                    axisLabel: { show: false }
+                    axisLabel: {
+                        interval: 0,
+                        color: '#fff',
+                        fontSize: 12,
+                        margin: 10,
+                        formatter: function (value) {
+                            const date = new Date(value);
+                            return date.getHours().toString().padStart(2, '0') + ':' +
+                                date.getMinutes().toString().padStart(2, '0');
+                        },
+                    },
+                    splitLine: { show: false }
                 },
                 yAxis: {
                     type: 'value',
