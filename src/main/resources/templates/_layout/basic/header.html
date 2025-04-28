@@ -20,7 +20,7 @@
 
             const pad = n => String(n).padStart(2, '0');
 
-            $('.date').text(`${year}/${pad(month)}/${pad(date)} ${pad(hour)}:${pad(minute)}:${pad(second)}`);
+            $('.todayTxt').text(`${year}/${pad(month)}/${pad(date)} ${pad(hour)}:${pad(minute)}:${pad(second)}`);
         }
 
     </script>
@@ -51,7 +51,7 @@
             </div>
         </div>
         <div class="header-box3">
-            <span class="date"></span>
+            <span class="date todayTxt"></span>
         </div>
     </div>
 </th:block>
