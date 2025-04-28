@@ -1,11 +1,12 @@
 package biz.placelink.seek.analysis.schedule;
 
-import biz.placelink.seek.analysis.vo.AnalysisVO;
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.stereotype.Component;
+
+import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 
 /**
  * <pre>
@@ -21,28 +22,28 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class AnalysisRequestStatus {
 
-    private final Map<String, AnalysisVO> processingAnalysisMap;
+    private final Map<String, AnalysisDetailVO> processingAnalysisMap;
 
     AnalysisRequestStatus() {
         this.processingAnalysisMap = new ConcurrentHashMap<>();
     }
 
-    public void add(List<AnalysisVO> analysisList) {
+    public void add(List<AnalysisDetailVO> analysisList) {
         if (analysisList != null) {
-            for (AnalysisVO analysis : analysisList) {
-                String analysisId = analysis.getAnalysisId();
-                if (!processingAnalysisMap.containsKey(analysisId)) {
-                    processingAnalysisMap.put(analysisId, analysis);
+            for (AnalysisDetailVO analysis : analysisList) {
+                String analysisResultId = analysis.getAnalysisResultId();
+                if (!processingAnalysisMap.containsKey(analysisResultId)) {
+                    processingAnalysisMap.put(analysisResultId, analysis);
                 }
             }
         }
     }
 
-    public AnalysisVO get() {
-        AnalysisVO result = null;
+    public AnalysisDetailVO get() {
+        AnalysisDetailVO result = null;
         if (!processingAnalysisMap.isEmpty()) {
-            for (Map.Entry<String, AnalysisVO> entry : processingAnalysisMap.entrySet()) {
-                AnalysisVO item = entry.getValue();
+            for (Map.Entry<String, AnalysisDetailVO> entry : processingAnalysisMap.entrySet()) {
+                AnalysisDetailVO item = entry.getValue();
                 if (item != null && !item.isRequesting()) {
                     result = item;
                     break;
@@ -52,15 +53,15 @@ public class AnalysisRequestStatus {
         return result;
     }
 
-    public void setRequestStatus(String analysisId, boolean isRequesting) {
-        AnalysisVO analysis = processingAnalysisMap.get(analysisId);
+    public void setRequestStatus(String analysisResultId, boolean isRequesting) {
+        AnalysisDetailVO analysis = processingAnalysisMap.get(analysisResultId);
         if (analysis != null) {
             analysis.setRequesting(isRequesting);
         }
     }
 
-    public void remove(String analysisId) {
-        processingAnalysisMap.remove(analysisId);
+    public void remove(String analysisResultId) {
+        processingAnalysisMap.remove(analysisResultId);
     }
 
 }

@@ -1,9 +1,7 @@
 package biz.placelink.seek.analysis.schedule;
 
-import biz.placelink.seek.analysis.service.AnalysisService;
-import biz.placelink.seek.analysis.service.OperationService;
-import biz.placelink.seek.analysis.vo.AnalysisVO;
-import biz.placelink.seek.analysis.vo.OperationDetailVO;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,7 +10,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import biz.placelink.seek.analysis.service.AnalysisService;
+import biz.placelink.seek.analysis.service.AnalyzerService;
+import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 
 /**
  * <pre>
@@ -31,14 +31,14 @@ public class AnalysisScheduler {
     private static final Logger logger = LoggerFactory.getLogger(AnalysisScheduler.class);
 
     private final AnalysisRequestStatus analysisRequestStatus;
-    private final OperationService operationService;
     private final AnalysisService analysisService;
+    private final AnalyzerService AnalyzerService;
     private final ThreadPoolTaskExecutor analysisTaskExecutor;
 
-    public AnalysisScheduler(AnalysisRequestStatus analysisRequestStatus, OperationService operationService, AnalysisService analysisService, @Qualifier("analysisTaskExecutor") ThreadPoolTaskExecutor analysisTaskExecutor) {
+    public AnalysisScheduler(AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, AnalyzerService AnalyzerService, @Qualifier("analysisTaskExecutor") ThreadPoolTaskExecutor analysisTaskExecutor) {
         this.analysisRequestStatus = analysisRequestStatus;
-        this.operationService = operationService;
         this.analysisService = analysisService;
+        this.AnalyzerService = AnalyzerService;
         this.analysisTaskExecutor = analysisTaskExecutor;
     }
 
@@ -72,11 +72,11 @@ public class AnalysisScheduler {
 
         // 처리 가능한 만큼만 요청 조회
         int processableCount = Math.min(availableSlots, analysisScheduleRequestMaxcnt);
-        List<OperationDetailVO> waitOperationList = operationService.selectOperationHistListToExecuted(processableCount);
+        List<AnalysisDetailVO> waitAnalysisList = analysisService.selectAnalysisHistListToExecuted(processableCount);
 
-        if (waitOperationList != null) {
-            for (OperationDetailVO operation : waitOperationList) {
-                analysisService.asyncAnalysisRequest(operation);
+        if (waitAnalysisList != null) {
+            for (AnalysisDetailVO analysis : waitAnalysisList) {
+                AnalyzerService.asyncAnalysisRequest(analysis);
             }
         }
 
@@ -86,11 +86,11 @@ public class AnalysisScheduler {
 
     @Scheduled(fixedRate = 2000)
     public void analysisResult() {
-        AnalysisVO analysis = null;
+        AnalysisDetailVO analysisDetail = null;
         do {
-            analysis = analysisRequestStatus.get();
-            analysisService.asyncPollAnalysisResults(analysis);
-        } while (analysis != null);
+            analysisDetail = analysisRequestStatus.get();
+            AnalyzerService.asyncPollAnalysisResults(analysisDetail);
+        } while (analysisDetail != null);
     }
 
 }

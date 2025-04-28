@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION FN_PREPARE_TEXT_CONTENT_FOR_ANALYSIS()
     RETURNS TRIGGER AS $$
 DECLARE
-    operation_hist_id UUID := GEN_RANDOM_UUID();
+    analysis_id UUID := GEN_RANDOM_UUID();
     table_name TEXT := TG_ARGV[0];            -- 대상 테이블명
     column_name TEXT := TG_ARGV[1];           -- 대상 컬럼명
     pk_column_names TEXT := TG_ARGV[2];       -- 프라이머리 키 컬럼명들 (복합키인 경우 쉼표로 구분)
@@ -15,8 +15,8 @@ DECLARE
     i INT;                                    -- 루프 인덱스
 BEGIN
     /**
-     * table_name 테이블의 column_name 컬럼 내용을 SEEK_ANALYSIS 테이블로 이동하고,
-     * 분석을 위한 준비 작업을 수행하며, pk_combined 가 SEEK_ANALYSIS 에 없을 때만 삽입한다.
+     * table_name 테이블의 column_name 컬럼 내용을 SEEK_ANALYSIS_RESULT 테이블로 이동하고,
+     * 분석을 위한 준비 작업을 수행하며, pk_combined 가 SEEK_ANALYSIS_RESULT 에 없을 때만 삽입한다.
      */
 
     -- 프라이머리 키 값 동적으로 가져오기
@@ -49,37 +49,41 @@ BEGIN
             USING NEW;
     END IF;
 
-    -- pk_combined 가 SEEK_ANALYSIS_DATABASE 의 TARGET_INFORMATION 에 없는 경우에만 삽입
+    -- pk_combined 가 SEEK_ANALYSIS_RESULT_DATABASE 의 TARGET_INFORMATION 에 없는 경우에만 삽입
     IF NOT EXISTS (
         SELECT 1
-        FROM SEEK_DATABASE_OPERATION
+        FROM SEEK_DATABASE_ANALYSIS
         WHERE TARGET_INFORMATION = pk_combined
             AND (type_compare_value IS NULL OR column_type = type_compare_value)
     ) THEN
-        INSERT INTO SEEK_OPERATION_HIST (
-            OPERATION_HIST_ID,
-            OPERATION_TYPE_CCD,
+        INSERT INTO SEEK_ANALYSIS (
             ANALYSIS_ID,
-            CREATE_DT
+            ANALYSIS_TYPE_CCD,
+            ANALYSIS_STATUS_CCD,
+            ANALYSIS_RESULT_ID,
+            CREATE_DT,
+            MODIFY_DT
         ) VALUES (
-            operation_hist_id,
+            analysis_id,
             'DATABASE',
+            'WAIT',
             NULL,
+            CLOCK_TIMESTAMP(),
             CLOCK_TIMESTAMP()
         );
 
-        INSERT INTO SEEK_DATABASE_OPERATION (
-            OPERATION_HIST_ID,
+        INSERT INTO SEEK_DATABASE_ANALYSIS (
+            ANALYSIS_ID,
             TARGET_INFORMATION,
             CONTENT
         ) VALUES (
-            operation_hist_id,
+            analysis_id,
             pk_combined,
             column_value
         );
 
         -- NEW 의 대상 컬럼에 UUID 반영
-        NEW := NEW #= hstore(column_name, '$WT{' || operation_hist_id || '}');
+        NEW := NEW #= hstore(column_name, '$WT{' || analysis_id || '}');
     END IF;
 
     RETURN NEW;

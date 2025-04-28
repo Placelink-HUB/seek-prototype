@@ -21,8 +21,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import biz.placelink.seek.analysis.vo.AnalysisVO;
-import biz.placelink.seek.analysis.vo.OperationDetailVO;
+import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
@@ -47,11 +47,11 @@ public class WildpathAnalysisService {
 
     private static final Logger logger = LoggerFactory.getLogger(WildpathAnalysisService.class);
 
-    private final AnalysisService analysisService;
+    private final AnalysisResultService analysisService;
     private final SensitiveInformationService sensitiveInformationService;
     private final FileService fileService;
 
-    public WildpathAnalysisService(AnalysisService analysisService,
+    public WildpathAnalysisService(AnalysisResultService analysisService,
             SensitiveInformationService sensitiveInformationService, FileService fileService) {
         this.analysisService = analysisService;
         this.sensitiveInformationService = sensitiveInformationService;
@@ -63,19 +63,19 @@ public class WildpathAnalysisService {
 
     public int asyncPostAnalysis(String requestId, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
         int result = 0;
-        String analysisId = UUID.randomUUID().toString();
+        String analysisResultId = UUID.randomUUID().toString();
 
-        AnalysisVO analysis = new AnalysisVO();
-        analysis.setAnalysisId(analysisId);
+        AnalysisResultVO analysis = new AnalysisResultVO();
+        analysis.setAnalysisResultId(analysisResultId);
         analysis.setAnalysisTypeCcd(Constants.CD_ANALYSIS_TYPE_PROXY);
         analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
 
         /// ///// 작업 정보를 등록해야 한다.
         if (analysisService.insertAnalysis(analysis) > 0) {
-            OperationDetailVO analysisDetail = new OperationDetailVO();
-            analysisDetail.setAnalysisId(analysisId);
-            analysisDetail.setOperationId(requestId);
-            analysisDetail.setOperationTypeCcd(Constants.CD_OPERATION_TYPE_POST);
+            AnalysisDetailVO analysisDetail = new AnalysisDetailVO();
+            analysisDetail.setAnalysisResultId(analysisResultId);
+            analysisDetail.setRequestId(requestId);
+            analysisDetail.setAnalysisTypeCcd(Constants.CD_ANALYSIS_TYPE_ASYNC_POST);
             analysisDetail.setUrl(url);
             analysisDetail.setHeader(header);
             analysisDetail.setQueryString(queryString);

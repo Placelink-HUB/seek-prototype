@@ -2,12 +2,12 @@ package biz.placelink.seek.analysis.vo;
 
 import biz.placelink.seek.system.file.vo.FileDetailVO;
 
-public class OperationDetailVO extends OperationHistVO {
+public class AnalysisDetailVO extends AnalysisVO {
 
-    //---------- 프록시 ----------//
+    // ---------- 프록시 ----------//
 
     /* 작업 ID */
-    private String operationId;
+    private String requestId;
     /* URL */
     private String url;
     /* 헤더 */
@@ -21,20 +21,19 @@ public class OperationDetailVO extends OperationHistVO {
     /* 파일 상세 */
     private FileDetailVO fileDetail;
 
-    //---------- 데이터베이스 ----------//
+    // ---------- 데이터베이스 ----------//
 
     /* 대상 정보 */
     private String targetInformation;
     /* 내용 */
     private String content;
 
-
-    public String getOperationId() {
-        return operationId;
+    public String getRequestId() {
+        return requestId;
     }
 
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
     public String getUrl() {

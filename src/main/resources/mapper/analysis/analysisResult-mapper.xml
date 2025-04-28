@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.analysis.service.AnalysisResultMapper">
+
+    <select id="selectAnalysisResultCountByHash" resultType="integer">
+		/** selectAnalysisResultCountByHash : 해시 값(분석 결과 ID)으로 동일 분석 결과가 있는지 확인한다. */
+		SELECT COUNT(1)
+		FROM SEEK_ANALYSIS_RESULT
+		WHERE ANALYSIS_RESULT_ID = #{analysisResultId}
+    </select>
+
+    <select id="selectAnalysisResult" resultType="analysisResultVO">
+		/** selectAnalysisResult : 분석 결과를 조회한다. */
+		SELECT
+            sa.ANALYSIS_ID,
+            sar.ANALYSIS_RESULT_ID,
+            sar.ANALYZED_CONTENT,
+            COALESCE(sar.TOTAL_DETECTED_COUNT, 0) AS TOTAL_DETECTED_COUNT,
+            sda.TARGET_INFORMATION,
+            sda.CONTENT
+		FROM SEEK_ANALYSIS sa
+            JOIN SEEK_ANALYSIS_RESULT sar
+                ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
+            LEFT JOIN SEEK_DATABASE_ANALYSIS sda
+                ON sa.ANALYSIS_ID = sda.ANALYSIS_ID
+                AND COALESCE(sa.ANALYSIS_TYPE_CCD, '') = 'DATABASE'
+		WHERE sa.ANALYSIS_ID = #{analysisId}
+            AND sar.ANALYSIS_RESULT_ID = #{analysisResultId}
+    </select>
+
+    <insert id="insertAnalysisResult">
+        /** insertAnalysisResult : 분석 결과를 등록한다. */
+        INSERT INTO SEEK_ANALYSIS_RESULT (
+            ANALYSIS_RESULT_ID,
+            CREATE_DT,
+            MODIFY_DT
+        ) VALUES (
+            #{analysisResultId},
+            NOW(),
+            NOW()
+        )
+    </insert>
+
+    <update id="updateAnalysisResult">
+        /** updateAnalysisResult : 분석 결과를 수정한다. */
+        UPDATE SEEK_ANALYSIS_RESULT
+        SET
+            ANALYZED_CONTENT = #{analyzedContent},
+            TOTAL_DETECTED_COUNT = #{totalDetectedCount},
+            MODIFY_DT = NOW()
+        WHERE ANALYSIS_RESULT_ID = #{analysisResultId}
+    </update>
+
+    <insert id="insertAnalysisResultItemList">
+		/** insertAnalysisResultItemList : 분석 결과 항목 목록을 등록한다. */
+		INSERT INTO SEEK_ANALYSIS_RESULT_ITEMS (
+			ANALYSIS_RESULT_ID,
+			DETECTION_TYPE_CCD,
+			DETECTED_COUNT
+		) VALUES
+        <foreach collection="analysisResultItemList" item="item" separator=",">
+			(
+				#{item.analysisResultId},
+				#{item.detectionTypeCcd},
+				#{item.detectedCount}
+			)
+        </foreach>
+    </insert>
+
+
+
+</mapper>

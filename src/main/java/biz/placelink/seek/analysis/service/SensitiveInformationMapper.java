@@ -1,12 +1,13 @@
 package biz.placelink.seek.analysis.service;
 
-import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
-import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
-import java.util.Map;
+import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
+import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 
 /**
  * <pre>

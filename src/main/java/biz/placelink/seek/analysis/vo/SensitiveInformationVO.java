@@ -1,12 +1,12 @@
 package biz.placelink.seek.analysis.vo;
 
-import biz.placelink.seek.com.vo.DefaultVO;
-
 import java.util.List;
+
+import biz.placelink.seek.com.vo.DefaultVO;
 
 public class SensitiveInformationVO extends DefaultVO {
 
-    /* 민감 정보 ID */
+    /* 민감 정보 ID (해시 값) */
     private String sensitiveInformationId;
     /* 대상 문자열 */
     private String targetText;

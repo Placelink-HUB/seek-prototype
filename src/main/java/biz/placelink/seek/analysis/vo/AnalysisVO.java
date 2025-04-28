@@ -2,9 +2,11 @@ package biz.placelink.seek.analysis.vo;
 
 import java.time.LocalDateTime;
 
-public class AnalysisVO extends OperationDetailVO {
+import biz.placelink.seek.com.vo.DefaultVO;
 
-    /* 분석 id */
+public class AnalysisVO extends DefaultVO {
+
+    /* 분석 ID */
     private String analysisId;
     /* 분석 타입 공통코드 */
     private String analysisTypeCcd;
@@ -14,16 +16,14 @@ public class AnalysisVO extends OperationDetailVO {
     private String analysisStatusCcdNm;
     /* 분석 모델 */
     private String analysisModel;
-    /* 분석 해시 */
-    private String analysisHash;
+    /* 분석 결과 ID (해시 값) */
+    private String analysisResultId;
     /* 분석 시작 일시 */
     private LocalDateTime analysisStartDt;
     /* 분석 종료 일시 */
     private LocalDateTime analysisEndDt;
     /* 분석 시간(ms) */
-    private long analysisTime;
-    /* 전체 검출 개수 */
-    private Integer totalDetectedCount;
+    private Long analysisTime;
 
     /* 요청 상태 */
     private boolean isRequesting = false;
@@ -76,12 +76,12 @@ public class AnalysisVO extends OperationDetailVO {
         this.analysisModel = analysisModel;
     }
 
-    public String getAnalysisHash() {
-        return analysisHash;
+    public String getAnalysisResultId() {
+        return analysisResultId;
     }
 
-    public void setAnalysisHash(String analysisHash) {
-        this.analysisHash = analysisHash;
+    public void setAnalysisResultId(String analysisResultId) {
+        this.analysisResultId = analysisResultId;
     }
 
     public LocalDateTime getAnalysisStartDt() {
@@ -100,20 +100,12 @@ public class AnalysisVO extends OperationDetailVO {
         this.analysisEndDt = analysisEndDt;
     }
 
-    public long getAnalysisTime() {
+    public Long getAnalysisTime() {
         return analysisTime;
     }
 
-    public void setAnalysisTime(long analysisTime) {
+    public void setAnalysisTime(Long analysisTime) {
         this.analysisTime = analysisTime;
-    }
-
-    public Integer getTotalDetectedCount() {
-        return totalDetectedCount;
-    }
-
-    public void setTotalDetectedCount(Integer totalDetectedCount) {
-        this.totalDetectedCount = totalDetectedCount;
     }
 
     public boolean isRequesting() {
@@ -123,4 +115,5 @@ public class AnalysisVO extends OperationDetailVO {
     public void setRequesting(boolean requesting) {
         isRequesting = requesting;
     }
+
 }

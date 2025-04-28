@@ -74,17 +74,27 @@ public class Constants {
      */
     public static final String TYPE_DATA_DOUBLE = "double";
 
-
     /**
      * 시스템 식별자
      */
     public static final String SYSTEM_UID = "00000000-0000-0000-0000-000000000000";
 
-
     /**
-     * 분석_타입_공통코드 - 프록시
+     * 분석_타입_공통코드 - 전처리
      */
-    public static final String CD_ANALYSIS_TYPE_PROXY = "PROXY";
+    public static final String CD_ANALYSIS_TYPE_PRE = "PRE";
+    /**
+     * 분석_타입_공통코드 - 전처리(비동기)
+     */
+    public static final String CD_ANALYSIS_TYPE_ASYNC_PRE = "ASYNC_PRE";
+    /**
+     * 분석_타입_공통코드 - 후처리
+     */
+    public static final String CD_ANALYSIS_TYPE_POST = "POST";
+    /**
+     * 분석_타입_공통코드 - 후처리(비동기)
+     */
+    public static final String CD_ANALYSIS_TYPE_ASYNC_POST = "ASYNC_POST";
     /**
      * 분석_타입_공통코드 - 데이터베이스
      */
@@ -108,15 +118,6 @@ public class Constants {
     public static final String CD_ANALYSIS_STATUS_ERROR = "ERROR";
 
     /**
-     * 작업_타입_공통코드 - 전처리
-     */
-    public static final String CD_OPERATION_TYPE_PRE = "PRE";
-    /**
-     * 작업_타입_공통코드 - 후처리
-     */
-    public static final String CD_OPERATION_TYPE_POST = "POST";
-
-    /**
      * 게시글_타입_공통코드
      */
     public static final String GRPCD_ARTICLE_TYPE = "ARTICLE_TYPE_CCD";
@@ -129,7 +130,6 @@ public class Constants {
      */
     public static final String CD_ARTICLE_TYPE_FILE = "FILE";
 
-
     public static void setConstsMap(Map<String, Object> consts) {
         if (consts == null) {
             consts = new HashMap<>();
@@ -140,22 +140,22 @@ public class Constants {
             for (Field field : fields) {
                 try {
                     switch (field.getType().getName()) {
-                        case Constants.TYPE_WRAPPER_STRING:
-                        case Constants.TYPE_WRAPPER_INTEGER:
-                        case Constants.TYPE_DATA_INT:
-                        case Constants.TYPE_WRAPPER_LONG:
-                        case Constants.TYPE_DATA_LONG:
-                        case Constants.TYPE_WRAPPER_FLOAT:
-                        case Constants.TYPE_DATA_FLOAT:
-                        case Constants.TYPE_WRAPPER_DOUBLE:
-                        case Constants.TYPE_DATA_DOUBLE:
-                            consts.put(field.getName(), field.get(Constants.class));
-                            break;
-                        case Constants.TYPE_ARRAY_STRING:
-                            consts.put(field.getName(), Arrays.toString((String[]) field.get(Constants.class)).replaceAll("[]\\[\\s]", ""));
-                            break;
-                        default:
-                            break;
+                    case Constants.TYPE_WRAPPER_STRING:
+                    case Constants.TYPE_WRAPPER_INTEGER:
+                    case Constants.TYPE_DATA_INT:
+                    case Constants.TYPE_WRAPPER_LONG:
+                    case Constants.TYPE_DATA_LONG:
+                    case Constants.TYPE_WRAPPER_FLOAT:
+                    case Constants.TYPE_DATA_FLOAT:
+                    case Constants.TYPE_WRAPPER_DOUBLE:
+                    case Constants.TYPE_DATA_DOUBLE:
+                        consts.put(field.getName(), field.get(Constants.class));
+                        break;
+                    case Constants.TYPE_ARRAY_STRING:
+                        consts.put(field.getName(), Arrays.toString((String[]) field.get(Constants.class)).replaceAll("[]\\[\\s]", ""));
+                        break;
+                    default:
+                        break;
                     }
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     continue;
