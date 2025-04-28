@@ -2,6 +2,27 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <th:block th:fragment="headerFragment">
     <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', () => {
+
+            setInterval(printCurrentTime, 1000);
+
+        });
+
+        function printCurrentTime() {
+            const now = new Date();
+
+            const year = now.getFullYear();      // 연도 (예: 2025)
+            const month = now.getMonth() + 1;    // 월 (0~11이므로 +1, 예: 4)
+            const date = now.getDate();          // 일 (예: 28)
+            const hour = now.getHours();         // 시 (0~23, 예: 14)
+            const minute = now.getMinutes();     // 분 (0~59)
+            const second = now.getSeconds();     // 초 (0~59)
+
+            const pad = n => String(n).padStart(2, '0');
+
+            $('.todayTxt').text(`${year}/${pad(month)}/${pad(date)} ${pad(hour)}:${pad(minute)}:${pad(second)}`);
+        }
+
     </script>
     <div class="header-wrap">
         <div class="header-box1">
@@ -30,7 +51,7 @@
             </div>
         </div>
         <div class="header-box3">
-            <span class="date">2025/04/24 10:32:12</span>
+            <span class="date todayTxt"></span>
         </div>
     </div>
 </th:block>
