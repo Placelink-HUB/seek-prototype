@@ -11,8 +11,13 @@ public class DashboardController {
 
     private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
 
+    @GetMapping(value = "/public/dashboard/integrated")
+    protected String integratedDashboard(@PathVariable String siteId) {
+        return "dashboard/integrated-dashboard";
+    }
+
     @GetMapping(value = "/public/dashboard/{siteId}")
-    protected String dashboard(@PathVariable String siteId) {
+    protected String detailDashboard(@PathVariable String siteId) {
         return "dashboard/detail-dashboard";
     }
 
