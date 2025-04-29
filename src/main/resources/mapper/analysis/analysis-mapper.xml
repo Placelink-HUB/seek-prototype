@@ -66,7 +66,7 @@
 			sa.ANALYSIS_STATUS_CCD,
 			sa.ANALYSIS_MODEL,
 			sa.ANALYSIS_RESULT_ID,
-			sa.sa.ANALYSIS_START_DT,
+			sa.ANALYSIS_START_DT,
 			sa.ANALYSIS_END_DT,
 			sa.ANALYSIS_TIME,
 			sda.CONTENT,
@@ -86,12 +86,14 @@
 			ANALYSIS_TYPE_CCD,
 			ANALYSIS_STATUS_CCD,
 			ANALYSIS_MODEL,
-			CREATE_DT
+			CREATE_DT,
+			MODIFY_DT
 		) VALUES (
 			#{analysisId},
 			#{analysisTypeCcd},
 			#{analysisStatusCcd},
 			#{analysisModel},
+			NOW(),
 			NOW()
 		)
     </insert>
@@ -103,20 +105,20 @@
 			ANALYSIS_STATUS_CCD = COALESCE(#{analysisStatusCcd}, ANALYSIS_STATUS_CCD),
             ANALYSIS_MODEL = COALESCE(#{analysisModel}, ANALYSIS_MODEL),
             ANALYSIS_RESULT_ID = COALESCE(#{analysisResultId}, ANALYSIS_RESULT_ID),
-        <choose>
-            <when test='analysisStatusCcd eq "PROCESSING"'>
-                ANALYSIS_START_DT = CASE
-                    WHEN ANALYSIS_START_DT IS NULL THEN NOW()
-                    ELSE ANALYSIS_START_DT
-                END,
-            </when>
-            <when test='analysisStatusCcd eq "COMPLETE" or analysisStatusCcd eq "ERROR"'>
-                ANALYSIS_END_DT = CASE
-                    WHEN ANALYSIS_END_DT IS NULL THEN NOW()
-                    ELSE ANALYSIS_END_DT
-                END,
-            </when>
-        </choose>
+			<choose>
+				<when test='analysisStatusCcd eq "PROCESSING"'>
+					ANALYSIS_START_DT = CASE
+						WHEN ANALYSIS_START_DT IS NULL THEN NOW()
+						ELSE ANALYSIS_START_DT
+					END,
+				</when>
+				<when test='analysisStatusCcd eq "COMPLETE" or analysisStatusCcd eq "ERROR"'>
+					ANALYSIS_END_DT = CASE
+						WHEN ANALYSIS_END_DT IS NULL THEN NOW()
+						ELSE ANALYSIS_END_DT
+					END,
+				</when>
+			</choose>
 			ANALYSIS_TIME = COALESCE(#{analysisTime}, ANALYSIS_TIME),
             MODIFY_DT = NOW()
 		WHERE ANALYSIS_ID = #{analysisId}
@@ -124,7 +126,7 @@
 
     <update id="updateAnalysisTimeoutError">
 		/** updateAnalysisTimeoutError : 실행 시간이 초과된 분석을 오류 처리한다. */
-		UPDATE SEEK_ANALYSIS_RESULT
+		UPDATE SEEK_ANALYSIS
 		SET
 			ANALYSIS_STATUS_CCD = 'ERROR',
 			ANALYSIS_END_DT = NOW()

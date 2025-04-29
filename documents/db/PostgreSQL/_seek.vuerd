@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -490,
-    "scrollLeft": -725.875,
+    "scrollTop": -935,
+    "scrollLeft": -335.875,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -1851,20 +1851,20 @@
       "vxJiuA_IQU_35NNjtwHPC": {
         "id": "vxJiuA_IQU_35NNjtwHPC",
         "tableId": "0A4rsdnMGOX6ZlJTsh3y5",
-        "name": "DETECTED_COUNT",
+        "name": "DETECTION_COUNT",
         "comment": "검출_개수",
         "dataType": "NUMERIC(5)",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
-          "widthName": 102,
+          "widthName": 108,
           "widthComment": 60,
           "widthDataType": 68,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1743753570599,
+          "updateAt": 1745911314727,
           "createAt": 1743753540020
         }
       },
@@ -4572,7 +4572,7 @@
       1743753540020,
       -1,
       {
-        "name": 1743753553527,
+        "name": 1745911314726,
         "dataType": 1743753563033,
         "options(notNull)": 1743753563975,
         "comment": 1743753570599
