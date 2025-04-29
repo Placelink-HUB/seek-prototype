@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -867,
-    "scrollLeft": -497.875,
+    "scrollTop": -918,
+    "scrollLeft": -518.875,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -281,8 +281,8 @@
       },
       "0A4rsdnMGOX6ZlJTsh3y5": {
         "id": "0A4rsdnMGOX6ZlJTsh3y5",
-        "name": "SEEK_ANALYSIS_RESULT_ITEMS",
-        "comment": "분석_결과_항목",
+        "name": "SEEK_ANALYSIS_DETECTIONS",
+        "comment": "분석_검출",
         "columnIds": [
           "CTICHzhNE2SrY9nFfCcYI",
           "AKnxfEE-lhCEK336GD5zj",
@@ -296,14 +296,14 @@
         ],
         "ui": {
           "x": 157.8112,
-          "y": 1400.1823,
+          "y": 1344.0848,
           "zIndex": 2521,
-          "widthName": 166,
-          "widthComment": 84,
+          "widthName": 158,
+          "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1745824977102,
+          "updateAt": 1745889958419,
           "createAt": 1743753362166
         }
       },
@@ -595,6 +595,7 @@
         "columnIds": [
           "CT5R8bjaMI0zt1L-YkKDd",
           "17q42o4vTqM1aiUFZG9f8",
+          "TuHIuNyx6gdA6l65CI3oM",
           "hYrU5vAtBstEeX4g3w1Fh",
           "qDchmhGBeFrmFry0lcS4Y",
           "2zUF8nvK86hcMpaMkpkrb",
@@ -605,6 +606,7 @@
           "CT5R8bjaMI0zt1L-YkKDd",
           "17q42o4vTqM1aiUFZG9f8",
           "duwCNiUCBIPWicZJJAWJO",
+          "TuHIuNyx6gdA6l65CI3oM",
           "hYrU5vAtBstEeX4g3w1Fh",
           "qDchmhGBeFrmFry0lcS4Y",
           "2zUF8nvK86hcMpaMkpkrb",
@@ -620,7 +622,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1745820636138,
+          "updateAt": 1745893111123,
           "createAt": 1745210649443
         }
       }
@@ -2189,20 +2191,20 @@
       "FPfcgKOtJDJ1Q_fnWnrF7": {
         "id": "FPfcgKOtJDJ1Q_fnWnrF7",
         "tableId": "Yb8CUNZWbGFMH-3n8qxAj",
-        "name": "TOTAL_DETECTED_COUNT",
+        "name": "TOTAL_DETECTION_COUNT",
         "comment": "전체_검출_개수",
         "dataType": "NUMERIC(5)",
         "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
-          "widthName": 140,
+          "widthName": 146,
           "widthComment": 84,
           "widthDataType": 68,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1744082955384,
+          "updateAt": 1745890681912,
           "createAt": 1744082927660
         }
       },
@@ -3485,6 +3487,26 @@
           "updateAt": 1745850345043,
           "createAt": 1745850334907
         }
+      },
+      "TuHIuNyx6gdA6l65CI3oM": {
+        "id": "TuHIuNyx6gdA6l65CI3oM",
+        "tableId": "Zg3TicWVmVILwPgPsjmTX",
+        "name": "COUNTRY_CCD",
+        "comment": "국가_공통코드",
+        "dataType": "VARCHAR(30)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 83,
+          "widthComment": 79,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1745893203859,
+          "createAt": 1745893078109
+        }
       }
     },
     "relationshipEntities": {
@@ -3554,7 +3576,7 @@
           "columnIds": [
             "6Ae2l0X0PEhK8ZwfwXayu"
           ],
-          "x": 441.5947,
+          "x": 444.5947,
           "y": 1178.8025,
           "direction": 8
         },
@@ -3564,7 +3586,7 @@
             "CTICHzhNE2SrY9nFfCcYI"
           ],
           "x": 429.8112,
-          "y": 1400.1823,
+          "y": 1344.0848,
           "direction": 4
         },
         "meta": {
@@ -3648,7 +3670,7 @@
             "CT5R8bjaMI0zt1L-YkKDd"
           ],
           "x": 876.8289,
-          "y": 635.1707,
+          "y": 647.1707,
           "direction": 1
         },
         "meta": {
@@ -3694,7 +3716,7 @@
           "columnIds": [
             "6Ae2l0X0PEhK8ZwfwXayu"
           ],
-          "x": 441.5947,
+          "x": 444.5947,
           "y": 1002.8025,
           "direction": 4
         },
@@ -4510,8 +4532,8 @@
       1743753362165,
       -1,
       {
-        "name": 1744081934732,
-        "comment": 1744081842524
+        "name": 1745889779602,
+        "comment": 1745889789468
       }
     ],
     "CTICHzhNE2SrY9nFfCcYI": [
@@ -4775,7 +4797,7 @@
       1744082927659,
       -1,
       {
-        "name": 1744082937957,
+        "name": 1745890681911,
         "dataType": 1744082945880,
         "comment": 1744082955384
       }
@@ -5597,6 +5619,17 @@
         "dataType": 1745850338772,
         "options(notNull)": 1745850340356,
         "comment": 1745850345038
+      }
+    ],
+    "TuHIuNyx6gdA6l65CI3oM": [
+      "tableColumnEntities",
+      1745893078109,
+      -1,
+      {
+        "name": 1745893084461,
+        "dataType": 1745893203859,
+        "comment": 1745893103785,
+        "options(notNull)": 1745893113884
       }
     ]
   }

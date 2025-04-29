@@ -15,20 +15,19 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
-import biz.placelink.seek.analysis.vo.AnalysisResultVO;
+import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.system.file.service.FileService;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.util.S2EncryptionUtil;
+import kr.s2.ext.util.S2Util;
 
 /**
  * <pre>
@@ -45,15 +44,14 @@ import kr.s2.ext.util.S2EncryptionUtil;
 @Transactional(readOnly = true)
 public class WildpathAnalysisService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WildpathAnalysisService.class);
-
-    private final AnalysisResultService analysisService;
+    private final AnalysisService analysisService;
+    private final AnalysisDetailService analysisDetailService;
     private final SensitiveInformationService sensitiveInformationService;
     private final FileService fileService;
 
-    public WildpathAnalysisService(AnalysisResultService analysisService,
-            SensitiveInformationService sensitiveInformationService, FileService fileService) {
+    public WildpathAnalysisService(AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, FileService fileService) {
         this.analysisService = analysisService;
+        this.analysisDetailService = analysisDetailService;
         this.sensitiveInformationService = sensitiveInformationService;
         this.fileService = fileService;
     }
@@ -61,32 +59,63 @@ public class WildpathAnalysisService {
     @Value("${encryption.password}")
     public String encryptionPassword;
 
-    public int asyncPostAnalysis(String requestId, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
+    public int createProxyAnalysis(String analysisTypeCcd, String requestId, String countryCcd, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
         int result = 0;
-        String analysisResultId = UUID.randomUUID().toString();
+        String analysisId = UUID.randomUUID().toString();
 
-        AnalysisResultVO analysis = new AnalysisResultVO();
-        analysis.setAnalysisResultId(analysisResultId);
-        analysis.setAnalysisTypeCcd(Constants.CD_ANALYSIS_TYPE_PROXY);
+        // 분석 등록 (분석 모델은 AnalyzerService 에서 분석 요청시 결정)
+        AnalysisVO analysis = new AnalysisVO();
+        analysis.setAnalysisId(analysisId);
+        analysis.setAnalysisTypeCcd(analysisTypeCcd);
         analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
 
-        /// ///// 작업 정보를 등록해야 한다.
-        if (analysisService.insertAnalysis(analysis) > 0) {
+        result = analysisService.insertAnalysis(analysis);
+
+        if (result > 0) {
             AnalysisDetailVO analysisDetail = new AnalysisDetailVO();
-            analysisDetail.setAnalysisResultId(analysisResultId);
+            analysisDetail.setAnalysisId(analysisId);
             analysisDetail.setRequestId(requestId);
-            analysisDetail.setAnalysisTypeCcd(Constants.CD_ANALYSIS_TYPE_ASYNC_POST);
+            analysisDetail.setCountryCcd(countryCcd);
             analysisDetail.setUrl(url);
             analysisDetail.setHeader(header);
             analysisDetail.setQueryString(queryString);
             analysisDetail.setBody(body);
 
             if (fileData != null) {
-                FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisTypeCcd(), null);
+                FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisTypeCcd(), Constants.CD_FILE_SE_1010);
+
+                if (fileDetailVO != null) {
+                    String fileId = UUID.randomUUID().toString();
+                    String baseFileName = "";
+                    String fileExtension = "";
+
+                    if (S2Util.isNotEmpty(fileName)) {
+                        int lastIndex = fileName.lastIndexOf(".");
+                        if (lastIndex > 0) {
+                            baseFileName = fileName.substring(0, lastIndex);
+                            fileExtension = fileName.substring(lastIndex + 1);
+                        } else {
+                            baseFileName = fileName;
+                        }
+                    }
+
+                    // 파일 정보
+                    fileDetailVO.setFileId(fileId);
+                    fileDetailVO.setFileSeCcd(Constants.CD_FILE_SE_1010);
+
+                    // 파일 상세 정보
+                    fileDetailVO.setFileDetailId(fileId);
+                    fileDetailVO.setFileName(baseFileName);
+                    fileDetailVO.setFileExt(fileExtension);
+                    fileDetailVO.setContentType(contentType);
+
+                    if (fileService.insertFileWithDetail(fileDetailVO, Constants.SYSTEM_UID) > 0) {
+                        analysisDetail.setFileId(fileId);
+                    }
+                }
             }
 
-            /// //// 작업 상세 정보를 등록해야 한다.
-            result = analysisService.insertAnalysisProxy(analysisDetail);
+            analysisDetailService.insertProxyAnalysis(analysisDetail);
         }
 
         return result;
@@ -121,8 +150,7 @@ public class WildpathAnalysisService {
         if (!patterns.isEmpty()) {
             SchSensitiveInformationVO searchVO = new SchSensitiveInformationVO();
             searchVO.setSchSensitiveInformationIdList(patterns);
-            List<SensitiveInformationVO> sensitiveInformationList = sensitiveInformationService
-                    .selectSensitiveInformationList(searchVO);
+            List<SensitiveInformationVO> sensitiveInformationList = sensitiveInformationService.selectSensitiveInformationList(searchVO);
 
             if (sensitiveInformationList != null) {
                 for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {

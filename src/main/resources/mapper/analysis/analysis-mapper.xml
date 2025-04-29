@@ -101,6 +101,7 @@
 		UPDATE SEEK_ANALYSIS
 		SET
 			ANALYSIS_STATUS_CCD = COALESCE(#{analysisStatusCcd}, ANALYSIS_STATUS_CCD),
+            ANALYSIS_MODEL = COALESCE(#{analysisModel}, ANALYSIS_MODEL),
             ANALYSIS_RESULT_ID = COALESCE(#{analysisResultId}, ANALYSIS_RESULT_ID),
         <choose>
             <when test='analysisStatusCcd eq "PROCESSING"'>
@@ -120,41 +121,6 @@
             MODIFY_DT = NOW()
 		WHERE ANALYSIS_ID = #{analysisId}
     </update>
-
-    <update id="updateDatabaseAnalysisContent">
-		/** updateAnalysisDatabaseContent : 데이터베이스 분석 정보 내용을 수정한다. */
-		UPDATE SEEK_DATABASE_ANALYSIS
-		SET CONTENT = #{content}
-		WHERE ANALYSIS_ID = #{analysisId}
-    </update>
-
-    <update id="updateAnalysisTargetColumnDynamically">
-		/** updateAnalysisTargetColumnDynamically : 분석 대상 컬럼을 동적으로 수정한다. */
-		UPDATE ${tableName}
-		SET ${columnName} = #{newValue}
-		WHERE ${columnName} = #{oldValue}
-    </update>
-
-    <insert id="insertProxyAnalysis" parameterType="analysisDetailVO">
-		/** insertProxyAnalysis : 프록시 분석 정보를 등록한다. */
-		INSERT INTO SEEK_PROXY_ANALYSIS (
-			ANALYSIS_ID,
-			REQUEST_ID,
-			URL,
-			HEADER,
-			QUERY_STRING,
-			BODY,
-			FILE_ID
-		) VALUES (
-			#{analysisId},
-			#{requestId},
-			#{url},
-			#{header},
-			#{queryString},
-			#{body},
-			#{fileId}
-		)
-    </insert>
 
     <update id="updateAnalysisTimeoutError">
 		/** updateAnalysisTimeoutError : 실행 시간이 초과된 분석을 오류 처리한다. */

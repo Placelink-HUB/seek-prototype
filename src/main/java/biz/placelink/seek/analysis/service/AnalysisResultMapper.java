@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import biz.placelink.seek.analysis.vo.AnalysisResultItemVO;
+import biz.placelink.seek.analysis.vo.AnalysisDetectionVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 
 /**
@@ -50,19 +50,19 @@ public interface AnalysisResultMapper {
     /**
      * 분석 결과를 수정한다.
      *
-     * @param analysisResultId   분석 결과 ID
-     * @param analyzedContent    분석된 내용
-     * @param totalDetectedCount 총 탐지 개수
+     * @param analysisResultId    분석 결과 ID
+     * @param analyzedContent     분석된 내용
+     * @param totalDetectionCount 총 탐지 개수
      * @return 등록 개수
      */
-    int updateAnalysisResult(@Param("analysisResultId") String analysisResultId, @Param("analyzedContent") String analyzedContent, @Param("totalDetectedCount") Integer totalDetectedCount);
+    int updateAnalysisResult(@Param("analysisResultId") String analysisResultId, @Param("analyzedContent") String analyzedContent, @Param("totalDetectionCount") Integer totalDetectionCount);
 
     /**
-     * 분석 결과 항목을 등록한다.
+     * 분석 검출 목록을 등록한다.
      *
-     * @param analysisResultItemList 분석 결과 항목 목록
+     * @param analysisDetectionList 분석 결과 항목 목록
      * @return 등록 개수
      */
-    int insertAnalysisResultItems(@Param("analysisResultItemList") List<AnalysisResultItemVO> analysisResultItemList);
+    int insertAnalysisDetectionList(@Param("analysisDetectionList") List<AnalysisDetectionVO> analysisDetectionList);
 
 }

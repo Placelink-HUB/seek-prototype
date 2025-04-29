@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import biz.placelink.seek.analysis.vo.AnalysisResultItemVO;
+import biz.placelink.seek.analysis.vo.AnalysisDetectionVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 
 /**
@@ -64,23 +64,23 @@ public class AnalysisResultService {
     /**
      * 분석 결과를 수정한다.
      *
-     * @param analysisResultId   분석 결과 ID
-     * @param analyzedContent    분석된 내용
-     * @param totalDetectedCount 총 탐지 개수
+     * @param analysisResultId    분석 결과 ID
+     * @param analyzedContent     분석된 내용
+     * @param totalDetectionCount 총 탐지 개수
      * @return 등록 개수
      */
-    public int updateAnalysisResult(String analysisResultId, String analyzedContent, Integer totalDetectedCount) {
-        return analysisResultMapper.updateAnalysisResult(analysisResultId, analyzedContent, totalDetectedCount);
+    public int updateAnalysisResult(String analysisResultId, String analyzedContent, Integer totalDetectionCount) {
+        return analysisResultMapper.updateAnalysisResult(analysisResultId, analyzedContent, totalDetectionCount);
     }
 
     /**
-     * 분석 결과 항목을 등록한다.
+     * 분석 검출 목록을 등록한다.
      *
-     * @param analysisResultItemList 분석 결과 항목 목록
+     * @param analysisDetectionList 분석 결과 항목 목록
      * @return 등록 개수
      */
-    public int insertAnalysisResultItems(List<AnalysisResultItemVO> analysisResultItemList) {
-        return analysisResultMapper.insertAnalysisResultItems(analysisResultItemList);
+    public int insertAnalysisDetectionList(List<AnalysisDetectionVO> analysisDetectionList) {
+        return analysisResultMapper.insertAnalysisDetectionList(analysisDetectionList);
     }
 
 }

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.analysis.service.AnalysisDetailMapper">
+
+    <update id="updateDatabaseAnalysisContent">
+		/** updateAnalysisDatabaseContent : 데이터베이스 분석 정보 내용을 수정한다. */
+		UPDATE SEEK_DATABASE_ANALYSIS
+		SET CONTENT = #{content}
+		WHERE ANALYSIS_ID = #{analysisId}
+    </update>
+
+    <update id="updateAnalysisTargetColumnDynamically">
+		/** updateAnalysisTargetColumnDynamically : 분석 대상 컬럼을 동적으로 수정한다. */
+		UPDATE ${tableName}
+		SET ${columnName} = #{newValue}
+		WHERE ${columnName} = #{oldValue}
+    </update>
+
+    <insert id="insertProxyAnalysis" parameterType="analysisDetailVO">
+		/** insertProxyAnalysis : 프록시 분석 정보를 등록한다. */
+		INSERT INTO SEEK_PROXY_ANALYSIS (
+			ANALYSIS_ID,
+			REQUEST_ID,
+			COUNTRY_CCD,
+			URL,
+			HEADER,
+			QUERY_STRING,
+			BODY,
+			FILE_ID
+		) VALUES (
+			#{analysisId},
+			#{requestId},
+			#{countryCcd},
+			#{url},
+			#{header},
+			#{queryString},
+			#{body},
+			#{fileId}
+		)
+    </insert>
+
+</mapper>

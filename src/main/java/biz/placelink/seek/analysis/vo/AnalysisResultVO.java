@@ -7,7 +7,7 @@ public class AnalysisResultVO extends AnalysisDetailVO {
     /* 분석된 내용 */
     private String analyzedContent;
     /* 전체 검출 개수 */
-    private Integer totalDetectedCount;
+    private Integer totalDetectionCount;
 
     public String getAnalysisResultId() {
         return analysisResultId;
@@ -25,12 +25,12 @@ public class AnalysisResultVO extends AnalysisDetailVO {
         this.analyzedContent = analyzedContent;
     }
 
-    public Integer getTotalDetectedCount() {
-        return totalDetectedCount;
+    public Integer getTotalDetectionCount() {
+        return totalDetectionCount;
     }
 
-    public void setTotalDetectedCount(Integer totalDetectedCount) {
-        this.totalDetectedCount = totalDetectedCount;
+    public void setTotalDetectionCount(Integer totalDetectionCount) {
+        this.totalDetectionCount = totalDetectionCount;
     }
 
 }

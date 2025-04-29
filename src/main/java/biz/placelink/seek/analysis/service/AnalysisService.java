@@ -28,10 +28,12 @@ import kr.s2.ext.util.S2Util;
 public class AnalysisService {
 
     private final AnalysisMapper analysisMapper;
+    private final AnalysisDetailService analysisDetailService;
     private final AnalysisResultService analysisResultService;
 
-    public AnalysisService(AnalysisMapper analysisMapper, AnalysisResultService analysisResultService) {
+    public AnalysisService(AnalysisMapper analysisMapper, AnalysisDetailService analysisDetailService, AnalysisResultService analysisResultService) {
         this.analysisMapper = analysisMapper;
+        this.analysisDetailService = analysisDetailService;
         this.analysisResultService = analysisResultService;
     }
 
@@ -79,13 +81,15 @@ public class AnalysisService {
      *
      * @param analysisId        분석 ID
      * @param analysisStatusCcd 분석 상태 공통코드
+     * @param analysisModel     분석 모델
      * @return 수정 개수
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public int updateAnalysisStatusWithNewTransaction(String analysisId, String analysisStatusCcd) {
+    public int updateAnalysisStatusWithNewTransaction(String analysisId, String analysisStatusCcd, String analysisModel) {
         AnalysisVO paramVO = new AnalysisVO();
         paramVO.setAnalysisId(analysisId);
         paramVO.setAnalysisStatusCcd(analysisStatusCcd);
+        paramVO.setAnalysisModel(analysisModel);
 
         return this.updateAnalysis(paramVO);
     }
@@ -115,20 +119,20 @@ public class AnalysisService {
      * @return 수정 개수
      */
     public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisTypeCcd) {
-        int totalDetectedCount = 0;
+        int totalDetectionCount = 0;
         String dataBaseTargetInformation = null;
         String analyzedContent = null;
         String content = null;
         if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisTypeCcd)) {
             AnalysisResultVO analysisResult = analysisResultService.selectAnalysisResult(analysisId, analysisResultId);
             if (analysisResult != null) {
-                totalDetectedCount = analysisResult.getTotalDetectedCount();
+                totalDetectionCount = analysisResult.getTotalDetectionCount();
                 dataBaseTargetInformation = analysisResult.getTargetInformation();
                 analyzedContent = analysisResult.getAnalyzedContent();
                 content = analysisResult.getContent();
             }
         }
-        return this.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisTypeCcd, totalDetectedCount, dataBaseTargetInformation, analyzedContent, content);
+        return this.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisTypeCcd, totalDetectionCount, dataBaseTargetInformation, analyzedContent, content);
     }
 
     /**
@@ -138,13 +142,13 @@ public class AnalysisService {
      * @param analysisResultId          분석 결과 ID
      * @param analysisTime              분석 시간(ms)
      * @param analysisTypeCcd           분석 타입 공통코드
-     * @param totalDetectedCount        전체 검출 개수
+     * @param totalDetectionCount       전체 검출 개수
      * @param dataBaseTargetInformation DB 대상 정보
      * @param analyzedContent           분석된 내용
      * @param content                   분석 내용(원본)
      * @return 수정 개수
      */
-    public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisTypeCcd, int totalDetectedCount, String dataBaseTargetInformation, String analyzedContent, String content) {
+    public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisTypeCcd, int totalDetectionCount, String dataBaseTargetInformation, String analyzedContent, String content) {
         AnalysisVO paramVO = new AnalysisVO();
         paramVO.setAnalysisResultId(analysisResultId);
         paramVO.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_COMPLETE);
@@ -153,60 +157,19 @@ public class AnalysisService {
 
         int result = this.updateAnalysis(paramVO);
         if (result > 0 && Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisTypeCcd)) {
-            String newContent = totalDetectedCount > 0 ? analyzedContent : content;
+            String newContent = totalDetectionCount > 0 ? analyzedContent : content;
 
             if (S2Util.isNotEmpty(dataBaseTargetInformation) && S2Util.isNotEmpty(newContent)) {
                 String[] targetInformationArr = dataBaseTargetInformation.split("\\.");
                 if (targetInformationArr.length >= 2) {
                     // DB 대상 정보가 있다면 대상 콘텐츠 테이블의 컬럼에 마스킹 정보가 반영된 콘텐츠를 동적으로 수정한다.
-                    this.updateAnalysisTargetColumnDynamically(targetInformationArr[0], targetInformationArr[1], String.format("$WT{%s}", analysisId), newContent);
+                    analysisDetailService.updateAnalysisTargetColumnDynamically(targetInformationArr[0], targetInformationArr[1], String.format("$WT{%s}", analysisId), newContent);
                 }
             }
 
-            this.updateDatabaseAnalysisContent(analysisId, analyzedContent);
+            analysisDetailService.updateDatabaseAnalysisContent(analysisId, analyzedContent);
         }
         return result;
-    }
-
-    /**
-     * 데이터베이스 작업 정보 내용을 수정한다.
-     *
-     * @param analysisId 작업 이력 ID
-     * @param content    내용
-     * @return 수정 개수
-     */
-    private int updateDatabaseAnalysisContent(String analysisId, String content) {
-        return analysisMapper.updateDatabaseAnalysisContent(analysisId, content);
-    }
-
-    /**
-     * 분석 대상 컬럼을 동적으로 수정한다.
-     *
-     * @param tableName  테이블 명
-     * @param columnName 컬럼 명
-     * @param oldValue   기존 값
-     * @param newValue   변경 값
-     * @return 처리 개수
-     */
-    private int updateAnalysisTargetColumnDynamically(String tableName, String columnName, String oldValue, String newValue) {
-        int result = 0;
-        if (S2Util.isNotEmpty(tableName) && S2Util.isNotEmpty(columnName) &&
-                S2Util.isNotEmpty(oldValue) && S2Util.isNotEmpty(newValue) &&
-                // 테이블명은 대소문자 구분없이 tb_로 시작하고, 컬럼명은 영문자, 숫자, 언더바(_)로만 구성되어야 한다.
-                tableName.matches("(?i)^tb_[a-zA-Z0-9_]+") && columnName.matches("[a-zA-Z0-9_]+")) {
-            result = analysisMapper.updateAnalysisTargetColumnDynamically(tableName, columnName, oldValue, newValue);
-        }
-        return result;
-    }
-
-    /**
-     * 프록시 분석 정보를 등록한다.
-     *
-     * @param paramVO 프록시 작업 정보
-     * @return 등록 개수
-     */
-    public int insertProxyAnalysis(AnalysisDetailVO paramVO) {
-        return analysisMapper.insertProxyAnalysis(paramVO);
     }
 
     /**

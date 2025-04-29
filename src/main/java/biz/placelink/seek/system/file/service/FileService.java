@@ -1,14 +1,18 @@
 package biz.placelink.seek.system.file.service;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import biz.placelink.seek.com.util.FileUtils;
-import biz.placelink.seek.com.util.SessionUtil;
-import biz.placelink.seek.system.file.vo.FileDetailVO;
-import biz.placelink.seek.system.file.vo.FileVO;
-import kr.s2.ext.exception.S2RuntimeException;
-import kr.s2.ext.file.FileManager;
-import kr.s2.ext.util.S2Util;
-import kr.s2.ext.util.vo.S2RemoteFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,17 +20,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import biz.placelink.seek.com.util.FileUtils;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
+import biz.placelink.seek.system.file.vo.FileVO;
+import kr.s2.ext.exception.S2RuntimeException;
+import kr.s2.ext.file.FileManager;
+import kr.s2.ext.util.S2FileUtil;
+import kr.s2.ext.util.S2Util;
+import kr.s2.ext.util.vo.S2RemoteFile;
 
 /**
  * <pre>
@@ -97,7 +98,6 @@ public class FileService {
     public FileDetailVO selectFileDetail(String fileId) {
         return fileMapper.selectFileDetail(fileId);
     }
-
 
     /**
      * 파일 정보를 등록한다.
@@ -279,6 +279,7 @@ public class FileService {
             result = new FileDetailVO();
             result.setSavePath(savePath);
             result.setSaveName(saveName);
+            result.setFileSize(S2FileUtil.getSize(Paths.get(savePath, saveName)));
         }
         return result;
     }

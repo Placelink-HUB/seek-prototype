@@ -8,6 +8,8 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     /* 작업 ID */
     private String requestId;
+    /* 국가 공통코드 */
+    private String countryCcd;
     /* URL */
     private String url;
     /* 헤더 */
@@ -34,6 +36,14 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     public void setRequestId(String requestId) {
         this.requestId = requestId;
+    }
+
+    public String getCountryCcd() {
+        return countryCcd;
+    }
+
+    public void setCountryCcd(String countryCcd) {
+        this.countryCcd = countryCcd;
     }
 
     public String getUrl() {
@@ -99,4 +109,5 @@ public class AnalysisDetailVO extends AnalysisVO {
     public void setContent(String content) {
         this.content = content;
     }
+
 }

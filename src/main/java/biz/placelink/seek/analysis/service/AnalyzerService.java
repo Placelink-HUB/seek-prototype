@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import biz.placelink.seek.analysis.schedule.AnalysisRequestStatus;
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
-import biz.placelink.seek.analysis.vo.AnalysisResultItemVO;
+import biz.placelink.seek.analysis.vo.AnalysisDetectionVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.RestApiUtil;
@@ -96,14 +96,15 @@ public class AnalyzerService {
             String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
             String analysisId = analysisDetail.getAnalysisId();
             String analysisTypeCcd = analysisDetail.getAnalysisTypeCcd();
+            String analysisModel = analysisModelName;
             String analysisData = "";
 
-            analysisService.updateAnalysisStatusWithNewTransaction(analysisId, Constants.CD_ANALYSIS_STATUS_PROCESSING);
+            analysisService.updateAnalysisStatusWithNewTransaction(analysisId, Constants.CD_ANALYSIS_STATUS_PROCESSING, analysisModel);
 
             List<InputStream> hashDataStreamList = new ArrayList<>();
             List<Map.Entry<String, Object>> analysisParamList = new ArrayList<>();
 
-            try (ByteArrayInputStream analysisModelNameStream = new ByteArrayInputStream(analysisModelName.getBytes(StandardCharsets.UTF_8))) {
+            try (ByteArrayInputStream analysisModelStream = new ByteArrayInputStream(analysisModel.getBytes(StandardCharsets.UTF_8))) {
                 if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisTypeCcd)) {
                     String analyzedContent = analysisDetail.getContent();
                     if (S2Util.isNotEmpty(analyzedContent)) {
@@ -131,8 +132,8 @@ public class AnalyzerService {
                     throw new S2RuntimeException("분석할 데이터가 없습니다.");
                 }
 
-                // analysisModelNameStream 사용: 동일 데이터라도 analysisModel 이 다르면 해시값이 달라지도록 한다. (동일한 데이터라도 분석 모델이 다르면 분석 결과가 다를 수 있다.)
-                hashDataStreamList.add(0, analysisModelNameStream);
+                // analysisModelStream 사용: 동일 데이터라도 analysisModel 이 다르면 해시값이 달라지도록 한다. (동일한 데이터라도 분석 모델이 다르면 분석 결과가 다를 수 있다.)
+                hashDataStreamList.add(0, analysisModelStream);
 
                 String analysisHash = S2HashUtil.generateXXHash64(hashSeed, true, hashDataStreamList.toArray(new InputStream[0]));
 
@@ -147,7 +148,7 @@ public class AnalyzerService {
                 }
 
                 analysisParamList.add(Map.entry("request_id", analysisId));
-                analysisParamList.add(Map.entry("model_name", analysisModelName));
+                analysisParamList.add(Map.entry("model_name", analysisModel));
 
                 if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisDetail.getAnalysisTypeCcd())) {
                     analysisParamList.add(Map.entry("user_input", analysisDetail.getContent()));
@@ -231,7 +232,7 @@ public class AnalyzerService {
             analysisRequestStatus.setRequestStatus(analysisId, true);
 
             try {
-                String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisModelName));
+                String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisDetail.getAnalysisModel()));
                 JsonNode analysisJsonData = null;
 
                 analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.GET, apiTimeout);
@@ -245,7 +246,7 @@ public class AnalyzerService {
                 }
 
                 if (analysisJsonData != null && analysisJsonData.path("status").asText("").equalsIgnoreCase("success")) {
-                    int totalDetectedCount = analysisJsonData.path("total_hit").asInt(0);
+                    int totalDetectionCount = analysisJsonData.path("total_hit").asInt(0);
 
                     String analyzedContent = analysisJsonData.path("content").asText("");
                     long analysisTime = analysisJsonData.path("latency").asLong(0);
@@ -255,7 +256,7 @@ public class AnalyzerService {
 
                     List<SensitiveInformationVO> sensitiveInformationList = new ArrayList<>();
                     List<Map<String, String>> sensitiveInformationTypeList = new ArrayList<>();
-                    Map<String, Integer> analysisResultItemsMap = new HashMap<>();
+                    Map<String, Integer> analysisDetectionsMap = new HashMap<>();
 
                     if (items.isArray()) {
                         for (JsonNode item : items) {
@@ -287,8 +288,8 @@ public class AnalyzerService {
                                 }
                             }
 
-                            int detectedCount = S2Util.getValue(analysisResultItemsMap, severityCcd, 0);
-                            analysisResultItemsMap.put(severityCcd, detectedCount + hitCount);
+                            int detectionCount = S2Util.getValue(analysisDetectionsMap, severityCcd, 0);
+                            analysisDetectionsMap.put(severityCcd, detectionCount + hitCount);
 
                             SensitiveInformationVO sensitiveInformation = new SensitiveInformationVO();
                             sensitiveInformation.setSensitiveInformationId(sensitiveInformationId);
@@ -305,24 +306,24 @@ public class AnalyzerService {
                         analyzedContent = null;
                     }
 
-                    if (analysisResultService.updateAnalysisResult(analysisResultId, analyzedContent, totalDetectedCount) > 0) {
-                        List<AnalysisResultItemVO> analysisResultItemList = new ArrayList<>();
+                    if (analysisResultService.updateAnalysisResult(analysisResultId, analyzedContent, totalDetectionCount) > 0) {
+                        List<AnalysisDetectionVO> analysisDetectionList = new ArrayList<>();
 
                         if (!sensitiveInformationList.isEmpty()) {
-                            for (String key : analysisResultItemsMap.keySet()) {
-                                Integer detectedCount = analysisResultItemsMap.get(key);
-                                if (detectedCount != null && detectedCount > 0) {
-                                    AnalysisResultItemVO item = new AnalysisResultItemVO();
+                            for (String key : analysisDetectionsMap.keySet()) {
+                                Integer detectionCount = analysisDetectionsMap.get(key);
+                                if (detectionCount != null && detectionCount > 0) {
+                                    AnalysisDetectionVO item = new AnalysisDetectionVO();
                                     item.setAnalysisId(analysisId);
                                     item.setDetectionTypeCcd(key);
-                                    item.setDetectedCount(detectedCount);
+                                    item.setDetectionCount(detectionCount);
 
-                                    analysisResultItemList.add(item);
+                                    analysisDetectionList.add(item);
                                 }
                             }
 
-                            if (!analysisResultItemList.isEmpty()) {
-                                analysisResultService.insertAnalysisResultItems(analysisResultItemList);
+                            if (!analysisDetectionList.isEmpty()) {
+                                analysisResultService.insertAnalysisDetectionList(analysisDetectionList);
                             }
 
                             sensitiveInformationService.insertSensitiveInformationList(sensitiveInformationList);
@@ -332,7 +333,7 @@ public class AnalyzerService {
                             }
                         }
 
-                        analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisTypeCcd(), totalDetectedCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
+                        analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisTypeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
                         analysisRequestStatus.remove(analysisId);
                     }
                 }
