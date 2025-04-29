@@ -1,12 +1,12 @@
 package biz.placelink.seek.sample.service;
 
-import biz.placelink.seek.com.vo.SearchVO;
-import biz.placelink.seek.sample.vo.ArticleVO;
-import biz.placelink.seek.sample.vo.SchArticleVO;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import biz.placelink.seek.sample.vo.ArticleVO;
+import biz.placelink.seek.sample.vo.SchArticleVO;
 
 /**
  * <pre>
