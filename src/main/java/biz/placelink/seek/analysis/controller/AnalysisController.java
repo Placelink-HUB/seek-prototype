@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,9 +36,8 @@ public class AnalysisController {
      * Sample 페이지
      */
     @RequestMapping(value = "analysis")
-    public void tissue(HttpServletRequest request,
-    HttpServletResponse response, @RequestParam(required = false) Map<String, String> formDataParams, @RequestBody(required = false) Map<String, Object> jsonParams)
-            throws IOException{
+    public void tissue(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) Map<String, String> formDataParams, @RequestBody(required = false) Map<String, Object> jsonParams)
+            throws IOException {
         if (request instanceof MultipartHttpServletRequest) {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
@@ -57,32 +57,27 @@ public class AnalysisController {
             if (jsonParams != null) {
                 // jsonParams 를 이용한 처리
                 System.out.println("JSON 요청: " + jsonParams);
-            } else{
+            } else {
                 // 직접 request.getInputStream() 을 이용하여 처리
-                BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(request.getInputStream()));
+                BufferedReader reader = new BufferedReader(new InputStreamReader(request.getInputStream()));
                 StringBuilder json = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     json.append(line);
                 }
                 ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> map = objectMapper.readValue(json
-                        .toString(), Map.class);
+                Map<String, Object> map = objectMapper.readValue(json.toString(), new TypeReference<Map<String, Object>>() {
+                });
                 System.out.println("JSON 요청(getInputStream): " + map);
             }
-        } else if (contentType != null && (contentType
-                .contains("application/x-www-form-urlencoded")
-                || contentType
-                        .contains("multipart/form-data"))) {
+        } else if (contentType != null && (contentType.contains("application/x-www-form-urlencoded") || contentType.contains("multipart/form-data"))) {
             // form-data 요청 처리
             if (formDataParams != null) {
                 // formDataParams 를 이용한 처리
                 System.out.println("Form-data 요청: " + formDataParams);
             } else {
                 // request.getParameter() 를 이용한 처리
-                System.out.println("Form-data 요청(getParameter): " + request
-                        .getParameterMap());
+                System.out.println("Form-data 요청(getParameter): " + request.getParameterMap());
             }
         } else {
             // 기타 요청 처리
