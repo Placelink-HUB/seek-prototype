@@ -6,6 +6,7 @@ spring:
             - optional:classpath:config/prop-seek.yml
             - optional:classpath:config/prop-file.yml
             - optional:classpath:config/prop-sftp.yml
+            - optional:classpath:config/prop-webpush.yml
             - optional:classpath:config/fs.properties
     application:
         name: seek

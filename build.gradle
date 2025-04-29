@@ -49,6 +49,11 @@ dependencies {
     // Jackson
     implementation 'com.fasterxml.jackson.core:jackson-databind'
 
+    //Web-Push
+    implementation("nl.martijndwars:web-push:5.1.1")
+    //encrypt
+    implementation("org.bouncycastle:bcprov-jdk18on:1.80")
+
     //
     implementation 'org.apache.poi:poi:5.2.3'
     implementation 'org.apache.poi:poi-ooxml:5.2.3'
