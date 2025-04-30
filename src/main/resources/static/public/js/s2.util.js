@@ -68,7 +68,7 @@ const S2Util = (function () {
             if ($(`[aria-labelledby=${targetId}]`).length === 0) {
                 $(this).after(`
 					<div class="dropdown-menu dropdown-category category" aria-labelledby="${targetId}" ${datasetStr}>
-						<section>	
+						<section>
 							<div class="box-tree">
 								<div class="category-box card-body p-1">
 									<ul id="dropdown_${targetId}" class="nav nav-pills flex-column">
@@ -140,10 +140,10 @@ const S2Util = (function () {
                 responseTypeChecker = param.get('responseType');
                 timeout = param.get('timeout');
 
-                param.delete('method')
-                param.delete('dataType')
-                param.delete('responseType')
-                param.delete('timeout')
+                param.delete('method');
+                param.delete('dataType');
+                param.delete('responseType');
+                param.delete('timeout');
             } else if (S2Util.isJSON(param)) {
                 paramType = 'JSON';
                 methodChecker = param.method;
@@ -262,7 +262,7 @@ const S2Util = (function () {
 
                     const result = {
                         type: responseType
-                    }
+                    };
 
                     switch (result.type) {
                         case 'BLOB':
@@ -292,7 +292,7 @@ const S2Util = (function () {
                 })
                 .then((result) => {
                     if (result.type === 'BLOB') {
-                        result.data.then(data => {
+                        result.data.then((data) => {
                             const url = window.URL.createObjectURL(data);
                             const link = document.createElement('a');
                             link.href = url;
@@ -307,7 +307,7 @@ const S2Util = (function () {
                             }
                         });
                     } else {
-                        result.data.then(data => {
+                        result.data.then((data) => {
                             if (S2Util.isJSON(data)) {
                                 if (!data.status) {
                                     const error = new Error('Result error!');
@@ -1198,7 +1198,7 @@ const S2Util = (function () {
 
                 for (const [key, value] of Object.entries(parsedJson)) {
                     if (Array.isArray(value)) {
-                        value.forEach(item => formData.append(key, item));
+                        value.forEach((item) => formData.append(key, item));
                     } else {
                         formData.append(key, value);
                     }
@@ -1213,7 +1213,7 @@ const S2Util = (function () {
          */
         isQueryString(param) {
             try {
-                const query = param.startsWith("?") ? param : `?${param}`;
+                const query = param.startsWith('?') ? param : `?${param}`;
                 const params = new URLSearchParams(query);
                 return params.toString().length > 0;
             } catch (e) {
@@ -1228,7 +1228,7 @@ const S2Util = (function () {
                 return queryString;
             }
 
-            const cleanQuery = queryString.startsWith("?") ? queryString.slice(1) : queryString;
+            const cleanQuery = queryString.startsWith('?') ? queryString.slice(1) : queryString;
             const params = new URLSearchParams(cleanQuery);
             const values = params.getAll(key); // 모든 값 배열로 가져오기
 
@@ -1247,7 +1247,7 @@ const S2Util = (function () {
                 return queryString;
             }
 
-            const params = new URLSearchParams(queryString.startsWith("?") ? queryString.slice(1) : queryString);
+            const params = new URLSearchParams(queryString.startsWith('?') ? queryString.slice(1) : queryString);
             params.delete(key);
             return params.toString();
         },
@@ -1566,28 +1566,41 @@ const S2Util = (function () {
                 );
             }
         },
+        urlBase64ToUint8Array: function (base64String) {
+            const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+            const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+
+            const rawData = window.atob(base64);
+            const outputArray = new Uint8Array(rawData.length);
+
+            for (let i = 0; i < rawData.length; ++i) {
+                outputArray[i] = rawData.charCodeAt(i);
+            }
+            return outputArray;
+        },
         // 서비스 워커 구독
         subscribeServiceWorker: async function (publicKey) {
             if ('PushManager' in window && 'serviceWorker' in navigator) {
-                const lastSubscriptionsDate = S2Util.getLocalStorage('goonoSubscriptionsDate');
+                const lastSubscriptionsDate = S2Util.getLocalStorage('plSubscriptionsDate');
                 const today = dayjs().format('YYYYMMDD');
 
                 // 알림 컨펌 사용 여부 ("구노에서 알림 받기를 수락하시겠습니까?")
                 const isOpenNotificationConfirm = false;
-
+                console.log('publicKey', publicKey);
+                console.log('lastSubscriptionsDate', today, lastSubscriptionsDate, today === lastSubscriptionsDate);
                 if (!publicKey) {
                     //console.error('Public key 가 없습니다.');
                     return;
                 } else if (today === lastSubscriptionsDate) {
                     //console.error('금일 구독 완료');
-                    return;
+                    //return;
                 }
 
                 // 금일 구독을 안했다면 구독을 신청(갱신)한다.
                 try {
                     let confirmResult = !!lastSubscriptionsDate;
 
-                    const registration = await navigator.serviceWorker.register('/public/core/js/service-worker.goono.js', {scope: '/public/core/js/'}).then((reg) => {
+                    const registration = await navigator.serviceWorker.register('/public/js/service-worker.pl.js', {scope: '/public/js/'}).then((reg) => {
                         reg.update();
                         return reg;
                     });
@@ -1608,11 +1621,11 @@ const S2Util = (function () {
                     if (confirmResult) {
                         const subscription = await registration.pushManager.subscribe({
                             userVisibleOnly: true,
-                            applicationServerKey: urlBase64ToUint8Array(publicKey)
+                            applicationServerKey: S2Util.urlBase64ToUint8Array(publicKey)
                         });
 
                         // 서버에 구독 정보 전송
-                        const response = await fetch('/system/serviceworker/subscribe.ar', {
+                        const response = await fetch('/public/serviceworker/subscribe.ar', {
                             method: 'POST',
                             body: JSON.stringify(subscription),
                             headers: {
@@ -1620,7 +1633,7 @@ const S2Util = (function () {
                             }
                         });
                         if (response.ok) {
-                            S2Util.setLocalStorage('goonoSubscriptionsDate', today);
+                            S2Util.setLocalStorage('plSubscriptionsDate', today);
                             console.log('Push 구독 정보 서버 전송 성공');
                         }
                     }

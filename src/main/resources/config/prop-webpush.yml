@@ -4,3 +4,4 @@ web:
     vapid:
       public: BMnUE5YMLiSefwYKkGptiAsuzEHjNjWdsDGuz8OOv437cPWcIVeK0Bz7w2n9SmRy0BFEwNa6R9PRKPOq8x3jS28
       private: Ng8J6-W2mFaLEH0nwr0xWO9uTfIa7fBYJmEo8wQPW_s
+    isTest: true

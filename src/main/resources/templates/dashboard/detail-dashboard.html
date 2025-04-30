@@ -10,6 +10,8 @@
                 initLineChart();
                 initBarChart();
                 initBarChart2();
+
+                S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
             });
 
             function initDoughnutChart() {

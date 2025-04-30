@@ -56,6 +56,12 @@ public class ServiceWorkerService {
     @Value("${web.push.vapid.private}")
     private String privateKey;
 
+    /**
+     * VAPID 개인키
+     */
+    @Value("${web.push.isTest}")
+    private boolean isTest;
+
     ServiceWorkerService(ServiceWorkerMapper serviceWorkerMapper) {
         this.serviceWorkerMapper = serviceWorkerMapper;
     }
@@ -81,7 +87,7 @@ public class ServiceWorkerService {
     public void subscribe(SubscriptionVO subscriptionVO) {
         int result = 0;
         if (this.isValidSubscription(subscriptionVO)) {
-            // subscriptionVO.setUserMno(SessionHelper.getUserMno());
+            // subscriptionVO.setUserId(SessionHelper.getUserId());
             result = serviceWorkerMapper.mergeSubscription(subscriptionVO);
         }
         if (result == 0) {
@@ -95,19 +101,19 @@ public class ServiceWorkerService {
                 S2Util.isNotEmpty(subscriptionVO.keys.p256dh) &&
                 S2Util.isNotEmpty(subscriptionVO.keys.auth) &&
                 S2Util.isNotEmpty(subscriptionVO.endpoint) &&
-                subscriptionVO.endpoint.startsWith("https://");
+                (isTest || subscriptionVO.endpoint.startsWith("https://"));
     }
 
     /**
      * 지정된 사용자들에게 푸시 알림을 전송합니다.
      *
-     * @param message    전송할 알림 메시지
-     * @param userMnoArr 알림을 받을 사용자 관리 번호 배열
+     * @param message   전송할 알림 메시지
+     * @param userIdArr 알림을 받을 사용자 관리 번호 배열
      */
-    public void sendNotification(String message, Long... userMnoArr) {
+    public void sendNotification(String message, Long... userIdArr) {
         if (S2Util.isNotEmpty(message)) {
             CompletableFuture.runAsync(() -> {
-                List<SubscriptionVO> subscriptionList = serviceWorkerMapper.selectSubscriptionList(userMnoArr);
+                List<SubscriptionVO> subscriptionList = serviceWorkerMapper.selectSubscriptionList(userIdArr);
                 if (subscriptionList != null) {
                     CompletableFuture.allOf(subscriptionList.stream()
                             .filter(Objects::nonNull)
@@ -127,10 +133,10 @@ public class ServiceWorkerService {
     /**
      * 구독자 정보를 제거합니다.
      *
-     * @param userMnoArr 구독 취소할 사용자 관리 번호 배열
+     * @param userIdArr 구독 취소할 사용자 관리 번호 배열
      */
-    public void unsubscribe(Long... userMnoArr) {
-        serviceWorkerMapper.deleteSubscription(userMnoArr);
+    public void unsubscribe(Long... userIdArr) {
+        serviceWorkerMapper.deleteSubscription(userIdArr);
     }
 
 }

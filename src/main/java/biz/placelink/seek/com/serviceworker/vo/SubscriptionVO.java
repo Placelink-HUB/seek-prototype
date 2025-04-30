@@ -15,7 +15,7 @@ import nl.martijndwars.webpush.Subscription;
 
  *  ------------       --------    ---------------------------
 
- *  2025. 11. 10.       CJS       최초생성
+ *  2025. 04. 29.      s2          최초생성
  * </pre>
  */
 @ToString
@@ -23,7 +23,7 @@ import nl.martijndwars.webpush.Subscription;
 public class SubscriptionVO extends Subscription {
 
     /** 사용자 관리번호 */
-    private Long userMno;
+    private String userId;
     /** 만료일자 */
     private Date expirationDate;
     /** 등록일시 */
@@ -32,5 +32,45 @@ public class SubscriptionVO extends Subscription {
     private Date modifyDt;
     /** 중복 개수 */
     private Integer duplicateCount;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public Date getCreateDt() {
+        return createDt;
+    }
+
+    public void setCreateDt(Date createDt) {
+        this.createDt = createDt;
+    }
+
+    public Date getModifyDt() {
+        return modifyDt;
+    }
+
+    public void setModifyDt(Date modifyDt) {
+        this.modifyDt = modifyDt;
+    }
+
+    public Integer getDuplicateCount() {
+        return duplicateCount;
+    }
+
+    public void setDuplicateCount(Integer duplicateCount) {
+        this.duplicateCount = duplicateCount;
+    }
 
 }

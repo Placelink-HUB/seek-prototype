@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.com.serviceworker.service.ServiceWorkerMapper">
+
+    <insert id="mergeSubscription" parameterType="subscriptionVO">
+        /** 서비스워커 구독 정보를 등록한다. (최대 7일간 구독하고, 이후에는 7일 이내에 다시 접속해야 함) */
+        <selectKey keyProperty="duplicateCount" resultType="integer" order="BEFORE">
+            SELECT COUNT(1)
+            FROM SEEK_SERVICE_WORKER_SUBSCRIPTIONS
+            WHERE USER_ID = #{userId}
+                AND ENDPOINT = #{endpoint}
+        </selectKey>
+        <choose>
+            <when test='duplicateCount gt 0'>
+                UPDATE SEEK_SERVICE_WORKER_SUBSCRIPTIONS
+                SET
+                    KEYS_P256DH = #{keys.p256dh},
+                    KEYS_AUTH = #{keys.auth},
+                    EXPIRATION_DATE = NOW() + INTERVAL '7 DAY', /* 7일 후를 만료일로 지정 (DB 에 맞게 수정해야 함) */
+                    MODIFY_DT = NOW()
+                WHERE USER_ID = #{userId}
+                    AND ENDPOINT = #{endpoint}
+            </when>
+            <otherwise>
+                INSERT INTO SEEK_SERVICE_WORKER_SUBSCRIPTIONS (
+                    USER_ID,
+                    ENDPOINT,
+                    KEYS_P256DH,
+                    KEYS_AUTH,
+                    EXPIRATION_DATE,
+                    CREATE_DT,
+                    MODIFY_DT
+                ) VALUES (
+                    #{userId},
+                    #{endpoint},
+                    #{keys.p256dh},
+                    #{keys.auth},
+                    NOW() + INTERVAL '7 DAY', /* 7일 후를 만료일로 지정 (DB 에 맞게 수정해야 함) */
+                    NOW(),
+                    NOW()
+                )
+            </otherwise>
+        </choose>
+    </insert>
+
+    <select id="selectSubscriptionList" resultType="subscriptionVO">
+        /** selectSubscriptionList : 서비스워커 구독 목록을 조회한다. */
+        SELECT
+            USER_ID,
+            ENDPOINT,
+            KEYS_P256DH AS "keys.p256dh",
+            KEYS_AUTH AS "keys.auth",
+            EXPIRATION_DATE,
+            CREATE_DT,
+            MODIFY_DT
+        FROM SEEK_SERVICE_WORKER_SUBSCRIPTIONS
+        WHERE EXPIRATION_DATE >= CURRENT_DATE /* 만료일 이전 구독 목록만 조회 (DB 에 맞게 수정해야 함) */
+        <if test='userIdArr neq null and userIdArr.length gt 0'>
+            AND USER_ID IN
+            <foreach item="userId" collection="userIdArr" open="(" separator="," close=")">
+                #{userId}
+            </foreach>
+        </if>
+    </select>
+
+    <delete id="deleteSubscription">
+        /** deleteSubscription : 서비스워커 구독 정보를 삭제한다. */
+        DELETE FROM PL_SERVICE_WORKER_SUBSCRIPTIONS
+        WHERE USER_ID IN
+        <foreach item="userId" collection="userIdArr" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
+</mapper>
