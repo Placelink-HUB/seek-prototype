@@ -12,7 +12,6 @@ public class AnalysisStatisticsVO extends DefaultVO {
     private int maskingCount;
     /* 언마스킹 개수 */
     private int unmaskingCount;
-
     /* 전체 분석 개수 */
     private int totalAnalysisCount;
     /* 전체 탐지 개수 */
@@ -21,6 +20,14 @@ public class AnalysisStatisticsVO extends DefaultVO {
     private int totalMaskingCount;
     /* 전체 언마스킹 개수 */
     private int totalUnmaskingCount;
+
+
+    /* 탐지 현황 - 위험 */
+    private int highCount;
+    /* 탐지 현황 - 보통 */
+    private int midCount;
+    /* 탐지 현황 - 낮음 */
+    private int lowCount;
 
 
     public Integer getAnalysisCount() { return analysisCount; }
@@ -60,4 +67,15 @@ public class AnalysisStatisticsVO extends DefaultVO {
     public void setTotalUnmaskingCount(int totalUnmaskingCount) { this.totalUnmaskingCount = totalUnmaskingCount; }
 
 
+    public int getHighCount() { return highCount; }
+
+    public void setHighCount(int highCount) { this.highCount = highCount; }
+
+    public int getMidCount() { return midCount; }
+
+    public void setMidCount(int midCount) { this.midCount = midCount; }
+
+    public int getLowCount() { return lowCount; }
+
+    public void setLowCount(int lowCount) { this.lowCount = lowCount; }
 }

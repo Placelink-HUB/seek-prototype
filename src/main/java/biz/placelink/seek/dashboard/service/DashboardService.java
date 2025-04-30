@@ -60,4 +60,13 @@ public class DashboardService {
 
         return analysisStatisticsVO;
     }
+
+    /**
+     * 탐지 현황 정보를 조회한다.
+     *
+     * @return 탐지 현황
+     */
+    public AnalysisStatisticsVO selectDetectionStatistics(SchAnalysisStatisticsVO searchVO) {
+        return dashboardMapper.selectDetectionStatistics(searchVO);
+    }
 }

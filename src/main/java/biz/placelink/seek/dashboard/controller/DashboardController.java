@@ -51,4 +51,18 @@ public class DashboardController {
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     *  탐지 현황 조회
+     *
+     * @return 탐지 현황
+     */
+    @GetMapping(value = "/public/dashboard/detection-statistics")
+    public ResponseEntity<Map<String, Object>> detectionStatistics(SchAnalysisStatisticsVO searchVO) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("detectionData", dashboardService.selectDetectionStatistics(searchVO));
+        response.put(Constants.RESULT_CODE, 1);
+        return ResponseEntity.ok(response);
+    }
 }

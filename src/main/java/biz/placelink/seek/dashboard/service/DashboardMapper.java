@@ -37,4 +37,11 @@ public interface DashboardMapper {
      * @return 민감정보 탐지 횟수
      */
     AnalysisStatisticsVO selectAnalysisResultCount(SchAnalysisStatisticsVO searchVO);
+
+    /**
+     *  탐지 현황 정보를 조회한다.
+     *
+     * @return 탐지 현황
+     */
+    AnalysisStatisticsVO selectDetectionStatistics(SchAnalysisStatisticsVO searchVO);
 }
