@@ -15,19 +15,26 @@
             });
 
             function initDoughnutChart() {
-                const doughnutChart1 = echarts.init(document.getElementById('doughnutChart1'));
-                const doughnutChart2 = echarts.init(document.getElementById('doughnutChart2'));
-                const doughnutChart3 = echarts.init(document.getElementById('doughnutChart3'));
-                const doughnutChart4 = echarts.init(document.getElementById('doughnutChart4'));
+                S2Util.fetch('/public/dashboard/analysis-statistics', {
+                    method: 'get',
+                    dataType: 'json',
+                }, function (response) {
+                    const data = response.statisticsData;
 
-                doughnutChart1.setOption(createDoughnutOption(25, 1136, '#6eb7ff'));
-                doughnutChart2.setOption(createDoughnutOption(65, 459, '#04f0fb'));
-                doughnutChart3.setOption(createDoughnutOption(50, 357, '#b4b4fc'));
-                doughnutChart4.setOption(createDoughnutOption(87, 563, '#5eefa6'));
+                    const doughnutChart1 = echarts.init(document.getElementById('doughnutChart1'));
+                    const doughnutChart2 = echarts.init(document.getElementById('doughnutChart2'));
+                    const doughnutChart3 = echarts.init(document.getElementById('doughnutChart3'));
+                    const doughnutChart4 = echarts.init(document.getElementById('doughnutChart4'));
+
+                    doughnutChart1.setOption(createDoughnutOption(data.analysisCount, data.totalAnalysisCount, '#6eb7ff'));
+                    doughnutChart2.setOption(createDoughnutOption(data.detectionCount, data.totalDetectionCount, '#04f0fb'));
+                    doughnutChart3.setOption(createDoughnutOption(data.maskingCount, data.totalMaskingCount, '#b4b4fc'));
+                    doughnutChart4.setOption(createDoughnutOption(data.unmaskingCount, data.totalUnmaskingCount, '#5eefa6'));
+                });
             }
 
-            function createDoughnutOption(value, count, color) {
-                const formattedCount = count.toLocaleString('en-US');
+            function createDoughnutOption(value, total, color) {
+                const formattedCount = value.toLocaleString('en-US');
 
                 return {
                     title: {
@@ -35,7 +42,7 @@
                         left: 'center',
                         top: 'center',
                         textStyle: {
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: 'bold',
                             color: '#fff',
                             fontFamily: 'Pretendard'
@@ -44,7 +51,7 @@
                     series: [
                         {
                             type: 'pie',
-                            radius: ['75%', '100%'],
+                            radius: ['65%', '90%'],
                             avoidLabelOverlap: false,
                             label: {
                                 show: false,
@@ -54,8 +61,8 @@
                                 show: false
                             },
                             data: [
-                                {value: value, name: 'value', itemStyle: {color: color}},
-                                {value: 100 - value, name: 'rest', itemStyle: {color: '#858688', opacity: 1}}
+                                {value: value === 0 ? null : value, name: 'value', itemStyle: {color: color}},
+                                {value: total - value, name: 'rest', itemStyle: {color: '#858688', opacity: 1}}
                             ]
                         }
                     ]
@@ -63,11 +70,26 @@
             }
 
             function initSemicircleChart() {
-                const semicircleChart1 = echarts.init(document.getElementById('semicircleChart1'));
-                const semicircleChart2 = echarts.init(document.getElementById('semicircleChart2'));
+                S2Util.fetch('/public/dashboard/detection-statistics', {
+                    method: 'get',
+                    dataType: 'json',
+                }, function (response) {
+                    const data = response.detectionData;
+                    const totalCount = data.highCount + data.midCount + data.lowCount;
 
-                semicircleChart1.setOption(createSemicircleChart(50, 3871, '#c900e4', '#fa0050', '#61082b', '한국'));
-                semicircleChart2.setOption(createSemicircleChart(30, 409, '#3134ff', '#a40aff', '#460C63', '해외'));
+                    $('.domestic-users .high-count').text(data.highCount);
+                    $('.domestic-users .mid-count').text(data.midCount);
+                    $('.domestic-users .low-count').text(data.lowCount);
+                    $('.overseas-users .high-count').text(data.highCount);
+                    $('.overseas-users .mid-count').text(data.midCount);
+                    $('.overseas-users .low-count').text(data.lowCount);
+
+                    const semicircleChart1 = echarts.init(document.getElementById('semicircleChart1'));
+                    const semicircleChart2 = echarts.init(document.getElementById('semicircleChart2'));
+
+                    semicircleChart1.setOption(createSemicircleChart(totalCount, totalCount, '#c900e4', '#fa0050', '#61082b', '한국'));
+                    semicircleChart2.setOption(createSemicircleChart(totalCount, totalCount, '#3134ff', '#a40aff', '#460C63', '해외'));
+                });
             }
 
             function createSemicircleChart(value, count, color1, color2, backColor, text) {
@@ -120,7 +142,7 @@
                                         fontSize: 16,
                                         fontWeight: '300',
                                         fill: '#fff',
-                                        padding: [8, 0, 0, 4],
+                                        padding: [5, 0, 0, 4],
                                         fontFamily: 'Pretendard'
                                     }
                                 }
@@ -154,7 +176,7 @@
                                         }
                                     }
                                 }, // 실제 값
-                                {value: 100 - value, itemStyle: {color: backColor}}
+                                {value: 100 - value, itemStyle: {color: backColor}} // 변경 필요 (100)
                             ]
                         }
                     ]
@@ -168,9 +190,9 @@
                 const now = new Date();
                 // 예시: 1분 간격의 시간 데이터 5개 생성
                 const xAxisData = [];
-                for (let i = 0; i < 10; i++) {
-                    // 9분 전부터 현재까지 1분 간격으로 생성
-                    xAxisData.push(new Date(now.getTime() - (9 - i) * 60 * 1000));
+                for (let i = 0; i < 30; i++) {
+                    // 29분 전부터 현재까지 1분 간격으로 생성
+                    xAxisData.push(new Date(now.getTime() - (29 - i) * 60 * 1000));
                 }
 
                 // [시간, 값] 쌍으로 데이터 준비
@@ -179,7 +201,10 @@
                     [xAxisData[1], 20],
                     [xAxisData[2], 40],
                     [xAxisData[3], 70],
-                    [xAxisData[4], 80]
+                    [xAxisData[4], 80],
+                    [xAxisData[5], 60],
+                    [xAxisData[6], 30],
+                    [xAxisData[7], 40]
                 ];
                 const data2 = [
                     [xAxisData[0], 0],
@@ -191,7 +216,27 @@
                     [xAxisData[6], 100],
                     [xAxisData[7], 80],
                     [xAxisData[8], 120],
-                    [xAxisData[9], 140]
+                    [xAxisData[9], 130],
+                    [xAxisData[10], 132],
+                    [xAxisData[11], 100],
+                    [xAxisData[12], 80],
+                    [xAxisData[13], 40],
+                    [xAxisData[14], 80],
+                    [xAxisData[15], 100],
+                    [xAxisData[16], 120],
+                    [xAxisData[17], 140],
+                    [xAxisData[18], 140],
+                    [xAxisData[19], 140],
+                    [xAxisData[20], 140],
+                    [xAxisData[21], 140],
+                    [xAxisData[22], 140],
+                    [xAxisData[23], 140],
+                    [xAxisData[24], 140],
+                    [xAxisData[25], 140],
+                    [xAxisData[26], 140],
+                    [xAxisData[27], 140],
+                    [xAxisData[28], 140],
+                    [xAxisData[29], 140]
                 ];
 
                 // 마커 인덱스 (마지막 값)
@@ -467,25 +512,25 @@
                     <div class="status-box">
                         <div class="box box1">
                             <div class="box-top">국내 접속자 탐지 현황</div>
-                            <div class="box-contents">
+                            <div class="box-contents domestic-users">
                                 <div id="semicircleChart1" class="graph"></div>
                                 <div class="data-wrap">
                                     <div class="data data1">
                                         <div class="data-title">낮음</div>
                                         <div class="data-contents">
-                                            <div><span>2,021</span><span> 건</span></div>
+                                            <div><span class="low-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
                                     <div class="data data2">
                                         <div class="data-title">보통</div>
                                         <div class="data-contents">
-                                            <div><span>1,812</span><span> 건</span></div>
+                                            <div><span class="mid-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
                                     <div class="data data3">
                                         <div class="data-title">위험</div>
                                         <div class="data-contents">
-                                            <div><span>34</span><span> 건</span></div>
+                                            <div><span class="high-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -493,25 +538,25 @@
                         </div>
                         <div class="box box2">
                             <div class="box-top">해외 접속자 탐지 현황</div>
-                            <div class="box-contents">
+                            <div class="box-contents overseas-users">
                                 <div id="semicircleChart2" class="graph"></div>
                                 <div class="data-wrap">
                                     <div class="data data1">
                                         <div class="data-title">낮음</div>
                                         <div class="data-contents">
-                                            <div><span>813</span><span> 건</span></div>
+                                            <div><span class="low-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
                                     <div class="data data2">
                                         <div class="data-title">보통</div>
                                         <div class="data-contents">
-                                            <div><span>589</span><span> 건</span></div>
+                                            <div><span class="mid-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
                                     <div class="data data3">
                                         <div class="data-title">위험</div>
                                         <div class="data-contents">
-                                            <div><span>5</span><span> 건</span></div>
+                                            <div><span class="high-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
                                 </div>

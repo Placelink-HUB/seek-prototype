@@ -148,14 +148,4 @@ public class ArticleController {
         return "downloadView";
     }
 
-
-    /**
-     * 사이트별 현황 페이지
-     *
-     * @return Sample 페이지 경로
-     */
-    @GetMapping(value = "/public/sample/siteStatus")
-    public String statistics(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false) Integer pageNo, Model model) {
-        return "sample/site_status";
-    }
 }
