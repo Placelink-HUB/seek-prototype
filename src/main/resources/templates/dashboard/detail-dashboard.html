@@ -13,19 +13,28 @@
             });
 
             function initDoughnutChart() {
-                const doughnutChart1 = echarts.init(document.getElementById('doughnutChart1'));
-                const doughnutChart2 = echarts.init(document.getElementById('doughnutChart2'));
-                const doughnutChart3 = echarts.init(document.getElementById('doughnutChart3'));
-                const doughnutChart4 = echarts.init(document.getElementById('doughnutChart4'));
+                S2Util.fetch('/public/dashboard/analysis-statistics', {
+                    method: 'get',
+                    dataType: 'json',
+                }, function (response) {
+                    const data = response.statisticsData;
 
-                doughnutChart1.setOption(createDoughnutOption(25, 1136, '#6eb7ff'));
-                doughnutChart2.setOption(createDoughnutOption(65, 459, '#04f0fb'));
-                doughnutChart3.setOption(createDoughnutOption(50, 357, '#b4b4fc'));
-                doughnutChart4.setOption(createDoughnutOption(87, 563, '#5eefa6'));
+                    const doughnutChart1 = echarts.init(document.getElementById('doughnutChart1'));
+                    const doughnutChart2 = echarts.init(document.getElementById('doughnutChart2'));
+                    const doughnutChart3 = echarts.init(document.getElementById('doughnutChart3'));
+                    const doughnutChart4 = echarts.init(document.getElementById('doughnutChart4'));
+
+                    doughnutChart1.setOption(createDoughnutOption(data.analysisCount, data.totalAnalysisCount, '#6eb7ff'));
+                    doughnutChart2.setOption(createDoughnutOption(data.detectionCount, data.totalDetectionCount, '#04f0fb'));
+                    doughnutChart3.setOption(createDoughnutOption(data.maskingCount, data.totalMaskingCount, '#b4b4fc'));
+                    doughnutChart4.setOption(createDoughnutOption(data.unmaskingCount, data.totalUnmaskingCount, '#5eefa6'));
+                });
+
+
             }
 
-            function createDoughnutOption(value, count, color) {
-                const formattedCount = count.toLocaleString('en-US');
+            function createDoughnutOption(value, total, color) {
+                const formattedCount = value.toLocaleString('en-US');
 
                 return {
                     title: {
@@ -52,8 +61,8 @@
                                 show: false
                             },
                             data: [
-                                {value: value, name: 'value', itemStyle: {color: color}},
-                                {value: 100 - value, name: 'rest', itemStyle: {color: '#858688', opacity: 1}}
+                                {value: value === 0 ? null : value, name: 'value', itemStyle: {color: color}},
+                                {value: total - value, name: 'rest', itemStyle: {color: '#858688', opacity: 1}}
                             ]
                         }
                     ]
@@ -166,9 +175,9 @@
                 const now = new Date();
                 // 예시: 1분 간격의 시간 데이터 5개 생성
                 const xAxisData = [];
-                for (let i = 0; i < 10; i++) {
-                    // 9분 전부터 현재까지 1분 간격으로 생성
-                    xAxisData.push(new Date(now.getTime() - (9 - i) * 60 * 1000));
+                for (let i = 0; i < 30; i++) {
+                    // 29분 전부터 현재까지 1분 간격으로 생성
+                    xAxisData.push(new Date(now.getTime() - (29 - i) * 60 * 1000));
                 }
 
                 // [시간, 값] 쌍으로 데이터 준비
@@ -177,7 +186,10 @@
                     [xAxisData[1], 20],
                     [xAxisData[2], 40],
                     [xAxisData[3], 70],
-                    [xAxisData[4], 80]
+                    [xAxisData[4], 80],
+                    [xAxisData[5], 60],
+                    [xAxisData[6], 30],
+                    [xAxisData[7], 40]
                 ];
                 const data2 = [
                     [xAxisData[0], 0],
@@ -189,7 +201,27 @@
                     [xAxisData[6], 100],
                     [xAxisData[7], 80],
                     [xAxisData[8], 120],
-                    [xAxisData[9], 140]
+                    [xAxisData[9], 130],
+                    [xAxisData[10], 132],
+                    [xAxisData[11], 100],
+                    [xAxisData[12], 80],
+                    [xAxisData[13], 40],
+                    [xAxisData[14], 80],
+                    [xAxisData[15], 100],
+                    [xAxisData[16], 120],
+                    [xAxisData[17], 140],
+                    [xAxisData[18], 140],
+                    [xAxisData[19], 140],
+                    [xAxisData[20], 140],
+                    [xAxisData[21], 140],
+                    [xAxisData[22], 140],
+                    [xAxisData[23], 140],
+                    [xAxisData[24], 140],
+                    [xAxisData[25], 140],
+                    [xAxisData[26], 140],
+                    [xAxisData[27], 140],
+                    [xAxisData[28], 140],
+                    [xAxisData[29], 140]
                 ];
 
                 // 마커 인덱스 (마지막 값)
