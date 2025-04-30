@@ -1586,14 +1586,13 @@ const S2Util = (function () {
 
                 // 알림 컨펌 사용 여부 ("구노에서 알림 받기를 수락하시겠습니까?")
                 const isOpenNotificationConfirm = false;
-                console.log('publicKey', publicKey);
-                console.log('lastSubscriptionsDate', today, lastSubscriptionsDate, today === lastSubscriptionsDate);
+
                 if (!publicKey) {
-                    //console.error('Public key 가 없습니다.');
+                    console.debug('Public key 가 없습니다.');
                     return;
                 } else if (today === lastSubscriptionsDate) {
-                    //console.error('금일 구독 완료');
-                    //return;
+                    console.debug('금일 구독 완료');
+                    return;
                 }
 
                 // 금일 구독을 안했다면 구독을 신청(갱신)한다.

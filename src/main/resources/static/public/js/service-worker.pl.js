@@ -7,16 +7,16 @@ const notiOption = {
 };
 
 self.addEventListener('push', function (event) {
+    console.log('Push event received:', event, event.data);
     const jsonData = event.data.json();
-    const content = jsonData.content ? `[${jsonData.content}] ` : '';
-    const message = `${jsonData.createUserNm}님이 ${content}${jsonData.elnHistSeCcdNm} 했습니다.`;
+    const message = jsonData.message;
 
     notiOption['body'] = message;
     if (jsonData.link) {
         notiOption['data'] = {
             link: jsonData.link
         };
-        
+
         // link 가 있다면 추가적인 액션을 할 수 있는 버튼 추가
         notiOption['actions'] = [
             {action: 'explore', title: '자세히 보기'},
@@ -65,11 +65,14 @@ self.addEventListener('notificationclick', function (event) {
                         // 클라이언트에서 같은 도메인의 탭이 있는지 확인한다.
                         if (new URL(client.url).origin === openUrl.origin) {
                             // 같은 도메인의 탭을 찾았으면 해당 탭에서 URL 열기
-                            return client.navigate(openUrl.href).then((client) => client.focus()).catch((err) => {
-                                console.error('탭을 여는 중 오류 발생:', err);
-                                // 오류가 발생하면 새 탭에서 열기
-                                return self.clients.openWindow(openUrl.href);
-                            });
+                            return client
+                                .navigate(openUrl.href)
+                                .then((client) => client.focus())
+                                .catch((err) => {
+                                    console.error('탭을 여는 중 오류 발생:', err);
+                                    // 오류가 발생하면 새 탭에서 열기
+                                    return self.clients.openWindow(openUrl.href);
+                                });
                         }
                     }
 

@@ -1,14 +1,9 @@
 package biz.placelink.seek.dashboard.service;
 
-import biz.placelink.seek.analysis.vo.AnalysisDetectionVO;
+import org.apache.ibatis.annotations.Mapper;
+
 import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
 import biz.placelink.seek.dashboard.vo.SchAnalysisStatisticsVO;
-import biz.placelink.seek.sample.vo.ArticleVO;
-import biz.placelink.seek.sample.vo.SchArticleVO;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * <pre>
@@ -32,16 +27,17 @@ public interface DashboardMapper {
     AnalysisStatisticsVO selectAnalysisCount(SchAnalysisStatisticsVO searchVO);
 
     /**
-     *  민감정보 탐지 횟수를 조회한다.
+     * 민감정보 탐지 횟수를 조회한다.
      *
      * @return 민감정보 탐지 횟수
      */
     AnalysisStatisticsVO selectAnalysisResultCount(SchAnalysisStatisticsVO searchVO);
 
     /**
-     *  탐지 현황 정보를 조회한다.
+     * 탐지 현황 정보를 조회한다.
      *
      * @return 탐지 현황
      */
     AnalysisStatisticsVO selectDetectionStatistics(SchAnalysisStatisticsVO searchVO);
+
 }

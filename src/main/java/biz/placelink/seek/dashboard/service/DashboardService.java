@@ -1,22 +1,10 @@
 package biz.placelink.seek.dashboard.service;
 
-import biz.placelink.seek.analysis.vo.AnalysisDetectionVO;
-import biz.placelink.seek.com.constants.Constants;
-import biz.placelink.seek.com.util.PaginationInfo;
-import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
-import biz.placelink.seek.dashboard.vo.SchAnalysisStatisticsVO;
-import biz.placelink.seek.sample.vo.ArticleVO;
-import biz.placelink.seek.sample.vo.SchArticleVO;
-import biz.placelink.seek.system.file.service.FileService;
-import biz.placelink.seek.system.file.vo.FileDetailVO;
-import kr.s2.ext.util.S2Util;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
+import biz.placelink.seek.dashboard.vo.SchAnalysisStatisticsVO;
 
 /**
  * <pre>
@@ -38,7 +26,6 @@ public class DashboardService {
     public DashboardService(DashboardMapper dashboardMapper) {
         this.dashboardMapper = dashboardMapper;
     }
-
 
     /**
      * 분석 현황 정보를 조회한다.

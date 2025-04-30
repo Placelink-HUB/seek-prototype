@@ -29,6 +29,7 @@ import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisDetectionVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import biz.placelink.seek.com.util.RestApiUtil;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.exception.S2Exception;
@@ -56,6 +57,7 @@ public class AnalyzerService {
 
     private static final Logger logger = LoggerFactory.getLogger(AnalyzerService.class);
 
+    private final ServiceWorkerService serviceWorkerService;
     private final AnalysisRequestStatus analysisRequestStatus;
     private final AnalysisService analysisService;
     private final AnalysisResultService analysisResultService;
@@ -63,7 +65,8 @@ public class AnalyzerService {
     private final SensitiveInformationService sensitiveInformationService;
     private final FileManager fileManager;
 
-    public AnalyzerService(AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, AnalysisResultService analysisResultService, AnalysisErrorService analysisErrorService, SensitiveInformationService sensitiveInformationService, FileManager fileManager) {
+    public AnalyzerService(ServiceWorkerService serviceWorkerService, AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, AnalysisResultService analysisResultService, AnalysisErrorService analysisErrorService, SensitiveInformationService sensitiveInformationService, FileManager fileManager) {
+        this.serviceWorkerService = serviceWorkerService;
         this.analysisRequestStatus = analysisRequestStatus;
         this.analysisService = analysisService;
         this.analysisResultService = analysisResultService;
@@ -89,6 +92,7 @@ public class AnalyzerService {
      *
      * @param analysisDetail 작업 상세 정보
      */
+    @SuppressWarnings("unchecked")
     @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
     public void asyncAnalysisRequest(AnalysisDetailVO analysisDetail) {
@@ -331,6 +335,8 @@ public class AnalyzerService {
                             if (!sensitiveInformationTypeList.isEmpty()) {
                                 sensitiveInformationService.insertSensitiveInformationTypes(sensitiveInformationTypeList);
                             }
+
+                            serviceWorkerService.sendNotificationAll("{\"message\" : \"민감정보 발견\"}");
                         }
 
                         analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisTypeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
