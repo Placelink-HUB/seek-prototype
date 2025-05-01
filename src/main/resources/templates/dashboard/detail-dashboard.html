@@ -4,9 +4,8 @@
         <script type="text/javascript">
             let isRegistering = false;
 
-            const analysisInfo = {};
             const analysisCompleteInfo = {};
-            let analysisXAxisData = [];
+            const analysisInfo = {};
 
             document.addEventListener('DOMContentLoaded', () => {
                 initDoughnutChart();
@@ -15,26 +14,67 @@
                 initBarChart();
                 initBarChart2();
 
-                analysisXAxisData = [];
+                getTimeSeriesAnalysis();
 
                 S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
             });
 
-            function getAnalysisInfo() {
-                S2Util.fetch(
-                    '/public/dashboard/analysis-statistics',
-                    {
-                        method: 'get',
-                        dataType: 'json'
-                    },
-                    function (response) {
-                        const data = response.statisticsData;
-                        analysisInfo.analysisCount = data.analysisCount;
-                        analysisInfo.detectionCount = data.detectionCount;
-                        analysisInfo.maskingCount = data.maskingCount;
-                        analysisInfo.unmaskingCount = data.unmaskingCount;
-                    }
-                );
+            function getTimeSeriesAnalysis() {
+                /* 가상의 분석 현황데이터를 만든다. => 실제 데이터로 대체 필요 !!!! */
+                const xAxisData = [];
+
+                for (let i = 0; i < 30; i++) {
+                    const date = dayjs()
+                        .subtract(29 - i, 'minute')
+                        .format('YYYYMMDDHHmm');
+                    xAxisData.push(date);
+                }
+
+                analysisCompleteInfo[xAxisData[0]] = 0;
+                analysisCompleteInfo[xAxisData[1]] = 20;
+                analysisCompleteInfo[xAxisData[2]] = 40;
+                analysisCompleteInfo[xAxisData[3]] = 70;
+                analysisCompleteInfo[xAxisData[4]] = 80;
+                analysisCompleteInfo[xAxisData[5]] = 60;
+                analysisCompleteInfo[xAxisData[6]] = 30;
+                analysisCompleteInfo[xAxisData[7]] = 40;
+
+                analysisInfo[xAxisData[0]] = 0;
+                analysisInfo[xAxisData[1]] = 40;
+                analysisInfo[xAxisData[2]] = 70;
+                analysisInfo[xAxisData[3]] = 80;
+                analysisInfo[xAxisData[4]] = 90;
+                analysisInfo[xAxisData[5]] = 90;
+                analysisInfo[xAxisData[6]] = 100;
+                analysisInfo[xAxisData[7]] = 80;
+                analysisInfo[xAxisData[8]] = 120;
+                analysisInfo[xAxisData[9]] = 130;
+                analysisInfo[xAxisData[10]] = 132;
+                analysisInfo[xAxisData[11]] = 100;
+                analysisInfo[xAxisData[12]] = 80;
+                analysisInfo[xAxisData[13]] = 40;
+                analysisInfo[xAxisData[14]] = 80;
+                analysisInfo[xAxisData[15]] = 100;
+                analysisInfo[xAxisData[16]] = 120;
+                analysisInfo[xAxisData[17]] = 140;
+                analysisInfo[xAxisData[18]] = 140;
+                analysisInfo[xAxisData[19]] = 140;
+                analysisInfo[xAxisData[20]] = 140;
+                analysisInfo[xAxisData[21]] = 140;
+                analysisInfo[xAxisData[22]] = 140;
+                analysisInfo[xAxisData[23]] = 140;
+                analysisInfo[xAxisData[24]] = 140;
+                analysisInfo[xAxisData[25]] = 140;
+                analysisInfo[xAxisData[26]] = 140;
+                analysisInfo[xAxisData[27]] = 140;
+                analysisInfo[xAxisData[28]] = 140;
+                analysisInfo[xAxisData[29]] = 140;
+
+                // 최초 분석 현황 조회 이후 변경되는 데이터에 따라 차트 업데이트
+                updateLineChart();
+                setInterval(() => {
+                    updateLineChart();
+                }, 1000);
             }
 
             function initDoughnutChart() {
@@ -217,78 +257,20 @@
             function initLineChart() {
                 const lineChart = echarts.init(document.getElementById('lineChart'));
 
-                // x축을 time 타입으로 설정
-                const now = new Date();
-                // 예시: 1분 간격의 시간 데이터 5개 생성
-                const xAxisData = [];
-                for (let i = 0; i < 30; i++) {
-                    // 29분 전부터 현재까지 1분 간격으로 생성
-                    xAxisData.push(new Date(now.getTime() - (29 - i) * 60 * 1000));
-                }
-
-                // [시간, 값] 쌍으로 데이터 준비
-                const data1 = [
-                    [xAxisData[0], 0],
-                    [xAxisData[1], 20],
-                    [xAxisData[2], 40],
-                    [xAxisData[3], 70],
-                    [xAxisData[4], 80],
-                    [xAxisData[5], 60],
-                    [xAxisData[6], 30],
-                    [xAxisData[7], 40]
-                ];
-                const data2 = [
-                    [xAxisData[0], 0],
-                    [xAxisData[1], 40],
-                    [xAxisData[2], 70],
-                    [xAxisData[3], 80],
-                    [xAxisData[4], 90],
-                    [xAxisData[5], 90],
-                    [xAxisData[6], 100],
-                    [xAxisData[7], 80],
-                    [xAxisData[8], 120],
-                    [xAxisData[9], 130],
-                    [xAxisData[10], 132],
-                    [xAxisData[11], 100],
-                    [xAxisData[12], 80],
-                    [xAxisData[13], 40],
-                    [xAxisData[14], 80],
-                    [xAxisData[15], 100],
-                    [xAxisData[16], 120],
-                    [xAxisData[17], 140],
-                    [xAxisData[18], 140],
-                    [xAxisData[19], 140],
-                    [xAxisData[20], 140],
-                    [xAxisData[21], 140],
-                    [xAxisData[22], 140],
-                    [xAxisData[23], 140],
-                    [xAxisData[24], 140],
-                    [xAxisData[25], 140],
-                    [xAxisData[26], 140],
-                    [xAxisData[27], 140],
-                    [xAxisData[28], 140],
-                    [xAxisData[29], 140]
-                ];
-
-                // 마커 인덱스 (마지막 값)
-                const marker1Index = data1.length - 1;
-                const marker2Index = data2.length - 1;
-
-                // 마커 데이터 생성 (마지막 값만 표시)
-                const markerData1 = Array(data1.length).fill(null);
-                markerData1[marker1Index] = data1[marker1Index];
-                const markerData2 = Array(data2.length).fill(null);
-                markerData2[marker2Index] = data2[marker2Index];
-
                 const option = {
                     grid: {left: 50, right: 30, top: 20, bottom: 30},
                     tooltip: {
-                        trigger: 'axis'
+                        trigger: 'axis',
                         // axisPointer: { type: 'cross' },
+                        formatter: function (params) {
+                            const date = dayjs(params[0].value[0]).format('YYYY-MM-DD HH:mm');
+                            const value = params[0].value[1];
+                            return `${date}<br/>${value}건`;
+                        }
                     },
                     xAxis: {
                         type: 'time',
-                        max: now,
+                        // max: now,
                         // min: new Date(now.getTime() - 60 * 60 * 1000),
                         boundaryGap: false,
                         axisLine: {show: false},
@@ -299,8 +281,7 @@
                             fontSize: 12,
                             margin: 10,
                             formatter: function (value) {
-                                const date = new Date(value);
-                                return date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+                                return dayjs(value).format('HH:mm');
                             }
                         },
                         splitLine: {show: false}
@@ -330,7 +311,7 @@
                         // 첫 번째 면적그래프
                         {
                             type: 'line',
-                            data: data1,
+                            // data: data1,
                             smooth: true,
                             symbol: 'none',
                             lineStyle: {width: 0},
@@ -346,7 +327,7 @@
                         // 첫 번째 그래프 마커 (보라색)
                         {
                             type: 'scatter',
-                            data: markerData1,
+                            // data: markerData1,
                             tooltip: {show: false},
                             symbolSize: 12,
                             itemStyle: {
@@ -359,7 +340,7 @@
                         // 두 번째 면적그래프
                         {
                             type: 'line',
-                            data: data2,
+                            // data: data2,
                             smooth: true,
                             symbol: 'none',
                             lineStyle: {width: 0},
@@ -375,7 +356,7 @@
                         // 두 번째 그래프 마커 (흰색)
                         {
                             type: 'scatter',
-                            data: markerData2,
+                            // data: markerData2,
                             tooltip: {show: false},
                             symbolSize: 12,
                             itemStyle: {
@@ -389,6 +370,64 @@
                 };
 
                 lineChart.setOption(option);
+            }
+
+            function updateLineChart() {
+                const lineChart = echarts.getInstanceByDom(document.getElementById('lineChart'));
+                if (lineChart) {
+                    const analysisCompleteData = [];
+                    const analysisData = [];
+
+                    for (let i = 0; i < 30; i++) {
+                        // 29분 전부터 현재까지 1분 간격으로 생성
+                        const date = dayjs()
+                            .subtract(29 - i, 'minute')
+                            .toDate();
+                        const dateKey = dayjs(date).format('YYYYMMDDHHmm');
+                        const analysisValue = analysisInfo[dateKey] || 0;
+                        const analysisCompleteValue = analysisCompleteInfo[dateKey];
+
+                        if (analysisCompleteValue || analysisCompleteValue === 0) {
+                            // 분석 완료 데이터는 값이 있을 때만 넣는다.
+                            analysisCompleteData.push([date, analysisCompleteValue]);
+                        }
+                        // 전체 분석 데이터는 무조건 넣는다.
+                        analysisData.push([date, analysisValue]);
+                    }
+
+                    // 마커 인덱스 (마지막 값)
+                    const marker1Index = analysisCompleteData.length - 1;
+                    const marker2Index = analysisData.length - 1;
+
+                    // 마커 데이터 생성 (마지막 값만 표시)
+                    const markerData1 = Array(analysisCompleteData.length).fill(null);
+                    markerData1[marker1Index] = analysisCompleteData[marker1Index];
+                    const markerData2 = Array(analysisData.length).fill(null);
+                    markerData2[marker2Index] = analysisData[marker2Index];
+
+                    const updateSeries = {
+                        series: [
+                            // 첫 번째 면적그래프
+                            {
+                                data: analysisCompleteData
+                            },
+                            // 첫 번째 그래프 마커 (보라색)
+                            {
+                                data: markerData1
+                            },
+                            // 두 번째 면적그래프
+                            {
+                                data: analysisData
+                            },
+                            // 두 번째 그래프 마커 (흰색)
+                            {
+                                data: markerData2
+                            }
+                        ]
+                    };
+
+                    lineChart.setOption(updateSeries, false);
+                }
             }
 
             function initBarChart() {

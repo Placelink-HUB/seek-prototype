@@ -57,7 +57,7 @@ const S2Util = (function () {
 
     return {
         fetch: function (url, param, success, fail) {
-            console.log('fetch start:', new Date());
+            console.debug('fetch start:', new Date());
             const option = {
                 headers: {
                     'X-S2-Request': 's2-fetch'
@@ -287,12 +287,12 @@ const S2Util = (function () {
                 })
                 .finally(() => {
                     if (window['hideLoadingPage'] && (!param || !param.hideLoading)) {
-                        console.log('hideLoading');
+                        console.debug('hideLoading');
                         // 로딩 숨김
                         window['hideLoadingPage']();
                     }
                     clearTimeout(timeoutId); // 완료 시 타임아웃 해제
-                    console.log('fetch end:', new Date());
+                    console.debug('fetch end:', new Date());
                 });
         },
         /**
@@ -1526,8 +1526,6 @@ const S2Util = (function () {
                 // 알림 컨펌 사용 여부 ("구노에서 알림 받기를 수락하시겠습니까?")
                 const isOpenNotificationConfirm = false;
 
-                console.log(today, lastSubscriptionsDate);
-
                 if (!publicKey) {
                     console.debug('Public key 가 없습니다.');
                     return;
@@ -1574,7 +1572,7 @@ const S2Util = (function () {
                         });
                         if (response.ok) {
                             S2Util.setLocalStorage('plSubscriptionsDate', today);
-                            console.log('Push 구독 정보 서버 전송 성공');
+                            console.debug('Push 구독 정보 서버 전송 성공');
                         }
                     }
                 } catch (error) {
