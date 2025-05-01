@@ -1,7 +1,7 @@
 package biz.placelink.seek.com.serviceworker.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -31,18 +31,17 @@ public class ServiceWorkerController {
     }
 
     @PostMapping("/public/serviceworker/subscribe.ar")
-    public String subscribe(@RequestBody SubscriptionVO subscriptionVO, HttpServletRequest request, Model model) {
+    public ResponseEntity<String> subscribe(@RequestBody SubscriptionVO subscriptionVO, HttpServletRequest request) {
         // !!s2!! 사용자 정보가 없어서 임시로 요청 IP를 사용하여 사용자 ID를 설정한다. (추후에는 삭제하고 ServiceWorkerService.subscribe 에서 사용자 정보를 사용하자)
         subscriptionVO.setUserId(S2ServletUtil.getClientIp(request));
         serviceWorkerService.subscribe(subscriptionVO);
-        return "jsonView";
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/public/serviceworker/unsubscribe.ar")
-    public String unsubscribe(@RequestBody String endpoint, Model model) {
+    public ResponseEntity<String> unsubscribe(@RequestBody String endpoint) {
         // serviceWorkerService.unsubscribe(SessionHelper.getUserId());
-        // model.addAttribute(Constants.RESULT_CODE, 1);
-        return "jsonView";
+        return ResponseEntity.ok().build();
     }
 
 }

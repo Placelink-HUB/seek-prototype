@@ -10,109 +10,49 @@ const S2Util = (function () {
     };
 
     {
-        /* 목록 테이블 헤더 정렬 */
-        $('[sort-nm]')
-            .each(function () {
-                if ($(this).find('> .fas.fa-sort').length === 0) {
-                    $(this).html($(this).html() + '<i class="fas fa-sort"></i>');
-                }
-            })
-            .on('click', function () {
-                if ($(this).parents('table:first').find('tbody tr').length <= 1) {
+        // 목록 테이블 헤더 정렬
+        document.querySelectorAll('[sort-nm]').forEach((header) => {
+            if (!header.querySelector('> .fas.fa-sort')) {
+                header.innerHTML += '<i class="fas fa-sort"></i>';
+            }
+
+            header.addEventListener('click', () => {
+                const table = header.closest('table');
+                if (table && table.querySelectorAll('tbody tr').length <= 1) {
                     return;
                 }
 
-                const thisSortNm = $(this).attr('sort-nm');
-                const thisSortFnNm = $(this).attr('sort-fn-nm');
-                let $target = $(this).find('.fas.fa-sort');
+                const thisSortNm = header.getAttribute('sort-nm');
+                const thisSortFnNm = header.getAttribute('sort-fn-nm');
+                const sortIcon = header.querySelector('.fas.fa-sort');
 
-                if (!$target.hasClass('fa-sort-up')) {
-                    $target.addClass('fa-sort-up').removeClass('fa-sort-down');
-                } else {
-                    $target.addClass('fa-sort-down').removeClass('fa-sort-up');
+                if (sortIcon) {
+                    if (!sortIcon.classList.contains('fa-sort-up')) {
+                        sortIcon.classList.add('fa-sort-up');
+                        sortIcon.classList.remove('fa-sort-down');
+                    } else {
+                        sortIcon.classList.add('fa-sort-down');
+                        sortIcon.classList.remove('fa-sort-up');
+                    }
                 }
 
-                $(this)
-                    .parents('thead')
-                    .find('[sort-nm]')
-                    .each(function () {
-                        // 다른 sort 는 초기화 한다.
-                        if ($(this).attr('sort-nm') !== thisSortNm) {
-                            $(this).find('.fas.fa-sort').removeClass('fa-sort-up').removeClass('fa-sort-down');
+                header
+                    .closest('thead')
+                    .querySelectorAll('[sort-nm]')
+                    .forEach((otherHeader) => {
+                        if (otherHeader.getAttribute('sort-nm') !== thisSortNm) {
+                            const otherSortIcon = otherHeader.querySelector('.fas.fa-sort');
+                            if (otherSortIcon) {
+                                otherSortIcon.classList.remove('fa-sort-up', 'fa-sort-down');
+                            }
                         }
                     });
 
-                if (thisSortFnNm && window[thisSortFnNm] && typeof window[thisSortFnNm] === 'function') {
-                    window[thisSortFnNm](this);
+                if (thisSortFnNm && typeof window[thisSortFnNm] === 'function') {
+                    window[thisSortFnNm](header);
                 }
             });
-    }
-
-    {
-        // jQuery 확장 함수
-
-        $.fn.setDropdownCategory = function (clickNode, dataset) {
-            let targetId = $(this).attr('id');
-            $(this).attr('data-bs-toggle', 'dropdown').attr('data-bs-auto-close', 'outside').attr('aria-haspopup', 'true').attr('aria-expanded', 'false');
-
-            let datasetStr = '';
-            if (dataset && S2Util.isJSON(dataset)) {
-                for (const key in dataset) {
-                    if (datasetStr) {
-                        datasetStr += ' ';
-                    }
-                    datasetStr += `data-${key}="${dataset[key]}"`;
-                }
-            }
-
-            if ($(`[aria-labelledby=${targetId}]`).length === 0) {
-                $(this).after(`
-					<div class="dropdown-menu dropdown-category category" aria-labelledby="${targetId}" ${datasetStr}>
-						<section>
-							<div class="box-tree">
-								<div class="category-box card-body p-1">
-									<ul id="dropdown_${targetId}" class="nav nav-pills flex-column">
-										<li class="core-tree category"></li>
-									</ul>
-								</div>
-							</div>
-						</section>
-					</div>
-				`);
-            }
-
-            let objTree = null;
-            /*
-			if (objTree != null) {
-				objTree.destory();
-				delete objTree;
-				objTree = null;
-			}
-			*/
-
-            objTree = $('[aria-labelledby=' + targetId + '] .core-tree.category').coreTree();
-
-            ajaxPostSingleton('/eln/category/categoryTreeList.ar', '', '[[#{i18n.common.loading}]]', function (res) {
-                for (const idx in res.data) {
-                    const data = res.data[idx];
-                    objTree.addCoreNode(`${data.upperMno};${data.categoryMno}`, data.upperMno, data.categoryMno, data.categoryNm, data.useYn === 'Y' ? 'fa fa-use-tree' : 'fa fa-unuse-tree category', false, false, false, data);
-                }
-                objTree.renderCoreNode(function () {
-                    objTree.deSelectAll();
-                    objTree.openAll();
-                });
-
-                objTree.onSelectNodeHandler(function () {
-                    $(`#${targetId}`).dropdown('hide');
-                    const node = objTree.selectedNode();
-                    if (!coreCommon.isEmpty(node)) {
-                        if (clickNode && typeof clickNode == 'function') {
-                            clickNode(node);
-                        }
-                    }
-                });
-            });
-        };
+        });
     }
 
     return {
@@ -430,24 +370,25 @@ const S2Util = (function () {
          * select option 생성
          *
          * option: {
-         *     target: jQuery selector or jQuery (required),
+         *     target: DOM selector or DOM element (required),
          *     items: array or object (required),
          *     itemValue: fieldNm or '{{=fieldNm1}}.{{=fieldNm2}}' (required),
          *     itemLabel: fieldNm or '{{=fieldNm1}}.{{=fieldNm2}}',
          *     initVal: value,
-         *     clear: null -> all remove, not null -> jQuery selector remove
+         *     clear: null -> all remove, not null -> CSS selector remove
          * }
          */
         s2Options: function (option) {
             if (!option) {
                 return;
             }
-            const $target = typeof option.target == 'string' ? $(option.target) : option.target;
-            if ($target.length > 0) {
+            const target = typeof option.target === 'string' ? document.querySelector(option.target) : option.target;
+            if (target) {
                 if (!option.clear) {
-                    $target.empty();
-                } else if (typeof option.clear == 'string') {
-                    $target.find(option.clear).remove();
+                    target.innerHTML = '';
+                } else if (typeof option.clear === 'string') {
+                    const elementsToRemove = target.querySelectorAll(option.clear);
+                    elementsToRemove.forEach((el) => el.remove());
                 }
 
                 if (option.items && option.itemValue) {
@@ -455,20 +396,20 @@ const S2Util = (function () {
                         option.items = [option.items];
                     }
 
-                    for (const idx in option.items) {
-                        let item = option.items[idx];
-                        let itemValue = String(option.itemValue);
-                        let itemLabel = String(option['itemLabel']);
-                        let value = itemValue.match(/({{=([^}}]+)}})/) ? S2Util.s2Template(itemValue, item) : item[itemValue];
-                        let label = itemLabel && itemLabel.match(/({{=([^}}]+)}})/) ? S2Util.s2Template(itemLabel, item) : item[itemLabel];
+                    option.items.forEach((item) => {
+                        const itemValue = String(option.itemValue);
+                        const itemLabel = String(option.itemLabel);
+                        const value = itemValue.match(/{{=([^}}]+)}}/) ? S2Util.s2Template(itemValue, item) : item[itemValue];
+                        const label = itemLabel && itemLabel.match(/{{=([^}}]+)}}/) ? S2Util.s2Template(itemLabel, item) : item[itemLabel];
 
-                        $('<option>', {value: value ? value : ''})
-                            .text(label ? label : value)
-                            .appendTo($target);
-                    }
+                        const optionElement = document.createElement('option');
+                        optionElement.value = value || '';
+                        optionElement.textContent = label || value;
+                        target.appendChild(optionElement);
+                    });
 
-                    if (option['initVal']) {
-                        $target.val(option['initVal']);
+                    if (option.initVal) {
+                        target.value = option.initVal;
                     }
                 }
             }
@@ -579,29 +520,27 @@ const S2Util = (function () {
         getThOrderBy: function (selector, defaultOrderBy) {
             let orderBy = '';
 
-            $(selector)
-                .find('[sort-nm]')
-                .each(function () {
-                    const sortNm = $(this).attr('sort-nm');
-                    const $sort = $(this).find('.fas.fa-sort');
+            document.querySelectorAll(`${selector} [sort-nm]`).forEach((header) => {
+                const sortNm = header.getAttribute('sort-nm');
+                const sortIcon = header.querySelector('.fas.fa-sort');
 
-                    if ($sort.length > 0) {
-                        let direction = '';
+                if (sortIcon) {
+                    let direction = '';
 
-                        if ($sort.hasClass('fa-sort-up')) {
-                            direction = 'ASC';
-                        } else if ($sort.hasClass('fa-sort-down')) {
-                            direction = 'DESC';
-                        }
-
-                        if (sortNm && direction) {
-                            if (orderBy) {
-                                orderBy += ', ';
-                            }
-                            orderBy += sortNm + ' ' + direction;
-                        }
+                    if (sortIcon.classList.contains('fa-sort-up')) {
+                        direction = 'ASC';
+                    } else if (sortIcon.classList.contains('fa-sort-down')) {
+                        direction = 'DESC';
                     }
-                });
+
+                    if (sortNm && direction) {
+                        if (orderBy) {
+                            orderBy += ', ';
+                        }
+                        orderBy += `${sortNm} ${direction}`;
+                    }
+                }
+            });
 
             if (!orderBy && defaultOrderBy) {
                 orderBy = defaultOrderBy;
@@ -1586,6 +1525,8 @@ const S2Util = (function () {
 
                 // 알림 컨펌 사용 여부 ("구노에서 알림 받기를 수락하시겠습니까?")
                 const isOpenNotificationConfirm = false;
+
+                console.log(today, lastSubscriptionsDate);
 
                 if (!publicKey) {
                     console.debug('Public key 가 없습니다.');
