@@ -4,6 +4,7 @@
         <script type="text/javascript">
             let isRegistering = false;
 
+            let analysisChartMaxValue = 50;
             const analysisCompleteInfo = {};
             const analysisInfo = {};
 
@@ -289,7 +290,7 @@
                     yAxis: {
                         type: 'value',
                         min: 0,
-                        max: 150,
+                        max: analysisChartMaxValue,
                         splitNumber: 5,
                         axisLine: {show: false},
                         axisTick: {show: false},
@@ -387,6 +388,12 @@
                         const analysisValue = analysisInfo[dateKey] || 0;
                         const analysisCompleteValue = analysisCompleteInfo[dateKey];
 
+                        const maxValue = Math.max(analysisValue, analysisCompleteValue || 0);
+                        if (maxValue >= analysisChartMaxValue) {
+                            // 기존 최대값보다 크면 10의 배수로 올림
+                            analysisChartMaxValue = Math.ceil((maxValue + 10) / 10) * 10;
+                        }
+
                         if (analysisCompleteValue || analysisCompleteValue === 0) {
                             // 분석 완료 데이터는 값이 있을 때만 넣는다.
                             analysisCompleteData.push([date, analysisCompleteValue]);
@@ -406,6 +413,9 @@
                     markerData2[marker2Index] = analysisData[marker2Index];
 
                     const updateSeries = {
+                        yAxis: {
+                            max: analysisChartMaxValue
+                        },
                         series: [
                             // 첫 번째 면적그래프
                             {
