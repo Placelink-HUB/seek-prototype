@@ -89,9 +89,7 @@ public class AnalysisScheduler {
         AnalysisDetailVO analysisDetail = null;
         do {
             analysisDetail = analysisRequestStatus.get();
-            if (analysisDetail != null) {
-                AnalyzerService.asyncPollAnalysisResults(analysisDetail);
-            }
+            AnalyzerService.asyncPollAnalysisResults(analysisDetail);
         } while (analysisDetail != null);
     }
 

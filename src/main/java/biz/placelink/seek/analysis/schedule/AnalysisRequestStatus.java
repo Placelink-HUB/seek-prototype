@@ -44,7 +44,8 @@ public class AnalysisRequestStatus {
         if (!processingAnalysisMap.isEmpty()) {
             for (Map.Entry<String, AnalysisDetailVO> entry : processingAnalysisMap.entrySet()) {
                 AnalysisDetailVO item = entry.getValue();
-                if (item != null && !item.isRequesting()) {
+                if (item != null && !item.isInUse()) {
+                    item.setInUse(true);
                     result = item;
                     break;
                 }
@@ -53,15 +54,15 @@ public class AnalysisRequestStatus {
         return result;
     }
 
-    public void setRequestStatus(String analysisId, boolean isRequesting) {
+    public void setInUse(String analysisId, boolean inUse) {
         AnalysisDetailVO analysis = processingAnalysisMap.get(analysisId);
         if (analysis != null) {
-            analysis.setRequesting(isRequesting);
+            analysis.setInUse(inUse);
         }
     }
 
-    public void remove(String analysisResultId) {
-        processingAnalysisMap.remove(analysisResultId);
+    public void remove(String analysisId) {
+        processingAnalysisMap.remove(analysisId);
     }
 
 }
