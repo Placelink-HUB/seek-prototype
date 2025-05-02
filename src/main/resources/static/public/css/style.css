@@ -707,6 +707,7 @@ table caption {
 =================================================================================================== */
 .header-wrapper .header-wrap {
     display: flex;
+    min-width: 1100px;
     align-items: center;
     background-color: #070707;
     border-bottom: 1px solid #aaa;
@@ -786,6 +787,7 @@ table caption {
     margin-left: 61px;
 }
 #main .main-contents .main-contents-contents {
+    min-width: 1800px;
     padding: 0 50px;
     margin-top: 20px;
 }
@@ -1093,6 +1095,14 @@ table caption {
     border: 1px solid #bfcdf0;
     border-radius: 10px;
     background: #fff;
+}
+
+
+
+@media (max-width: 1800px) {
+    #main .main-contents {
+        overflow-x: auto;
+    }
 }
 
 /* ===================================================================================================
