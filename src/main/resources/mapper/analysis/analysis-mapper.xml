@@ -159,4 +159,28 @@
 			AND NOW() - MAKE_INTERVAL(MINS => #{maxMinutes}) > ANALYSIS_START_DT
     </update>
 
+    <select id="selectRecentRealtimeAnalysisStatus" resultType="integer">
+        /** selectRecentRealtimeAnalysisStatus : 최근 실시간 분석 현황을 조회한다. */
+        SELECT
+            CREATE_DT_STR,
+            COUNT(1) AS TOTAL_COUNT,
+            SUM(COMPLETE_COUNT) AS COMPLETE_COUNT
+        FROM (
+            SELECT
+                CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END AS COMPLETE_COUNT,
+                TO_CHAR(sa.CREATE_DT, 'YYYYMMDDHH24MI') AS CREATE_DT_STR
+            FROM SEEK_ANALYSIS sa
+            WHERE sa.CREATE_DT >= NOW() - INTERVAL '30 MINUTES'
+        )
+        GROUP BY CREATE_DT_STR
+        ORDER BY CREATE_DT_STR
+    </select>
+
+    <select id="selectLastCompleteDtStr" resultType="string">
+        /** selectLastCompleteDtStr : 최근 완료된 분석의 날짜를 조회한다. */
+        SELECT TO_CHAR(MAX(CREATE_DT), 'YYYYMMDDHH24MI')
+        FROM SEEK_ANALYSIS
+        WHERE ANALYSIS_STATUS_CCD = 'COMPLETE'
+    </select>
+
 </mapper>

@@ -31,9 +31,9 @@ public class AnalysisRequestStatus {
     public void add(List<AnalysisDetailVO> analysisList) {
         if (analysisList != null) {
             for (AnalysisDetailVO analysis : analysisList) {
-                String analysisResultId = analysis.getAnalysisResultId();
-                if (!processingAnalysisMap.containsKey(analysisResultId)) {
-                    processingAnalysisMap.put(analysisResultId, analysis);
+                String analysisId = analysis.getAnalysisId();
+                if (!processingAnalysisMap.containsKey(analysisId)) {
+                    processingAnalysisMap.put(analysisId, analysis);
                 }
             }
         }
@@ -53,8 +53,8 @@ public class AnalysisRequestStatus {
         return result;
     }
 
-    public void setRequestStatus(String analysisResultId, boolean isRequesting) {
-        AnalysisDetailVO analysis = processingAnalysisMap.get(analysisResultId);
+    public void setRequestStatus(String analysisId, boolean isRequesting) {
+        AnalysisDetailVO analysis = processingAnalysisMap.get(analysisId);
         if (analysis != null) {
             analysis.setRequesting(isRequesting);
         }
