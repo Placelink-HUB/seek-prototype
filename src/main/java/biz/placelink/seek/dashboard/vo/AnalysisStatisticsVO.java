@@ -21,7 +21,6 @@ public class AnalysisStatisticsVO extends DefaultVO {
     /* 전체 언마스킹 개수 */
     private int totalUnmaskingCount;
 
-
     /* 탐지 현황 - 위험 */
     private int highCount;
     /* 탐지 현황 - 보통 */
@@ -29,6 +28,12 @@ public class AnalysisStatisticsVO extends DefaultVO {
     /* 탐지 현황 - 낮음 */
     private int lowCount;
 
+    /* 탐지 현황 - 전체 건수 */
+    private int totalCountryCount;
+    /* 탐지 현황 - 국내 건수 */
+    private int koreaCount;
+    /* 탐지 현황 - 해외 건수 */
+    private int otherCountryCount;
 
     public Integer getAnalysisCount() { return analysisCount; }
 
@@ -78,4 +83,17 @@ public class AnalysisStatisticsVO extends DefaultVO {
     public int getLowCount() { return lowCount; }
 
     public void setLowCount(int lowCount) { this.lowCount = lowCount; }
+
+
+    public int getTotalCountryCount() { return totalCountryCount; }
+
+    public void setTotalCountryCount(int totalCountryCount) { this.totalCountryCount = totalCountryCount; }
+
+    public int getKoreaCount() { return koreaCount; }
+
+    public void setKoreaCount(int koreaCount) { this.koreaCount = koreaCount; }
+
+    public int getOtherCountryCount() { return otherCountryCount; }
+
+    public void setOtherCountryCount(int otherCountryCount) { this.otherCountryCount = otherCountryCount; }
 }
