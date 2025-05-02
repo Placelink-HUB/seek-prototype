@@ -96,6 +96,10 @@ public class AnalyzerService {
     @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
     public void asyncAnalysisRequest(AnalysisDetailVO analysisDetail) {
+        if (true) {
+            // 테스트용으로 분석 요청을 하지 않도록 한다.
+            return;
+        }
         if (analysisDetail != null && S2Util.isNotEmpty(analysisDetail.getAnalysisId()) && S2Util.isEmpty(analysisDetail.getAnalysisResultId())) {
             String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
             String analysisId = analysisDetail.getAnalysisId();

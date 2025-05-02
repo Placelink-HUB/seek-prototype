@@ -1531,7 +1531,7 @@ const S2Util = (function () {
                     return;
                 } else if (today === lastSubscriptionsDate) {
                     console.debug('금일 구독 완료');
-                    return;
+                    //return;
                 }
 
                 // 금일 구독을 안했다면 구독을 신청(갱신)한다.
@@ -1583,6 +1583,7 @@ const S2Util = (function () {
         // 서비스 워커 푸시 이벤트 수신
         receiveServiceWorkerEvents: function () {
             navigator.serviceWorker.addEventListener('message', (event) => {
+                console.debug('event.data', event.data);
                 if (event.data.type === 'S2_SHOW_TOAST') {
                     S2Util.showToast(event.data.message);
                 }

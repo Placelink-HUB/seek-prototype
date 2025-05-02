@@ -1,40 +1,43 @@
 const notiIcon = 'https://goono.placelink.biz/lib/eln/img/img_gnb_profile.svg';
 const notiOption = {
-    tag: 'goono-notification',
+    tag: 'pl-notification',
     icon: notiIcon,
     badge: notiIcon,
     vibrate: [200, 100, 200]
 };
 
 self.addEventListener('push', function (event) {
-    console.log('Push event received:', event, event.data);
+    console.debug('Push event received:', event, event.data);
     const jsonData = event.data.json();
+    const pushTypeCcd = jsonData.pushTypeCcd;
     const message = jsonData.message;
 
-    notiOption['body'] = message;
-    if (jsonData.link) {
-        notiOption['data'] = {
-            link: jsonData.link
-        };
+    if (message) {
+        notiOption['body'] = message;
+        if (jsonData.link) {
+            notiOption['data'] = {
+                link: jsonData.link
+            };
 
-        // link 가 있다면 추가적인 액션을 할 수 있는 버튼 추가
-        notiOption['actions'] = [
-            {action: 'explore', title: '자세히 보기'},
-            {action: 'close', title: '닫기'}
-        ];
+            // link 가 있다면 추가적인 액션을 할 수 있는 버튼 추가
+            notiOption['actions'] = [
+                {action: 'explore', title: '자세히 보기'},
+                {action: 'close', title: '닫기'}
+            ];
+        }
+
+        event.waitUntil(
+            // 서비스워커 알림(Notification) 사용
+            self.registration.showNotification('【SEEK】', notiOption)
+        );
     }
-
-    event.waitUntil(
-        // 서비스워커 알림(Notification) 사용
-        self.registration.showNotification('【Goono ELN】', notiOption)
-    );
 
     event.waitUntil(
         // 클라이언트 메인 스크립트 토스트 사용
         self.clients.matchAll({includeUncontrolled: true, type: 'window'}).then((clientList) => {
             clientList.forEach((client) => {
                 client.postMessage({
-                    type: 'S2_SHOW_TOAST',
+                    type: pushTypeCcd,
                     message: message
                 });
             });

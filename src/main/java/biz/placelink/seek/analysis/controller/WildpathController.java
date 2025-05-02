@@ -105,7 +105,8 @@ public class WildpathController {
 
     @PostMapping("/postprocess/**")
     protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response, Map<String, String> headers) throws Exception {
-        if ("text".equals(WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType()))) {
+        String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType());
+        if ("text".equals(documentTypeFromContentType) && !this.isStaticResource(request, "/postprocess/")) {
             String seekMode = request.getHeader("X-Seek-Mode");
 
             String payload = "";
@@ -138,6 +139,10 @@ public class WildpathController {
 
     @PostMapping(path = "/response/async/**")
     protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (this.isStaticResource(request, "/response/async/")) {
+            return;
+        }
+
         String requestId = request.getHeader("X-Request-ID");
         String contentType = request.getContentType();
         String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(contentType);
@@ -171,6 +176,19 @@ public class WildpathController {
             }
             break;
         }
+    }
+
+    private boolean isStaticResource(HttpServletRequest request, String stdPath) {
+        String realPath = request.getServletPath().split(stdPath)[1];
+        if (!realPath.startsWith("/")) {
+            realPath = "/" + realPath;
+        }
+        if (realPath.startsWith("/public/js") || realPath.startsWith("/public/css") || realPath.startsWith("/public/images"))
+
+        {
+            return true;
+        }
+        return false;
     }
 
 }

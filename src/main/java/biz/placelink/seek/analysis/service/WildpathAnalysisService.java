@@ -2,20 +2,28 @@ package biz.placelink.seek.analysis.service;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import biz.placelink.seek.system.file.service.FileService;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.util.S2EncryptionUtil;
@@ -36,12 +44,16 @@ import kr.s2.ext.util.S2Util;
 @Transactional(readOnly = true)
 public class WildpathAnalysisService {
 
+    private static final Logger logger = LoggerFactory.getLogger(WildpathAnalysisService.class);
+
+    private final ServiceWorkerService serviceWorkerService;
     private final AnalysisService analysisService;
     private final AnalysisDetailService analysisDetailService;
     private final SensitiveInformationService sensitiveInformationService;
     private final FileService fileService;
 
-    public WildpathAnalysisService(AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, FileService fileService) {
+    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, FileService fileService) {
+        this.serviceWorkerService = serviceWorkerService;
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
         this.sensitiveInformationService = sensitiveInformationService;
@@ -51,6 +63,7 @@ public class WildpathAnalysisService {
     @Value("${encryption.password}")
     public String encryptionPassword;
 
+    @Transactional(readOnly = false)
     public int createProxyAnalysis(String analysisTypeCcd, String requestId, String countryCcd, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
         int result = 0;
         String analysisId = UUID.randomUUID().toString();
@@ -123,6 +136,7 @@ public class WildpathAnalysisService {
     public String maskSensitiveInformation(String textData, String seekMode) {
         String resultText = textData;
         List<String> patterns = new ArrayList<>();
+        int count = 0;
 
         if (!"raw".equals(seekMode)) {
             if (Pattern.compile("(\\$WT\\{[^}]+\\})").matcher(textData).find()) {
@@ -133,6 +147,7 @@ public class WildpathAnalysisService {
 
                 while (matcher.find()) {
                     patterns.add(matcher.group(1));
+                    count++;
                 }
             }
         }
@@ -149,6 +164,22 @@ public class WildpathAnalysisService {
                             : sensitiveInformation.getEscapeText());
                 }
             }
+        }
+
+        if (!"origin".equals(seekMode) && count > 0) {
+            Map<String, Object> pushMap = new HashMap<>();
+            pushMap.put("pushTypeCcd", "mask");
+            pushMap.put("maskTypeCcd", seekMode);
+            pushMap.put("count", count);
+
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String jsonMessage = mapper.writeValueAsString(pushMap);
+                serviceWorkerService.sendNotificationAll(jsonMessage);
+            } catch (JsonProcessingException e) {
+                logger.error("알림 메시지 JSON 파싱 실패");
+            }
+
         }
 
         return resultText;
