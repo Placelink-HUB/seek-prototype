@@ -25,9 +25,7 @@
                 const xAxisData = [];
 
                 for (let i = 0; i < 30; i++) {
-                    const date = dayjs()
-                        .subtract(29 - i, 'minute')
-                        .format('YYYYMMDDHHmm');
+                    const date = dayjs().subtract(29 - i, 'minute').format('YYYYMMDDHHmm');
                     xAxisData.push(date);
                 }
 
