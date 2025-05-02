@@ -35,6 +35,7 @@ import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.exception.S2Exception;
 import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
+import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2HashUtil;
 import kr.s2.ext.util.S2StreamUtil;
 import kr.s2.ext.util.S2Util;
@@ -217,7 +218,7 @@ public class AnalyzerService {
      *
      * @param analysisDetail 분석 상세 정보
      */
-    // @Async("analysisTaskExecutor")
+    @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
     public void asyncPollAnalysisResults(AnalysisDetailVO analysisDetail) {
         if (analysisDetail != null) {
@@ -231,8 +232,6 @@ public class AnalyzerService {
             }
 
             String analysisData = "";
-
-            analysisRequestStatus.setRequestStatus(analysisId, true);
 
             try {
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisDetail.getAnalysisModel()));
@@ -296,8 +295,7 @@ public class AnalyzerService {
 
                             SensitiveInformationVO sensitiveInformation = new SensitiveInformationVO();
                             sensitiveInformation.setSensitiveInformationId(sensitiveInformationId);
-                            // sensitiveInformation.setTargetText(S2EncryptionUtil.encrypt(targetText, encryptionPassword)); // 민감 정보 문자열은 암호화한다.
-                            sensitiveInformation.setTargetText(targetText); // 민감 정보 문자열은 암호화한다.
+                            sensitiveInformation.setTargetText(S2EncryptionUtil.encrypt(targetText, encryptionPassword)); // 민감 정보 문자열은 암호화한다.
                             sensitiveInformation.setEscapeText(escapeText);
                             sensitiveInformation.setHitCount(hitCount);
                             sensitiveInformation.setSeverityCcd(severityCcd);
@@ -347,7 +345,7 @@ public class AnalyzerService {
                 analysisErrorService.insertAnalysisErrorWithNewTransaction(analysisId, analysisData, e.getMessage() + "\n" + S2Exception.getStackTrace(e));
                 logger.error("asyncPollAnalysisResults Error : {}", e.getMessage(), e);
             } finally {
-                analysisRequestStatus.setRequestStatus(analysisId, false);
+                analysisRequestStatus.setInUse(analysisId, false);
             }
         }
     }

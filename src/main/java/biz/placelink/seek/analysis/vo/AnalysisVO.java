@@ -25,8 +25,8 @@ public class AnalysisVO extends DefaultVO {
     /* 분석 시간(ms) */
     private Long analysisTime;
 
-    /* 요청 상태 */
-    private boolean isRequesting = false;
+    /* 사용 중 여부 */
+    private boolean inUse = false;
 
     public String getAnalysisId() {
         return analysisId;
@@ -108,12 +108,12 @@ public class AnalysisVO extends DefaultVO {
         this.analysisTime = analysisTime;
     }
 
-    public boolean isRequesting() {
-        return isRequesting;
+    public boolean isInUse() {
+        return inUse;
     }
 
-    public void setRequesting(boolean requesting) {
-        isRequesting = requesting;
+    public void setInUse(boolean inUse) {
+        this.inUse = inUse;
     }
 
 }
