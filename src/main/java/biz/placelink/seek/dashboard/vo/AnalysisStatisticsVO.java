@@ -44,40 +44,45 @@ public class AnalysisStatisticsVO extends DefaultVO {
     /* 탐지 현황 - 해외 낮음 */
     private int otherLowCount;
 
+    /* 민감 정보 검출 타입 공통코드 */
+    private String detectionTypeCcd;
+    /* 민감 정보 탐지 횟수 */
+    private int hitCount;
 
-    public Integer getAnalysisCount() { return analysisCount; }
+
+    public int getAnalysisCount() { return analysisCount; }
 
     public void setAnalysisCount(int analysisCount) {
         this.analysisCount = analysisCount;
     }
 
-    public Integer getDetectionCount() { return detectionCount; }
+    public int getDetectionCount() { return detectionCount; }
 
     public void setDetectionCount(int detectionCount) {
         this.detectionCount = detectionCount;
     }
 
-    public Integer getMaskingCount() { return maskingCount; }
+    public int getMaskingCount() { return maskingCount; }
 
     public void setMaskingCount(int maskingCount) { this.maskingCount = maskingCount; }
 
-    public Integer getUnmaskingCount() { return unmaskingCount; }
+    public int getUnmaskingCount() { return unmaskingCount; }
 
     public void setUnmaskingCount(int unmaskingCount) { this.unmaskingCount = unmaskingCount; }
 
-    public Integer getTotalAnalysisCount() { return totalAnalysisCount; }
+    public int getTotalAnalysisCount() { return totalAnalysisCount; }
 
     public void setTotalAnalysisCount(int totalAnalysisCount) { this.totalAnalysisCount = totalAnalysisCount; }
 
-    public Integer getTotalDetectionCount() { return totalDetectionCount; }
+    public int getTotalDetectionCount() { return totalDetectionCount; }
 
     public void setTotalDetectionCount(int totalDetectionCount) { this.totalDetectionCount = totalDetectionCount; }
 
-    public Integer getTotalMaskingCount() { return totalMaskingCount; }
+    public int getTotalMaskingCount() { return totalMaskingCount; }
 
     public void setTotalMaskingCount(int totalMaskingCount) { this.totalMaskingCount = totalMaskingCount; }
 
-    public Integer getTotalUnmaskingCount() { return totalUnmaskingCount; }
+    public int getTotalUnmaskingCount() { return totalUnmaskingCount; }
 
     public void setTotalUnmaskingCount(int totalUnmaskingCount) { this.totalUnmaskingCount = totalUnmaskingCount; }
 
@@ -125,6 +130,15 @@ public class AnalysisStatisticsVO extends DefaultVO {
     public int getOtherLowCount() { return otherLowCount; }
 
     public void setOtherLowCount(int otherLowCount) { this.otherLowCount = otherLowCount; }
+
+
+    public String getDetectionTypeCcd() { return detectionTypeCcd; }
+
+    public void setDetectionTypeCcd(String detectionTypeCcd) { this.detectionTypeCcd = detectionTypeCcd; }
+
+    public int getHitCount() { return hitCount; }
+
+    public void setHitCount(int hitCount) { this.hitCount = hitCount; }
 
 
 }

@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
 import biz.placelink.seek.dashboard.vo.SchAnalysisStatisticsVO;
 
+import java.util.List;
+
 /**
  * <pre>
  * << 개정이력(Modification Information) >>
@@ -39,5 +41,12 @@ public interface DashboardMapper {
      * @return 탐지 현황
      */
     AnalysisStatisticsVO selectDetectionStatistics(SchAnalysisStatisticsVO searchVO);
+
+    /**
+     * 민감정보 상위 항목 정보를 조회한다.
+     *
+     * @return 민감정보 상위 항목
+     */
+    List<AnalysisStatisticsVO> selectTopSensitiveInformation(SchAnalysisStatisticsVO searchVO);
 
 }

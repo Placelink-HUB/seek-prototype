@@ -66,4 +66,18 @@ public class DashboardController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * 민감정보 상위 항목 조회
+     *
+     * @return 민감정보 상위 항목
+     */
+    @GetMapping(value = "/public/dashboard/top-sensitive-statistics")
+    public ResponseEntity<Map<String, Object>> topSensitiveInformation(SchAnalysisStatisticsVO searchVO) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(searchVO));
+        response.put(Constants.RESULT_CODE, 1);
+        return ResponseEntity.ok(response);
+    }
+
 }

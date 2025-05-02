@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.dashboard.service.DashboardMapper">
 
-	<select id="selectAnalysisCount" parameterType="schAnalysisStatisticsVO" resultType="AnalysisStatisticsVO">
+	<select id="selectAnalysisCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
         /** selectAnalysisCount : 전체 데이터 분석 수를 조회한다. */
         SELECT
             COUNT(1) AS TOTAL_ANALYSIS_COUNT,
@@ -20,7 +20,7 @@
         </where>
     </select>
 
-	<select id="selectAnalysisResultCount" parameterType="schAnalysisStatisticsVO" resultType="AnalysisStatisticsVO">
+	<select id="selectAnalysisResultCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
         /** selectAnalysisResultCount: 민감정보 탐지 횟수를 조회한다. */
         SELECT
             COUNT(1) AS TOTAL_DETECTION_COUNT,
@@ -39,7 +39,7 @@
         </choose>
     </select>
 
-    <select id="selectDetectionStatistics" parameterType="schAnalysisStatisticsVO" resultType="AnalysisStatisticsVO">
+    <select id="selectDetectionStatistics" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
         /** selectDetectionStatistics : 탐지 현황을 조회한다. */
         SELECT
             SUM(COALESCE(KOREA_CNT, 0)) + SUM(COALESCE(OTHER_CNT, 0)) AS TOTAL_COUNTRY_COUNT,
@@ -105,7 +105,23 @@
                         AND TO_CHAR(sa.ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(NOW(), 'YYYYMMDD')
                     </otherwise>
                 </choose>
-            ) x
+        ) x
+    </select>
+
+    <select id="selectTopSensitiveInformation" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+        /** selectTopSensitiveInformation : 민감정보 상위 5개 항목을 조회한다. */
+        SELECT x.*
+        FROM (
+                SELECT
+                    ssit.DETECTION_TYPE_CCD,
+                    SUM(COALESCE(ssi.HIT_COUNT, 0)) AS HIT_COUNT
+                FROM SEEK_SENSITIVE_INFORMATION ssi
+                    LEFT JOIN SEEK_SENSITIVE_INFORMATION_TYPES ssit
+                        ON ssi.SENSITIVE_INFORMATION_ID = ssit.SENSITIVE_INFORMATION_ID
+                GROUP BY ssit.DETECTION_TYPE_CCD
+        ) x
+        ORDER BY x.HIT_COUNT DESC
+        LIMIT 5
     </select>
 
 </mapper>
