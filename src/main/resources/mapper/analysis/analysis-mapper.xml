@@ -2,8 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.analysis.service.AnalysisMapper">
 
-    <resultMap id="analysisDetailMap" type="analysisDetailVO">
-        <association property="fileDetail" javaType="fileDetailVO">
+    <resultMap id="analysisDetailMap" type="biz.placelink.seek.analysis.vo.AnalysisDetailVO">
+        <!-- AnalysisDetailVO의 기본 필드 매핑 -->
+        <result property="analysisId" column="ANALYSIS_ID"/>
+        <result property="analysisTypeCcd" column="ANALYSIS_TYPE_CCD"/>
+        <result property="analysisResultId" column="ANALYSIS_RESULT_ID"/>
+        <result property="requestId" column="REQUEST_ID"/>
+        <result property="url" column="URL"/>
+        <result property="header" column="HEADER"/>
+        <result property="queryString" column="QUERY_STRING"/>
+        <result property="body" column="BODY"/>
+        <result property="fileId" column="FILE_ID"/>
+        <result property="targetInformation" column="TARGET_INFORMATION"/>
+        <result property="content" column="CONTENT"/>
+        <result property="createDt" column="CREATE_DT"/>
+
+        <!-- fileDetail 필드 매핑 -->
+        <association property="fileDetail" javaType="biz.placelink.seek.system.file.vo.FileDetailVO">
+            <result property="fileDetailId" column="fileDetail.FILE_DETAIL_ID"/>
+            <result property="fileId" column="fileDetail.FILE_ID"/>
+            <result property="fileName" column="fileDetail.FILE_NAME"/>
+            <result property="fileExt" column="fileDetail.FILE_EXT"/>
+            <result property="fileSize" column="fileDetail.FILE_SIZE"/>
+            <result property="fileHash" column="fileDetail.FILE_HASH"/>
+            <result property="contentType" column="fileDetail.CONTENT_TYPE"/>
+            <result property="savePath" column="fileDetail.SAVE_PATH"/>
+            <result property="saveName" column="fileDetail.SAVE_NAME"/>
         </association>
     </resultMap>
 
@@ -69,6 +93,7 @@
 			sa.ANALYSIS_START_DT,
 			sa.ANALYSIS_END_DT,
 			sa.ANALYSIS_TIME,
+			sda.TARGET_INFORMATION,
 			sda.CONTENT,
 			sa.CREATE_DT
 		FROM SEEK_ANALYSIS sa
@@ -105,20 +130,20 @@
 			ANALYSIS_STATUS_CCD = COALESCE(#{analysisStatusCcd}, ANALYSIS_STATUS_CCD),
             ANALYSIS_MODEL = COALESCE(#{analysisModel}, ANALYSIS_MODEL),
             ANALYSIS_RESULT_ID = COALESCE(#{analysisResultId}, ANALYSIS_RESULT_ID),
-			<choose>
-				<when test='analysisStatusCcd eq "PROCESSING"'>
+        <choose>
+            <when test='analysisStatusCcd eq "PROCESSING"'>
 					ANALYSIS_START_DT = CASE
 						WHEN ANALYSIS_START_DT IS NULL THEN NOW()
 						ELSE ANALYSIS_START_DT
 					END,
-				</when>
-				<when test='analysisStatusCcd eq "COMPLETE" or analysisStatusCcd eq "ERROR"'>
+            </when>
+            <when test='analysisStatusCcd eq "COMPLETE" or analysisStatusCcd eq "ERROR"'>
 					ANALYSIS_END_DT = CASE
 						WHEN ANALYSIS_END_DT IS NULL THEN NOW()
 						ELSE ANALYSIS_END_DT
 					END,
-				</when>
-			</choose>
+            </when>
+        </choose>
 			ANALYSIS_TIME = COALESCE(#{analysisTime}, ANALYSIS_TIME),
             MODIFY_DT = NOW()
 		WHERE ANALYSIS_ID = #{analysisId}

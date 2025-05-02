@@ -150,7 +150,7 @@ public class AnalysisService {
      */
     public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisTypeCcd, int totalDetectionCount, String dataBaseTargetInformation, String analyzedContent, String content) {
         AnalysisVO paramVO = new AnalysisVO();
-        paramVO.setAnalysisResultId(analysisResultId);
+        paramVO.setAnalysisId(analysisId);
         paramVO.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_COMPLETE);
         paramVO.setAnalysisResultId(analysisResultId);
         paramVO.setAnalysisTime(analysisTime);
