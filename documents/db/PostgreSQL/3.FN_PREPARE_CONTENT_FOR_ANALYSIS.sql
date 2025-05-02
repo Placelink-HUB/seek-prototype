@@ -21,17 +21,17 @@ BEGIN
 
     -- 프라이머리 키 값 동적으로 가져오기
     FOR i IN 1..ARRAY_LENGTH(pk_columns, 1) LOOP
-            DECLARE
-                pk_value TEXT;
-            BEGIN
-                -- NEW 에서 각 프라이머리 키 컬럼 값 추출
-                EXECUTE format('SELECT ($1).%I::TEXT', TRIM(pk_columns[i]))
-                    INTO pk_value
-                    USING NEW;
+        DECLARE
+            pk_value TEXT;
+        BEGIN
+            -- NEW 에서 각 프라이머리 키 컬럼 값 추출
+            EXECUTE format('SELECT ($1).%I::TEXT', TRIM(pk_columns[i]))
+                INTO pk_value
+                USING NEW;
                 -- 배열에 값 추가 (NULL 은 빈 문자열로 처리)
-                pk_values := pk_values || COALESCE(pk_value, '');
-            END;
-        END LOOP;
+            pk_values := pk_values || COALESCE(pk_value, '');
+        END;
+    END LOOP;
 
     -- 프라이머리 키 값들을 쉼표로 결합
     pk_combined := table_name || '.' || column_name || '.' || ARRAY_TO_STRING(pk_values, ',');
@@ -49,12 +49,11 @@ BEGIN
             USING NEW;
     END IF;
 
-    -- pk_combined 가 SEEK_ANALYSIS_RESULT_DATABASE 의 TARGET_INFORMATION 에 없는 경우에만 삽입
-    IF NOT EXISTS (
+    -- 타입 비교 값이 NULL 이거나 대상 컬럼 값과 같고, pk_combined 가 SEEK_ANALYSIS_RESULT_DATABASE 의 TARGET_INFORMATION 에 없는 경우에만 삽입
+    IF (type_compare_value IS NULL OR column_type = type_compare_value) AND NOT EXISTS (
         SELECT 1
         FROM SEEK_DATABASE_ANALYSIS
         WHERE TARGET_INFORMATION = pk_combined
-            AND (type_compare_value IS NULL OR column_type = type_compare_value)
     ) THEN
         INSERT INTO SEEK_ANALYSIS (
             ANALYSIS_ID,
