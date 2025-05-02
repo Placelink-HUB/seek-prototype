@@ -144,26 +144,27 @@
                     },
                     function (response) {
                         const data = response.detectionData;
-                        const totalCount = data.highCount + data.midCount + data.lowCount;
+                        const total = data.totalKoreaCount + data.totalOtherCountryCount;
 
-                        $('.domestic-users .high-count').text(data.highCount);
-                        $('.domestic-users .mid-count').text(data.midCount);
-                        $('.domestic-users .low-count').text(data.lowCount);
-                        $('.overseas-users .high-count').text(data.highCount);
-                        $('.overseas-users .mid-count').text(data.midCount);
-                        $('.overseas-users .low-count').text(data.lowCount);
+                        $('.domestic-users .high-count').text(data.koreaHighCount);
+                        $('.domestic-users .mid-count').text(data.koreaMidCount);
+                        $('.domestic-users .low-count').text(data.koreaLowCount);
+
+                        $('.overseas-users .high-count').text(data.otherHighCount);
+                        $('.overseas-users .mid-count').text(data.otherMidCount);
+                        $('.overseas-users .low-count').text(data.otherLowCount);
 
                         const semicircleChart1 = echarts.init(document.getElementById('semicircleChart1'));
                         const semicircleChart2 = echarts.init(document.getElementById('semicircleChart2'));
 
-                        semicircleChart1.setOption(createSemicircleChart(totalCount, totalCount, '#c900e4', '#fa0050', '#61082b', '한국'));
-                        semicircleChart2.setOption(createSemicircleChart(totalCount, totalCount, '#3134ff', '#a40aff', '#460C63', '해외'));
+                        semicircleChart1.setOption(createSemicircleChart(data.totalKoreaCount, total, '#c900e4', '#fa0050', '#61082b', '한국'));
+                        semicircleChart2.setOption(createSemicircleChart(data.totalOtherCountryCount, total, '#3134ff', '#a40aff', '#460C63', '해외'));
                     }
                 );
             }
 
-            function createSemicircleChart(value, count, color1, color2, backColor, text) {
-                const formattedCount = count.toLocaleString('en-US');
+            function createSemicircleChart(value, total, color1, color2, backColor, text) {
+                const formattedCount = value.toLocaleString('en-US');
                 return {
                     title: [
                         {
@@ -246,7 +247,7 @@
                                         }
                                     }
                                 }, // 실제 값
-                                {value: 100 - value, itemStyle: {color: backColor}} // 변경 필요 (100)
+                                {value: total - value, itemStyle: {color: backColor}} // 변경 필요 (100)
                             ]
                         }
                     ]

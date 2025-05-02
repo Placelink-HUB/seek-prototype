@@ -21,19 +21,29 @@ public class AnalysisStatisticsVO extends DefaultVO {
     /* 전체 언마스킹 개수 */
     private int totalUnmaskingCount;
 
-    /* 탐지 현황 - 위험 */
-    private int highCount;
-    /* 탐지 현황 - 보통 */
-    private int midCount;
-    /* 탐지 현황 - 낮음 */
-    private int lowCount;
-
     /* 탐지 현황 - 전체 건수 */
     private int totalCountryCount;
+    /* 탐지 현황 - 전체 국내 건수 */
+    private int totalKoreaCount;
+    /* 탐지 현황 - 전체 해외 건수 */
+    private int totalOtherCountryCount;
     /* 탐지 현황 - 국내 건수 */
     private int koreaCount;
     /* 탐지 현황 - 해외 건수 */
     private int otherCountryCount;
+    /* 탐지 현황 - 국내 위험 */
+    private int koreaHighCount;
+    /* 탐지 현황 - 국내 보통 */
+    private int koreaMidCount;
+    /* 탐지 현황 - 국내 낮음 */
+    private int koreaLowCount;
+    /* 탐지 현황 - 해외 위험 */
+    private int otherHighCount;
+    /* 탐지 현황 - 해외 보통 */
+    private int otherMidCount;
+    /* 탐지 현황 - 해외 낮음 */
+    private int otherLowCount;
+
 
     public Integer getAnalysisCount() { return analysisCount; }
 
@@ -72,22 +82,17 @@ public class AnalysisStatisticsVO extends DefaultVO {
     public void setTotalUnmaskingCount(int totalUnmaskingCount) { this.totalUnmaskingCount = totalUnmaskingCount; }
 
 
-    public int getHighCount() { return highCount; }
-
-    public void setHighCount(int highCount) { this.highCount = highCount; }
-
-    public int getMidCount() { return midCount; }
-
-    public void setMidCount(int midCount) { this.midCount = midCount; }
-
-    public int getLowCount() { return lowCount; }
-
-    public void setLowCount(int lowCount) { this.lowCount = lowCount; }
-
-
     public int getTotalCountryCount() { return totalCountryCount; }
 
     public void setTotalCountryCount(int totalCountryCount) { this.totalCountryCount = totalCountryCount; }
+
+    public int getTotalKoreaCount() { return totalKoreaCount; }
+
+    public void setTotalKoreaCount(int totalKoreaCount) { this.totalKoreaCount = totalKoreaCount; }
+
+    public int getTotalOtherCountryCount() { return totalOtherCountryCount; }
+
+    public void setTotalOtherCountryCount(int totalOtherCountryCount) { this.totalOtherCountryCount = totalOtherCountryCount; }
 
     public int getKoreaCount() { return koreaCount; }
 
@@ -96,4 +101,30 @@ public class AnalysisStatisticsVO extends DefaultVO {
     public int getOtherCountryCount() { return otherCountryCount; }
 
     public void setOtherCountryCount(int otherCountryCount) { this.otherCountryCount = otherCountryCount; }
+
+    public int getKoreaHighCount() { return koreaHighCount; }
+
+    public void setKoreaHighCount(int koreaHighCount) { this.koreaHighCount = koreaHighCount; }
+
+    public int getKoreaMidCount() { return koreaMidCount; }
+
+    public void setKoreaMidCount(int koreaMidCount) { this.koreaMidCount = koreaMidCount; }
+
+    public int getKoreaLowCount() { return koreaLowCount; }
+
+    public void setKoreaLowCount(int koreaLowCount) { this.koreaLowCount = koreaLowCount; }
+
+    public int getOtherHighCount() { return otherHighCount; }
+
+    public void setOtherHighCount(int otherHighCount) { this.otherHighCount = otherHighCount; }
+
+    public int getOtherMidCount() { return otherMidCount; }
+
+    public void setOtherMidCount(int otherMidCount) { this.otherMidCount = otherMidCount; }
+
+    public int getOtherLowCount() { return otherLowCount; }
+
+    public void setOtherLowCount(int otherLowCount) { this.otherLowCount = otherLowCount; }
+
+
 }
