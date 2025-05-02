@@ -440,50 +440,64 @@
             }
 
             function initBarChart() {
-                const barChart1 = echarts.init(document.getElementById('barChart1'));
-                option = {
-                    grid: {left: 0, right: 0, top: 20, bottom: 50},
-                    tooltip: {
-                        trigger: 'axis'
+                S2Util.fetch(
+                    '/public/dashboard/top-sensitive-statistics',
+                    {
+                        method: 'get',
+                        dataType: 'json'
                     },
-                    xAxis: {
-                        type: 'category',
-                        data: ['rrn', 'phone', 'account', 'ssh', 'document'],
-                        axisLine: {show: false},
-                        axisTick: {show: false},
-                        axisLabel: {
-                            color: '#fff',
-                            fontSize: 12,
-                            fontWeight: 200,
-                            formatter: function (value) {
-                                // return value.length > 8 ? value.slice(0, 8) + '...' : value; // 말줄임
-                                return value.length > 8 ? value.slice(0, 6) + '\n' + value.slice(6) : value; // 줄바꿈
-                            }
-                        }
-                    },
-                    yAxis: {
-                        type: 'value',
-                        axisLine: {show: false},
-                        axisTick: {show: false},
-                        splitLine: {show: false},
-                        axisLabel: {show: false}
-                    },
-                    series: [
-                        {
-                            type: 'bar',
-                            data: [90, 120, 100, 70, 110],
-                            barWidth: 28,
-                            itemStyle: {
-                                borderRadius: [10, 10, 10, 10],
-                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                    {offset: 0, color: '#097bdd'},
-                                    {offset: 1, color: '#04e6f8'}
-                                ])
-                            }
-                        }
-                    ]
-                };
-                barChart1.setOption(option);
+                    function (response) {
+                        const data = response.hitRankDataList;
+                        const barChart1 = echarts.init(document.getElementById('barChart1'));
+
+                        const xAxisData = data.map(item => item.detectionTypeCcd);
+                        const seriesData = data.map(item => item.hitCount);
+
+                        option = {
+                            grid: {left: 0, right: 0, top: 20, bottom: 50},
+                            tooltip: {
+                                trigger: 'axis'
+                            },
+                            xAxis: {
+                                type: 'category',
+                                data: xAxisData,
+                                axisLine: {show: false},
+                                axisTick: {show: false},
+                                axisLabel: {
+                                    color: '#fff',
+                                    fontSize: 12,
+                                    fontWeight: 200,
+                                    formatter: function (value) {
+                                        // return value.length > 8 ? value.slice(0, 8) + '...' : value; // 말줄임
+                                        return value.length > 8 ? value.slice(0, 6) + '\n' + value.slice(6) : value; // 줄바꿈
+                                    }
+                                }
+                            },
+                            yAxis: {
+                                type: 'value',
+                                axisLine: {show: false},
+                                axisTick: {show: false},
+                                splitLine: {show: false},
+                                axisLabel: {show: false}
+                            },
+                            series: [
+                                {
+                                    type: 'bar',
+                                    data: seriesData,
+                                    barWidth: 28,
+                                    itemStyle: {
+                                        borderRadius: [10, 10, 10, 10],
+                                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                            {offset: 0, color: '#097bdd'},
+                                            {offset: 1, color: '#04e6f8'}
+                                        ])
+                                    }
+                                }
+                            ]
+                        };
+                        barChart1.setOption(option);
+                    }
+                );
             }
 
             function initBarChart2() {
