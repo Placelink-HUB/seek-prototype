@@ -61,6 +61,6 @@ public interface SensitiveInformationMapper {
      * @param sensitiveInformationTypeList 민감 정보 유형 목록
      * @return 등록 개수
      */
-    int insertSensitiveInformationTypes(@Param("sensitiveInformationTypeList") List<Map<String, String>> sensitiveInformationTypeList);
+    int insertSensitiveInformationTypeList(@Param("sensitiveInformationTypeList") List<Map<String, String>> sensitiveInformationTypeList);
 
 }

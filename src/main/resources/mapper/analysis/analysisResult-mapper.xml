@@ -58,11 +58,11 @@
 			DETECTION_TYPE_CCD,
 			DETECTION_COUNT
 		) VALUES
-        <foreach collection="analysisDetectionList" item="item" separator=",">
+        <foreach collection="analysisDetectionList" item="analysisDetection" separator=",">
 			(
-				#{item.analysisResultId},
-				#{item.detectionTypeCcd},
-				#{item.detectionCount}
+				#{analysisDetection.analysisResultId},
+				#{analysisDetection.detectionTypeCcd},
+				#{analysisDetection.detectionCount}
 			)
         </foreach>
     </insert>

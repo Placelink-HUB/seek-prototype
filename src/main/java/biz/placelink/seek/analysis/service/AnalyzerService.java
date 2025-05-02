@@ -35,7 +35,6 @@ import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.exception.S2Exception;
 import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
-import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2HashUtil;
 import kr.s2.ext.util.S2StreamUtil;
 import kr.s2.ext.util.S2Util;
@@ -218,7 +217,7 @@ public class AnalyzerService {
      *
      * @param analysisDetail 분석 상세 정보
      */
-    @Async("analysisTaskExecutor")
+    // @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
     public void asyncPollAnalysisResults(AnalysisDetailVO analysisDetail) {
         if (analysisDetail != null) {
@@ -297,7 +296,8 @@ public class AnalyzerService {
 
                             SensitiveInformationVO sensitiveInformation = new SensitiveInformationVO();
                             sensitiveInformation.setSensitiveInformationId(sensitiveInformationId);
-                            sensitiveInformation.setTargetText(S2EncryptionUtil.encrypt(targetText, encryptionPassword)); // 민감 정보 문자열은 암호화한다.
+                            // sensitiveInformation.setTargetText(S2EncryptionUtil.encrypt(targetText, encryptionPassword)); // 민감 정보 문자열은 암호화한다.
+                            sensitiveInformation.setTargetText(targetText); // 민감 정보 문자열은 암호화한다.
                             sensitiveInformation.setEscapeText(escapeText);
                             sensitiveInformation.setHitCount(hitCount);
                             sensitiveInformation.setSeverityCcd(severityCcd);
@@ -318,7 +318,7 @@ public class AnalyzerService {
                                 Integer detectionCount = analysisDetectionsMap.get(key);
                                 if (detectionCount != null && detectionCount > 0) {
                                     AnalysisDetectionVO item = new AnalysisDetectionVO();
-                                    item.setAnalysisId(analysisId);
+                                    item.setAnalysisResultId(analysisResultId);
                                     item.setDetectionTypeCcd(key);
                                     item.setDetectionCount(detectionCount);
 
@@ -333,7 +333,7 @@ public class AnalyzerService {
                             sensitiveInformationService.insertSensitiveInformationList(sensitiveInformationList);
 
                             if (!sensitiveInformationTypeList.isEmpty()) {
-                                sensitiveInformationService.insertSensitiveInformationTypes(sensitiveInformationTypeList);
+                                sensitiveInformationService.insertSensitiveInformationTypeList(sensitiveInformationTypeList);
                             }
 
                             serviceWorkerService.sendNotificationAll("{\"message\" : \"민감정보 발견\"}");

@@ -1,13 +1,14 @@
 package biz.placelink.seek.analysis.service;
 
-import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
-import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
+import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
+import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 
 /**
  * <pre>
@@ -76,8 +77,8 @@ public class SensitiveInformationService {
      * @param sensitiveInformationTypeList 민감 정보 유형 목록
      * @return 등록 개수
      */
-    public int insertSensitiveInformationTypes(@Param("sensitiveInformationTypeList") List<Map<String, String>> sensitiveInformationTypeList) {
-        return sensitiveInformationMapper.insertSensitiveInformationTypes(sensitiveInformationTypeList);
+    public int insertSensitiveInformationTypeList(@Param("sensitiveInformationTypeList") List<Map<String, String>> sensitiveInformationTypeList) {
+        return sensitiveInformationMapper.insertSensitiveInformationTypeList(sensitiveInformationTypeList);
     }
 
 }

@@ -1,19 +1,11 @@
 package biz.placelink.seek.analysis.service;
 
 import java.io.InputStream;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -128,9 +120,7 @@ public class WildpathAnalysisService {
      * @param seekMode 마스킹 모드 (mask: 마스킹된 데이터, origin: 원본 데이터, raw: 저장된 실제 데이터)
      * @return 마스킹한 문자열
      */
-    public String maskSensitiveInformation(String textData, String seekMode) throws InvalidAlgorithmParameterException,
-            NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException,
-            BadPaddingException, InvalidKeyException {
+    public String maskSensitiveInformation(String textData, String seekMode) {
         String resultText = textData;
         List<String> patterns = new ArrayList<>();
 
@@ -154,11 +144,9 @@ public class WildpathAnalysisService {
 
             if (sensitiveInformationList != null) {
                 for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {
-                    resultText = resultText.replace(sensitiveInformation.getSensitiveInformationId(), "origin"
-                            .equals(seekMode)
-                                    ? S2EncryptionUtil.decrypt(sensitiveInformation
-                                            .getTargetText(), encryptionPassword)
-                                    : sensitiveInformation.getEscapeText());
+                    resultText = resultText.replace(sensitiveInformation.getSensitiveInformationId(), "origin".equals(seekMode)
+                            ? S2EncryptionUtil.decrypt(sensitiveInformation.getTargetText(), encryptionPassword)
+                            : sensitiveInformation.getEscapeText());
                 }
             }
         }

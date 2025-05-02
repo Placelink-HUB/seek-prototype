@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.analysis.service.SensitiveInformationMapper">
 
-	<sql id="sqlSensitiveInformation">
+    <sql id="sqlSensitiveInformation">
 		SELECT
 			si.SENSITIVE_INFORMATION_ID,
 			si.TARGET_TEXT,
@@ -16,43 +16,43 @@
 			LEFT JOIN SEEK_COM_CD cc1
 				ON si.SEVERITY_CCD = cc1.COM_CD
 				AND cc1.GROUP_CD = 'SEVERITY_CCD'
-		<where>
-			<if test='schSensitiveInformationId neq null and schSensitiveInformationId neq ""'>
+        <where>
+            <if test='schSensitiveInformationId neq null and schSensitiveInformationId neq ""'>
 				AND si.SENSITIVE_INFORMATION_ID = #{schSensitiveInformationId}
-			</if>
-			<if test='schSensitiveInformationIdList neq null and schSensitiveInformationIdList.size > 0'>
+            </if>
+            <if test='schSensitiveInformationIdList neq null and schSensitiveInformationIdList.size > 0'>
 				AND si.SENSITIVE_INFORMATION_ID IN
-					<foreach collection="schSensitiveInformationIdList" item="schId" open="(" separator="," close=")">
+                <foreach collection="schSensitiveInformationIdList" item="schId" open="(" separator="," close=")">
 						#{schId}
-					</foreach>
-			</if>
-		</where>
-	</sql>
-	
-	<select id="selectSensitiveInformationList" parameterType="schSensitiveInformationVO" resultType="sensitiveInformationVO">
-		/** selectSensitiveInformationList : 민감 정보 목록을 조회한다. */
-		<include refid="common.sql.paging_header"/>
-		<include refid="sqlSensitiveInformation"/>
-		<include refid="common.sql.paging_footer"/>
-	</select>
+                </foreach>
+            </if>
+        </where>
+    </sql>
 
-	<select id="selectSensitiveInformationListCount" parameterType="schSensitiveInformationVO" resultType="integer">
+    <select id="selectSensitiveInformationList" parameterType="schSensitiveInformationVO" resultType="sensitiveInformationVO">
+		/** selectSensitiveInformationList : 민감 정보 목록을 조회한다. */
+        <include refid="common.sql.paging_header"/>
+        <include refid="sqlSensitiveInformation"/>
+        <include refid="common.sql.paging_footer"/>
+    </select>
+
+    <select id="selectSensitiveInformationListCount" parameterType="schSensitiveInformationVO" resultType="integer">
 		/** selectSensitiveInformationListCount : 민감 정보 목록 개수를 조회한다. */
 		SELECT COUNT(*)
 		FROM (
-			<include refid="sqlSensitiveInformation"/>
+        <include refid="sqlSensitiveInformation"/>
 		)
-	</select>
+    </select>
 
-	<select id="selectSensitiveInformation" parameterType="string" resultType="sensitiveInformationVO">
+    <select id="selectSensitiveInformation" parameterType="string" resultType="sensitiveInformationVO">
 		/** selectSensitiveInformation : 민감 정보를 조회한다. */
 		SELECT COUNT(*)
 		FROM (
-		<include refid="sqlSensitiveInformation"/>
+        <include refid="sqlSensitiveInformation"/>
 		)
-	</select>
+    </select>
 
-	<insert id="insertSensitiveInformationList">
+    <insert id="insertSensitiveInformationList">
 		/** insertSensitiveInformationList : 민감 정보 목록을 등록한다. */
 		INSERT INTO SEEK_SENSITIVE_INFORMATION AS target (
 			SENSITIVE_INFORMATION_ID,
@@ -63,7 +63,7 @@
 			CREATE_DT,
 			MODIFY_DT
 		) VALUES
-		<foreach collection="sensitiveInformationList" item="item" separator=",">
+        <foreach collection="sensitiveInformationList" item="item" separator=",">
 			(
 				#{item.sensitiveInformationId},
 				#{item.targetText},
@@ -73,7 +73,7 @@
 			 	NOW(),
 			 	NOW()
 			)
-		</foreach>
+        </foreach>
 		ON CONFLICT (SENSITIVE_INFORMATION_ID)
 		DO UPDATE SET
 			TARGET_TEXT = EXCLUDED.TARGET_TEXT,
@@ -81,22 +81,22 @@
 			HIT_COUNT = target.HIT_COUNT + EXCLUDED.HIT_COUNT,
 			SEVERITY_CCD = EXCLUDED.SEVERITY_CCD,
 			MODIFY_DT = NOW()
-	</insert>
+    </insert>
 
-	<insert id="insertSensitiveInformationTypes">
-		/** insertSensitiveInformationTypes : 민감 정보 유형 목록을 등록한다. */
+    <insert id="insertSensitiveInformationTypeList">
+		/** insertSensitiveInformationTypeList : 민감 정보 유형 목록을 등록한다. */
 		INSERT INTO SEEK_SENSITIVE_INFORMATION_TYPES (
 			SENSITIVE_INFORMATION_ID,
 			DETECTION_TYPE_CCD
 		) VALUES
-		<foreach collection="sensitiveInformationTypeList" item="item" separator=",">
+        <foreach collection="sensitiveInformationTypeList" item="item" separator=",">
 			(
 				#{item.sensitiveInformationId},
 				#{item.detectionTypeCcd}
 			)
-		</foreach>
+        </foreach>
 		ON CONFLICT (SENSITIVE_INFORMATION_ID, DETECTION_TYPE_CCD)
 		DO NOTHING
-	</insert>
+    </insert>
 
 </mapper>
