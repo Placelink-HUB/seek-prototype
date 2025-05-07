@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.analysis.service.MaskHistMapper">
+
+    <insert id="insertMaskHist">
+		/** insertMaskHist : 마스크 이력을 등록한다. */
+        INSERT INTO MASK_HIST (
+            ANALYSIS_ID,
+            ANALYSIS_MODE_CCD,
+            MASK_MODE_CCD,
+            MASK_COUNT,
+            CREATE_DT
+        ) VALUES (
+            #{analysisId},
+            #{analysisModeCcd},
+            #{maskModeCcd},
+            #{maskCount},
+            NOW()
+        )
+    </insert>
+
+</mapper>

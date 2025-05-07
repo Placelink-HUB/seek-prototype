@@ -39,6 +39,13 @@ public class WildpathController {
         this.wildpathAnalysisService = wildpathAnalysisService;
     }
 
+    /**
+     * 역방향 프록시 전처리 비동기 처리
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @return ResponseEntity<String>
+     */
     @RequestMapping("/request/async/**")
     protected ResponseEntity<String> onBeforePreprocess(HttpServletRequest request, HttpServletResponse response) {
         try {
@@ -54,6 +61,13 @@ public class WildpathController {
         return ResponseEntity.ok("");
     }
 
+    /**
+     * 역방향 프록시 전처리 비동기 처리 - 파일 업로드
+     *
+     * @param file MultipartFile
+     * @return ResponseEntity<String>
+     * @throws IOException 예외 발생 시
+     */
     @RequestMapping(path = "/preprocess/**", consumes = "multipart/form-data")
     protected ResponseEntity<String> preprocess(@RequestParam("file") MultipartFile file) throws IOException {
         file.transferTo(Paths.get("/Users/e01000/Downloads/requestHandle", file.getOriginalFilename()));
@@ -88,6 +102,14 @@ public class WildpathController {
         }
     }
 
+    /**
+     * 역방향 프록시 전처리 동기 처리
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @return ResponseEntity<String>
+     * @throws IOException 예외 발생 시
+     */
     @RequestMapping(path = "/preprocess/**")
     protected ResponseEntity<String> preprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         byte[] target = "Sample".getBytes(StandardCharsets.UTF_8);
@@ -103,9 +125,19 @@ public class WildpathController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * 역방향 프록시 후처리 동기 처리
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @param headers  요청 헤더
+     * @return ResponseEntity<String>
+     * @throws Exception 예외 발생 시
+     */
     @PostMapping("/postprocess/**")
     protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response, Map<String, String> headers) throws Exception {
         String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType());
+        String requestId = request.getHeader("X-Request-ID");
         if ("text".equals(documentTypeFromContentType) && !this.isStaticResource(request, "/postprocess/")) {
             String seekMode = request.getHeader("X-Seek-Mode");
 
@@ -121,6 +153,7 @@ public class WildpathController {
                 logger.error(e.getMessage(), e);
             }
 
+            // payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_REVERSE_POST, payload, seekMode);
             payload = wildpathAnalysisService.maskSensitiveInformation(payload, seekMode);
 
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, request.getContentType()).body(payload);
@@ -137,6 +170,13 @@ public class WildpathController {
         }
     }
 
+    /**
+     * 역방향 프록시 후처리 비동기 처리
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @throws IOException 예외 발생 시
+     */
     @PostMapping(path = "/response/async/**")
     protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (this.isStaticResource(request, "/response/async/")) {
@@ -178,6 +218,13 @@ public class WildpathController {
         }
     }
 
+    /**
+     * 정적 리소스인지 확인
+     *
+     * @param request HttpServletRequest
+     * @param stdPath 정적 리소스 경로
+     * @return
+     */
     private boolean isStaticResource(HttpServletRequest request, String stdPath) {
         String realPath = request.getServletPath().split(stdPath)[1];
         if (!realPath.startsWith("/")) {
