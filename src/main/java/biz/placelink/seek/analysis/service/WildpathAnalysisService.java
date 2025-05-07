@@ -50,13 +50,15 @@ public class WildpathAnalysisService {
     private final AnalysisService analysisService;
     private final AnalysisDetailService analysisDetailService;
     private final SensitiveInformationService sensitiveInformationService;
+    private final MaskHistService maskHistService;
     private final FileService fileService;
 
-    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, FileService fileService) {
+    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, FileService fileService) {
         this.serviceWorkerService = serviceWorkerService;
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
         this.sensitiveInformationService = sensitiveInformationService;
+        this.maskHistService = maskHistService;
         this.fileService = fileService;
     }
 
@@ -129,15 +131,18 @@ public class WildpathAnalysisService {
     /**
      * 주어진 문자열 데이터에서 민감 정보를 마스킹한다.
      *
-     * @param textData 문자열 데이터
-     * @param seekMode 마스킹 모드 (mask: 마스킹된 데이터, origin: 원본 데이터, raw: 저장된 실제 데이터)
+     * @param requestId       요청 ID
+     * @param analysisModeCcd 분석 모드 공통코드
+     * @param textData        문자열 데이터
+     * @param seekMode        마스킹 모드 (mask: 마스킹된 데이터, origin: 원본 데이터, raw: 저장된 실제 데이터)
      * @return 마스킹한 문자열
      */
-    public String maskSensitiveInformation(String textData, String seekMode) {
+    @Transactional(readOnly = false)
+    public String maskSensitiveInformation(String requestId, String analysisModeCcd, String textData, String seekMode) {
         String maskModeCcd = S2Util.isEmpty(seekMode) ? Constants.CD_MASK_MODE_MASK : seekMode;
         String resultText = textData;
         List<String> patterns = new ArrayList<>();
-        int count = 0;
+        int maskCount = 0;
 
         if (!"raw".equals(seekMode)) {
             if (Pattern.compile("(\\$WT\\{[^}]+\\})").matcher(textData).find()) {
@@ -148,7 +153,7 @@ public class WildpathAnalysisService {
 
                 while (matcher.find()) {
                     patterns.add(matcher.group(1));
-                    count++;
+                    maskCount++;
                 }
             }
         }
@@ -167,11 +172,14 @@ public class WildpathAnalysisService {
             }
         }
 
-        if (!Constants.CD_MASK_MODE_RAW.equals(maskModeCcd) && count > 0) {
+        if (!Constants.CD_MASK_MODE_RAW.equals(maskModeCcd) && maskCount > 0) {
+            // 마스킹 이력 등록
+            maskHistService.insertMaskHist(requestId, analysisModeCcd, maskModeCcd, maskCount);
+
             Map<String, Object> pushMap = new HashMap<>();
             pushMap.put("pushTypeCcd", "masking");
             pushMap.put("maskModeCcd", maskModeCcd);
-            pushMap.put("count", count);
+            pushMap.put("count", maskCount);
 
             ObjectMapper mapper = new ObjectMapper();
             try {
@@ -180,7 +188,6 @@ public class WildpathAnalysisService {
             } catch (JsonProcessingException e) {
                 logger.error("알림 메시지 JSON 파싱 실패");
             }
-
         }
 
         return resultText;

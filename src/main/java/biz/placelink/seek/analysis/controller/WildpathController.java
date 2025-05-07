@@ -52,7 +52,7 @@ public class WildpathController {
             // POST, PUT 같은 요청일 때만 body 읽기
             if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
                 String payload = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-                System.out.println("[WILD] Received Payload:\n" + payload);
+                logger.debug("[WILD] Received Payload:\n" + payload);
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
@@ -137,7 +137,7 @@ public class WildpathController {
     @PostMapping("/postprocess/**")
     protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response, Map<String, String> headers) throws Exception {
         String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType());
-        String requestId = request.getHeader("X-Request-ID");
+        String requestId = request.getHeader("X-Request-Id");
         if ("text".equals(documentTypeFromContentType) && !this.isStaticResource(request, "/postprocess/")) {
             String seekMode = request.getHeader("X-Seek-Mode");
 
@@ -147,14 +147,13 @@ public class WildpathController {
                 // POST, PUT 같은 요청일 때만 body 읽기
                 if ("POST".equalsIgnoreCase(request.getMethod()) || "PUT".equalsIgnoreCase(request.getMethod())) {
                     payload = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-                    System.out.println("[WILD] Received Payload:\n" + payload);
+                    logger.debug("[WILD] Received Payload:\n" + payload);
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
 
-            // payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_REVERSE_POST, payload, seekMode);
-            payload = wildpathAnalysisService.maskSensitiveInformation(payload, seekMode);
+            payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_REVERSE_POST, payload, seekMode);
 
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, request.getContentType()).body(payload);
         } else {
@@ -183,7 +182,7 @@ public class WildpathController {
             return;
         }
 
-        String requestId = request.getHeader("X-Request-ID");
+        String requestId = request.getHeader("X-Request-Id");
         String contentType = request.getContentType();
         String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(contentType);
         String countryCcd = request.getHeader("X-Country_Code");

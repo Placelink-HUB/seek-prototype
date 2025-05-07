@@ -4,14 +4,14 @@
 
     <insert id="insertMaskHist">
 		/** insertMaskHist : 마스크 이력을 등록한다. */
-        INSERT INTO MASK_HIST (
-            ANALYSIS_ID,
+        INSERT INTO SEEK_MASK_HIST (
+            REQUEST_ID,
             ANALYSIS_MODE_CCD,
             MASK_MODE_CCD,
             MASK_COUNT,
             CREATE_DT
         ) VALUES (
-            #{analysisId},
+            #{requestId},
             #{analysisModeCcd},
             #{maskModeCcd},
             #{maskCount},

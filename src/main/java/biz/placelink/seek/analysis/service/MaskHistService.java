@@ -33,6 +33,7 @@ public class MaskHistService {
      * @param maskCount       마스크 개수
      * @return 등록 개수
      */
+    @Transactional(readOnly = false)
     public int insertMaskHist(String requestId, String analysisModeCcd, String maskModeCcd, int maskCount) {
         return maskHistMapper.insertMaskHist(requestId, analysisModeCcd, maskModeCcd, maskCount);
     }
