@@ -103,7 +103,7 @@ public class AnalyzerService {
         if (analysisDetail != null && S2Util.isNotEmpty(analysisDetail.getAnalysisId()) && S2Util.isEmpty(analysisDetail.getAnalysisResultId())) {
             String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
             String analysisId = analysisDetail.getAnalysisId();
-            String analysisTypeCcd = analysisDetail.getAnalysisTypeCcd();
+            String analysisModeCcd = analysisDetail.getAnalysisModeCcd();
             String analysisModel = analysisModelName;
             String analysisData = "";
 
@@ -113,7 +113,7 @@ public class AnalyzerService {
             List<Map.Entry<String, Object>> analysisParamList = new ArrayList<>();
 
             try (ByteArrayInputStream analysisModelStream = new ByteArrayInputStream(analysisModel.getBytes(StandardCharsets.UTF_8))) {
-                if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisTypeCcd)) {
+                if (Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisModeCcd)) {
                     String analyzedContent = analysisDetail.getContent();
                     if (S2Util.isNotEmpty(analyzedContent)) {
                         hashDataStreamList.add(new ByteArrayInputStream(analyzedContent.getBytes(StandardCharsets.UTF_8)));
@@ -151,14 +151,14 @@ public class AnalyzerService {
 
                 if (analysisResultService.checkAnalysisHashExists(analysisHash)) {
                     // 이미 분석된 데이터인 경우, 중복 분석 할 필요가 없으므로 해당 해시 값을 분석 결과 ID 로 완료 처리한다.
-                    analysisService.updateAnalysisCompleted(analysisId, analysisHash, 0, analysisTypeCcd);
+                    analysisService.updateAnalysisCompleted(analysisId, analysisHash, 0, analysisModeCcd);
                     return;
                 }
 
                 analysisParamList.add(Map.entry("request_id", analysisId));
                 analysisParamList.add(Map.entry("model_name", analysisModel));
 
-                if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisDetail.getAnalysisTypeCcd())) {
+                if (Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisDetail.getAnalysisModeCcd())) {
                     analysisParamList.add(Map.entry("user_input", analysisDetail.getContent()));
                 } else {
                     String body = analysisDetail.getBody();
@@ -341,7 +341,7 @@ public class AnalyzerService {
                             serviceWorkerService.sendNotificationAll("{\"message\" : \"민감정보 발견\"}");
                         }
 
-                        analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisTypeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
+                        analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisModeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
                         analysisRequestStatus.remove(analysisId);
                     }
                 }

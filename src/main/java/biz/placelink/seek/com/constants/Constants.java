@@ -80,41 +80,41 @@ public class Constants {
     public static final String SYSTEM_UID = "00000000-0000-0000-0000-000000000000";
 
     /**
-     * 분석_타입_공통코드 - 역방향 전처리
+     * 분석_모드_공통코드 - 역방향 전처리
      */
-    public static final String CD_ANALYSIS_TYPE_REVERSE_PRE = "REVERSE_PRE";
+    public static final String CD_ANALYSIS_MODE_REVERSE_PRE = "REVERSE_PRE";
     /**
-     * 분석_타입_공통코드 - 역방향 전처리(비동기)
+     * 분석_모드_공통코드 - 역방향 전처리(비동기)
      */
-    public static final String CD_ANALYSIS_TYPE_REVERSE_ASYNC_PRE = "REVERSE_ASYNC_PRE";
+    public static final String CD_ANALYSIS_MODE_REVERSE_ASYNC_PRE = "REVERSE_ASYNC_PRE";
     /**
-     * 분석_타입_공통코드 - 역방향 후처리
+     * 분석_모드_공통코드 - 역방향 후처리
      */
-    public static final String CD_ANALYSIS_TYPE_REVERSE_POST = "REVERSE_POST";
+    public static final String CD_ANALYSIS_MODE_REVERSE_POST = "REVERSE_POST";
     /**
-     * 분석_타입_공통코드 - 역방향 후처리(비동기)
+     * 분석_모드_공통코드 - 역방향 후처리(비동기)
      */
-    public static final String CD_ANALYSIS_TYPE_REVERSE_ASYNC_POST = "REVERSE_ASYNC_POST";
+    public static final String CD_ANALYSIS_MODE_REVERSE_ASYNC_POST = "REVERSE_ASYNC_POST";
     /**
-     * 분석_타입_공통코드 - 순방향 전처리
+     * 분석_모드_공통코드 - 순방향 전처리
      */
-    public static final String CD_ANALYSIS_TYPE_FORWARD_PRE = "FORWARD_PRE";
+    public static final String CD_ANALYSIS_MODE_FORWARD_PRE = "FORWARD_PRE";
     /**
-     * 분석_타입_공통코드 - 순방향 전처리(비동기)
+     * 분석_모드_공통코드 - 순방향 전처리(비동기)
      */
-    public static final String CD_ANALYSIS_TYPE_FORWARD_ASYNC_PRE = "FORWARD_ASYNC_PRE";
+    public static final String CD_ANALYSIS_MODE_FORWARD_ASYNC_PRE = "FORWARD_ASYNC_PRE";
     /**
-     * 분석_타입_공통코드 - 순방향 후처리
+     * 분석_모드_공통코드 - 순방향 후처리
      */
-    public static final String CD_ANALYSIS_TYPE_FORWARD_POST = "FORWARD_POST";
+    public static final String CD_ANALYSIS_MODE_FORWARD_POST = "FORWARD_POST";
     /**
-     * 분석_타입_공통코드 - 순방향 후처리(비동기)
+     * 분석_모드_공통코드 - 순방향 후처리(비동기)
      */
-    public static final String CD_ANALYSIS_TYPE_FORWARD_ASYNC_POST = "FORWARD_ASYNC_POST";
+    public static final String CD_ANALYSIS_MODE_FORWARD_ASYNC_POST = "FORWARD_ASYNC_POST";
     /**
-     * 분석_타입_공통코드 - 데이터베이스
+     * 분석_모드_공통코드 - 데이터베이스
      */
-    public static final String CD_ANALYSIS_TYPE_DATABASE = "DATABASE";
+    public static final String CD_ANALYSIS_MODE_DATABASE = "DATABASE";
 
     /**
      * 분석_상태_공통코드 - 대기
@@ -132,6 +132,19 @@ public class Constants {
      * 분석_상태_공통코드 - 오류
      */
     public static final String CD_ANALYSIS_STATUS_ERROR = "ERROR";
+
+    /**
+     * 마스크_모드_공통코드 - 원본 유지
+     */
+    public static final String CD_MASK_MODE_RAW = "raw";
+    /**
+     * 마스크_모드_공통코드 - 데이터 마스킹
+     */
+    public static final String CD_MASK_MODE_MASK = "mask";
+    /**
+     * 마스크_모드_공통코드 - 마스킹 해제
+     */
+    public static final String CD_MASK_MODE_UNMASK = "unmask";
 
     /**
      * 파일_구분_공통코드 - 분석 요청 파일

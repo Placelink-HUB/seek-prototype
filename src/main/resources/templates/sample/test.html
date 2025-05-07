@@ -1,46 +1,45 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{_layout/basic/layout}">
-<th:block layout:fragment="bodyStyle">
-    <style>
-        .header-wrapper .header-wrap {
-            border-right: 0;
-        }
-        .content-wrapper.contents-type2 #main .main-contents {
-            margin-top: 0;
-            padding-top: 0;
-        }
-        #main .main-contents .btn-sty-02 {
-            margin: 10px 0 10px calc(100% - 180px);
-        }
-        #main .main-contents .main-contents-contents .contents-box {
-            margin-top: 0;
-        }
-        .table-wrap .table-sty01 th,
-        .table-wrap .table-sty01 td {
-            height: 49px;
-        }
-        .table-wrap .pagination-wrapper {
-            margin-top: 16px;
-        }
-        .content-wrapper.contents-type2 {
-            overflow-y: hidden;
-        }
-    </style>
-</th:block>
-<th:block layout:fragment="bodyScript">
-    <script type="text/javascript">
-        let isRegistering = false;
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
+    <th:block layout:fragment="bodyStyle">
+        <style>
+            .header-wrapper .header-wrap {
+                border-right: 0;
+            }
+            .content-wrapper.contents-type2 #main .main-contents {
+                margin-top: 0;
+                padding-top: 0;
+            }
+            #main .main-contents .btn-sty-02 {
+                margin: 10px 0 10px calc(100% - 180px);
+            }
+            #main .main-contents .main-contents-contents .contents-box {
+                margin-top: 0;
+            }
+            .table-wrap .table-sty01 th,
+            .table-wrap .table-sty01 td {
+                height: 49px;
+            }
+            .table-wrap .pagination-wrapper {
+                margin-top: 16px;
+            }
+            .content-wrapper.contents-type2 {
+                overflow-y: hidden;
+            }
+        </style>
+    </th:block>
+    <th:block layout:fragment="bodyScript">
+        <script type="text/javascript">
+            let isRegistering = false;
 
-        document.addEventListener('DOMContentLoaded', () => {
-        });
+            document.addEventListener('DOMContentLoaded', () => {});
 
-        function goPage(pageNo) {
-            location.href = `/public/sample/test?pageNo=${pageNo}`;
-        }
+            function goPage(pageNo) {
+                location.href = `/public/sample/test?pageNo=${pageNo}`;
+            }
 
-        function openCreateArticle() {
-            showModal(`
+            function openCreateArticle() {
+                showModal(
+                    `
                 <div class="risk-inspection-wrap modal">
                     <div class="tab-container">
                         <div class="tab-buttons">
@@ -90,81 +89,102 @@
                         </div>
                     </div>
                 </div>
-            `, {
-                width: '800px',
-                title: '새글 등록',
-            }, function(modalSelector){
-                // 탭
-                const tabButtons = document.querySelectorAll('.tab-container .tab-buttons .tab-btn');
-                const tabContents = document.querySelectorAll('.tab-container .tab-contents');
+            `,
+                    {
+                        width: '800px',
+                        title: '새글 등록'
+                    },
+                    function (modalSelector) {
+                        // 탭
+                        const tabButtons = document.querySelectorAll('.tab-container .tab-buttons .tab-btn');
+                        const tabContents = document.querySelectorAll('.tab-container .tab-contents');
 
-                tabButtons.forEach(selectedTabButton => {
-                    selectedTabButton.addEventListener('click', () => {
-                        tabButtons.forEach(tabButton => {tabButton.classList.remove('active');});
-                        tabContents.forEach(tabContent => {tabContent.classList.remove('active');});
+                        tabButtons.forEach((selectedTabButton) => {
+                            selectedTabButton.addEventListener('click', () => {
+                                tabButtons.forEach((tabButton) => {
+                                    tabButton.classList.remove('active');
+                                });
+                                tabContents.forEach((tabContent) => {
+                                    tabContent.classList.remove('active');
+                                });
 
-                        selectedTabButton.classList.add('active');
-                        const targetContent = document.getElementById(selectedTabButton.dataset.tab);
-                        targetContent.classList.add('active');
+                                selectedTabButton.classList.add('active');
+                                const targetContent = document.getElementById(selectedTabButton.dataset.tab);
+                                targetContent.classList.add('active');
 
-                        const activeTabButton = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
-                        if (activeTabButton === 'tab-file') {
-                            initDropZone();
-                        }
-                    })
-                });
-
-                // 등록 버튼 클릭 이벤트 처리
-                document.body.addEventListener('click', (event) => {
-                    if (event.target.classList.contains('create-article-btn') && !isRegistering) {
-                        isRegistering = true;
-                        const activeTab = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
-                        if (activeTab === 'tab-text') { // 글 등록
-                            const desc = document.querySelector(`${modalSelector} [name=desc]`);
-
-                            S2Util.fetch(`/public/sample/create-article`, {
-                                method: 'post',
-                                content: desc.value
-                            }, function () {
-                                S2Util.showToast('등록되었습니다.');
-                                setTimeout(function () {
-                                    location.reload();
-                                }, 500);
+                                const activeTabButton = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
+                                if (activeTabButton === 'tab-file') {
+                                    initDropZone();
+                                }
                             });
-                        } else if (activeTab === 'tab-file') { // 파일 등록
-                            S2Util.fetch(`/public/sample/create-article-file`, {
-                                method: 'post',
-                                dataType: 'multipart/form-data',
-                                file: g_uploadFile
-                            }, function () {
-                                S2Util.showToast('등록되었습니다.');
-                                setTimeout(function () {
-                                    location.reload();
-                                }, 500);
-                            });
-                        }
+                        });
+
+                        // 등록 버튼 클릭 이벤트 처리
+                        document.body.addEventListener('click', (event) => {
+                            if (event.target.classList.contains('create-article-btn') && !isRegistering) {
+                                isRegistering = true;
+                                const activeTab = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
+                                if (activeTab === 'tab-text') {
+                                    // 글 등록
+                                    const desc = document.querySelector(`${modalSelector} [name=desc]`);
+
+                                    S2Util.fetch(
+                                        `/public/sample/create-article`,
+                                        {
+                                            method: 'post',
+                                            content: desc.value
+                                        },
+                                        function () {
+                                            S2Util.showToast('등록되었습니다.');
+                                            setTimeout(function () {
+                                                location.reload();
+                                            }, 500);
+                                        }
+                                    );
+                                } else if (activeTab === 'tab-file') {
+                                    // 파일 등록
+                                    S2Util.fetch(
+                                        `/public/sample/create-article-file`,
+                                        {
+                                            method: 'post',
+                                            dataType: 'multipart/form-data',
+                                            file: g_uploadFile
+                                        },
+                                        function () {
+                                            S2Util.showToast('등록되었습니다.');
+                                            setTimeout(function () {
+                                                location.reload();
+                                            }, 500);
+                                        }
+                                    );
+                                }
+                            }
+                        });
                     }
-                });
-            });
-        }
+                );
+            }
 
-        function openModalArticleContents(articleId, seekMode) {
-            S2Util.fetch(`/public/sample/article-info` + (seekMode ? `?seek_mode=${seekMode}` : ''), {
-                method: 'get',
-                dataType: 'json',
-                articleId: articleId
-            }, function (response) {
-                const data = response.articleData;
-                let innerHtml = '';
+            function openModalArticleContents(articleId, seekMode) {
+                S2Util.fetch(
+                    `/public/sample/article-info` + (seekMode ? `?seek_mode=${seekMode}` : ''),
+                    {
+                        method: 'get',
+                        dataType: 'json',
+                        articleId: articleId
+                    },
+                    function (response) {
+                        const data = response.articleData;
+                        let innerHtml = '';
 
-                if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_TEXT}]]') {
-                    innerHtml = `<pre class="detail_contents">${data.content}</pre>`;
-                } else if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_FILE}]]') {
-                    data.serverUrl = '';
-                    innerHtml = S2Util.s2Template('template_contents_file', data);
-                }
+                        if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_TEXT}]]') {
+                            innerHtml = `<pre class="detail_contents">${data.content}</pre>`;
+                        } else if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_FILE}]]') {
+                            data.serverUrl = '';
+                            innerHtml = S2Util.s2Template('template_contents_file', data);
+                        }
 
-                showModal(`
+                        showModal(
+                            `
                         <div class="risk-inspection-wrap modal">
                             <div class="box1">
                                 <div class="contents">
@@ -172,173 +192,164 @@
                                 </div>
                             </div>
                         </div>
-                    `, {
-                    width: '800px',
-                    title: '상세',
-                });
+                    `,
+                            {
+                                width: '800px',
+                                title: '상세'
+                            }
+                        );
+                    }
+                );
+            }
 
-            });
-        }
+            function downloadFile(articleId) {
+                S2Util.fetch(
+                    '/public/sample/downloadFile.ar',
+                    {
+                        method: 'POST',
+                        responseType: 'blob',
+                        articleId: articleId
+                    },
+                    function () {
+                        S2Util.toasts('다운로드 성공하였습니다.');
+                    }
+                );
+            }
 
-        function downloadFile(articleId) {
-            S2Util.fetch(
-                '/public/sample/downloadFile.ar',
-                {
-                    method: 'POST',
-                    responseType: 'blob',
-                    articleId: articleId,
-                },
-                function () {
-                    S2Util.toasts('다운로드 성공하였습니다.');
+            let g_uploadFile = null;
+            function initDropZone() {
+                g_uploadFile = null;
+                const dropZone = document.querySelector('.file-upload .file-upload-box');
+                const fileUpload = document.querySelector('.file-upload .file-upload');
+
+                objDropZone = new coreDropZone(
+                    $('.file-upload .file-upload-box'),
+                    function () {
+                        return '/';
+                    },
+                    function (uploadItems) {
+                        const file = uploadItems.files[0];
+                        g_uploadFile = file;
+
+                        $('.file-upload .file-upload-box').addClass('active').end().find('.file-upload-icon').addClass('d-none').end().find('.file-upload-ok').removeClass('d-none').find('.file-info .file-name').text(file.name);
+                    }
+                );
+
+                if (dropZone) {
+                    dropZone.addEventListener('dragenter', function () {
+                        this.classList.add('highlight');
+                    });
+
+                    dropZone.addEventListener('dragover', function (e) {
+                        e.preventDefault();
+                        this.classList.add('highlight');
+                    });
+
+                    dropZone.addEventListener('dragleave', function () {
+                        this.classList.remove('highlight');
+                    });
+
+                    dropZone.addEventListener('drop', function (e) {
+                        e.preventDefault();
+                        this.classList.remove('highlight');
+                    });
+
+                    const ceUpload = dropZone.querySelector('.file-upload-button');
+
+                    if (ceUpload) {
+                        ceUpload.addEventListener('click', function (e) {
+                            fileUpload.click();
+                        });
+                    }
                 }
-            );
-        }
 
-        let g_uploadFile = null;
-        function initDropZone() {
-            g_uploadFile = null;
-            const dropZone = document.querySelector('.file-upload .file-upload-box');
-            const fileUpload = document.querySelector('.file-upload .file-upload');
-
-            objDropZone = new coreDropZone(
-                $('.file-upload .file-upload-box'),
-                function () {
-                    return '/';
-                },
-                function (uploadItems) {
-                    const file = uploadItems.files[0];
-                    g_uploadFile = file;
-
-                    $('.file-upload .file-upload-box')
-                        .addClass('active').end()
-                        .find('.file-upload-icon').addClass('d-none').end()
-                        .find('.file-upload-ok').removeClass('d-none')
-                        .find('.file-info .file-name').text(file.name);
-                }
-            );
-
-            if (dropZone) {
-                dropZone.addEventListener('dragenter', function () {
-                    this.classList.add('highlight');
-                });
-
-                dropZone.addEventListener('dragover', function (e) {
-                    e.preventDefault();
-                    this.classList.add('highlight');
-                });
-
-                dropZone.addEventListener('dragleave', function () {
-                    this.classList.remove('highlight');
-                });
-
-                dropZone.addEventListener('drop', function (e) {
-                    e.preventDefault();
-                    this.classList.remove('highlight');
-                });
-
-                const ceUpload = dropZone.querySelector('.file-upload-button');
-
-                if (ceUpload) {
-                    ceUpload.addEventListener('click', function (e) {
-                        fileUpload.click();
+                if (fileUpload) {
+                    fileUpload.addEventListener('change', function (e) {
+                        inputFileUpload(this);
                     });
                 }
             }
 
-            if (fileUpload) {
-                fileUpload.addEventListener('change', function (e) {
-                    inputFileUpload(this);
-                });
-            }
-        }
+            function inputFileUpload(obj) {
+                const filePath = '/';
+                for (let i = 0; i < obj.files.length; i++) {
+                    const file = obj.files[i];
+                    file.filePath = filePath;
+                    if (file.filePath !== '/') {
+                        file.fullPath = file.filePath + '/' + file.name;
+                    } else {
+                        file.fullPath = file.filePath + file.name;
+                    }
 
-        function inputFileUpload(obj) {
-            const filePath = '/';
-            for (let i = 0; i < obj.files.length; i++) {
-                const file = obj.files[i];
-                file.filePath = filePath;
-                if (file.filePath !== '/') {
-                    file.fullPath = file.filePath + '/' + file.name;
-                } else {
-                    file.fullPath = file.filePath + file.name;
+                    g_uploadFile = file;
+                    $('.file-upload .file-upload-box').addClass('active').end().find('.file-upload-icon').addClass('d-none').end().find('.file-upload-ok').removeClass('d-none').end().find('.file-info .file-name').text(file.name);
                 }
-
-                g_uploadFile = file;
-                $('.file-upload .file-upload-box')
-                    .addClass('active').end()
-                    .find('.file-upload-icon').addClass('d-none').end()
-                    .find('.file-upload-ok').removeClass('d-none').end()
-                    .find('.file-info .file-name').text(file.name);
             }
-        }
 
-        function deleteFile() {
-            g_uploadFile = '';
-            $('.file-upload .file-upload-box')
-                .removeClass('active').end()
-                .find('.file-upload-icon').removeClass('d-none').end()
-                .find('.file-upload-ok').addClass('d-none')
-                .find('.file-info .file-name').text('');
-        }
-    </script>
-</th:block>
-<th:block layout:fragment="bodyFragment">
-    <div class="main-btn">
-        <button class="btn-sty-02" onclick="openCreateArticle();">새글 등록</button>
-    </div>
-    <div class="main-contents-contents">
-        <div class="contents-box">
-            <div class="table-wrap">
-                <table class="table-sty01">
-                    <caption>위험성 탐지 목록</caption>
-                    <thead>
-                        <tr>
-                            <th>등록 일시</th>
-                            <th>게시글 타입</th>
-                            <th>raw 보기</th>
-                            <th>내용 보기</th>
-                            <th>원본 보기</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:if="${articleListPagination.isEmpty}">
-                            <td colspan="5">데이터가 없습니다.</td>
-                        </tr>
-                        <tr th:each="article : ${articleListPagination.dataList}">
-                            <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
-                            <td th:text="${article.articleTypeCcdNm}"></td>
-                            <td>
-                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], 'raw');">내용 보기</button>
-                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
-                            </td>
-                            <td>
-                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
-                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
-                            </td>
-                            <td>
-                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], 'origin');">원본보기</button>
-                                <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="pagination-wrapper">
-                    <ul th:if="${articleListPagination.isNotEmpty}" class="pagination">
-                        <li th:if="${articleListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev"><a href="#" th:onclick="goPage([[${articleListPagination.firstPageNoOnPageList - 1}]])">&lt;</a></li>
-                        <th:block th:each="pageNo : ${#numbers.sequence(articleListPagination.firstPageNoOnPageList, articleListPagination.lastPageNoOnPageList)}">
-                            <li th:if="${pageNo eq articleListPagination.pageNo}" class="paginate_button active"><a href="#" th:text="${pageNo}"></a></li>
-                            <li th:if="${pageNo ne articleListPagination.pageNo}" class="paginate_button"><a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a></li>
-                        </th:block>
-                        <li th:if="${articleListPagination.lastPageNoOnPageList lt articleListPagination.lastPageNo}" class="paginate_button next"><a href="#" th:onclick="goPage([[${articleListPagination.lastPageNoOnPageList + 1}]])">&gt;</a></li>
-                    </ul>
+            function deleteFile() {
+                g_uploadFile = '';
+                $('.file-upload .file-upload-box').removeClass('active').end().find('.file-upload-icon').removeClass('d-none').end().find('.file-upload-ok').addClass('d-none').find('.file-info .file-name').text('');
+            }
+        </script>
+    </th:block>
+    <th:block layout:fragment="bodyFragment">
+        <div class="main-btn">
+            <button class="btn-sty-02" onclick="openCreateArticle();">새글 등록</button>
+        </div>
+        <div class="main-contents-contents">
+            <div class="contents-box">
+                <div class="table-wrap">
+                    <table class="table-sty01">
+                        <caption>
+                            위험성 탐지 목록
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th>등록 일시</th>
+                                <th>게시글 타입</th>
+                                <th>raw 보기</th>
+                                <th>내용 보기</th>
+                                <th>원본 보기</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${articleListPagination.isEmpty}">
+                                <td colspan="5">데이터가 없습니다.</td>
+                            </tr>
+                            <tr th:each="article : ${articleListPagination.dataList}">
+                                <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
+                                <td th:text="${article.articleTypeCcdNm}"></td>
+                                <td>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], '[[${Constants.CD_MASK_MODE_RAW}]]');">원시 데이터</button>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
+                                </td>
+                                <td>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
+                                </td>
+                                <td>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], '[[${Constants.CD_MASK_MODE_UNMASK}]]');">원본보기</button>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination-wrapper">
+                        <ul th:if="${articleListPagination.isNotEmpty}" class="pagination">
+                            <li th:if="${articleListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev"><a href="#" th:onclick="goPage([[${articleListPagination.firstPageNoOnPageList - 1}]])">&lt;</a></li>
+                            <th:block th:each="pageNo : ${#numbers.sequence(articleListPagination.firstPageNoOnPageList, articleListPagination.lastPageNoOnPageList)}">
+                                <li th:if="${pageNo eq articleListPagination.pageNo}" class="paginate_button active"><a href="#" th:text="${pageNo}"></a></li>
+                                <li th:if="${pageNo ne articleListPagination.pageNo}" class="paginate_button"><a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a></li>
+                            </th:block>
+                            <li th:if="${articleListPagination.lastPageNoOnPageList lt articleListPagination.lastPageNo}" class="paginate_button next"><a href="#" th:onclick="goPage([[${articleListPagination.lastPageNoOnPageList + 1}]])">&gt;</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
+
+            <script id="template_contents_file" type="text/template">
+                <img th:src="@{{{=serverUrl}}/file/image/view/{{=fileId}}}" alt="파일이미지"/>
+            </script>
         </div>
-
-        <script id="template_contents_file" type="text/template">
-            <img th:src="@{{{=serverUrl}}/file/image/view/{{=fileId}}}" alt="파일이미지"/>
-        </script>
-
-    </div>
-</th:block>
+    </th:block>
 </html>

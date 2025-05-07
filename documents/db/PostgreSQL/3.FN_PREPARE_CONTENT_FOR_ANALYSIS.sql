@@ -57,7 +57,7 @@ BEGIN
     ) THEN
         INSERT INTO SEEK_ANALYSIS (
             ANALYSIS_ID,
-            ANALYSIS_TYPE_CCD,
+            ANALYSIS_MODE_CCD,
             ANALYSIS_STATUS_CCD,
             ANALYSIS_RESULT_ID,
             CREATE_DT,

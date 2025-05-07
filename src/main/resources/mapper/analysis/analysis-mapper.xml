@@ -5,7 +5,7 @@
     <resultMap id="analysisDetailMap" type="biz.placelink.seek.analysis.vo.AnalysisDetailVO">
         <!-- AnalysisDetailVO의 기본 필드 매핑 -->
         <result property="analysisId" column="ANALYSIS_ID"/>
-        <result property="analysisTypeCcd" column="ANALYSIS_TYPE_CCD"/>
+        <result property="analysisModeCcd" column="ANALYSIS_MODE_CCD"/>
         <result property="analysisResultId" column="ANALYSIS_RESULT_ID"/>
         <result property="requestId" column="REQUEST_ID"/>
         <result property="url" column="URL"/>
@@ -41,7 +41,7 @@
 		)
         SELECT
 			sa.ANALYSIS_ID,
-			sa.ANALYSIS_TYPE_CCD,
+			sa.ANALYSIS_MODE_CCD,
 			sa.ANALYSIS_RESULT_ID,
 			spa.REQUEST_ID,
 			spa.URL,
@@ -64,12 +64,12 @@
 		FROM SEEK_ANALYSIS sa
             LEFT JOIN SEEK_PROXY_ANALYSIS spa
                 ON sa.ANALYSIS_ID = spa.ANALYSIS_ID
-                AND COALESCE(sa.ANALYSIS_TYPE_CCD, '') != 'DATABASE'
+                AND COALESCE(sa.ANALYSIS_MODE_CCD, '') != 'DATABASE'
             LEFT JOIN SEEK_FILE_DETAIL sfd
                 ON spa.FILE_ID = sfd.FILE_ID
             LEFT JOIN SEEK_DATABASE_ANALYSIS sda
                 ON sa.ANALYSIS_ID = sda.ANALYSIS_ID
-                AND COALESCE(sa.ANALYSIS_TYPE_CCD, '') = 'DATABASE'
+                AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DATABASE'
 		WHERE sa.ANALYSIS_STATUS_CCD = 'WAIT'
 		ORDER BY sa.CREATE_DT
 		LIMIT (
@@ -86,7 +86,7 @@
 		/** selectProcessingAnalysisList : 실행중인 분석 정보 목록을 조회한다. */
 		SELECT
 			sa.ANALYSIS_ID,
-			sa.ANALYSIS_TYPE_CCD,
+			sa.ANALYSIS_MODE_CCD,
 			sa.ANALYSIS_STATUS_CCD,
 			sa.ANALYSIS_MODEL,
 			sa.ANALYSIS_RESULT_ID,
@@ -99,7 +99,7 @@
 		FROM SEEK_ANALYSIS sa
             LEFT JOIN SEEK_DATABASE_ANALYSIS sda
                 ON sa.ANALYSIS_ID = sda.ANALYSIS_ID
-                AND COALESCE(sa.ANALYSIS_TYPE_CCD, '') = 'DATABASE'
+                AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DATABASE'
 		WHERE sa.ANALYSIS_STATUS_CCD = 'PROCESSING'
 		ORDER BY sa.CREATE_DT
     </select>
@@ -108,14 +108,14 @@
 		/** insertAnalysis : 분석 정보를 등록한다. */
 		INSERT INTO SEEK_ANALYSIS (
 			ANALYSIS_ID,
-			ANALYSIS_TYPE_CCD,
+			ANALYSIS_MODE_CCD,
 			ANALYSIS_STATUS_CCD,
 			ANALYSIS_MODEL,
 			CREATE_DT,
 			MODIFY_DT
 		) VALUES (
 			#{analysisId},
-			#{analysisTypeCcd},
+			#{analysisModeCcd},
 			#{analysisStatusCcd},
 			#{analysisModel},
 			NOW(),

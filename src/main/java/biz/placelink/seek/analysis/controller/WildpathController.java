@@ -159,7 +159,7 @@ public class WildpathController {
         switch (documentTypeFromContentType) {
         case "text":
             String body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-            wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_TYPE_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, body, null, null, null);
+            wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, body, null, null, null);
             break;
         case "image":
         case "pdf":
@@ -172,7 +172,7 @@ public class WildpathController {
         case "hwp":
             try (InputStream fileData = request.getInputStream()) {
                 String fileName = S2ServletUtil.getFilenameFromHeader(request);
-                wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_TYPE_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
+                wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
             }
             break;
         }

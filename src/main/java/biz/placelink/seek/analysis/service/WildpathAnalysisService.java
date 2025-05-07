@@ -64,14 +64,14 @@ public class WildpathAnalysisService {
     public String encryptionPassword;
 
     @Transactional(readOnly = false)
-    public int createProxyAnalysis(String analysisTypeCcd, String requestId, String countryCcd, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
+    public int createProxyAnalysis(String analysisModeCcd, String requestId, String countryCcd, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
         int result = 0;
         String analysisId = UUID.randomUUID().toString();
 
         // 분석 등록 (분석 모델은 AnalyzerService 에서 분석 요청시 결정)
         AnalysisVO analysis = new AnalysisVO();
         analysis.setAnalysisId(analysisId);
-        analysis.setAnalysisTypeCcd(analysisTypeCcd);
+        analysis.setAnalysisModeCcd(analysisModeCcd);
         analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
 
         result = analysisService.insertAnalysis(analysis);
@@ -87,7 +87,7 @@ public class WildpathAnalysisService {
             analysisDetail.setBody(body);
 
             if (fileData != null) {
-                FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisTypeCcd(), Constants.CD_FILE_SE_1010);
+                FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisModeCcd(), Constants.CD_FILE_SE_1010);
 
                 if (fileDetailVO != null) {
                     String fileId = UUID.randomUUID().toString();
@@ -134,6 +134,7 @@ public class WildpathAnalysisService {
      * @return 마스킹한 문자열
      */
     public String maskSensitiveInformation(String textData, String seekMode) {
+        String maskModeCcd = S2Util.isEmpty(seekMode) ? Constants.CD_MASK_MODE_MASK : seekMode;
         String resultText = textData;
         List<String> patterns = new ArrayList<>();
         int count = 0;
@@ -159,17 +160,17 @@ public class WildpathAnalysisService {
 
             if (sensitiveInformationList != null) {
                 for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {
-                    resultText = resultText.replace(sensitiveInformation.getSensitiveInformationId(), "origin".equals(seekMode)
+                    resultText = resultText.replace(sensitiveInformation.getSensitiveInformationId(), Constants.CD_MASK_MODE_UNMASK.equals(maskModeCcd)
                             ? S2EncryptionUtil.decrypt(sensitiveInformation.getTargetText(), encryptionPassword)
                             : sensitiveInformation.getEscapeText());
                 }
             }
         }
 
-        if (!"origin".equals(seekMode) && count > 0) {
+        if (!Constants.CD_MASK_MODE_RAW.equals(maskModeCcd) && count > 0) {
             Map<String, Object> pushMap = new HashMap<>();
-            pushMap.put("pushTypeCcd", "mask");
-            pushMap.put("maskTypeCcd", seekMode);
+            pushMap.put("pushTypeCcd", "masking");
+            pushMap.put("maskModeCcd", maskModeCcd);
             pushMap.put("count", count);
 
             ObjectMapper mapper = new ObjectMapper();

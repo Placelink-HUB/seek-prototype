@@ -38,7 +38,8 @@ self.addEventListener('push', function (event) {
             clientList.forEach((client) => {
                 client.postMessage({
                     type: pushTypeCcd,
-                    message: message
+                    message: message,
+                    data: jsonData
                 });
             });
         })

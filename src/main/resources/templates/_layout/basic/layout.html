@@ -1,79 +1,75 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.thymeleaf.org http://www.thymeleaf.org/xsd/thymeleaf-spring5.xsd"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns="">
-<head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>SEEK - Sensitive Entity & Enterprise Keeper</title>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.thymeleaf.org http://www.thymeleaf.org/xsd/thymeleaf-spring5.xsd" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns="">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>SEEK - Sensitive Entity & Enterprise Keeper</title>
 
-    <link rel="shortcut icon" th:href="@{/public/ico/favicon.ico}"/>
-    <link rel="stylesheet" th:href="@{/public/css/layout.css}"/>
-    <link rel="stylesheet" th:href="@{/public/css/style.css}"/>
-    <link rel="stylesheet" th:href="@{/public/css/toast.css}"/>
-    <link rel="stylesheet" th:href="@{/public/css/loading.css}"/>
-    <link rel="stylesheet" th:href="@{/public/css/modal.css}"/>
-    <link rel="stylesheet" th:href="@{/public/js/lib/flatpickr/flatpickr.min.css}"/>
+        <link rel="shortcut icon" th:href="@{/public/ico/favicon.ico}" />
+        <link rel="stylesheet" th:href="@{/public/css/layout.css}" />
+        <link rel="stylesheet" th:href="@{/public/css/style.css}" />
+        <link rel="stylesheet" th:href="@{/public/css/toast.css}" />
+        <link rel="stylesheet" th:href="@{/public/css/loading.css}" />
+        <link rel="stylesheet" th:href="@{/public/css/modal.css}" />
+        <link rel="stylesheet" th:href="@{/public/js/lib/flatpickr/flatpickr.min.css}" />
 
-    <th:block layout:fragment="bodyStyle"></th:block>
-    <style>
-        .flatpickr-wrapper { /* flatpickr 전체를 감싸는 요소 */
-            font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
-        }
-        .flatpickr-calendar { /* 달력 부분 */
-            font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
-        }
-        .flatpickr-day { /* 날짜 부분 */
-            font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
-        }
-    </style>
+        <th:block layout:fragment="bodyStyle"></th:block>
+        <style>
+            .flatpickr-wrapper {
+                /* flatpickr 전체를 감싸는 요소 */
+                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+            }
+            .flatpickr-calendar {
+                /* 달력 부분 */
+                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+            }
+            .flatpickr-day {
+                /* 날짜 부분 */
+                font-family: 'Pretendard', sans-serif;
+                font-size: 14px;
+            }
+        </style>
 
-    <script th:src="@{/public/js/jquery-3.4.1.min.js}"></script>
-    <script th:src="@{/public/js/core.common.js}"></script>
-    <script th:src="@{/public/js/core.dropzone.js}"></script>
-    <script th:src="@{/public/js/s2.util.js}"></script>
-    <script th:src="@{/public/js/loading.js}"></script>
-    <script th:src="@{/public/js/modal.js}"></script>
-    <script th:src="@{/public/js/lib/dayjs.min.js}"></script>
-    <script th:src="@{/public/js/lib/flatpickr/flatpickr.min.js}"></script>
-    <script th:src="@{/public/js/lib/flatpickr/ko.js}"></script>
-    <script th:src="@{/public/js/echarts.min.js}"></script>
+        <script th:src="@{/public/js/jquery-3.4.1.min.js}"></script>
+        <script th:src="@{/public/js/core.common.js}"></script>
+        <script th:src="@{/public/js/core.dropzone.js}"></script>
+        <script th:src="@{/public/js/s2.util.js}"></script>
+        <script th:src="@{/public/js/loading.js}"></script>
+        <script th:src="@{/public/js/modal.js}"></script>
+        <script th:src="@{/public/js/lib/dayjs.min.js}"></script>
+        <script th:src="@{/public/js/lib/flatpickr/flatpickr.min.js}"></script>
+        <script th:src="@{/public/js/lib/flatpickr/ko.js}"></script>
 
-    <th:block layout:fragment="bodyScript"></th:block>
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => {
+        <th:block layout:fragment="bodyScript"></th:block>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {});
+        </script>
+    </head>
+    <body class="hold-transition layout-fixed sidebar-collapse">
+        <div class="wrapper">
+            <div class="content_wrap">
+                <header class="header-wrapper">
+                    <th:block th:replace="~{_layout/basic/header :: headerFragment}"></th:block>
+                </header>
 
-        });
-    </script>
-</head>
-<body class="hold-transition layout-fixed sidebar-collapse">
-<div class="wrapper">
-    <div class="content_wrap">
-        <header class="header-wrapper">
-            <th:block th:replace="~{_layout/basic/header :: headerFragment}"></th:block>
-        </header>
+                <section class="content-wrapper">
+                    <div id="main">
+                        <div class="sidebar-wrapper">
+                            <th:block th:replace="~{_layout/basic/sidebar :: sidebarFragment}"></th:block>
+                        </div>
+                        <div class="main-contents">
+                            <th:block layout:fragment="bodyFragment"></th:block>
+                        </div>
+                    </div>
+                </section>
 
-        <section class="content-wrapper">
-            <div id="main">
-                <div class="sidebar-wrapper">
-                    <th:block th:replace="~{_layout/basic/sidebar :: sidebarFragment}"></th:block>
-                </div>
-                <div class="main-contents">
-                    <th:block layout:fragment="bodyFragment"></th:block>
-                </div>
+                <footer class="footer-wrapper">
+                    <th:block th:replace="~{_layout/basic/footer :: footerFragment}"></th:block>
+                </footer>
             </div>
-        </section>
-
-        <footer class="footer-wrapper">
-            <th:block th:replace="~{_layout/basic/footer :: footerFragment}"></th:block>
-        </footer>
-    </div>
-</div>
-</body>
+        </div>
+    </body>
 </html>

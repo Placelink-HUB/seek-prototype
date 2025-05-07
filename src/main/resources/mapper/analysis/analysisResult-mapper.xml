@@ -23,7 +23,7 @@
                 ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
             LEFT JOIN SEEK_DATABASE_ANALYSIS sda
                 ON sa.ANALYSIS_ID = sda.ANALYSIS_ID
-                AND COALESCE(sa.ANALYSIS_TYPE_CCD, '') = 'DATABASE'
+                AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DATABASE'
 		WHERE sa.ANALYSIS_ID = #{analysisId}
             AND sar.ANALYSIS_RESULT_ID = #{analysisResultId}
     </select>

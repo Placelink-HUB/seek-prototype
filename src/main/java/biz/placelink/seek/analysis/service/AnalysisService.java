@@ -115,15 +115,15 @@ public class AnalysisService {
      * @param analysisId       분석 ID
      * @param analysisResultId 분석 결과 ID
      * @param analysisTime     분석 시간(ms)
-     * @param analysisTypeCcd  분석 타입 공통코드
+     * @param analysisModeCcd  분석 모드 공통코드
      * @return 수정 개수
      */
-    public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisTypeCcd) {
+    public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisModeCcd) {
         int totalDetectionCount = 0;
         String dataBaseTargetInformation = null;
         String analyzedContent = null;
         String content = null;
-        if (Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisTypeCcd)) {
+        if (Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisModeCcd)) {
             AnalysisResultVO analysisResult = analysisResultService.selectAnalysisResult(analysisId, analysisResultId);
             if (analysisResult != null) {
                 totalDetectionCount = analysisResult.getTotalDetectionCount();
@@ -132,7 +132,7 @@ public class AnalysisService {
                 content = analysisResult.getContent();
             }
         }
-        return this.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisTypeCcd, totalDetectionCount, dataBaseTargetInformation, analyzedContent, content);
+        return this.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisModeCcd, totalDetectionCount, dataBaseTargetInformation, analyzedContent, content);
     }
 
     /**
@@ -141,14 +141,14 @@ public class AnalysisService {
      * @param analysisId                분석 ID
      * @param analysisResultId          분석 결과 ID
      * @param analysisTime              분석 시간(ms)
-     * @param analysisTypeCcd           분석 타입 공통코드
+     * @param analysisModeCcd           분석 모드 공통코드
      * @param totalDetectionCount       전체 검출 개수
      * @param dataBaseTargetInformation DB 대상 정보
      * @param analyzedContent           분석된 내용
      * @param content                   분석 내용(원본)
      * @return 수정 개수
      */
-    public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisTypeCcd, int totalDetectionCount, String dataBaseTargetInformation, String analyzedContent, String content) {
+    public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisModeCcd, int totalDetectionCount, String dataBaseTargetInformation, String analyzedContent, String content) {
         AnalysisVO paramVO = new AnalysisVO();
         paramVO.setAnalysisId(analysisId);
         paramVO.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_COMPLETE);
@@ -156,7 +156,7 @@ public class AnalysisService {
         paramVO.setAnalysisTime(analysisTime);
 
         int result = this.updateAnalysis(paramVO);
-        if (result > 0 && Constants.CD_ANALYSIS_TYPE_DATABASE.equals(analysisTypeCcd)) {
+        if (result > 0 && Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisModeCcd)) {
             String newContent = totalDetectionCount > 0 ? analyzedContent : content;
 
             if (S2Util.isNotEmpty(dataBaseTargetInformation) && S2Util.isNotEmpty(newContent)) {

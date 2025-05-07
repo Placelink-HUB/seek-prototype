@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
     <th:block layout:fragment="bodyScript">
+        <script th:src="@{/public/js/echarts.min.js}"></script>
         <script type="text/javascript">
             let isRegistering = false;
 
             let analysisChartMaxValue = 50;
             const analysisCompleteInfo = {};
             const analysisInfo = {};
+
+            let lineChart;
 
             document.addEventListener('DOMContentLoaded', () => {
                 initDoughnutChart();
@@ -20,12 +23,26 @@
                 S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
             });
 
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                console.debug('Received Message', event.data);
+                switch (event.data.type) {
+                    case 'mask':
+                        if (isRegistering) {
+                            S2Util.showToast('푸시 알림 구독이 완료되었습니다.');
+                            isRegistering = false;
+                        }
+                        break;
+                }
+            });
+
             function getTimeSeriesAnalysis() {
                 /* 가상의 분석 현황데이터를 만든다. => 실제 데이터로 대체 필요 !!!! */
                 const xAxisData = [];
 
                 for (let i = 0; i < 30; i++) {
-                    const date = dayjs().subtract(29 - i, 'minute').format('YYYYMMDDHHmm');
+                    const date = dayjs()
+                        .subtract(29 - i, 'minute')
+                        .format('YYYYMMDDHHmm');
                     xAxisData.push(date);
                 }
 
@@ -255,7 +272,7 @@
             }
 
             function initLineChart() {
-                const lineChart = echarts.init(document.getElementById('lineChart'));
+                lineChart = echarts.init(document.getElementById('lineChart'));
 
                 const option = {
                     grid: {left: 50, right: 30, top: 20, bottom: 30},
@@ -373,7 +390,6 @@
             }
 
             function updateLineChart() {
-                const lineChart = echarts.getInstanceByDom(document.getElementById('lineChart'));
                 if (lineChart) {
                     const analysisCompleteData = [];
                     const analysisData = [];
@@ -450,8 +466,8 @@
                         const data = response.hitRankDataList;
                         const barChart1 = echarts.init(document.getElementById('barChart1'));
 
-                        const xAxisData = data.map(item => item.detectionTypeCcd);
-                        const seriesData = data.map(item => item.hitCount);
+                        const xAxisData = data.map((item) => item.detectionTypeCcd);
+                        const seriesData = data.map((item) => item.hitCount);
 
                         option = {
                             grid: {left: 0, right: 0, top: 20, bottom: 50},

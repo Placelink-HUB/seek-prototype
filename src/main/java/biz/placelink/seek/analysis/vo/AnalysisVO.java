@@ -8,9 +8,9 @@ public class AnalysisVO extends DefaultVO {
 
     /* 분석 ID */
     private String analysisId;
-    /* 분석 타입 공통코드 */
-    private String analysisTypeCcd;
-    private String analysisTypeCcdNm;
+    /* 분석 모드 공통코드 */
+    private String analysisModeCcd;
+    private String analysisModeCcdNm;
     /* 분석 상태 공통코드 */
     private String analysisStatusCcd;
     private String analysisStatusCcdNm;
@@ -36,20 +36,20 @@ public class AnalysisVO extends DefaultVO {
         this.analysisId = analysisId;
     }
 
-    public String getAnalysisTypeCcd() {
-        return analysisTypeCcd;
+    public String getAnalysisModeCcd() {
+        return analysisModeCcd;
     }
 
-    public void setAnalysisTypeCcd(String analysisTypeCcd) {
-        this.analysisTypeCcd = analysisTypeCcd;
+    public void setAnalysisModeCcd(String analysisModeCcd) {
+        this.analysisModeCcd = analysisModeCcd;
     }
 
-    public String getAnalysisTypeCcdNm() {
-        return analysisTypeCcdNm;
+    public String getAnalysisModeCcdNm() {
+        return analysisModeCcdNm;
     }
 
-    public void setAnalysisTypeCcdNm(String analysisTypeCcdNm) {
-        this.analysisTypeCcdNm = analysisTypeCcdNm;
+    public void setAnalysisModeCcdNm(String analysisModeCcdNm) {
+        this.analysisModeCcdNm = analysisModeCcdNm;
     }
 
     public String getAnalysisStatusCcd() {
