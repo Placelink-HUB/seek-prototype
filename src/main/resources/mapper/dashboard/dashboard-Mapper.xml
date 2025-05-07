@@ -108,6 +108,27 @@
         ) x
     </select>
 
+    <select id="selectRealtimeAnalysisCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+        /** selectRealtimeAnalysisCount : 실시간 분석 현황을 조회한다. */
+        SELECT
+            DATE_TRUNC('minute', ANALYSIS_START_DT) AS MINUTE_GROUP,
+            COUNT(1) AS TOTAL_ANALYSIS_COUNT,
+            COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS ANALYSIS_COUNT
+        FROM SEEK_ANALYSIS
+        <where>
+            <choose>
+                <when test='schBeginDe neq null and schBeginDe neq ""'>
+                    AND TO_CHAR(ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(#{schBeginDe}::DATE, 'YYYYMMDD')
+                </when>
+                <otherwise>
+                    AND TO_CHAR(ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(NOW(), 'YYYYMMDD')
+                </otherwise>
+            </choose>
+        </where>
+        GROUP BY MINUTE_GROUP
+        ORDER BY MINUTE_GROUP
+    </select>
+
     <select id="selectTopSensitiveInformation" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
         /** selectTopSensitiveInformation : 민감정보 상위 5개 항목을 조회한다. */
         SELECT x.*

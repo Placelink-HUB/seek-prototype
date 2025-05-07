@@ -43,6 +43,13 @@ public interface DashboardMapper {
     AnalysisStatisticsVO selectDetectionStatistics(SchAnalysisStatisticsVO searchVO);
 
     /**
+     * 실시간 분석 현황 정보를 조회한다.
+     *
+     * @return 실시간 분석 현황
+     */
+    List<AnalysisStatisticsVO> selectRealtimeAnalysisCount(SchAnalysisStatisticsVO searchVO);
+
+    /**
      * 민감정보 상위 항목 정보를 조회한다.
      *
      * @return 민감정보 상위 항목

@@ -44,6 +44,9 @@ public class AnalysisStatisticsVO extends DefaultVO {
     /* 탐지 현황 - 해외 낮음 */
     private int otherLowCount;
 
+    /* 실시간 분석 현황 - 분 */
+    private String minuteGroup;
+
     /* 민감 정보 검출 타입 공통코드 */
     private String detectionTypeCcd;
     /* 민감 정보 탐지 횟수 */
@@ -130,6 +133,11 @@ public class AnalysisStatisticsVO extends DefaultVO {
     public int getOtherLowCount() { return otherLowCount; }
 
     public void setOtherLowCount(int otherLowCount) { this.otherLowCount = otherLowCount; }
+
+
+    public String getMinuteGroup() { return minuteGroup; }
+
+    public void setMinuteGroup(String minuteGroup) { this.minuteGroup = minuteGroup; }
 
 
     public String getDetectionTypeCcd() { return detectionTypeCcd; }
