@@ -67,6 +67,20 @@ public class DashboardController {
     }
 
     /**
+     * 탐지 현황 조회
+     *
+     * @return 탐지 현황
+     */
+    @GetMapping(value = "/public/dashboard/realtime-analysis-statistics")
+    public ResponseEntity<Map<String, Object>> realtimeAnalysisCount(SchAnalysisStatisticsVO searchVO) {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(searchVO));
+        response.put(Constants.RESULT_CODE, 1);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * 민감정보 상위 항목 조회
      *
      * @return 민감정보 상위 항목

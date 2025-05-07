@@ -59,6 +59,16 @@ public class DashboardService {
         return dashboardMapper.selectDetectionStatistics(searchVO);
     }
 
+
+    /**
+     * 실시간 분석 정보를 조회한다.
+     *
+     * @return 실시간 분석 현황
+     */
+    public List<AnalysisStatisticsVO>  selectRealtimeAnalysisCount(SchAnalysisStatisticsVO searchVO) {
+        return dashboardMapper.selectRealtimeAnalysisCount(searchVO);
+    }
+
     /**
      * 민감정보 상위 항목 정보를 조회한다.
      *
