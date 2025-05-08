@@ -5,11 +5,40 @@
         <script type="text/javascript">
             let isRegistering = false;
 
-            let analysisChartMaxValue = 50;
-            const analysisCompleteInfo = {};
-            const analysisInfo = {};
+            const doughnutChart = {};
+            const semicircleChart = {};
+            const lineChart = {};
+            const barChart = {};
 
-            let lineChart;
+            const semicircleChartInfo = {
+                // 국내 접속자 탐지 현황
+                koreaDetectionStatus: {
+                    text: '한국',
+                    low: 0,
+                    mid: 0,
+                    high: 0,
+                    color1: '#c900e4',
+                    color2: '#fa0050',
+                    backColor: '#61082b'
+                },
+                // 해외 접속자 탐지 현황
+                overseasDetectionStatus: {
+                    text: '해외',
+                    low: 0,
+                    mid: 0,
+                    high: 0,
+                    color1: '#3134ff',
+                    color2: '#a40aff',
+                    backColor: '#460C63'
+                }
+            };
+
+            // 실시간 분석 현황
+            const realtimeAnalysisInfo = {
+                chartMaxValue: 50,
+                analysisComplete: {},
+                analysis: {}
+            };
 
             document.addEventListener('DOMContentLoaded', () => {
                 initDoughnutChart();
@@ -18,7 +47,9 @@
                 initBarChart();
                 initBarChart2();
 
-                getTimeSeriesAnalysis();
+                document.querySelector('.targetDate').textContent = dayjs().format('YYYY년 MM월 DD일');
+
+                getAnalysisStatistics();
 
                 S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
             });
@@ -35,9 +66,9 @@
                 }
             });
 
-            function getTimeSeriesAnalysis() {
+            function getAnalysisStatistics() {
                 S2Util.fetch(
-                    '/public/dashboard/realtime-analysis-statistics',
+                    '[[@{/public/dashboard/realtime-analysis-statistics}]]',
                     {
                         method: 'get',
                         dataType: 'json'
@@ -48,36 +79,33 @@
 
                         for (let i = 0; i < 30; i++) {
                             // 현재부터 29분전까지
-                            const date = dayjs().subtract(29 - i, 'minute').format('YYYYMMDDHHmm');
+                            const date = dayjs()
+                                .subtract(29 - i, 'minute')
+                                .format('YYYYMMDDHHmm');
                             xAxisData.push(date);
                         }
 
-                        const analysisCompleteInfo = {};
-                        const analysisInfo = {};
-
                         // 데이터 맵핑을 위해 minute_group을 키로 하는 Map 생성
                         const dataMap = {};
-                        data.forEach(item => {
+                        data.forEach((item) => {
                             const key = dayjs(item.minute_group).format('YYYYMMDDHHmm');
                             dataMap[key] = item;
                         });
 
                         // xAxisData를 기준으로 값 할당 (없으면 0)
-                        xAxisData.forEach(key => {
-                            analysisCompleteInfo[key] = dataMap[key]?.analysis_count || 0;
-                            analysisInfo[key] = dataMap[key]?.total_analysis_count || 0;
+                        xAxisData.forEach((key) => {
+                            realtimeAnalysisInfo.analysisComplete[key] = dataMap[key]?.analysis_count || 0;
+                            realtimeAnalysisInfo.analysis[key] = dataMap[key]?.total_analysis_count || 0;
                         });
+
+                        // 최초 분석 현황 조회 이후 변경되는 데이터에 따라 차트 업데이트
+                        updateLineChart();
+                        setInterval(() => {
+                            updateLineChart();
+                        }, 1000);
                     }
                 );
 
-                // 최초 분석 현황 조회 이후 변경되는 데이터에 따라 차트 업데이트
-                updateLineChart();
-                setInterval(() => {
-                    updateLineChart();
-                }, 1000);
-            }
-
-            function initDoughnutChart() {
                 S2Util.fetch(
                     '/public/dashboard/analysis-statistics',
                     {
@@ -87,25 +115,87 @@
                     function (response) {
                         const data = response.statisticsData;
 
-                        const doughnutChart1 = echarts.init(document.getElementById('doughnutChart1'));
-                        const doughnutChart2 = echarts.init(document.getElementById('doughnutChart2'));
-                        const doughnutChart3 = echarts.init(document.getElementById('doughnutChart3'));
-                        const doughnutChart4 = echarts.init(document.getElementById('doughnutChart4'));
+                        updateDoughnutChart('analysis', data.analysisCount, data.totalAnalysisCount);
+                        updateDoughnutChart('detection', data.detectionCount, data.totalDetectionCount);
+                        updateDoughnutChart('masking', data.maskingCount, data.totalMaskingCount);
+                        updateDoughnutChart('unmasking', data.unmaskingCount, data.totalUnmaskingCount);
+                    }
+                );
 
-                        doughnutChart1.setOption(createDoughnutOption(data.analysisCount, data.totalAnalysisCount, '#6eb7ff'));
-                        doughnutChart2.setOption(createDoughnutOption(data.detectionCount, data.totalDetectionCount, '#04f0fb'));
-                        doughnutChart3.setOption(createDoughnutOption(data.maskingCount, data.totalMaskingCount, '#b4b4fc'));
-                        doughnutChart4.setOption(createDoughnutOption(data.unmaskingCount, data.totalUnmaskingCount, '#5eefa6'));
+                S2Util.fetch(
+                    '/public/dashboard/detection-statistics',
+                    {
+                        method: 'get',
+                        dataType: 'json'
+                    },
+                    function (response) {
+                        const detectionData = response.detectionData;
+
+                        semicircleChartInfo['koreaDetectionStatus'].low = detectionData.koreaLowCount;
+                        semicircleChartInfo['koreaDetectionStatus'].mid = detectionData.koreaMidCount;
+                        semicircleChartInfo['koreaDetectionStatus'].high = detectionData.koreaHighCount;
+
+                        semicircleChartInfo['overseasDetectionStatus'].low = detectionData.otherLowCount;
+                        semicircleChartInfo['overseasDetectionStatus'].mid = detectionData.otherMidCount;
+                        semicircleChartInfo['overseasDetectionStatus'].high = detectionData.otherHighCount;
+
+                        updateSemicircleChart();
                     }
                 );
             }
 
-            function createDoughnutOption(value, total, color) {
-                const formattedCount = value.toLocaleString('en-US');
+            function initDoughnutChart() {
+                doughnutChart['analysis'] = echarts.init(document.getElementById('doughnutChart1'));
+                doughnutChart['detection'] = echarts.init(document.getElementById('doughnutChart2'));
+                doughnutChart['masking'] = echarts.init(document.getElementById('doughnutChart3'));
+                doughnutChart['unmasking'] = echarts.init(document.getElementById('doughnutChart4'));
 
+                doughnutChart['analysis'].setOption(createDoughnutOption('#6eb7ff'));
+                doughnutChart['detection'].setOption(createDoughnutOption('#04f0fb'));
+                doughnutChart['masking'].setOption(createDoughnutOption('#b4b4fc'));
+                doughnutChart['unmasking'].setOption(createDoughnutOption('#5eefa6'));
+            }
+
+            function updateDoughnutChart(targetChartName, count, totalCount) {
+                if (!doughnutChart[targetChartName]) {
+                    return;
+                }
+
+                const itemColor = {
+                    analysis: '#6eb7ff',
+                    detection: '#04f0fb',
+                    masking: '#b4b4fc',
+                    unmasking: '#5eefa6'
+                }[targetChartName];
+
+                doughnutChart[targetChartName].setOption(
+                    {
+                        title: {text: count.toLocaleString('ko-KR')},
+                        series: [
+                            {
+                                data: [
+                                    {
+                                        value: count ? count : null,
+                                        name: 'value',
+                                        itemStyle: {color: itemColor}
+                                    },
+                                    {
+                                        value: totalCount - count,
+                                        name: 'rest',
+                                        itemStyle: {color: '#858688', opacity: 1}
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    false // false로 설정하여 기존 값은 유지
+                );
+            }
+
+            function createDoughnutOption(color) {
                 return {
                     title: {
-                        text: String(formattedCount),
+                        text: null,
                         left: 'center',
                         top: 'center',
                         textStyle: {
@@ -128,8 +218,16 @@
                                 show: false
                             },
                             data: [
-                                {value: value === 0 ? null : value, name: 'value', itemStyle: {color: color}},
-                                {value: total - value, name: 'rest', itemStyle: {color: '#858688', opacity: 1}}
+                                {
+                                    value: null,
+                                    name: 'value',
+                                    itemStyle: {color: color}
+                                },
+                                {
+                                    value: 0,
+                                    name: 'rest',
+                                    itemStyle: {color: '#858688', opacity: 1}
+                                }
                             ]
                         }
                     ]
@@ -137,39 +235,21 @@
             }
 
             function initSemicircleChart() {
-                S2Util.fetch(
-                    '/public/dashboard/detection-statistics',
-                    {
-                        method: 'get',
-                        dataType: 'json'
-                    },
-                    function (response) {
-                        const data = response.detectionData;
-                        const total = data.totalKoreaCount + data.totalOtherCountryCount;
+                semicircleChart['koreaDetectionStatus'] = echarts.init(document.getElementById('semicircleChart1'));
+                semicircleChart['overseasDetectionStatus'] = echarts.init(document.getElementById('semicircleChart2'));
 
-                        $('.domestic-users .high-count').text(data.koreaHighCount);
-                        $('.domestic-users .mid-count').text(data.koreaMidCount);
-                        $('.domestic-users .low-count').text(data.koreaLowCount);
-
-                        $('.overseas-users .high-count').text(data.otherHighCount);
-                        $('.overseas-users .mid-count').text(data.otherMidCount);
-                        $('.overseas-users .low-count').text(data.otherLowCount);
-
-                        const semicircleChart1 = echarts.init(document.getElementById('semicircleChart1'));
-                        const semicircleChart2 = echarts.init(document.getElementById('semicircleChart2'));
-
-                        semicircleChart1.setOption(createSemicircleChart(data.totalKoreaCount, total, '#c900e4', '#fa0050', '#61082b', '한국'));
-                        semicircleChart2.setOption(createSemicircleChart(data.totalOtherCountryCount, total, '#3134ff', '#a40aff', '#460C63', '해외'));
-                    }
-                );
+                semicircleChart['koreaDetectionStatus'].setOption(createSemicircleChart('koreaDetectionStatus'));
+                semicircleChart['overseasDetectionStatus'].setOption(createSemicircleChart('overseasDetectionStatus'));
             }
 
-            function createSemicircleChart(value, total, color1, color2, backColor, text) {
-                const formattedCount = value.toLocaleString('en-US');
+            function createSemicircleChart(targetChartName) {
+                const targetChartInfo = semicircleChartInfo[targetChartName];
+                const count = 0;
+                const totalCount = 0;
                 return {
                     title: [
                         {
-                            text: text,
+                            text: targetChartInfo.text,
                             left: 'center',
                             top: '40%',
                             textStyle: {
@@ -192,7 +272,7 @@
                                 y2: 0
                             },
                             style: {
-                                stroke: color2,
+                                stroke: targetChartInfo.color2,
                                 lineWidth: 1,
                                 shadowBlur: 0
                             }
@@ -202,7 +282,7 @@
                             left: 'center',
                             top: '74%',
                             style: {
-                                text: '{big|' + formattedCount + '}{small|건}',
+                                text: `{big|0}{small|건}`,
                                 rich: {
                                     big: {
                                         fontSize: 28,
@@ -233,7 +313,7 @@
                             labelLine: {show: false},
                             data: [
                                 {
-                                    value: value,
+                                    value: count,
                                     itemStyle: {
                                         color: {
                                             type: 'linear',
@@ -242,21 +322,83 @@
                                             x2: 1,
                                             y2: 0,
                                             colorStops: [
-                                                {offset: 0, color: color1},
-                                                {offset: 1, color: color2}
+                                                {offset: 0, color: targetChartInfo.color1},
+                                                {offset: 1, color: targetChartInfo.color2}
                                             ]
                                         }
                                     }
                                 }, // 실제 값
-                                {value: total - value, itemStyle: {color: backColor}} // 변경 필요 (100)
+                                {value: totalCount - count, itemStyle: {color: targetChartInfo.backColor}} // 변경 필요 (100)
                             ]
                         }
                     ]
                 };
             }
 
+            function updateSemicircleChart() {
+                let totalCount = 0;
+
+                for (const targetChartName in semicircleChartInfo) {
+                    const chartInfo = semicircleChartInfo[targetChartName];
+
+                    document.querySelector(`.${targetChartName} .low-count`).textContent = chartInfo.low.toLocaleString('ko-KR');
+                    document.querySelector(`.${targetChartName} .mid-count`).textContent = chartInfo.mid.toLocaleString('ko-KR');
+                    document.querySelector(`.${targetChartName} .high-count`).textContent = chartInfo.high.toLocaleString('ko-KR');
+
+                    totalCount += chartInfo.low + chartInfo.mid + chartInfo.high;
+                }
+
+                for (const targetChartName in semicircleChartInfo) {
+                    const chartInfo = semicircleChartInfo[targetChartName];
+                    const count = chartInfo.low + chartInfo.mid + chartInfo.high;
+
+                    const targetChartInfo = semicircleChartInfo[targetChartName];
+
+                    semicircleChart[targetChartName].setOption(
+                        {
+                            graphic: [
+                                {},
+                                {
+                                    style: {
+                                        text: `{big|${count.toLocaleString('ko-KR')}}{small|건}`
+                                    }
+                                }
+                            ],
+                            series: [
+                                {
+                                    data: [
+                                        {
+                                            value: count,
+                                            itemStyle: {
+                                                color: {
+                                                    colorStops: [
+                                                        {
+                                                            offset: 0,
+                                                            color: targetChartInfo.color1
+                                                        },
+                                                        {
+                                                            offset: 1,
+                                                            color: targetChartInfo.color2
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }, // 실제 값
+                                        {
+                                            value: totalCount - count,
+                                            itemStyle: {color: targetChartInfo.backColor}
+                                        } // 변경 필요 (100)
+                                    ]
+                                }
+                            ]
+                        },
+                        false // false로 설정하여 기존 값은 유지
+                    );
+                }
+            }
+
             function initLineChart() {
-                lineChart = echarts.init(document.getElementById('lineChart'));
+                lineChart['realtimeAnalysis'] = echarts.init(document.getElementById('lineChart'));
 
                 const option = {
                     grid: {left: 50, right: 30, top: 20, bottom: 30},
@@ -290,7 +432,7 @@
                     yAxis: {
                         type: 'value',
                         min: 0,
-                        max: analysisChartMaxValue,
+                        max: realtimeAnalysisInfo.chartMaxValue,
                         splitNumber: 5,
                         axisLine: {show: false},
                         axisTick: {show: false},
@@ -370,71 +512,75 @@
                     ]
                 };
 
-                lineChart.setOption(option);
+                lineChart['realtimeAnalysis'].setOption(option);
             }
 
             function updateLineChart() {
-                if (lineChart) {
-                    const analysisCompleteData = [];
-                    const analysisData = [];
+                if (!lineChart['realtimeAnalysis']) {
+                    return;
+                }
 
-                    for (let i = 0; i < 30; i++) {
-                        // 29분 전부터 현재까지 1분 간격으로 생성
-                        const date = dayjs().subtract(29 - i, 'minute').toDate();
-                        const dateKey = dayjs(date).format('YYYYMMDDHHmm');
-                        const analysisValue = analysisInfo[dateKey] || 0;
-                        const analysisCompleteValue = analysisCompleteInfo[dateKey];
+                const analysisCompleteData = [];
+                const analysisData = [];
 
-                        const maxValue = Math.max(analysisValue, analysisCompleteValue || 0);
-                        if (maxValue >= analysisChartMaxValue) {
-                            // 기존 최대값보다 크면 10의 배수로 올림
-                            analysisChartMaxValue = Math.ceil((maxValue + 10) / 10) * 10;
-                        }
+                for (let i = 0; i < 30; i++) {
+                    // 29분 전부터 현재까지 1분 간격으로 생성
+                    const date = dayjs()
+                        .subtract(29 - i, 'minute')
+                        .toDate();
+                    const dateKey = dayjs(date).format('YYYYMMDDHHmm');
+                    const analysisValue = realtimeAnalysisInfo.analysis[dateKey] || 0;
+                    const analysisCompleteValue = realtimeAnalysisInfo.analysisComplete[dateKey];
 
-                        if (analysisCompleteValue || analysisCompleteValue === 0) {
-                            // 분석 완료 데이터는 값이 있을 때만 넣는다.
-                            analysisCompleteData.push([date, analysisCompleteValue]);
-                        }
-                        // 전체 분석 데이터는 무조건 넣는다.
-                        analysisData.push([date, analysisValue]);
+                    const maxValue = Math.max(analysisValue, analysisCompleteValue || 0);
+                    if (maxValue >= realtimeAnalysisInfo.chartMaxValue) {
+                        // 기존 최대값보다 크면 10의 배수로 올림
+                        realtimeAnalysisInfo.chartMaxValue = Math.ceil((maxValue + 10) / 10) * 10;
                     }
 
-                    // 마커 인덱스 (마지막 값)
-                    const marker1Index = analysisCompleteData.length - 1;
-                    const marker2Index = analysisData.length - 1;
-
-                    // 마커 데이터 생성 (마지막 값만 표시)
-                    const markerData1 = Array(analysisCompleteData.length).fill(null);
-                    markerData1[marker1Index] = analysisCompleteData[marker1Index];
-                    const markerData2 = Array(analysisData.length).fill(null);
-                    markerData2[marker2Index] = analysisData[marker2Index];
-
-                    const updateSeries = {
-                        yAxis: {
-                            max: analysisChartMaxValue
-                        },
-                        series: [
-                            // 첫 번째 면적그래프
-                            {
-                                data: analysisCompleteData
-                            },
-                            // 첫 번째 그래프 마커 (보라색)
-                            {
-                                data: markerData1
-                            },
-                            // 두 번째 면적그래프
-                            {
-                                data: analysisData
-                            },
-                            // 두 번째 그래프 마커 (흰색)
-                            {
-                                data: markerData2
-                            }
-                        ]
-                    };
-
-                    lineChart.setOption(updateSeries, false);
+                    if (analysisCompleteValue || analysisCompleteValue === 0) {
+                        // 분석 완료 데이터는 값이 있을 때만 넣는다.
+                        analysisCompleteData.push([date, analysisCompleteValue]);
+                    }
+                    // 전체 분석 데이터는 무조건 넣는다.
+                    analysisData.push([date, analysisValue]);
                 }
+
+                // 마커 인덱스 (마지막 값)
+                const marker1Index = analysisCompleteData.length - 1;
+                const marker2Index = analysisData.length - 1;
+
+                // 마커 데이터 생성 (마지막 값만 표시)
+                const markerData1 = Array(analysisCompleteData.length).fill(null);
+                markerData1[marker1Index] = analysisCompleteData[marker1Index];
+                const markerData2 = Array(analysisData.length).fill(null);
+                markerData2[marker2Index] = analysisData[marker2Index];
+
+                const updateSeries = {
+                    yAxis: {
+                        max: realtimeAnalysisInfo.chartMaxValue
+                    },
+                    series: [
+                        // 첫 번째 면적그래프
+                        {
+                            data: analysisCompleteData
+                        },
+                        // 첫 번째 그래프 마커 (보라색)
+                        {
+                            data: markerData1
+                        },
+                        // 두 번째 면적그래프
+                        {
+                            data: analysisData
+                        },
+                        // 두 번째 그래프 마커 (흰색)
+                        {
+                            data: markerData2
+                        }
+                    ]
+                };
+
+                lineChart['realtimeAnalysis'].setOption(updateSeries, false); // false로 설정하여 기존 값은 유지
             }
 
             function initBarChart() {
@@ -446,7 +592,7 @@
                     },
                     function (response) {
                         const data = response.hitRankDataList;
-                        const barChart1 = echarts.init(document.getElementById('barChart1'));
+                        barChart['sensitiveInfoType'] = echarts.init(document.getElementById('barChart1'));
 
                         const xAxisData = data.map((item) => item.detectionTypeCcd);
                         const seriesData = data.map((item) => item.hitCount);
@@ -493,13 +639,13 @@
                                 }
                             ]
                         };
-                        barChart1.setOption(option);
+                        barChart['sensitiveInfoType'].setOption(option);
                     }
                 );
             }
 
             function initBarChart2() {
-                const barChart2 = echarts.init(document.getElementById('barChart2'));
+                barChart['documentType'] = echarts.init(document.getElementById('barChart2'));
                 option = {
                     grid: {left: 0, right: 0, top: 20, bottom: 50},
                     tooltip: {
@@ -545,7 +691,7 @@
                         }
                     ]
                 };
-                barChart2.setOption(option);
+                barChart['documentType'].setOption(option);
             }
         </script>
     </th:block>
@@ -560,7 +706,7 @@
                     <div class="flex-sty01">
                         <div class="arrow-left"></div>
                         <div class="data-date">
-                            <div class="date">2025년 04월 18일</div>
+                            <div class="date targetDate">0000년 00월 00일</div>
                             <div class="icon-today">TODAY</div>
                         </div>
                         <div class="arrow-right"></div>
@@ -603,25 +749,25 @@
                     <div class="status-box">
                         <div class="box box1">
                             <div class="box-top">국내 접속자 탐지 현황</div>
-                            <div class="box-contents domestic-users">
+                            <div class="box-contents domestic-users koreaDetectionStatus">
                                 <div id="semicircleChart1" class="graph"></div>
                                 <div class="data-wrap">
                                     <div class="data data1">
                                         <div class="data-title">낮음</div>
                                         <div class="data-contents">
-                                            <div><span class="low-count"></span><span> 건</span></div>
+                                            <div><span class="low-count">0</span><span> 건</span></div>
                                         </div>
                                     </div>
                                     <div class="data data2">
                                         <div class="data-title">보통</div>
                                         <div class="data-contents">
-                                            <div><span class="mid-count"></span><span> 건</span></div>
+                                            <div><span class="mid-count">0</span><span> 건</span></div>
                                         </div>
                                     </div>
                                     <div class="data data3">
                                         <div class="data-title">위험</div>
                                         <div class="data-contents">
-                                            <div><span class="high-count"></span><span> 건</span></div>
+                                            <div><span class="high-count">0</span><span> 건</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -629,7 +775,7 @@
                         </div>
                         <div class="box box2">
                             <div class="box-top">해외 접속자 탐지 현황</div>
-                            <div class="box-contents overseas-users">
+                            <div class="box-contents overseas-users overseasDetectionStatus">
                                 <div id="semicircleChart2" class="graph"></div>
                                 <div class="data-wrap">
                                     <div class="data data1">

@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -923,
-    "scrollLeft": -1639.875,
+    "scrollTop": -735,
+    "scrollLeft": -1264.875,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -672,14 +672,20 @@
           "J6teJF8fE7l7gTnUbPpFp",
           "0gjjIff2Mo7Gkqn7i8kwk",
           "-OTLCFLHexN8mxpjO8JXA",
-          "ooYvgkGr71-eXtfKm9uVE"
+          "ooYvgkGr71-eXtfKm9uVE",
+          "anzVhg5-QRZ5-irCIrtpG",
+          "sHgB1-msBUF7bupmGd0zv",
+          "miHh5R6TIAQk5uj8NxHRJ"
         ],
         "seqColumnIds": [
           "8qdjDXJR51l571tpwUz6g",
           "J6teJF8fE7l7gTnUbPpFp",
           "0gjjIff2Mo7Gkqn7i8kwk",
           "-OTLCFLHexN8mxpjO8JXA",
-          "ooYvgkGr71-eXtfKm9uVE"
+          "ooYvgkGr71-eXtfKm9uVE",
+          "anzVhg5-QRZ5-irCIrtpG",
+          "sHgB1-msBUF7bupmGd0zv",
+          "miHh5R6TIAQk5uj8NxHRJ"
         ],
         "ui": {
           "x": 2507.1646,
@@ -690,7 +696,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1746594309923,
+          "updateAt": 1746599199144,
           "createAt": 1746593007798
         }
       }
@@ -3719,101 +3725,161 @@
       "8qdjDXJR51l571tpwUz6g": {
         "id": "8qdjDXJR51l571tpwUz6g",
         "tableId": "hSlPLMDbQzka6JTyc9D6N",
-        "name": "REQUEST_ID",
-        "comment": "요청_ID",
-        "dataType": "CHAR(36)",
+        "name": "\"org.springframework.jdbc.UncategorizedSQLException:",
+        "comment": "",
+        "dataType": "",
         "default": "",
-        "options": 10,
+        "options": 2,
         "ui": {
           "keys": 1,
-          "widthName": 68,
+          "widthName": 297,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746594072009,
+          "updateAt": 1746599199142,
           "createAt": 1746594022704
         }
       },
       "J6teJF8fE7l7gTnUbPpFp": {
         "id": "J6teJF8fE7l7gTnUbPpFp",
         "tableId": "hSlPLMDbQzka6JTyc9D6N",
-        "name": "ANALYSIS_MODE_CCD",
-        "comment": "분석_모드_공통코드",
-        "dataType": "VARCHAR(30)",
+        "name": "### Error updating database.  Cause: org.postgresql.util.PSQLException: ERROR: cannot execute INSERT in a read-only transaction",
+        "comment": "",
+        "dataType": "",
         "default": "",
-        "options": 10,
+        "options": 2,
         "ui": {
           "keys": 1,
-          "widthName": 121,
-          "widthComment": 108,
-          "widthDataType": 75,
+          "widthName": 687,
+          "widthComment": 60,
+          "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746594073028,
+          "updateAt": 1746599199143,
           "createAt": 1746594024428
         }
       },
       "0gjjIff2Mo7Gkqn7i8kwk": {
         "id": "0gjjIff2Mo7Gkqn7i8kwk",
         "tableId": "hSlPLMDbQzka6JTyc9D6N",
-        "name": "MASK_MODE_CCD",
-        "comment": "마스크_모드_공통코드",
-        "dataType": "VARCHAR(30)",
+        "name": "### The error may exist in file [C:\\Users\\eseun\\Workspaces\\Java\\seek\\seek-prototype\\build\\resources\\main\\mapper\\analysis\\maskHist-mapper.xml]",
+        "comment": "",
+        "dataType": "",
         "default": "",
-        "options": 8,
+        "options": 0,
         "ui": {
           "keys": 0,
-          "widthName": 101,
-          "widthComment": 120,
-          "widthDataType": 75,
+          "widthName": 785,
+          "widthComment": 60,
+          "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746594102298,
+          "updateAt": 1746599199143,
           "createAt": 1746594074960
         }
       },
       "-OTLCFLHexN8mxpjO8JXA": {
         "id": "-OTLCFLHexN8mxpjO8JXA",
         "tableId": "hSlPLMDbQzka6JTyc9D6N",
-        "name": "MASK_COUNT",
-        "comment": "마스크_개수",
-        "dataType": "NUMERIC(5)",
+        "name": "### The error may involve defaultParameterMap",
+        "comment": "",
+        "dataType": "",
         "default": "",
-        "options": 8,
+        "options": 0,
         "ui": {
           "keys": 0,
-          "widthName": 78,
-          "widthComment": 67,
-          "widthDataType": 68,
+          "widthName": 259,
+          "widthComment": 60,
+          "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746594292252,
+          "updateAt": 1746599199143,
           "createAt": 1746594185546
         }
       },
       "ooYvgkGr71-eXtfKm9uVE": {
         "id": "ooYvgkGr71-eXtfKm9uVE",
         "tableId": "hSlPLMDbQzka6JTyc9D6N",
-        "name": "CREATE_DT",
-        "comment": "생성_일시",
-        "dataType": "TIMESTAMP",
+        "name": "### The error occurred while setting parameters",
+        "comment": "",
+        "dataType": "",
         "default": "",
-        "options": 8,
+        "options": 0,
         "ui": {
           "keys": 0,
-          "widthName": 61,
+          "widthName": 258,
           "widthComment": 60,
-          "widthDataType": 65,
+          "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1746594307039,
+          "updateAt": 1746599199143,
           "createAt": 1746594296791
+        }
+      },
+      "anzVhg5-QRZ5-irCIrtpG": {
+        "id": "anzVhg5-QRZ5-irCIrtpG",
+        "tableId": "hSlPLMDbQzka6JTyc9D6N",
+        "name": "### SQL: /** insertMaskHist : 마스크 이력을 등록한다. */         INSERT INTO SEEK_MASK_HIST (             REQUEST_ID,             ANALYSIS_MODE_CCD,             MASK_MODE_CCD,             MASK_COUNT,             CREATE_DT         ) VALUES (             ?,             ?,             ?,             ?,             NOW()         )",
+        "comment": "",
+        "dataType": "",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 1543,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1746599199144,
+          "createAt": 1746599199143
+        }
+      },
+      "sHgB1-msBUF7bupmGd0zv": {
+        "id": "sHgB1-msBUF7bupmGd0zv",
+        "tableId": "hSlPLMDbQzka6JTyc9D6N",
+        "name": "### Cause: org.postgresql.util.PSQLException: ERROR: cannot execute INSERT in a read-only transaction",
+        "comment": "",
+        "dataType": "",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 550,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1746599199144,
+          "createAt": 1746599199144
+        }
+      },
+      "miHh5R6TIAQk5uj8NxHRJ": {
+        "id": "miHh5R6TIAQk5uj8NxHRJ",
+        "tableId": "hSlPLMDbQzka6JTyc9D6N",
+        "name": "; uncategorized SQLException; SQL state [25006]; error code [0]; ERROR: cannot execute INSERT in a read-only transaction\"",
+        "comment": "",
+        "dataType": "",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 648,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1746599199144,
+          "createAt": 1746599199144
         }
       }
     },
@@ -5962,10 +6028,14 @@
       1746594022703,
       -1,
       {
-        "name": 1746594059384,
-        "dataType": 1746594064881,
-        "comment": 1746594069817,
-        "options(primaryKey)": 1746594072008
+        "name": 1746599199128,
+        "dataType": 1746599199128,
+        "comment": 1746599199128,
+        "options(primaryKey)": 1746594072008,
+        "options(notNull)": 1746599199128,
+        "options(unique)": 1746599199128,
+        "options(autoIncrement)": 1746599199128,
+        "default": 1746599199128
       }
     ],
     "J6teJF8fE7l7gTnUbPpFp": [
@@ -5973,10 +6043,14 @@
       1746594024428,
       -1,
       {
-        "name": 1746594025582,
-        "dataType": 1746594033848,
-        "comment": 1746594042926,
-        "options(primaryKey)": 1746594073028
+        "name": 1746599199128,
+        "dataType": 1746599199128,
+        "comment": 1746599199128,
+        "options(primaryKey)": 1746594073028,
+        "options(notNull)": 1746599199128,
+        "options(unique)": 1746599199128,
+        "options(autoIncrement)": 1746599199128,
+        "default": 1746599199128
       }
     ],
     "0gjjIff2Mo7Gkqn7i8kwk": [
@@ -5984,10 +6058,13 @@
       1746594074959,
       -1,
       {
-        "name": 1746594085431,
-        "dataType": 1746594090845,
-        "options(notNull)": 1746594092011,
-        "comment": 1746594102298
+        "name": 1746599199128,
+        "dataType": 1746599199128,
+        "options(notNull)": 1746599199128,
+        "comment": 1746599199128,
+        "options(unique)": 1746599199128,
+        "options(autoIncrement)": 1746599199128,
+        "default": 1746599199128
       }
     ],
     "-OTLCFLHexN8mxpjO8JXA": [
@@ -5995,10 +6072,13 @@
       1746594185545,
       -1,
       {
-        "name": 1746594285783,
-        "options(notNull)": 1746594188033,
-        "comment": 1746594292252,
-        "dataType": 1746594197792
+        "name": 1746599199128,
+        "options(notNull)": 1746599199128,
+        "comment": 1746599199128,
+        "dataType": 1746599199128,
+        "options(unique)": 1746599199128,
+        "options(autoIncrement)": 1746599199128,
+        "default": 1746599199128
       }
     ],
     "ooYvgkGr71-eXtfKm9uVE": [
@@ -6006,10 +6086,55 @@
       1746594296791,
       -1,
       {
-        "name": 1746594298081,
-        "dataType": 1746594301793,
-        "options(notNull)": 1746594302416,
-        "comment": 1746594307039
+        "name": 1746599199128,
+        "dataType": 1746599199128,
+        "options(notNull)": 1746599199128,
+        "comment": 1746599199128,
+        "options(unique)": 1746599199128,
+        "options(autoIncrement)": 1746599199128,
+        "default": 1746599199128
+      }
+    ],
+    "anzVhg5-QRZ5-irCIrtpG": [
+      "tableColumnEntities",
+      1746599199128,
+      -1,
+      {
+        "name": 1746599199128,
+        "dataType": 1746599199128,
+        "options(notNull)": 1746599199128,
+        "options(unique)": 1746599199128,
+        "options(autoIncrement)": 1746599199128,
+        "default": 1746599199128,
+        "comment": 1746599199128
+      }
+    ],
+    "sHgB1-msBUF7bupmGd0zv": [
+      "tableColumnEntities",
+      1746599199128,
+      -1,
+      {
+        "name": 1746599199128,
+        "dataType": 1746599199128,
+        "options(notNull)": 1746599199128,
+        "options(unique)": 1746599199128,
+        "options(autoIncrement)": 1746599199128,
+        "default": 1746599199128,
+        "comment": 1746599199128
+      }
+    ],
+    "miHh5R6TIAQk5uj8NxHRJ": [
+      "tableColumnEntities",
+      1746599199128,
+      -1,
+      {
+        "name": 1746599199128,
+        "dataType": 1746599199128,
+        "options(notNull)": 1746599199128,
+        "options(unique)": 1746599199128,
+        "options(autoIncrement)": 1746599199128,
+        "default": 1746599199128,
+        "comment": 1746599199128
       }
     ]
   }
