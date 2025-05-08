@@ -140,11 +140,14 @@
                         {
                             const analysisData = response.analysisData;
 
+                            // 분석
                             doughnutChartInfo['analysis'].count = analysisData.analysisCount;
                             doughnutChartInfo['analysis'].totalCount = analysisData.totalAnalysisCount;
+                            // 탐지
                             doughnutChartInfo['detection'].count = analysisData.detectionCount;
                             doughnutChartInfo['detection'].totalCount = analysisData.totalDetectionCount;
 
+                            // 마스킹(언마스킹)
                             const maskingDataArray = response.maskingData;
                             if (maskingDataArray) {
                                 let totalMaskingCount = 0;
@@ -175,10 +178,12 @@
                         {
                             const detectionData = response.detectionData;
 
+                            // 국내 접속자 탐지 현황
                             semicircleChartInfo['koreaDetectionStatus'].low = detectionData.koreaLowCount;
                             semicircleChartInfo['koreaDetectionStatus'].mid = detectionData.koreaMidCount;
                             semicircleChartInfo['koreaDetectionStatus'].high = detectionData.koreaHighCount;
 
+                            // 해외 접속자 탐지 현황
                             semicircleChartInfo['overseasDetectionStatus'].low = detectionData.otherLowCount;
                             semicircleChartInfo['overseasDetectionStatus'].mid = detectionData.otherMidCount;
                             semicircleChartInfo['overseasDetectionStatus'].high = detectionData.otherHighCount;
@@ -187,6 +192,7 @@
                         }
 
                         {
+                            // 실시간 분석 현황
                             const realtimeData = response.realtimeData;
                             const xAxisData = [];
 
@@ -220,6 +226,7 @@
                             }, 1000);
                         }
 
+                        // 상위 5개 항목
                         updateBarChart(response.hitRankDataList);
                     }
                 );
