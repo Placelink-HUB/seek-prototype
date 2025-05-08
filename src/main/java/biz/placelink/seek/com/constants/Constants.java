@@ -147,6 +147,23 @@ public class Constants {
     public static final String CD_MASK_MODE_UNMASK = "unmask";
 
     /**
+     * 푸시_타입_공통코드 - 분석 요청
+     */
+    public static final String CD_PUSH_TYPE_ANALYSIS_REQUEST = "analysis_request";
+    /**
+     * 푸시_타입_공통코드 - 분석 완료
+     */
+    public static final String CD_PUSH_TYPE_ANALYSIS_COMPLETE = "analysis_complete";
+    /**
+     * 푸시_타입_공통코드 - 탐지
+     */
+    public static final String CD_PUSH_TYPE_DETECTION = "detection";
+    /**
+     * 푸시_타입_공통코드 - 마스킹
+     */
+    public static final String CD_PUSH_TYPE_MASKING = "masking";
+
+    /**
      * 파일_구분_공통코드 - 분석 요청 파일
      */
     public static final String CD_FILE_SE_1010 = "1010";

@@ -91,7 +91,18 @@
             navigator.serviceWorker.addEventListener('message', (event) => {
                 console.debug('Received Message', event.data);
                 switch (event.data.type) {
-                    case 'masking':
+                    case '[[${Constants.CD_PUSH_TYPE_ANALYSIS_REQUEST}]]':
+                        // 분석 요청
+                        const requestCount = event.data.data.count;
+                        if (requestCount > 0) {
+                            const now = dayjs().format('YYYYMMDDHHmm');
+                            const previousCount = lineChartInfo.realtimeAnalysisStatus.requestCountInfo[now] || 0;
+                            lineChartInfo.realtimeAnalysisStatus.requestCountInfo[now] = previousCount + requestCount;
+                            updateLineChart();
+                        }
+                        break;
+                    case '[[${Constants.CD_PUSH_TYPE_MASKING}]]':
+                        // 마스킹
                         const maskCount = event.data.data.count;
                         if (maskCount > 0) {
                             let maskChartDataChanged = false;

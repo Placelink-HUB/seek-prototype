@@ -137,8 +137,9 @@ public class WildpathController {
     @PostMapping("/postprocess/**")
     protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response, Map<String, String> headers) throws Exception {
         String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType());
-        String requestId = request.getHeader("X-Request-Id");
-        if ("text".equals(documentTypeFromContentType) && !this.isStaticResource(request, "/postprocess/")) {
+
+        if (!this.isExcludedPath(request, "/postprocess/", true) && "text".equals(documentTypeFromContentType)) {
+            String requestId = request.getHeader("X-Request-Id");
             String seekMode = request.getHeader("X-Seek-Mode");
 
             String payload = "";
@@ -178,7 +179,7 @@ public class WildpathController {
      */
     @PostMapping(path = "/response/async/**")
     protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (this.isStaticResource(request, "/response/async/")) {
+        if (this.isExcludedPath(request, "/response/async/", true)) {
             return;
         }
 
@@ -218,23 +219,30 @@ public class WildpathController {
     }
 
     /**
-     * 정적 리소스인지 확인
+     * 제외할 경로인지 확인한다.
      *
-     * @param request HttpServletRequest
-     * @param stdPath 정적 리소스 경로
+     * @param request                  HttpServletRequest
+     * @param stdPath                  기준 경로 (기준 경로 뒤의 경로가 실제 경로)
+     * @param isStaticResourceExcluded 정적 리소스 제외 여부
      * @return
      */
-    private boolean isStaticResource(HttpServletRequest request, String stdPath) {
+    private boolean isExcludedPath(HttpServletRequest request, String stdPath, boolean isStaticResourceExcluded) {
+        boolean result = false;
+
         String realPath = request.getServletPath().split(stdPath)[1];
         if (!realPath.startsWith("/")) {
             realPath = "/" + realPath;
         }
-        if (realPath.startsWith("/public/js") || realPath.startsWith("/public/css") || realPath.startsWith("/public/images"))
 
-        {
-            return true;
+        if (realPath.startsWith("/public/dashboard/")) {
+            // 대시보드 화면
+            result = true;
+        } else if (isStaticResourceExcluded && (realPath.startsWith("/public/js/") || realPath.startsWith("/public/css/") || realPath.startsWith("/public/images/"))) {
+            // 정적 리소스 파일 경로인 경우
+            result = true;
         }
-        return false;
+
+        return result;
     }
 
 }

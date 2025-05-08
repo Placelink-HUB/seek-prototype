@@ -9,14 +9,9 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
@@ -43,8 +38,6 @@ import kr.s2.ext.util.S2Util;
 @Service
 @Transactional(readOnly = true)
 public class WildpathAnalysisService {
-
-    private static final Logger logger = LoggerFactory.getLogger(WildpathAnalysisService.class);
 
     private final ServiceWorkerService serviceWorkerService;
     private final AnalysisService analysisService;
@@ -123,6 +116,12 @@ public class WildpathAnalysisService {
             }
 
             analysisDetailService.insertProxyAnalysis(analysisDetail);
+
+            Map<String, Object> pushMap = new HashMap<>();
+            pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_ANALYSIS_REQUEST);
+            pushMap.put("count", result);
+
+            serviceWorkerService.sendNotificationAll(pushMap);
         }
 
         return result;
@@ -177,17 +176,11 @@ public class WildpathAnalysisService {
             maskHistService.insertMaskHist(requestId, analysisModeCcd, maskModeCcd, maskCount);
 
             Map<String, Object> pushMap = new HashMap<>();
-            pushMap.put("pushTypeCcd", "masking");
+            pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_MASKING);
             pushMap.put("maskModeCcd", maskModeCcd);
             pushMap.put("count", maskCount);
 
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                String jsonMessage = mapper.writeValueAsString(pushMap);
-                serviceWorkerService.sendNotificationAll(jsonMessage);
-            } catch (JsonProcessingException e) {
-                logger.error("알림 메시지 JSON 파싱 실패");
-            }
+            serviceWorkerService.sendNotificationAll(pushMap);
         }
 
         return resultText;

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Security;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -14,6 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biz.placelink.seek.com.serviceworker.vo.SubscriptionVO;
 import groovy.util.logging.Slf4j;
@@ -102,6 +106,23 @@ public class ServiceWorkerService {
                 S2Util.isNotEmpty(subscriptionVO.keys.auth) &&
                 S2Util.isNotEmpty(subscriptionVO.endpoint) &&
                 (isTest || subscriptionVO.endpoint.startsWith("https://"));
+    }
+
+    /**
+     * 전체 사용자들에게 푸시 알림을 전송합니다.
+     *
+     * @param messageMap 전송할 알림 메시지 Map
+     */
+    public void sendNotificationAll(Map<String, Object> messageMap) {
+        if (messageMap != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String jsonMessage = mapper.writeValueAsString(messageMap);
+                this.sendNotification(jsonMessage, (Long[]) null);
+            } catch (JsonProcessingException e) {
+                logger.error("알림 메시지 JSON 파싱 실패");
+            }
+        }
     }
 
     /**
