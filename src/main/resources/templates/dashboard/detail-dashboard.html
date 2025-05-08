@@ -10,6 +10,37 @@
             const lineChart = {};
             const barChart = {};
 
+            const doughnutChartInfo = {
+                // 분석 현황
+                analysis: {
+                    text: '분석',
+                    count: 0,
+                    totalCount: 0,
+                    color: '#6eb7ff'
+                },
+                // 탐지 현황
+                detection: {
+                    text: '탐지',
+                    count: 0,
+                    totalCount: 0,
+                    color: '#04f0fb'
+                },
+                // 마스킹 현황
+                masking: {
+                    text: '마스킹',
+                    count: 0,
+                    totalCount: 0,
+                    color: '#b4b4fc'
+                },
+                // 언마스킹 현황
+                unmasking: {
+                    text: '언마스킹',
+                    count: 0,
+                    totalCount: 0,
+                    color: '#5eefa6'
+                }
+            };
+
             const semicircleChartInfo = {
                 // 국내 접속자 탐지 현황
                 koreaDetectionStatus: {
@@ -113,12 +144,18 @@
                         dataType: 'json'
                     },
                     function (response) {
-                        const data = response.statisticsData;
+                        const statisticsData = response.statisticsData;
 
-                        updateDoughnutChart('analysis', data.analysisCount, data.totalAnalysisCount);
-                        updateDoughnutChart('detection', data.detectionCount, data.totalDetectionCount);
-                        updateDoughnutChart('masking', data.maskingCount, data.totalMaskingCount);
-                        updateDoughnutChart('unmasking', data.unmaskingCount, data.totalUnmaskingCount);
+                        doughnutChartInfo['analysis'].count = statisticsData.analysisCount;
+                        doughnutChartInfo['analysis'].totalCount = statisticsData.totalAnalysisCount;
+                        doughnutChartInfo['detection'].count = statisticsData.detectionCount;
+                        doughnutChartInfo['detection'].totalCount = statisticsData.totalDetectionCount;
+                        doughnutChartInfo['masking'].count = statisticsData.maskingCount;
+                        doughnutChartInfo['masking'].totalCount = statisticsData.totalMaskingCount;
+                        doughnutChartInfo['unmasking'].count = statisticsData.unmaskingCount;
+                        doughnutChartInfo['unmasking'].totalCount = statisticsData.totalUnmaskingCount;
+
+                        updateDoughnutChart();
                     }
                 );
 
@@ -150,88 +187,82 @@
                 doughnutChart['masking'] = echarts.init(document.getElementById('doughnutChart3'));
                 doughnutChart['unmasking'] = echarts.init(document.getElementById('doughnutChart4'));
 
-                doughnutChart['analysis'].setOption(createDoughnutOption('#6eb7ff'));
-                doughnutChart['detection'].setOption(createDoughnutOption('#04f0fb'));
-                doughnutChart['masking'].setOption(createDoughnutOption('#b4b4fc'));
-                doughnutChart['unmasking'].setOption(createDoughnutOption('#5eefa6'));
-            }
+                for (const targetChartName in doughnutChartInfo) {
+                    const chartInfo = doughnutChartInfo[targetChartName];
+                    const count = chartInfo.count;
+                    const totalCount = chartInfo.totalCount;
 
-            function updateDoughnutChart(targetChartName, count, totalCount) {
-                if (!doughnutChart[targetChartName]) {
-                    return;
-                }
-
-                const itemColor = {
-                    analysis: '#6eb7ff',
-                    detection: '#04f0fb',
-                    masking: '#b4b4fc',
-                    unmasking: '#5eefa6'
-                }[targetChartName];
-
-                doughnutChart[targetChartName].setOption(
-                    {
-                        title: {text: count.toLocaleString('ko-KR')},
+                    doughnutChart[targetChartName].setOption({
+                        title: {
+                            text: null,
+                            left: 'center',
+                            top: 'center',
+                            textStyle: {
+                                fontSize: 18,
+                                fontWeight: 'bold',
+                                color: '#fff',
+                                fontFamily: 'Pretendard'
+                            }
+                        },
                         series: [
                             {
+                                type: 'pie',
+                                radius: ['65%', '90%'],
+                                avoidLabelOverlap: false,
+                                label: {
+                                    show: false,
+                                    position: 'center'
+                                },
+                                labelLine: {
+                                    show: false
+                                },
                                 data: [
                                     {
-                                        value: count ? count : null,
+                                        value: null,
                                         name: 'value',
-                                        itemStyle: {color: itemColor}
+                                        itemStyle: {color: chartInfo.color}
                                     },
                                     {
-                                        value: totalCount - count,
+                                        value: 0,
                                         name: 'rest',
                                         itemStyle: {color: '#858688', opacity: 1}
                                     }
                                 ]
                             }
                         ]
-                    },
-                    false // false로 설정하여 기존 값은 유지
-                );
+                    });
+                }
             }
 
-            function createDoughnutOption(color) {
-                return {
-                    title: {
-                        text: null,
-                        left: 'center',
-                        top: 'center',
-                        textStyle: {
-                            fontSize: 18,
-                            fontWeight: 'bold',
-                            color: '#fff',
-                            fontFamily: 'Pretendard'
-                        }
-                    },
-                    series: [
+            function updateDoughnutChart() {
+                for (const targetChartName in doughnutChartInfo) {
+                    const chartInfo = doughnutChartInfo[targetChartName];
+                    const count = chartInfo.count;
+                    const totalCount = chartInfo.totalCount;
+
+                    doughnutChart[targetChartName].setOption(
                         {
-                            type: 'pie',
-                            radius: ['65%', '90%'],
-                            avoidLabelOverlap: false,
-                            label: {
-                                show: false,
-                                position: 'center'
-                            },
-                            labelLine: {
-                                show: false
-                            },
-                            data: [
+                            title: {text: count.toLocaleString('ko-KR')},
+                            series: [
                                 {
-                                    value: null,
-                                    name: 'value',
-                                    itemStyle: {color: color}
-                                },
-                                {
-                                    value: 0,
-                                    name: 'rest',
-                                    itemStyle: {color: '#858688', opacity: 1}
+                                    data: [
+                                        {
+                                            value: count ? count : null,
+                                            name: 'value',
+                                            itemStyle: {color: chartInfo.color}
+                                        },
+                                        {
+                                            value: totalCount - count,
+                                            name: 'rest',
+                                            itemStyle: {color: '#858688', opacity: 1}
+                                        }
+                                    ]
                                 }
                             ]
-                        }
-                    ]
-                };
+                        },
+                        false // false로 설정하여 기존 값은 유지);
+                    );
+                }
             }
 
             function initSemicircleChart() {
