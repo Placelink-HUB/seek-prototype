@@ -67,7 +67,7 @@
             const lineChartInfo = {
                 // 실시간 분석 현황
                 realtimeAnalysisStatus: {
-                    xAxisSeriesMaxCount: 50,
+                    xAxisSeriesMaxCount: 30, // 29분 전부터 현재까지 1분 간격으로 생성 (총 30분)
                     yAxisRangeMax: 50,
                     requestCountInfo: {},
                     completeCountInfo: {}
@@ -102,94 +102,96 @@
 
             function getAnalysisStatistics() {
                 S2Util.fetch(
-                    '/public/dashboard/analysis-statistics',
+                    '[[@{/public/dashboard/analysis-statistics}]]',
                     {
                         method: 'get',
                         dataType: 'json'
                     },
                     function (response) {
-                        const statisticsData = response.statisticsData;
+                        {
+                            const analysisData = response.analysisData;
 
-                        doughnutChartInfo['analysis'].count = statisticsData.analysisCount;
-                        doughnutChartInfo['analysis'].totalCount = statisticsData.totalAnalysisCount;
-                        doughnutChartInfo['detection'].count = statisticsData.detectionCount;
-                        doughnutChartInfo['detection'].totalCount = statisticsData.totalDetectionCount;
-                        doughnutChartInfo['masking'].count = statisticsData.maskingCount;
-                        doughnutChartInfo['masking'].totalCount = statisticsData.totalMaskingCount;
-                        doughnutChartInfo['unmasking'].count = statisticsData.unmaskingCount;
-                        doughnutChartInfo['unmasking'].totalCount = statisticsData.totalUnmaskingCount;
+                            doughnutChartInfo['analysis'].count = analysisData.analysisCount;
+                            doughnutChartInfo['analysis'].totalCount = analysisData.totalAnalysisCount;
+                            doughnutChartInfo['detection'].count = analysisData.detectionCount;
+                            doughnutChartInfo['detection'].totalCount = analysisData.totalDetectionCount;
 
-                        updateDoughnutChart();
-                    }
-                );
+                            const maskingDataArray = response.maskingData;
+                            console.log('response.maskingData', response.maskingData);
+                            if (maskingDataArray) {
+                                let totalMaskingCount = 0;
+                                let maskingCount = 0;
+                                let unmaskingCount = 0;
 
-                S2Util.fetch(
-                    '/public/dashboard/detection-statistics',
-                    {
-                        method: 'get',
-                        dataType: 'json'
-                    },
-                    function (response) {
-                        const detectionData = response.detectionData;
+                                for (maskingData of maskingDataArray) {
+                                    totalMaskingCount += maskingData.maskingCount;
+                                    switch (maskingData.maskingType) {
+                                        case 'mask':
+                                            maskingCount = maskingData.maskCount;
+                                            break;
+                                        case 'unmask':
+                                            unmaskingCount = maskingData.maskCount;
+                                            break;
+                                    }
+                                }
 
-                        semicircleChartInfo['koreaDetectionStatus'].low = detectionData.koreaLowCount;
-                        semicircleChartInfo['koreaDetectionStatus'].mid = detectionData.koreaMidCount;
-                        semicircleChartInfo['koreaDetectionStatus'].high = detectionData.koreaHighCount;
+                                doughnutChartInfo['masking'].count = maskingCount;
+                                doughnutChartInfo['masking'].totalCount = totalMaskingCount;
+                                doughnutChartInfo['unmasking'].count = unmaskingCount;
+                                doughnutChartInfo['unmasking'].totalCount = totalMaskingCount;
+                            }
 
-                        semicircleChartInfo['overseasDetectionStatus'].low = detectionData.otherLowCount;
-                        semicircleChartInfo['overseasDetectionStatus'].mid = detectionData.otherMidCount;
-                        semicircleChartInfo['overseasDetectionStatus'].high = detectionData.otherHighCount;
-
-                        updateSemicircleChart();
-                    }
-                );
-
-                S2Util.fetch(
-                    '[[@{/public/dashboard/realtime-analysis-statistics}]]',
-                    {
-                        method: 'get',
-                        dataType: 'json'
-                    },
-                    function (response) {
-                        const data = response.realtimeData;
-                        const xAxisData = [];
-
-                        for (let i = 0; i < 30; i++) {
-                            // 현재부터 29분전까지
-                            const date = dayjs()
-                                .subtract(29 - i, 'minute')
-                                .format('YYYYMMDDHHmm');
-                            xAxisData.push(date);
+                            updateDoughnutChart();
                         }
 
-                        // 데이터 맵핑을 위해 minute_group을 키로 하는 Map 생성
-                        const dataMap = {};
-                        data.forEach((item) => {
-                            const key = dayjs(item.minute_group).format('YYYYMMDDHHmm');
-                            dataMap[key] = item;
-                        });
+                        {
+                            const detectionData = response.detectionData;
 
-                        // xAxisData를 기준으로 값 할당 (없으면 0)
-                        xAxisData.forEach((key) => {
-                            lineChartInfo['realtimeAnalysisStatus'].completeCountInfo[key] = dataMap[key]?.analysis_count;
-                            lineChartInfo['realtimeAnalysisStatus'].requestCountInfo[key] = dataMap[key]?.total_analysis_count || 0;
-                        });
+                            semicircleChartInfo['koreaDetectionStatus'].low = detectionData.koreaLowCount;
+                            semicircleChartInfo['koreaDetectionStatus'].mid = detectionData.koreaMidCount;
+                            semicircleChartInfo['koreaDetectionStatus'].high = detectionData.koreaHighCount;
 
-                        // 최초 분석 현황 조회 이후 변경되는 데이터에 따라 차트 업데이트
-                        updateLineChart();
-                        setInterval(() => {
+                            semicircleChartInfo['overseasDetectionStatus'].low = detectionData.otherLowCount;
+                            semicircleChartInfo['overseasDetectionStatus'].mid = detectionData.otherMidCount;
+                            semicircleChartInfo['overseasDetectionStatus'].high = detectionData.otherHighCount;
+
+                            updateSemicircleChart();
+                        }
+
+                        {
+                            const realtimeData = response.realtimeData;
+                            const xAxisData = [];
+
+                            const realtimeAnalysisChartInfo = lineChartInfo['realtimeAnalysisStatus'];
+
+                            for (let i = 0; i < realtimeAnalysisChartInfo.xAxisSeriesMaxCount; i++) {
+                                // 현재부터 29분전까지
+                                const date = dayjs()
+                                    .subtract(29 - i, 'minute')
+                                    .format('YYYYMMDDHHmm');
+                                xAxisData.push(date);
+                            }
+
+                            // 데이터 맵핑을 위해 minute_group을 키로 하는 Map 생성
+                            const dataMap = {};
+                            realtimeData.forEach((item) => {
+                                const key = dayjs(item.minute_group).format('YYYYMMDDHHmm');
+                                dataMap[key] = item;
+                            });
+
+                            // xAxisData를 기준으로 값 할당 (없으면 0)
+                            xAxisData.forEach((key) => {
+                                realtimeAnalysisChartInfo.completeCountInfo[key] = dataMap[key]?.analysis_count;
+                                realtimeAnalysisChartInfo.requestCountInfo[key] = dataMap[key]?.total_analysis_count || 0;
+                            });
+
+                            // 최초 분석 현황 조회 이후 변경되는 데이터에 따라 차트 업데이트
                             updateLineChart();
-                        }, 1000);
-                    }
-                );
+                            setInterval(() => {
+                                updateLineChart();
+                            }, 1000);
+                        }
 
-                S2Util.fetch(
-                    '/public/dashboard/top-sensitive-statistics',
-                    {
-                        method: 'get',
-                        dataType: 'json'
-                    },
-                    function (response) {
                         updateBarChart(response.hitRankDataList);
                     }
                 );
@@ -565,7 +567,7 @@
                 const requestCountArray = [];
                 const completeCountArray = [];
 
-                for (let i = 0; i < 30; i++) {
+                for (let i = 0; i < chartInfo.xAxisSeriesMaxCount; i++) {
                     // 29분 전부터 현재까지 1분 간격으로 생성
                     const date = dayjs()
                         .subtract(29 - i, 'minute')

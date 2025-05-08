@@ -1,7 +1,11 @@
 package biz.placelink.seek.analysis.service;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import biz.placelink.seek.analysis.vo.MaskHistVO;
 
 /**
  * <pre>
@@ -27,5 +31,13 @@ public interface MaskHistMapper {
      * @return 등록 개수
      */
     int insertMaskHist(@Param("requestId") String requestId, @Param("analysisModeCcd") String analysisModeCcd, @Param("maskModeCcd") String maskModeCcd, @Param("maskCount") int maskCount);
+
+    /**
+     * 마스크 이력 정보를 조회한다.
+     *
+     * @param schDe 조회일자
+     * @return 마스크 이력 정보
+     */
+    List<MaskHistVO> selectMaskStatus(@Param("schDe") String schDe);
 
 }

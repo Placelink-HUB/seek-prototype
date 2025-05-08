@@ -18,5 +18,18 @@
             NOW()
         )
     </insert>
+    <select id="selectMaskStatus" resultType="maskHistVO">
+        /** selectMaskStatus : 마스크 현황을 조회한다. */
+        SELECT
+            MASK_MODE_CCD,
+            SUM(COALESCE(MASK_COUNT, 0)) AS MASK_COUNT
+        FROM SEEK_MASK_HIST
+        <where>
+            <if test='schDe != null and schDe != ""'>
+                AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
+            </if>
+        </where>
+        GROUP BY MASK_MODE_CCD
+    </select>
 
 </mapper>

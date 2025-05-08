@@ -1,5 +1,7 @@
 package biz.placelink.seek.dashboard.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import biz.placelink.seek.analysis.service.MaskHistService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.dashboard.service.DashboardService;
 import biz.placelink.seek.dashboard.vo.SchAnalysisStatisticsVO;
@@ -21,9 +24,11 @@ public class DashboardController {
     private String publicKey;
 
     private final DashboardService dashboardService;
+    private final MaskHistService maskHistService;
 
-    public DashboardController(DashboardService dashboardService) {
+    public DashboardController(DashboardService dashboardService, MaskHistService maskHistService) {
         this.dashboardService = dashboardService;
+        this.maskHistService = maskHistService;
     }
 
     @GetMapping(value = "/public/dashboard/integrated")
@@ -47,49 +52,12 @@ public class DashboardController {
     public ResponseEntity<Map<String, Object>> analysisStatistics(SchAnalysisStatisticsVO searchVO) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("statisticsData", dashboardService.selectAnalysisStatistics(searchVO));
-        response.put(Constants.RESULT_CODE, 1);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * 탐지 현황 조회
-     *
-     * @return 탐지 현황
-     */
-    @GetMapping(value = "/public/dashboard/detection-statistics")
-    public ResponseEntity<Map<String, Object>> detectionStatistics(SchAnalysisStatisticsVO searchVO) {
-        Map<String, Object> response = new HashMap<>();
-
+        response.put("analysisData", dashboardService.selectAnalysisStatistics(searchVO));
         response.put("detectionData", dashboardService.selectDetectionStatistics(searchVO));
-        response.put(Constants.RESULT_CODE, 1);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * 탐지 현황 조회
-     *
-     * @return 탐지 현황
-     */
-    @GetMapping(value = "/public/dashboard/realtime-analysis-statistics")
-    public ResponseEntity<Map<String, Object>> realtimeAnalysisCount(SchAnalysisStatisticsVO searchVO) {
-        Map<String, Object> response = new HashMap<>();
-
+        response.put("maskingData", maskHistService.selectMaskStatus(new SimpleDateFormat("yyyyMMdd").format(new Date())));
         response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(searchVO));
-        response.put(Constants.RESULT_CODE, 1);
-        return ResponseEntity.ok(response);
-    }
-
-    /**
-     * 민감정보 상위 항목 조회
-     *
-     * @return 민감정보 상위 항목
-     */
-    @GetMapping(value = "/public/dashboard/top-sensitive-statistics")
-    public ResponseEntity<Map<String, Object>> topSensitiveInformation(SchAnalysisStatisticsVO searchVO) {
-        Map<String, Object> response = new HashMap<>();
-
         response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(searchVO));
+
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);
     }

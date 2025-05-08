@@ -1,7 +1,11 @@
 package biz.placelink.seek.analysis.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import biz.placelink.seek.analysis.vo.MaskHistVO;
 
 /**
  * <pre>
@@ -36,6 +40,16 @@ public class MaskHistService {
     @Transactional(readOnly = false)
     public int insertMaskHist(String requestId, String analysisModeCcd, String maskModeCcd, int maskCount) {
         return maskHistMapper.insertMaskHist(requestId, analysisModeCcd, maskModeCcd, maskCount);
+    }
+
+    /**
+     * 마스크 이력 정보를 조회한다.
+     *
+     * @param schDe 조회일자
+     * @return 마스크 이력 정보
+     */
+    public List<MaskHistVO> selectMaskStatus(String schDe) {
+        return maskHistMapper.selectMaskStatus(schDe);
     }
 
 }
