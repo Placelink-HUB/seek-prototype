@@ -22,3 +22,10 @@ spring:
             max-request-size: 50MB # 요청 전체의 최대 크기
 server:
     port: 8080
+
+logging:
+    level:
+        root: debug
+        '[org.springframework.jdbc.support.JdbcTransactionManager]': info
+        '[biz.placelink.seek.analysis.schedule.AnalysisScheduler]': info
+        '[org.mybatis.spring.SqlSessionUtils]': info

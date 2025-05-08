@@ -91,10 +91,28 @@
             navigator.serviceWorker.addEventListener('message', (event) => {
                 console.debug('Received Message', event.data);
                 switch (event.data.type) {
-                    case 'mask':
-                        if (isRegistering) {
-                            S2Util.showToast('푸시 알림 구독이 완료되었습니다.');
-                            isRegistering = false;
+                    case 'masking':
+                        const maskCount = event.data.data.count;
+                        if (maskCount > 0) {
+                            let maskChartDataChanged = false;
+
+                            switch (event.data.data.maskModeCcd) {
+                                case 'mask':
+                                    doughnutChartInfo.masking.count += maskCount;
+                                    maskChartDataChanged = true;
+                                    break;
+                                case 'unmask':
+                                    doughnutChartInfo.unmasking.count += maskCount;
+                                    maskChartDataChanged = true;
+                                    break;
+                            }
+
+                            if (maskChartDataChanged) {
+                                doughnutChartInfo.masking.totalCount += maskCount;
+                                doughnutChartInfo.unmasking.totalCount += maskCount;
+                                updateDoughnutChart('masking');
+                                updateDoughnutChart('unmasking');
+                            }
                         }
                         break;
                 }
@@ -117,15 +135,14 @@
                             doughnutChartInfo['detection'].totalCount = analysisData.totalDetectionCount;
 
                             const maskingDataArray = response.maskingData;
-                            console.log('response.maskingData', response.maskingData);
                             if (maskingDataArray) {
                                 let totalMaskingCount = 0;
                                 let maskingCount = 0;
                                 let unmaskingCount = 0;
 
                                 for (maskingData of maskingDataArray) {
-                                    totalMaskingCount += maskingData.maskingCount;
-                                    switch (maskingData.maskingType) {
+                                    totalMaskingCount += maskingData.maskCount;
+                                    switch (maskingData.maskModeCcd) {
                                         case 'mask':
                                             maskingCount = maskingData.maskCount;
                                             break;
@@ -141,7 +158,7 @@
                                 doughnutChartInfo['unmasking'].totalCount = totalMaskingCount;
                             }
 
-                            updateDoughnutChart();
+                            updateDoughnutChartAll();
                         }
 
                         {
@@ -155,7 +172,7 @@
                             semicircleChartInfo['overseasDetectionStatus'].mid = detectionData.otherMidCount;
                             semicircleChartInfo['overseasDetectionStatus'].high = detectionData.otherHighCount;
 
-                            updateSemicircleChart();
+                            updateSemicircleChartAll();
                         }
 
                         {
@@ -250,35 +267,39 @@
                 }
             }
 
-            function updateDoughnutChart() {
+            function updateDoughnutChartAll() {
                 for (const targetChartName in doughnutChartInfo) {
-                    const chartInfo = doughnutChartInfo[targetChartName];
-                    const count = chartInfo.count;
-                    const totalCount = chartInfo.totalCount;
-
-                    doughnutChart[targetChartName].setOption(
-                        {
-                            title: {text: count.toLocaleString('ko-KR')},
-                            series: [
-                                {
-                                    data: [
-                                        {
-                                            value: count ? count : null,
-                                            name: 'value',
-                                            itemStyle: {color: chartInfo.color}
-                                        },
-                                        {
-                                            value: totalCount - count,
-                                            name: 'rest',
-                                            itemStyle: {color: '#858688', opacity: 1}
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        false // false로 설정하여 기존 값은 유지);
-                    );
+                    updateDoughnutChart(targetChartName);
                 }
+            }
+
+            function updateDoughnutChart(targetChartName) {
+                const chartInfo = doughnutChartInfo[targetChartName];
+                const count = chartInfo.count;
+                const totalCount = chartInfo.totalCount;
+
+                doughnutChart[targetChartName].setOption(
+                    {
+                        title: {text: count.toLocaleString('ko-KR')},
+                        series: [
+                            {
+                                data: [
+                                    {
+                                        value: count ? count : null,
+                                        name: 'value',
+                                        itemStyle: {color: chartInfo.color}
+                                    },
+                                    {
+                                        value: totalCount - count,
+                                        name: 'rest',
+                                        itemStyle: {color: '#858688', opacity: 1}
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    false // false로 설정하여 기존 값은 유지);
+                );
             }
 
             function initSemicircleChart() {
@@ -381,7 +402,7 @@
                 }
             }
 
-            function updateSemicircleChart() {
+            function updateSemicircleChartAll() {
                 let totalCount = 0;
 
                 for (const targetChartName in semicircleChartInfo) {
