@@ -1,12 +1,11 @@
 package biz.placelink.seek.dashboard.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
-import biz.placelink.seek.dashboard.vo.SchAnalysisStatisticsVO;
-
-import java.util.List;
 
 /**
  * <pre>
@@ -34,16 +33,16 @@ public class DashboardService {
      *
      * @return 분석 현황
      */
-    public AnalysisStatisticsVO selectAnalysisStatistics(SchAnalysisStatisticsVO searchVO) {
+    public AnalysisStatisticsVO selectAnalysisStatistics(String schDe) {
         AnalysisStatisticsVO analysisStatisticsVO = new AnalysisStatisticsVO();
 
         // 분석
-        AnalysisStatisticsVO result1 = dashboardMapper.selectAnalysisCount(searchVO);
+        AnalysisStatisticsVO result1 = dashboardMapper.selectAnalysisCount(schDe);
         analysisStatisticsVO.setTotalAnalysisCount(result1.getTotalAnalysisCount());
         analysisStatisticsVO.setAnalysisCount(result1.getAnalysisCount());
 
         // 탐지
-        AnalysisStatisticsVO result2 = dashboardMapper.selectAnalysisResultCount(searchVO);
+        AnalysisStatisticsVO result2 = dashboardMapper.selectAnalysisResultCount(schDe);
         analysisStatisticsVO.setTotalDetectionCount(result2.getTotalDetectionCount());
         analysisStatisticsVO.setDetectionCount(result2.getDetectionCount());
 
@@ -55,18 +54,17 @@ public class DashboardService {
      *
      * @return 탐지 현황
      */
-    public AnalysisStatisticsVO selectDetectionStatistics(SchAnalysisStatisticsVO searchVO) {
-        return dashboardMapper.selectDetectionStatistics(searchVO);
+    public AnalysisStatisticsVO selectDetectionStatistics(String schDe) {
+        return dashboardMapper.selectDetectionStatistics(schDe);
     }
-
 
     /**
      * 실시간 분석 정보를 조회한다.
      *
      * @return 실시간 분석 현황
      */
-    public List<AnalysisStatisticsVO>  selectRealtimeAnalysisCount(SchAnalysisStatisticsVO searchVO) {
-        return dashboardMapper.selectRealtimeAnalysisCount(searchVO);
+    public List<AnalysisStatisticsVO> selectRealtimeAnalysisCount(String schDe) {
+        return dashboardMapper.selectRealtimeAnalysisCount(schDe);
     }
 
     /**
@@ -74,7 +72,8 @@ public class DashboardService {
      *
      * @return 민감정보 상위 항목
      */
-    public List<AnalysisStatisticsVO> selectTopSensitiveInformation(SchAnalysisStatisticsVO searchVO) {
-        return dashboardMapper.selectTopSensitiveInformation(searchVO);
+    public List<AnalysisStatisticsVO> selectTopSensitiveInformation(String schDe) {
+        return dashboardMapper.selectTopSensitiveInformation(schDe);
     }
+
 }

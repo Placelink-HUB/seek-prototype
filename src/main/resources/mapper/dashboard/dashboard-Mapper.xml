@@ -2,25 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.dashboard.service.DashboardMapper">
 
-	<select id="selectAnalysisCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+    <select id="selectAnalysisCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
         /** selectAnalysisCount : 전체 데이터 분석 수를 조회한다. */
         SELECT
             COUNT(1) AS TOTAL_ANALYSIS_COUNT,
             COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS ANALYSIS_COUNT
         FROM SEEK_ANALYSIS
         <where>
-            <choose>
-                <when test='schBeginDe neq null and schBeginDe neq ""'>
-                    AND TO_CHAR(ANALYSIS_START_DT, 'YYYYMMDD') = TO_CHAR(#{schBeginDe}::DATE, 'YYYYMMDD')
-                </when>
-                <otherwise>
-                    AND TO_CHAR(ANALYSIS_START_DT, 'YYYYMMDD') = TO_CHAR(NOW(), 'YYYYMMDD')
-                </otherwise>
-            </choose>
+            <if test='schDe != null and schDe != ""'>
+                AND (ANALYSIS_START_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > ANALYSIS_START_DT)
+            </if>
         </where>
     </select>
 
-	<select id="selectAnalysisResultCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+    <select id="selectAnalysisResultCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
         /** selectAnalysisResultCount: 민감정보 탐지 횟수를 조회한다. */
         SELECT
             COUNT(1) AS TOTAL_DETECTION_COUNT,
@@ -29,14 +24,9 @@
             LEFT JOIN SEEK_ANALYSIS_RESULT sar
                 ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
         WHERE sa.analysis_status_ccd = 'COMPLETE'
-        <choose>
-            <when test='schBeginDe neq null and schBeginDe neq ""'>
-                AND TO_CHAR(sa.ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(#{schBeginDe}::DATE, 'YYYYMMDD')
-            </when>
-            <otherwise>
-                AND TO_CHAR(sa.ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(NOW(), 'YYYYMMDD')
-            </otherwise>
-        </choose>
+        <if test='schDe != null and schDe != ""'>
+            AND (sa.ANALYSIS_END_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.ANALYSIS_END_DT)
+        </if>
     </select>
 
     <select id="selectDetectionStatistics" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
@@ -70,14 +60,9 @@
                     ON sar.ANALYSIS_RESULT_ID = sad.ANALYSIS_RESULT_ID
             WHERE sa.analysis_status_ccd = 'COMPLETE'
                 AND COALESCE(spa.country_ccd, 'KR') = 'KR'
-                <choose>
-                    <when test='schBeginDe neq null and schBeginDe neq ""'>
-                        AND TO_CHAR(sa.ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(#{schBeginDe}::DATE, 'YYYYMMDD')
-                    </when>
-                    <otherwise>
-                        AND TO_CHAR(sa.ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(NOW(), 'YYYYMMDD')
-                    </otherwise>
-                </choose>
+        <if test='schDe != null and schDe != ""'>
+                AND (sa.ANALYSIS_END_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.ANALYSIS_END_DT)
+        </if>
 
             UNION ALL
 
@@ -97,14 +82,9 @@
                     ON sar.ANALYSIS_RESULT_ID = sad.ANALYSIS_RESULT_ID
             WHERE sa.analysis_status_ccd = 'COMPLETE'
                 AND  COALESCE(spa.country_ccd, 'KR') != 'KR'
-                <choose>
-                    <when test='schBeginDe neq null and schBeginDe neq ""'>
-                        AND TO_CHAR(sa.ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(#{schBeginDe}::DATE, 'YYYYMMDD')
-                    </when>
-                    <otherwise>
-                        AND TO_CHAR(sa.ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(NOW(), 'YYYYMMDD')
-                    </otherwise>
-                </choose>
+        <if test='schDe != null and schDe != ""'>
+                AND (sa.ANALYSIS_END_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.ANALYSIS_END_DT)
+        </if>
         ) x
     </select>
 
@@ -116,14 +96,9 @@
             COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS ANALYSIS_COUNT
         FROM SEEK_ANALYSIS
         <where>
-            <choose>
-                <when test='schBeginDe neq null and schBeginDe neq ""'>
-                    AND TO_CHAR(ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(#{schBeginDe}::DATE, 'YYYYMMDD')
-                </when>
-                <otherwise>
-                    AND TO_CHAR(ANALYSIS_END_DT, 'YYYYMMDD') = TO_CHAR(NOW(), 'YYYYMMDD')
-                </otherwise>
-            </choose>
+            <if test='schDe != null and schDe != ""'>
+                AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
+            </if>
         </where>
         GROUP BY MINUTE_GROUP
         ORDER BY MINUTE_GROUP
@@ -139,6 +114,11 @@
                 FROM SEEK_SENSITIVE_INFORMATION ssi
                     LEFT JOIN SEEK_SENSITIVE_INFORMATION_TYPES ssit
                         ON ssi.SENSITIVE_INFORMATION_ID = ssit.SENSITIVE_INFORMATION_ID
+        <where>
+            <if test='schDe != null and schDe != ""'>
+                        AND (ssi.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > ssi.CREATE_DT)
+            </if>
+        </where>
                 GROUP BY ssit.DETECTION_TYPE_CCD
         ) x
         ORDER BY x.HIT_COUNT DESC

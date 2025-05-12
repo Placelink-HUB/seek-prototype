@@ -1,11 +1,11 @@
 package biz.placelink.seek.dashboard.service;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
-import biz.placelink.seek.dashboard.vo.SchAnalysisStatisticsVO;
-
-import java.util.List;
 
 /**
  * <pre>
@@ -26,34 +26,34 @@ public interface DashboardMapper {
      *
      * @return 전체 데이터 분석 수
      */
-    AnalysisStatisticsVO selectAnalysisCount(SchAnalysisStatisticsVO searchVO);
+    AnalysisStatisticsVO selectAnalysisCount(@Param("schDe") String schDe);
 
     /**
      * 민감정보 탐지 횟수를 조회한다.
      *
      * @return 민감정보 탐지 횟수
      */
-    AnalysisStatisticsVO selectAnalysisResultCount(SchAnalysisStatisticsVO searchVO);
+    AnalysisStatisticsVO selectAnalysisResultCount(@Param("schDe") String schDe);
 
     /**
      * 탐지 현황 정보를 조회한다.
      *
      * @return 탐지 현황
      */
-    AnalysisStatisticsVO selectDetectionStatistics(SchAnalysisStatisticsVO searchVO);
+    AnalysisStatisticsVO selectDetectionStatistics(@Param("schDe") String schDe);
 
     /**
      * 실시간 분석 현황 정보를 조회한다.
      *
      * @return 실시간 분석 현황
      */
-    List<AnalysisStatisticsVO> selectRealtimeAnalysisCount(SchAnalysisStatisticsVO searchVO);
+    List<AnalysisStatisticsVO> selectRealtimeAnalysisCount(@Param("schDe") String schDe);
 
     /**
      * 민감정보 상위 항목 정보를 조회한다.
      *
      * @return 민감정보 상위 항목
      */
-    List<AnalysisStatisticsVO> selectTopSensitiveInformation(SchAnalysisStatisticsVO searchVO);
+    List<AnalysisStatisticsVO> selectTopSensitiveInformation(@Param("schDe") String schDe);
 
 }

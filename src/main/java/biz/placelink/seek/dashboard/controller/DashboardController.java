@@ -11,11 +11,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import biz.placelink.seek.analysis.service.MaskHistService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.dashboard.service.DashboardService;
-import biz.placelink.seek.dashboard.vo.SchAnalysisStatisticsVO;
+import kr.s2.ext.util.S2Util;
 
 @Controller
 public class DashboardController {
@@ -49,14 +50,18 @@ public class DashboardController {
      * @return 분석 현황
      */
     @GetMapping(value = "/public/dashboard/analysis-statistics")
-    public ResponseEntity<Map<String, Object>> analysisStatistics(SchAnalysisStatisticsVO searchVO) {
+    public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", required = false) String schDe) {
         Map<String, Object> response = new HashMap<>();
 
-        response.put("analysisData", dashboardService.selectAnalysisStatistics(searchVO));
-        response.put("detectionData", dashboardService.selectDetectionStatistics(searchVO));
-        response.put("maskingData", maskHistService.selectMaskStatus(new SimpleDateFormat("yyyyMMdd").format(new Date())));
-        response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(searchVO));
-        response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(searchVO));
+        if (S2Util.isEmpty(schDe)) {
+            schDe = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        }
+
+        response.put("analysisData", dashboardService.selectAnalysisStatistics(schDe));
+        response.put("detectionData", dashboardService.selectDetectionStatistics(schDe));
+        response.put("maskingData", maskHistService.selectMaskStatus(schDe));
+        response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(schDe));
+        response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(schDe));
 
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);
