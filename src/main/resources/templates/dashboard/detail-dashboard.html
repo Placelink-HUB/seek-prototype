@@ -68,7 +68,7 @@
                 // 실시간 분석 현황
                 realtimeAnalysisStatus: {
                     xAxisSeriesMaxCount: 30, // 29분 전부터 현재까지 1분 간격으로 생성 (총 30분)
-                    yAxisRangeMax: 50,
+                    yAxisRangeMax: 30,
                     requestCountInfo: {},
                     completeCountInfo: {}
                 }
@@ -206,17 +206,16 @@
                                 xAxisData.push(date);
                             }
 
-                            // 데이터 맵핑을 위해 minute_group을 키로 하는 Map 생성
+                            // 데이터 맵핑을 위해 minuteGroup 을 키로 하는 Map 생성
                             const dataMap = {};
                             realtimeData.forEach((item) => {
-                                const key = dayjs(item.minute_group).format('YYYYMMDDHHmm');
-                                dataMap[key] = item;
+                                dataMap[item.minuteGroup] = item;
                             });
 
                             // xAxisData를 기준으로 값 할당 (없으면 0)
                             xAxisData.forEach((key) => {
-                                realtimeAnalysisChartInfo.completeCountInfo[key] = dataMap[key]?.analysis_count;
-                                realtimeAnalysisChartInfo.requestCountInfo[key] = dataMap[key]?.total_analysis_count || 0;
+                                realtimeAnalysisChartInfo.completeCountInfo[key] = dataMap[key]?.analysisCount;
+                                realtimeAnalysisChartInfo.requestCountInfo[key] = dataMap[key]?.totalAnalysisCount || 0;
                             });
 
                             // 최초 분석 현황 조회 이후 변경되는 데이터에 따라 차트 업데이트
