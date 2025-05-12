@@ -147,6 +147,19 @@ public class Constants {
     public static final String CD_MASK_MODE_UNMASK = "unmask";
 
     /**
+     * 검출_타입_공통코드 - 위험
+     */
+    public static final String CD_DETECTION_TYPE_HIGH = "high";
+    /**
+     * 검출_타입_공통코드 - 보통
+     */
+    public static final String CD_DETECTION_TYPE_MID = "mid";
+    /**
+     * 검출_타입_공통코드 - 낮음
+     */
+    public static final String CD_DETECTION_TYPE_LOW = "low";
+
+    /**
      * 푸시_타입_공통코드 - 분석 요청
      */
     public static final String CD_PUSH_TYPE_ANALYSIS_REQUEST = "analysis_request";
@@ -154,10 +167,6 @@ public class Constants {
      * 푸시_타입_공통코드 - 분석 완료
      */
     public static final String CD_PUSH_TYPE_ANALYSIS_COMPLETE = "analysis_complete";
-    /**
-     * 푸시_타입_공통코드 - 탐지
-     */
-    public static final String CD_PUSH_TYPE_DETECTION = "detection";
     /**
      * 푸시_타입_공통코드 - 마스킹
      */

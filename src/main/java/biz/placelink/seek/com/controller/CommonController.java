@@ -24,7 +24,7 @@ public class CommonController {
      */
     @GetMapping(value = {"/", "/public/index"})
     public String index() {
-        return "redirect:/public/sample/test";
+        return "redirect:/public/dashboard/test";
     }
 
 }

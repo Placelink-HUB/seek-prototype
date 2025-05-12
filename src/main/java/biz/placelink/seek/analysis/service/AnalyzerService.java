@@ -315,16 +315,25 @@ public class AnalyzerService {
                     if (analysisResultService.updateAnalysisResult(analysisResultId, analyzedContent, totalDetectionCount) > 0) {
                         List<AnalysisDetectionVO> analysisDetectionList = new ArrayList<>();
 
+                        Map<String, Object> pushMap = new HashMap<>();
+                        pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE);
+                        pushMap.put("analysisModeCcd", analysisDetail.getAnalysisModeCcd());
+                        pushMap.put("countryCcd", analysisDetail.getCountryCcd());
+                        pushMap.put("totalDetectionCount", totalDetectionCount);
+
                         if (!sensitiveInformationList.isEmpty()) {
-                            for (String key : analysisDetectionsMap.keySet()) {
-                                Integer detectionCount = analysisDetectionsMap.get(key);
+                            for (String detectionTypeCcd : analysisDetectionsMap.keySet()) {
+                                Integer detectionCount = analysisDetectionsMap.get(detectionTypeCcd);
                                 if (detectionCount != null && detectionCount > 0) {
                                     AnalysisDetectionVO item = new AnalysisDetectionVO();
                                     item.setAnalysisResultId(analysisResultId);
-                                    item.setDetectionTypeCcd(key);
+                                    item.setDetectionTypeCcd(detectionTypeCcd);
                                     item.setDetectionCount(detectionCount);
 
                                     analysisDetectionList.add(item);
+
+                                    // 푸시 데이터에 타입별 검출 개수를 누적한다.
+                                    pushMap.put(detectionTypeCcd, detectionCount + S2Util.getValue(pushMap, detectionTypeCcd, 0));
                                 }
                             }
 
@@ -338,7 +347,7 @@ public class AnalyzerService {
                                 sensitiveInformationService.insertSensitiveInformationTypeList(sensitiveInformationTypeList);
                             }
 
-                            serviceWorkerService.sendNotificationAll("{\"message\" : \"민감정보 발견\"}");
+                            serviceWorkerService.sendNotificationAll(pushMap);
                         }
 
                         analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisModeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());

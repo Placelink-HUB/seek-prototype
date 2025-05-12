@@ -93,10 +93,14 @@
 			sa.ANALYSIS_START_DT,
 			sa.ANALYSIS_END_DT,
 			sa.ANALYSIS_TIME,
+			spa.COUNTRY_CCD,
 			sda.TARGET_INFORMATION,
 			sda.CONTENT,
 			sa.CREATE_DT
 		FROM SEEK_ANALYSIS sa
+            LEFT JOIN SEEK_PROXY_ANALYSIS spa
+                ON sa.ANALYSIS_ID = spa.ANALYSIS_ID
+                AND COALESCE(sa.ANALYSIS_MODE_CCD, '') != 'DATABASE'
             LEFT JOIN SEEK_DATABASE_ANALYSIS sda
                 ON sa.ANALYSIS_ID = sda.ANALYSIS_ID
                 AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DATABASE'

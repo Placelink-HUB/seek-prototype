@@ -101,6 +101,32 @@
                             updateLineChart();
                         }
                         break;
+                    case '[[${Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE}]]':
+                        // 분석 완료
+                        doughnutChartInfo.analysis.totalCount++;
+                        doughnutChartInfo.detection.totalCount++;
+
+                        if (event.data.data.totalDetectionCount > 0) {
+                            doughnutChartInfo.detection.count++;
+
+                            if (event.data.data.analysisModeCcd !== '[[${Constants.CD_ANALYSIS_MODE_DATABASE}]]') {
+                                if (event.data.data.countryCcd === '[[${Constants.CD_COUNTRY_KR}]]') {
+                                    semicircleChartInfo.koreaDetectionStatus.low += event.data.data['[[${Constants.CD_DETECTION_TYPE_LOW}]]'] || 0;
+                                    semicircleChartInfo.koreaDetectionStatus.mid += event.data.data['[[${Constants.CD_DETECTION_TYPE_MID}]]'] || 0;
+                                    semicircleChartInfo.koreaDetectionStatus.high += event.data.data['[[${Constants.CD_DETECTION_TYPE_HIGH}]]'] || 0;
+                                } else {
+                                    semicircleChartInfo.overseasDetectionStatus.low += event.data.data['[[${Constants.CD_DETECTION_TYPE_LOW}]]'] || 0;
+                                    semicircleChartInfo.overseasDetectionStatus.mid += event.data.data['[[${Constants.CD_DETECTION_TYPE_MID}]]'] || 0;
+                                    semicircleChartInfo.overseasDetectionStatus.high += event.data.data['[[${Constants.CD_DETECTION_TYPE_HIGH}]]'] || 0;
+                                }
+
+                                updateSemicircleChartAll();
+                            }
+                        }
+
+                        updateDoughnutChart('analysis');
+                        updateDoughnutChart('detection');
+                        break;
                     case '[[${Constants.CD_PUSH_TYPE_MASKING}]]':
                         // 마스킹
                         const maskCount = event.data.data.count;
