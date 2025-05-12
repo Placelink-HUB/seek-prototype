@@ -624,7 +624,7 @@
                     // 전체 분석 요청 데이터는 무조건 넣는다.
                     requestCountArray.push([date, requestCount]);
 
-                    if (!isNaN(completeCount) || completeCount === 0) {
+                    if (completeCount && !isNaN(completeCount)) {
                         // 분석 완료 데이터는 값이 있을 때만 넣는다.
                         completeCountArray.push([date, completeCount]);
                     }

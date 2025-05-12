@@ -10,7 +10,7 @@
         FROM SEEK_ANALYSIS
         <where>
             <if test='schDe != null and schDe != ""'>
-                AND (ANALYSIS_START_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > ANALYSIS_START_DT)
+                AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
             </if>
         </where>
     </select>
@@ -25,7 +25,7 @@
                 ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
         WHERE sa.analysis_status_ccd = 'COMPLETE'
         <if test='schDe != null and schDe != ""'>
-            AND (sa.ANALYSIS_END_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.ANALYSIS_END_DT)
+            AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
         </if>
     </select>
 
@@ -61,7 +61,7 @@
             WHERE sa.analysis_status_ccd = 'COMPLETE'
                 AND COALESCE(spa.country_ccd, 'KR') = 'KR'
         <if test='schDe != null and schDe != ""'>
-                AND (sa.ANALYSIS_END_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.ANALYSIS_END_DT)
+                AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
         </if>
 
             UNION ALL
@@ -83,7 +83,7 @@
             WHERE sa.analysis_status_ccd = 'COMPLETE'
                 AND  COALESCE(spa.country_ccd, 'KR') != 'KR'
         <if test='schDe != null and schDe != ""'>
-                AND (sa.ANALYSIS_END_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.ANALYSIS_END_DT)
+                AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
         </if>
         ) x
     </select>
