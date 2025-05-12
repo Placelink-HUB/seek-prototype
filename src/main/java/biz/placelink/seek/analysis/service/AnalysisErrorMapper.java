@@ -24,14 +24,22 @@ public interface AnalysisErrorMapper {
      *
      * @param paramVO 오류 정보
      */
-    void insertAnalysisError(AnalysisErrorVO paramVO);
+    int insertAnalysisError(AnalysisErrorVO paramVO);
 
     /**
      * 분석 오류를 배제 처리한다.
      *
-     * @param analysisResultId 분석 ID
+     * @param analysisId 분석 ID
      * @return 처리 개수
      */
-    int updateAnalysisErrorExclusion(@Param("analysisResultId") String analysisResultId);
+    int updateAnalysisErrorExclusion(@Param("analysisId") String analysisId);
+
+    /**
+     * 분석 상태를 오류 처리한다.
+     *
+     * @param analysisId 분석 ID
+     * @return 처리 개수
+     */
+    int updateAnalysisStatusToError(@Param("analysisId") String analysisId);
 
 }

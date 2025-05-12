@@ -41,7 +41,10 @@ public class AnalysisErrorService {
         paramVO.setAnalysisId(analysisId);
         paramVO.setAnalysisData(analysisData);
         paramVO.setErrorMessage(errorMessage);
-        analysisErrorMapper.insertAnalysisError(paramVO);
+        int result = analysisErrorMapper.insertAnalysisError(paramVO);
+        if (result > 0) {
+            analysisErrorMapper.updateAnalysisStatusToError(analysisId);
+        }
     }
 
 }

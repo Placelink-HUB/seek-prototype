@@ -100,7 +100,7 @@ public class AnalyzerService {
             // 분석 요청이 유효하지 않은 경우, 처리하지 않음
             return;
         }
-        if (analysisDetail != null && S2Util.isNotEmpty(analysisDetail.getAnalysisId()) && S2Util.isEmpty(analysisDetail.getAnalysisResultId())) {
+        if (S2Util.isNotEmpty(analysisDetail.getAnalysisId()) && S2Util.isEmpty(analysisDetail.getAnalysisResultId())) {
             String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
             String analysisId = analysisDetail.getAnalysisId();
             String analysisModeCcd = analysisDetail.getAnalysisModeCcd();
@@ -136,12 +136,12 @@ public class AnalyzerService {
                     }
                 }
 
-                if (hashDataStreamList.size() == 0) {
+                if (hashDataStreamList.isEmpty()) {
                     throw new S2RuntimeException("분석할 데이터가 없습니다.");
                 }
 
                 // analysisModelStream 사용: 동일 데이터라도 analysisModel 이 다르면 해시값이 달라지도록 한다. (동일한 데이터라도 분석 모델이 다르면 분석 결과가 다를 수 있다.)
-                hashDataStreamList.add(0, analysisModelStream);
+                hashDataStreamList.addFirst(analysisModelStream);
 
                 String analysisHash = S2HashUtil.generateXXHash64(hashSeed, true, hashDataStreamList.toArray(new InputStream[0]));
 
@@ -208,7 +208,7 @@ public class AnalyzerService {
 
                 for (Map.Entry<String, Object> param : analysisParamList) {
                     Object paramValue = param.getValue();
-                    if (paramValue != null && paramValue instanceof InputStream) {
+                    if (paramValue instanceof InputStream) {
                         S2StreamUtil.closeStream((InputStream) paramValue);
                     }
                 }
