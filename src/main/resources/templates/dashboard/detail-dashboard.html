@@ -179,8 +179,8 @@
                             const analysisData = response.analysisData;
 
                             // 분석
-                            doughnutChartInfo['analysis'].count = analysisData.analysisCount;
-                            doughnutChartInfo['analysis'].totalCount = analysisData.totalAnalysisCount;
+                            doughnutChartInfo['analysis'].count = analysisData.completeCount;
+                            doughnutChartInfo['analysis'].totalCount = analysisData.requestCount;
                             // 탐지
                             doughnutChartInfo['detection'].count = analysisData.detectionCount;
                             doughnutChartInfo['detection'].totalCount = analysisData.totalDetectionCount;
@@ -250,13 +250,14 @@
                                 dataMap[item.minuteGroup] = item;
                             });
 
-                            realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr = '[[${lastAnalysisCompleteDateTimeStr}]]';
+                            // 최종 분석완료 일시
+                            realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr = response.lastAnalysisCompleteDateTimeStr;
 
                             // xAxisData를 기준으로 값 할당 (없으면 0)
                             xAxisData.forEach((dateKey) => {
-                                realtimeAnalysisStatus.requestCountInfo[dateKey] = dataMap[dateKey]?.totalAnalysisCount || 0;
-                                // 최초의 분석 완료 차트는 최종 분석완료 일시를 포함한 이전에만 데이터를 넣는다.
-                                realtimeAnalysisStatus.completeCountInfo[dateKey] = realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr && realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr >= dateKey ? dataMap[dateKey]?.analysisCount || 0 : null;
+                                realtimeAnalysisStatus.requestCountInfo[dateKey] = dataMap[dateKey]?.requestCount || 0;
+                                // 분석 완료 차트는 최종 분석완료 일시를 포함한 이전에만 데이터를 넣는다.
+                                realtimeAnalysisStatus.completeCountInfo[dateKey] = realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr && realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr >= dateKey ? dataMap[dateKey]?.completeCount || 0 : null;
                             });
 
                             // 최초 분석 현황 조회 이후 변경되는 데이터에 따라 차트 업데이트
@@ -576,7 +577,7 @@
                         }
                     },
                     series: [
-                        // 첫 번째 면적그래프
+                        // 첫 번째 면적그래프 (분석 완료)
                         {
                             type: 'line',
                             // data: data1,
@@ -586,13 +587,13 @@
                             itemStyle: {color: '#d600b8'},
                             areaStyle: {
                                 color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                    {offset: 0, color: '#29b0ea'},
-                                    {offset: 1, color: '#48368a'}
+                                    {offset: 0, color: '#cf7ac8'}, // #29b0ea
+                                    {offset: 1, color: '#48368a'} // #48368a
                                 ]),
                                 opacity: 0.9
                             }
                         },
-                        // 첫 번째 그래프 마커 (보라색)
+                        // 첫 번째 그래프 마커 (분석 완료, 보라색)
                         {
                             type: 'scatter',
                             // data: markerData1,
@@ -603,9 +604,9 @@
                                 borderColor: '#2e4068',
                                 borderWidth: 2
                             },
-                            z: 10
+                            z: 100
                         },
-                        // 두 번째 면적그래프
+                        // 두 번째 면적그래프 (분석 요청)
                         {
                             type: 'line',
                             // data: data2,
@@ -621,7 +622,7 @@
                                 opacity: 0.6
                             }
                         },
-                        // 두 번째 그래프 마커 (흰색)
+                        // 두 번째 그래프 마커 (분석 요청, 흰색)
                         {
                             type: 'scatter',
                             // data: markerData2,

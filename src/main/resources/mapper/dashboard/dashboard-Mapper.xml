@@ -5,8 +5,8 @@
     <select id="selectAnalysisCount" resultType="analysisStatisticsVO">
         /** selectAnalysisCount : 전체 데이터 분석 수를 조회한다. */
         SELECT
-            COUNT(1) AS TOTAL_ANALYSIS_COUNT,
-            COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS ANALYSIS_COUNT
+            COUNT(1) AS REQUEST_COUNT,
+            COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS COMPLETE_COUNT
         FROM SEEK_ANALYSIS
         <where>
             <if test='schDe != null and schDe != ""'>
@@ -92,8 +92,8 @@
         /** selectRealtimeAnalysisCount : 실시간 분석 현황을 조회한다. */
         SELECT
             TO_CHAR(DATE_TRUNC('minute', CREATE_DT), 'YYYYMMDDHH24MI') AS MINUTE_GROUP,
-            COUNT(1) AS TOTAL_ANALYSIS_COUNT,
-            COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS ANALYSIS_COUNT
+            COUNT(1) AS REQUEST_COUNT,
+            COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS COMPLETE_COUNT
         FROM SEEK_ANALYSIS
         <where>
             <if test='schDe != null and schDe != ""'>

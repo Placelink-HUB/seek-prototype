@@ -4,20 +4,20 @@ import biz.placelink.seek.com.vo.DefaultVO;
 
 public class AnalysisStatisticsVO extends DefaultVO {
 
-    /* 분석 개수 */
-    private int analysisCount;
+    /* (분석) 요청 개수 */
+    private int requestCount;
+    /* (분석) 완료 개수 */
+    private int completeCount;
     /* 탐지 개수 */
     private int detectionCount;
-    /* 마스킹 개수 */
-    private int maskingCount;
-    /* 언마스킹 개수 */
-    private int unmaskingCount;
-    /* 전체 분석 개수 */
-    private int totalAnalysisCount;
     /* 전체 탐지 개수 */
     private int totalDetectionCount;
+    /* 마스킹 개수 */
+    private int maskingCount;
     /* 전체 마스킹 개수 */
     private int totalMaskingCount;
+    /* 언마스킹 개수 */
+    private int unmaskingCount;
     /* 전체 언마스킹 개수 */
     private int totalUnmaskingCount;
 
@@ -52,12 +52,20 @@ public class AnalysisStatisticsVO extends DefaultVO {
     /* 민감 정보 탐지 횟수 */
     private int hitCount;
 
-    public int getAnalysisCount() {
-        return analysisCount;
+    public int getRequestCount() {
+        return requestCount;
     }
 
-    public void setAnalysisCount(int analysisCount) {
-        this.analysisCount = analysisCount;
+    public void setRequestCount(int requestCount) {
+        this.requestCount = requestCount;
+    }
+
+    public int getCompleteCount() {
+        return completeCount;
+    }
+
+    public void setCompleteCount(int completeCount) {
+        this.completeCount = completeCount;
     }
 
     public int getDetectionCount() {
@@ -68,30 +76,6 @@ public class AnalysisStatisticsVO extends DefaultVO {
         this.detectionCount = detectionCount;
     }
 
-    public int getMaskingCount() {
-        return maskingCount;
-    }
-
-    public void setMaskingCount(int maskingCount) {
-        this.maskingCount = maskingCount;
-    }
-
-    public int getUnmaskingCount() {
-        return unmaskingCount;
-    }
-
-    public void setUnmaskingCount(int unmaskingCount) {
-        this.unmaskingCount = unmaskingCount;
-    }
-
-    public int getTotalAnalysisCount() {
-        return totalAnalysisCount;
-    }
-
-    public void setTotalAnalysisCount(int totalAnalysisCount) {
-        this.totalAnalysisCount = totalAnalysisCount;
-    }
-
     public int getTotalDetectionCount() {
         return totalDetectionCount;
     }
@@ -100,12 +84,28 @@ public class AnalysisStatisticsVO extends DefaultVO {
         this.totalDetectionCount = totalDetectionCount;
     }
 
+    public int getMaskingCount() {
+        return maskingCount;
+    }
+
+    public void setMaskingCount(int maskingCount) {
+        this.maskingCount = maskingCount;
+    }
+
     public int getTotalMaskingCount() {
         return totalMaskingCount;
     }
 
     public void setTotalMaskingCount(int totalMaskingCount) {
         this.totalMaskingCount = totalMaskingCount;
+    }
+
+    public int getUnmaskingCount() {
+        return unmaskingCount;
+    }
+
+    public void setUnmaskingCount(int unmaskingCount) {
+        this.unmaskingCount = unmaskingCount;
     }
 
     public int getTotalUnmaskingCount() {

@@ -39,8 +39,8 @@ public class DashboardService {
 
         // 분석
         AnalysisStatisticsVO result1 = dashboardMapper.selectAnalysisCount(schDe);
-        analysisStatisticsVO.setTotalAnalysisCount(result1.getTotalAnalysisCount());
-        analysisStatisticsVO.setAnalysisCount(result1.getAnalysisCount());
+        analysisStatisticsVO.setRequestCount(result1.getRequestCount());
+        analysisStatisticsVO.setCompleteCount(result1.getCompleteCount());
 
         // 탐지
         AnalysisStatisticsVO result2 = dashboardMapper.selectAnalysisResultCount(schDe);
