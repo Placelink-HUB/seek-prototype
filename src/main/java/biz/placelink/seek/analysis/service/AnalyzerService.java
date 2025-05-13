@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import biz.placelink.seek.analysis.schedule.AnalysisRequestStatus;
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisDetectionVO;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
@@ -151,7 +152,25 @@ public class AnalyzerService {
 
                 if (analysisResultService.checkAnalysisHashExists(analysisHash)) {
                     // 이미 분석된 데이터인 경우, 중복 분석 할 필요가 없으므로 해당 해시 값을 분석 결과 ID 로 완료 처리한다.
-                    analysisService.updateAnalysisCompleted(analysisId, analysisHash, 0, analysisModeCcd);
+                    AnalysisResultVO existingAnalysisResult = analysisResultService.selectAnalysisResult(analysisId, analysisHash);
+
+                    if (analysisService.updateAnalysisCompleted(analysisId, analysisHash, 0, analysisModeCcd, existingAnalysisResult) > 0 && existingAnalysisResult != null) {
+                        Map<String, Object> pushMap = new HashMap<>();
+
+                        pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE);
+                        pushMap.put("analysisModeCcd", existingAnalysisResult.getAnalysisModeCcd());
+                        pushMap.put("countryCcd", existingAnalysisResult.getCountryCcd());
+                        pushMap.put("totalDetectionCount", existingAnalysisResult.getTotalDetectionCount());
+
+                        List<AnalysisDetectionVO> existingDetectionList = analysisResultService.selectAnalysisDetectionList(analysisHash);
+                        if (existingDetectionList != null) {
+                            for (AnalysisDetectionVO existingDetection : existingDetectionList) {
+                                pushMap.put(existingDetection.getDetectionTypeCcd(), existingDetection.getDetectionCount());
+                            }
+
+                            serviceWorkerService.sendNotificationAll(pushMap);
+                        }
+                    }
                     return;
                 }
 
@@ -351,14 +370,13 @@ public class AnalyzerService {
                         }
 
                         analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisModeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
-                        analysisRequestStatus.remove(analysisId);
                     }
                 }
             } catch (Exception e) {
                 analysisErrorService.insertAnalysisErrorWithNewTransaction(analysisId, analysisData, e.getMessage() + "\n" + S2Exception.getStackTrace(e));
                 logger.error("asyncPollAnalysisResults Error : {}", e.getMessage(), e);
             } finally {
-                analysisRequestStatus.setInUse(analysisId, false);
+                analysisRequestStatus.remove(analysisId);
             }
         }
     }

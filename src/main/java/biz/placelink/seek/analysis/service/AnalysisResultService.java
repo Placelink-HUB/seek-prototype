@@ -83,4 +83,14 @@ public class AnalysisResultService {
         return analysisResultMapper.insertAnalysisDetectionList(analysisDetectionList);
     }
 
+    /**
+     * 분석 검출 목록을 등록한다.
+     *
+     * @param analysisResultId 분석 결과 ID
+     * @return 분석 검출 목록
+     */
+    public List<AnalysisDetectionVO> selectAnalysisDetectionList(String analysisResultId) {
+        return analysisResultMapper.selectAnalysisDetectionList(analysisResultId);
+    }
+
 }

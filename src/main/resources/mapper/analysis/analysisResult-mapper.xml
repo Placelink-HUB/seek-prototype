@@ -13,19 +13,23 @@
 		/** selectAnalysisResult : 분석 결과를 조회한다. */
 		SELECT
             sa.ANALYSIS_ID,
+            sa.ANALYSIS_MODE_CCD,
             sar.ANALYSIS_RESULT_ID,
             sar.ANALYZED_CONTENT,
             COALESCE(sar.TOTAL_DETECTION_COUNT, 0) AS TOTAL_DETECTION_COUNT,
+            spa.COUNTRY_CCD,
             sda.TARGET_INFORMATION,
             sda.CONTENT
 		FROM SEEK_ANALYSIS sa
             JOIN SEEK_ANALYSIS_RESULT sar
-                ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
+                ON sar.ANALYSIS_RESULT_ID = #{analysisResultId}
+            LEFT JOIN SEEK_PROXY_ANALYSIS spa
+                ON sa.ANALYSIS_ID = spa.ANALYSIS_ID
+                AND COALESCE(sa.ANALYSIS_MODE_CCD, '') != 'DATABASE'
             LEFT JOIN SEEK_DATABASE_ANALYSIS sda
                 ON sa.ANALYSIS_ID = sda.ANALYSIS_ID
                 AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DATABASE'
 		WHERE sa.ANALYSIS_ID = #{analysisId}
-            AND sar.ANALYSIS_RESULT_ID = #{analysisResultId}
     </select>
 
     <insert id="insertAnalysisResult">
@@ -67,6 +71,14 @@
         </foreach>
     </insert>
 
-
+    <select id="selectAnalysisDetectionList">
+        /** selectAnalysisDetectionList : 분석 검출 목록을 조회한다. */
+        SELECT
+            ANALYSIS_RESULT_ID,
+			DETECTION_TYPE_CCD,
+			DETECTION_COUNT
+        FROM SEEK_ANALYSIS_DETECTIONS
+        WHERE ANALYSIS_RESULT_ID = #{analysisResultId}
+    </select>
 
 </mapper>

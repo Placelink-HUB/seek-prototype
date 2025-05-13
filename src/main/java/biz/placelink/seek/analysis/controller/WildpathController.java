@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -38,6 +39,9 @@ public class WildpathController {
     public WildpathController(WildpathAnalysisService wildpathAnalysisService) {
         this.wildpathAnalysisService = wildpathAnalysisService;
     }
+
+    @Value("${analysis.excluded-paths}")
+    public String analysisExcludedPaths;
 
     /**
      * 역방향 프록시 전처리 비동기 처리
@@ -234,12 +238,17 @@ public class WildpathController {
             realPath = "/" + realPath;
         }
 
-        if (realPath.startsWith("/public/dashboard/")) {
-            // 대시보드 화면
-            result = true;
-        } else if (isStaticResourceExcluded && (realPath.startsWith("/public/js/") || realPath.startsWith("/public/css/") || realPath.startsWith("/public/images/"))) {
-            // 정적 리소스 파일 경로인 경우
-            result = true;
+        String[] analysisExcludedPathArray = S2Util.isNotEmpty(analysisExcludedPaths) ? analysisExcludedPaths.split(",") : null;
+        if (analysisExcludedPathArray != null) {
+            for (String analysisExcludedPath : analysisExcludedPathArray) {
+                if (realPath.startsWith(analysisExcludedPath)) {
+                    result = true;
+                }
+
+                if (result) {
+                    break;
+                }
+            }
         }
 
         return result;

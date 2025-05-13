@@ -65,4 +65,12 @@ public interface AnalysisResultMapper {
      */
     int insertAnalysisDetectionList(@Param("analysisDetectionList") List<AnalysisDetectionVO> analysisDetectionList);
 
+    /**
+     * 분석 검출 목록을 등록한다.
+     *
+     * @param analysisResultId 분석 결과 ID
+     * @return 분석 검출 목록
+     */
+    List<AnalysisDetectionVO> selectAnalysisDetectionList(@Param("analysisResultId") String analysisResultId);
+
 }

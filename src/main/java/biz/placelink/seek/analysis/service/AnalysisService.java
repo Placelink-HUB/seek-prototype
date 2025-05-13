@@ -29,12 +29,10 @@ public class AnalysisService {
 
     private final AnalysisMapper analysisMapper;
     private final AnalysisDetailService analysisDetailService;
-    private final AnalysisResultService analysisResultService;
 
-    public AnalysisService(AnalysisMapper analysisMapper, AnalysisDetailService analysisDetailService, AnalysisResultService analysisResultService) {
+    public AnalysisService(AnalysisMapper analysisMapper, AnalysisDetailService analysisDetailService) {
         this.analysisMapper = analysisMapper;
         this.analysisDetailService = analysisDetailService;
-        this.analysisResultService = analysisResultService;
     }
 
     /**
@@ -112,26 +110,26 @@ public class AnalysisService {
     /**
      * 분석을 완료 처리한다.
      *
-     * @param analysisId       분석 ID
-     * @param analysisResultId 분석 결과 ID
-     * @param analysisTime     분석 시간(ms)
-     * @param analysisModeCcd  분석 모드 공통코드
+     * @param analysisId             분석 ID
+     * @param analysisResultId       분석 결과 ID
+     * @param analysisTime           분석 시간(ms)
+     * @param analysisModeCcd        분석 모드 공통코드
+     * @param existingAnalysisResult 기존 분석 완료 정보
      * @return 수정 개수
      */
-    public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisModeCcd) {
+    public int updateAnalysisCompleted(String analysisId, String analysisResultId, long analysisTime, String analysisModeCcd, AnalysisResultVO existingAnalysisResult) {
         int totalDetectionCount = 0;
         String dataBaseTargetInformation = null;
         String analyzedContent = null;
         String content = null;
-        if (Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisModeCcd)) {
-            AnalysisResultVO analysisResult = analysisResultService.selectAnalysisResult(analysisId, analysisResultId);
-            if (analysisResult != null) {
-                totalDetectionCount = analysisResult.getTotalDetectionCount();
-                dataBaseTargetInformation = analysisResult.getTargetInformation();
-                analyzedContent = analysisResult.getAnalyzedContent();
-                content = analysisResult.getContent();
-            }
+
+        if (Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisModeCcd) && existingAnalysisResult != null) {
+            totalDetectionCount = existingAnalysisResult.getTotalDetectionCount();
+            dataBaseTargetInformation = existingAnalysisResult.getTargetInformation();
+            analyzedContent = existingAnalysisResult.getAnalyzedContent();
+            content = existingAnalysisResult.getContent();
         }
+
         return this.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisModeCcd, totalDetectionCount, dataBaseTargetInformation, analyzedContent, content);
     }
 
