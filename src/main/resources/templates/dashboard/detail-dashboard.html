@@ -70,7 +70,8 @@
                     xAxisSeriesMaxCount: 30, // 29분 전부터 현재까지 1분 간격으로 생성 (총 30분)
                     yAxisRangeMax: 5,
                     requestCountInfo: {},
-                    completeCountInfo: {}
+                    completeCountInfo: {},
+                    lastAnalysisCompleteDateTimeStr: ''
                 }
             };
 
@@ -90,14 +91,15 @@
 
             navigator.serviceWorker.addEventListener('message', (event) => {
                 console.debug('Received Message', event.data);
+                const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
+
                 switch (event.data.type) {
                     case '[[${Constants.CD_PUSH_TYPE_ANALYSIS_REQUEST}]]':
                         // 분석 요청
                         const requestCount = event.data.data.count;
                         if (requestCount > 0) {
-                            const now = dayjs().format('YYYYMMDDHHmm');
-                            const previousCount = lineChartInfo.realtimeAnalysisStatus.requestCountInfo[now] || 0;
-                            lineChartInfo.realtimeAnalysisStatus.requestCountInfo[now] = previousCount + requestCount;
+                            const previousRequestCount = realtimeAnalysisStatus.requestCountInfo[event.data.data.createDtStr] || 0;
+                            realtimeAnalysisStatus.requestCountInfo[event.data.data.createDtStr] = previousRequestCount + requestCount;
                             updateLineChart();
                         }
                         break;
@@ -127,6 +129,15 @@
 
                         updateDoughnutChart('analysis');
                         updateDoughnutChart('detection');
+
+                        // 실시간 분석 현황도 업데이트 한다.
+                        const previousCompleteCount = realtimeAnalysisStatus.completeCountInfo[event.data.data.createDtStr] || 0;
+                        realtimeAnalysisStatus.completeCountInfo[event.data.data.createDtStr] = previousCompleteCount + 1;
+                        if (!realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr || realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr < event.data.data.createDtStr) {
+                            // 최종 분석 완료된 일시 업데이트
+                            realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr = event.data.data.createDtStr;
+                        }
+                        updateLineChart();
                         break;
                     case '[[${Constants.CD_PUSH_TYPE_MASKING}]]':
                         // 마스킹
@@ -223,9 +234,9 @@
                             const realtimeData = response.realtimeData;
                             const xAxisData = [];
 
-                            const realtimeAnalysisChartInfo = lineChartInfo['realtimeAnalysisStatus'];
+                            const realtimeAnalysisStatus = lineChartInfo['realtimeAnalysisStatus'];
 
-                            for (let i = 0; i < realtimeAnalysisChartInfo.xAxisSeriesMaxCount; i++) {
+                            for (let i = 0; i < realtimeAnalysisStatus.xAxisSeriesMaxCount; i++) {
                                 // 현재부터 29분전까지
                                 const date = dayjs()
                                     .subtract(29 - i, 'minute')
@@ -239,10 +250,13 @@
                                 dataMap[item.minuteGroup] = item;
                             });
 
+                            realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr = '[[${lastAnalysisCompleteDateTimeStr}]]';
+
                             // xAxisData를 기준으로 값 할당 (없으면 0)
-                            xAxisData.forEach((key) => {
-                                realtimeAnalysisChartInfo.completeCountInfo[key] = dataMap[key]?.analysisCount;
-                                realtimeAnalysisChartInfo.requestCountInfo[key] = dataMap[key]?.totalAnalysisCount || 0;
+                            xAxisData.forEach((dateKey) => {
+                                realtimeAnalysisStatus.requestCountInfo[dateKey] = dataMap[dateKey]?.totalAnalysisCount || 0;
+                                // 최초의 분석 완료 차트는 최종 분석완료 일시를 포함한 이전에만 데이터를 넣는다.
+                                realtimeAnalysisStatus.completeCountInfo[dateKey] = realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr && realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr >= dateKey ? dataMap[dateKey]?.analysisCount || 0 : null;
                             });
 
                             // 최초 분석 현황 조회 이후 변경되는 데이터에 따라 차트 업데이트
@@ -627,30 +641,29 @@
             }
 
             function updateLineChart() {
-                const chartInfo = lineChartInfo['realtimeAnalysisStatus'];
-
+                const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
                 const requestCountArray = [];
                 const completeCountArray = [];
 
-                for (let i = 0; i < chartInfo.xAxisSeriesMaxCount; i++) {
+                for (let i = 0; i < realtimeAnalysisStatus.xAxisSeriesMaxCount; i++) {
                     // 29분 전부터 현재까지 1분 간격으로 생성
                     const date = dayjs()
                         .subtract(29 - i, 'minute')
                         .toDate();
                     const dateKey = dayjs(date).format('YYYYMMDDHHmm');
-                    const requestCount = chartInfo.requestCountInfo[dateKey] || 0;
-                    const completeCount = chartInfo.completeCountInfo[dateKey];
+                    const requestCount = realtimeAnalysisStatus.requestCountInfo[dateKey] || 0;
+                    const completeCount = realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr && realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr >= dateKey ? realtimeAnalysisStatus.completeCountInfo[dateKey] || 0 : null;
 
                     const maxValue = Math.max(requestCount, completeCount || 0);
-                    if (maxValue >= chartInfo.yAxisRangeMax) {
+                    if (maxValue >= realtimeAnalysisStatus.yAxisRangeMax) {
                         // 기존 최대값보다 크면 10의 배수로 올림
-                        chartInfo.yAxisRangeMax = Math.ceil((maxValue + 10) / 10) * 10;
+                        realtimeAnalysisStatus.yAxisRangeMax = Math.ceil((maxValue + 10) / 10) * 10;
                     }
 
                     // 전체 분석 요청 데이터는 무조건 넣는다.
                     requestCountArray.push([date, requestCount]);
 
-                    if (completeCount && !isNaN(completeCount)) {
+                    if ((completeCount || completeCount === 0) && !isNaN(completeCount)) {
                         // 분석 완료 데이터는 값이 있을 때만 넣는다.
                         completeCountArray.push([date, completeCount]);
                     }
@@ -668,7 +681,7 @@
 
                 const updateSeries = {
                     yAxis: {
-                        max: chartInfo.yAxisRangeMax
+                        max: realtimeAnalysisStatus.yAxisRangeMax
                     },
                     series: [
                         // 첫 번째 면적그래프

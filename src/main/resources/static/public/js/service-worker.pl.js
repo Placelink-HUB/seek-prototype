@@ -7,7 +7,7 @@ const notiOption = {
 };
 
 self.addEventListener('push', function (event) {
-    console.debug('Push event received:', event, event.data);
+    // console.debug('Push event received:', event, event.data);
     const jsonData = event.data.json();
     const pushTypeCcd = jsonData.pushTypeCcd;
     const message = jsonData.message;

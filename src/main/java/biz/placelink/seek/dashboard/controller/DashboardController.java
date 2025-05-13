@@ -61,6 +61,7 @@ public class DashboardController {
         response.put("detectionData", dashboardService.selectDetectionStatistics(schDe));
         response.put("maskingData", maskHistService.selectMaskStatus(schDe));
         response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(schDe));
+        response.put("lastAnalysisCompleteDateTimeStr", dashboardService.selectLastAnalysisCompleteDateTimeStr(schDe));
         response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(schDe));
 
         response.put(Constants.RESULT_CODE, 1);

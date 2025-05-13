@@ -50,6 +50,13 @@ public interface DashboardMapper {
     List<AnalysisStatisticsVO> selectRealtimeAnalysisCount(@Param("schDe") String schDe);
 
     /**
+     * 최종 분석이 완료된 일시를 조회한다.(문자열)
+     *
+     * @return 최종 분석이 완료된 일시(문자열)
+     */
+    String selectLastAnalysisCompleteDateTimeStr(@Param("schDe") String schDe);
+
+    /**
      * 민감정보 상위 항목 정보를 조회한다.
      *
      * @return 민감정보 상위 항목

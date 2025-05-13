@@ -19,7 +19,8 @@
             COALESCE(sar.TOTAL_DETECTION_COUNT, 0) AS TOTAL_DETECTION_COUNT,
             spa.COUNTRY_CCD,
             sda.TARGET_INFORMATION,
-            sda.CONTENT
+            sda.CONTENT,
+            sa.CREATE_DT
 		FROM SEEK_ANALYSIS sa
             JOIN SEEK_ANALYSIS_RESULT sar
                 ON sar.ANALYSIS_RESULT_ID = #{analysisResultId}

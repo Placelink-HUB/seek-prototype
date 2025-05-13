@@ -119,6 +119,7 @@ public class WildpathAnalysisService {
 
             Map<String, Object> pushMap = new HashMap<>();
             pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_ANALYSIS_REQUEST);
+            pushMap.put("createDtStr", analysis.getCreateDtStr());
             pushMap.put("count", result);
 
             serviceWorkerService.sendNotificationAll(pushMap);

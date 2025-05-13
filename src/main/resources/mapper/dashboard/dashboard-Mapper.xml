@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.dashboard.service.DashboardMapper">
 
-    <select id="selectAnalysisCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+    <select id="selectAnalysisCount" resultType="analysisStatisticsVO">
         /** selectAnalysisCount : 전체 데이터 분석 수를 조회한다. */
         SELECT
             COUNT(1) AS TOTAL_ANALYSIS_COUNT,
@@ -15,7 +15,7 @@
         </where>
     </select>
 
-    <select id="selectAnalysisResultCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+    <select id="selectAnalysisResultCount" resultType="analysisStatisticsVO">
         /** selectAnalysisResultCount: 민감정보 탐지 횟수를 조회한다. */
         SELECT
             COUNT(1) AS TOTAL_DETECTION_COUNT,
@@ -29,7 +29,7 @@
         </if>
     </select>
 
-    <select id="selectDetectionStatistics" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+    <select id="selectDetectionStatistics" resultType="analysisStatisticsVO">
         /** selectDetectionStatistics : 탐지 현황을 조회한다. */
         SELECT
             SUM(COALESCE(KOREA_CNT, 0)) + SUM(COALESCE(OTHER_CNT, 0)) AS TOTAL_COUNTRY_COUNT,
@@ -88,7 +88,7 @@
         ) x
     </select>
 
-    <select id="selectRealtimeAnalysisCount" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+    <select id="selectRealtimeAnalysisCount" resultType="analysisStatisticsVO">
         /** selectRealtimeAnalysisCount : 실시간 분석 현황을 조회한다. */
         SELECT
             TO_CHAR(DATE_TRUNC('minute', CREATE_DT), 'YYYYMMDDHH24MI') AS MINUTE_GROUP,
@@ -104,7 +104,18 @@
         ORDER BY MINUTE_GROUP
     </select>
 
-    <select id="selectTopSensitiveInformation" parameterType="schAnalysisStatisticsVO" resultType="analysisStatisticsVO">
+    <select id="selectLastAnalysisCompleteDateTimeStr" resultType="string">
+        /** selectLastAnalysisCompleteDateTimeStr : 최종 분석이 완료된 일시를 조회한다.(문자열) */
+        SELECT
+            TO_CHAR(MAX(CREATE_DT), 'YYYYMMDDHH24MI')
+        FROM SEEK_ANALYSIS
+        WHERE ANALYSIS_STATUS_CCD = 'COMPLETE'
+        <if test='schDe != null and schDe != ""'>
+                AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
+        </if>
+    </select>
+
+    <select id="selectTopSensitiveInformation" resultType="analysisStatisticsVO">
         /** selectTopSensitiveInformation : 민감정보 상위 5개 항목을 조회한다. */
         SELECT x.*
         FROM (

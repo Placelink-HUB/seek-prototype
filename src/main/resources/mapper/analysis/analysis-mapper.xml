@@ -110,6 +110,9 @@
 
     <insert id="insertAnalysis" parameterType="analysisVO">
 		/** insertAnalysis : 분석 정보를 등록한다. */
+        <selectKey keyProperty="createDtStr" resultType="string" order="BEFORE">
+            SELECT TO_CHAR(NOW(), 'YYYYMMDDHH24MI') AS CREATE_DT_STR
+        </selectKey>
 		INSERT INTO SEEK_ANALYSIS (
 			ANALYSIS_ID,
 			ANALYSIS_MODE_CCD,

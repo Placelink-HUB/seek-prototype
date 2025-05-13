@@ -3,6 +3,8 @@ package biz.placelink.seek.analysis.service;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -161,6 +163,7 @@ public class AnalyzerService {
                         pushMap.put("analysisModeCcd", existingAnalysisResult.getAnalysisModeCcd());
                         pushMap.put("countryCcd", existingAnalysisResult.getCountryCcd());
                         pushMap.put("totalDetectionCount", existingAnalysisResult.getTotalDetectionCount());
+                        pushMap.put("createDtStr", this.getCreateDtStr(existingAnalysisResult.getCreateDt()));
 
                         List<AnalysisDetectionVO> existingDetectionList = analysisResultService.selectAnalysisDetectionList(analysisHash);
                         if (existingDetectionList != null) {
@@ -338,6 +341,7 @@ public class AnalyzerService {
                         pushMap.put("analysisModeCcd", analysisDetail.getAnalysisModeCcd());
                         pushMap.put("countryCcd", analysisDetail.getCountryCcd());
                         pushMap.put("totalDetectionCount", totalDetectionCount);
+                        pushMap.put("createDtStr", this.getCreateDtStr(analysisDetail.getCreateDt()));
 
                         if (!sensitiveInformationList.isEmpty()) {
                             for (String detectionTypeCcd : analysisDetectionsMap.keySet()) {
@@ -379,6 +383,15 @@ public class AnalyzerService {
             } finally {
                 analysisRequestStatus.setInUse(analysisId, false);
             }
+        }
+    }
+
+    private String getCreateDtStr(LocalDateTime createDt) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmm");
+        if (createDt != null) {
+            return createDt.format(formatter);
+        } else {
+            return LocalDateTime.now().format(formatter);
         }
     }
 

@@ -24,6 +24,8 @@ public class AnalysisVO extends DefaultVO {
     private LocalDateTime analysisEndDt;
     /* 분석 시간(ms) */
     private Long analysisTime;
+    /* 생성 일시 문자열 */
+    private String createDtStr;
 
     /* 사용 중 여부 */
     private boolean inUse = false;
@@ -106,6 +108,14 @@ public class AnalysisVO extends DefaultVO {
 
     public void setAnalysisTime(Long analysisTime) {
         this.analysisTime = analysisTime;
+    }
+
+    public String getCreateDtStr() {
+        return createDtStr;
+    }
+
+    public void setCreateDtStr(String createDtStr) {
+        this.createDtStr = createDtStr;
     }
 
     public boolean isInUse() {

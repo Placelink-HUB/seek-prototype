@@ -2,6 +2,7 @@ package biz.placelink.seek.dashboard.service;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +66,15 @@ public class DashboardService {
      */
     public List<AnalysisStatisticsVO> selectRealtimeAnalysisCount(String schDe) {
         return dashboardMapper.selectRealtimeAnalysisCount(schDe);
+    }
+
+    /**
+     * 최종 분석이 완료된 일시를 조회한다.(문자열)
+     *
+     * @return 최종 분석이 완료된 일시(문자열)
+     */
+    public String selectLastAnalysisCompleteDateTimeStr(@Param("schDe") String schDe) {
+        return dashboardMapper.selectLastAnalysisCompleteDateTimeStr(schDe);
     }
 
     /**
