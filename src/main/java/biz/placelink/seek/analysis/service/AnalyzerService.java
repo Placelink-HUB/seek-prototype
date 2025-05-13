@@ -247,16 +247,15 @@ public class AnalyzerService {
         if (analysisDetail != null) {
             String analysisId = analysisDetail.getAnalysisId();
             String analysisResultId = analysisDetail.getAnalysisResultId();
-
-            if (S2Util.isEmpty(analysisId)) {
-                throw new S2RuntimeException("분석 ID 가 존재하지 않습니다.");
-            } else if (S2Util.isEmpty(analysisResultId)) {
-                throw new S2RuntimeException("분석 결과 ID 가 존재하지 않습니다.");
-            }
-
             String analysisData = "";
 
             try {
+                if (S2Util.isEmpty(analysisId)) {
+                    throw new S2RuntimeException("분석 ID 가 존재하지 않습니다.");
+                } else if (S2Util.isEmpty(analysisResultId)) {
+                    throw new S2RuntimeException("분석 결과 ID 가 존재하지 않습니다.");
+                }
+
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisDetail.getAnalysisModel()));
                 JsonNode analysisJsonData = null;
 
@@ -370,13 +369,15 @@ public class AnalyzerService {
                         }
 
                         analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisModeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
+                        analysisRequestStatus.remove(analysisId);
                     }
                 }
             } catch (Exception e) {
                 analysisErrorService.insertAnalysisErrorWithNewTransaction(analysisId, analysisData, e.getMessage() + "\n" + S2Exception.getStackTrace(e));
                 logger.error("asyncPollAnalysisResults Error : {}", e.getMessage(), e);
-            } finally {
                 analysisRequestStatus.remove(analysisId);
+            } finally {
+                analysisRequestStatus.setInUse(analysisId, false);
             }
         }
     }

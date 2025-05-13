@@ -48,7 +48,7 @@ public class AnalysisScheduler {
     @Value("${analysis.schedule.request.maxcnt}")
     private Integer analysisScheduleRequestMaxcnt;
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 10000)
     public void analysisRequest() {
         if (!analysisScheduleEnabled) {
             return;
@@ -86,11 +86,11 @@ public class AnalysisScheduler {
 
     @Scheduled(fixedRate = 2000)
     public void analysisResult() {
-        AnalysisDetailVO analysisDetail = null;
-        do {
-            analysisDetail = analysisRequestStatus.get();
+        AnalysisDetailVO analysisDetail = analysisRequestStatus.get();
+        while (analysisDetail != null) {
             AnalyzerService.asyncPollAnalysisResults(analysisDetail);
-        } while (analysisDetail != null);
+            analysisDetail = analysisRequestStatus.get();
+        }
     }
 
 }

@@ -68,7 +68,7 @@
                 // 실시간 분석 현황
                 realtimeAnalysisStatus: {
                     xAxisSeriesMaxCount: 30, // 29분 전부터 현재까지 1분 간격으로 생성 (총 30분)
-                    yAxisRangeMax: 30,
+                    yAxisRangeMax: 5,
                     requestCountInfo: {},
                     completeCountInfo: {}
                 }
@@ -103,6 +103,7 @@
                         break;
                     case '[[${Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE}]]':
                         // 분석 완료
+                        doughnutChartInfo.analysis.count++;
                         doughnutChartInfo.analysis.totalCount++;
                         doughnutChartInfo.detection.totalCount++;
 
