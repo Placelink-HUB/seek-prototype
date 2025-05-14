@@ -5,15 +5,19 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +30,6 @@ import biz.placelink.seek.com.constants.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.util.S2ServletUtil;
-import kr.s2.ext.util.S2StreamUtil;
 import kr.s2.ext.util.S2Util;
 
 @Controller
@@ -141,9 +144,10 @@ public class WildpathController {
      */
     @PostMapping("/postprocess/**")
     protected ResponseEntity<String> postprocess(HttpServletRequest request, HttpServletResponse response, Map<String, String> headers) throws Exception {
-        String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType());
+        String fileName = S2ServletUtil.getFilenameFromHeader(request);
+        String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(request.getContentType(), fileName);
 
-        if (!this.isExcludedPath(request, "/postprocess/", true) && "text".equals(documentTypeFromContentType)) {
+        if ("text".equals(documentTypeFromContentType)) {
             String requestId = request.getHeader("X-Request-Id");
             String seekMode = request.getHeader("X-Seek-Mode");
 
@@ -159,18 +163,28 @@ public class WildpathController {
                 logger.error(e.getMessage(), e);
             }
 
-            payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_REVERSE_POST, payload, seekMode);
+            if (!this.isExcludedPath(request, "/postprocess/", true)) {
+                payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_REVERSE_POST, payload, seekMode);
+            }
 
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, request.getContentType()).body(payload);
         } else {
             // 비 텍스트 타입의 경우, 원본 요청을 그대로 반환
-            try (BufferedInputStream inputStream = S2StreamUtil.getBufferedInputStream(request.getInputStream());
-                    BufferedOutputStream outputStream = S2StreamUtil.getBufferedOutputStream(response.getOutputStream())) {
-                IOUtils.copy(inputStream, outputStream);
-                outputStream.flush();
+            try {
+                // BufferedInputStream inputStream = S2StreamUtil.getBufferedInputStream(request.getInputStream());
+                // BufferedOutputStream outputStream = S2StreamUtil.getBufferedOutputStream(response.getOutputStream());
+                // long length = inputStream.transferTo(outputStream);
+
+                long length = streamWithNIO(request, response);
+                response.setContentType(request.getContentType());
+                response.setContentLengthLong(length);
+                // response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+                // response.setHeader("Transfer-Encoding", "chunked");
+                response.flushBuffer();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
+
             logger.info("####### S201000 REQUEST END: " + request.getServletPath());
             return ResponseEntity.ok().build();
         }
@@ -192,7 +206,8 @@ public class WildpathController {
 
         String requestId = request.getHeader("X-Request-Id");
         String contentType = request.getContentType();
-        String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(contentType);
+        String fileName = S2ServletUtil.getFilenameFromHeader(request);
+        String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(contentType, fileName);
         String countryCcd = request.getHeader("X-Country_Code");
         String url = request.getRequestURL().toString();
         String header = S2ServletUtil.getHeadersAsJsonString(request);
@@ -218,7 +233,6 @@ public class WildpathController {
         case "ppt":
         case "hwp":
             try (InputStream fileData = request.getInputStream()) {
-                String fileName = S2ServletUtil.getFilenameFromHeader(request);
                 wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
             }
             break;
@@ -255,6 +269,67 @@ public class WildpathController {
         }
 
         return result;
+    }
+
+    /**
+     * NIO 채널을 사용하여 HttpServletRequest에서 HttpServletResponse로
+     * 데이터를 고성능으로 스트리밍합니다.
+     *
+     * @param request  HTTP 요청
+     * @param response HTTP 응답
+     * @throws IOException 입출력 예외 발생 시
+     */
+    public static long streamWithNIO(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        long totalBytes = 0;
+        // NIO 채널 생성
+        ReadableByteChannel inputChannel = Channels.newChannel(request.getInputStream());
+        WritableByteChannel outputChannel = Channels.newChannel(response.getOutputStream());
+
+        // 다이렉트 버퍼 생성 (네이티브 I/O 작업에 최적화)
+        ByteBuffer buffer = ByteBuffer.allocateDirect(64 * 1024); // 64KB 버퍼 (성능에 맞게 조정 가능)
+
+        try {
+            // Content-Type 전달 (필요한 경우)
+            String contentType = request.getContentType();
+            if (contentType != null && response.getContentType() == null) {
+                response.setContentType(contentType);
+            }
+
+            // 데이터 전송 루프
+            int bytesRead = 0;
+            while ((bytesRead = inputChannel.read(buffer)) != -1) {
+                totalBytes += bytesRead;
+                // 버퍼를 읽기 모드로 전환
+                buffer.flip();
+
+                // 버퍼의 모든 데이터를 출력 채널에 쓰기
+                while (buffer.hasRemaining()) {
+                    outputChannel.write(buffer);
+                }
+
+                // 버퍼 비우고 쓰기 모드로 다시 전환
+                buffer.clear();
+            }
+        } finally {
+            // 채널 닫기 (스트림은 컨테이너가 관리하므로 닫지 않음)
+            try {
+                if (inputChannel != null) {
+                    inputChannel.close();
+                }
+            } catch (IOException e) {
+                // 로깅 처리
+            }
+
+            try {
+                if (outputChannel != null) {
+                    outputChannel.close();
+                }
+            } catch (IOException e) {
+                // 로깅 처리
+            }
+        }
+
+        return totalBytes;
     }
 
 }
