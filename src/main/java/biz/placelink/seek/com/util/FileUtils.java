@@ -1,5 +1,24 @@
 package biz.placelink.seek.com.util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.lang.NonNull;
+import org.springframework.web.multipart.MultipartFile;
+
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
 import jakarta.servlet.ServletOutputStream;
@@ -7,17 +26,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.util.S2StreamUtil;
 import kr.s2.ext.util.S2Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.lang.NonNull;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.*;
-import java.net.URLEncoder;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 
 /**
  * <pre>
@@ -68,25 +76,6 @@ public class FileUtils {
             result = directory.exists() || directory.mkdirs();
         }
         return result;
-    }
-
-    /**
-     * <pre>
-     * 디렉토리 생성
-     * </pre>
-     *
-     * @param path 생성할 디렉토리의 경로
-     * @return 없음
-     */
-    public static void reMakeDirectory(String path) {
-        File directory = new File(path);
-
-        if (directory.exists()) {
-            // 디렉토리 있는 경우 삭제
-            FileUtils.deleteDirectory(path);
-        }
-
-        directory.mkdirs();
     }
 
     /**
@@ -208,38 +197,6 @@ public class FileUtils {
         return new File(dest);
     }
 
-    /**
-     * <pre>
-     * 디렉토리 삭제
-     * </pre>
-     *
-     * @param strPath 디렉토리 경로
-     * @return void
-     */
-    @SuppressWarnings("null")
-    public static void deleteDirectory(String strPath) {
-        if (!FileUtils.exists(strPath)) {
-            return;
-        }
-
-        File file = new File(strPath);
-        String[] fileListOfDir = file.list();
-        int fileCnt = fileListOfDir != null ? fileListOfDir.length : 0;
-        String subPath = "";
-
-        for (int i = 0; i < fileCnt; i++) {
-            subPath = strPath + "/" + fileListOfDir[i];
-            File f = new File(subPath);
-            if (!f.isDirectory()) {
-                f.delete();
-            } else {
-                FileUtils.deleteDirectory(subPath);
-            }
-        }
-
-        file.delete();
-    }
-
     public static byte[] getByteArray(File resume) throws IOException {
 
         byte[] fileContent = new byte[(int) resume.length()];
@@ -304,8 +261,7 @@ public class FileUtils {
         return strFileExt;
     }
 
-    public static void downloadFileFromPath(HttpServletResponse response, String filePath,
-                                            String fileName, Long fileLength) throws IOException {
+    public static void downloadFileFromPath(HttpServletResponse response, String filePath, String fileName, Long fileLength) throws IOException {
 
         ServletOutputStream os = response.getOutputStream();
         FileInputStream fis = null;
@@ -322,10 +278,8 @@ public class FileUtils {
             String contentType = getContentType(ext);
 
             response.setContentType(contentType);
-            response.setHeader("Content-Disposition",
-                    "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
-            response.setHeader("Content-Length",
-                    "" + (fileLength != null ? fileLength : file.length()));
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+            response.setHeader("Content-Length", "" + (fileLength != null ? fileLength : file.length()));
 
             fis = new FileInputStream(file);
 
@@ -349,16 +303,14 @@ public class FileUtils {
         }
     }
 
-    public static void downloadFile(HttpServletResponse response, byte[] byteArray,
-                                    String outputFileName, Long fileLength) throws IOException {
+    public static void downloadFile(HttpServletResponse response, byte[] byteArray, String outputFileName, Long fileLength) throws IOException {
 
         try {
             String ext = FileUtils.getFileExtension(outputFileName).toUpperCase();
             String contentType = FileUtils.getContentType(ext);
 
             response.setContentType(contentType);
-            response.setHeader("Content-Disposition",
-                    "attachment;filename=" + URLEncoder.encode(outputFileName, "UTF-8"));
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(outputFileName, "UTF-8"));
             response.setHeader("Content-Length", "" + fileLength);
             response.getOutputStream().write(byteArray);
             response.getOutputStream().flush();
@@ -434,38 +386,6 @@ public class FileUtils {
             }
         }
     } // fileCopy
-
-    /**
-     * 특정 파일을 특정 위치에 move 처리.
-     *
-     * @param src  원본 경로(파일 또는 디렉토리)
-     * @param dest 대상 경로(파일 또는 디렉토리) @
-     */
-    public static void moveFile(String src, String dest) throws IOException {
-        File srcFile = new File(src);
-
-        if (!srcFile.exists()) {
-            throw new IOException();
-        }
-
-        if (srcFile.isDirectory()) {
-            File[] files = srcFile.listFiles();
-
-            FileUtils.makeDirectory(dest);
-
-            if (files != null) {
-                for (File f : files) {
-                    FileUtils.moveFile(f.getPath(), dest + File.separator + f.getName());
-                }
-            }
-
-            FileUtils.deleteDirectory(src);
-        } else {
-            File destFile = new File(dest);
-
-            srcFile.renameTo(destFile);
-        }
-    }
 
     /**
      * UUID를 사용하여 고유한 파일 ID를 생성합니다.
@@ -627,19 +547,18 @@ public class FileUtils {
                 continue;
             }
 
-            String contentType =
-                    file != null && file.getContentType() != null ? file.getContentType() : "";
+            String contentType = file != null && file.getContentType() != null ? file.getContentType() : "";
 
             switch (contentType) {
-                // case "application/octet-stream": // 확장자가 없거나 판단하지 못할때
-                case "application/x-csh":
-                case "application/java-archive":
-                case "application/x-sh":
-                case "application/js":
-                case "application/x-javascript":
-                case "text/html":
-                case "text/javascript":
-                    throw new S2RuntimeException("등록 가능한 파일이 아닙니다.");
+            // case "application/octet-stream": // 확장자가 없거나 판단하지 못할때
+            case "application/x-csh":
+            case "application/java-archive":
+            case "application/x-sh":
+            case "application/js":
+            case "application/x-javascript":
+            case "text/html":
+            case "text/javascript":
+                throw new S2RuntimeException("등록 가능한 파일이 아닙니다.");
             }
 
             boolean chkBlack = false;

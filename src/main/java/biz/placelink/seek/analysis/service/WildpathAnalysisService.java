@@ -22,6 +22,7 @@ import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import biz.placelink.seek.system.file.service.FileService;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.util.S2EncryptionUtil;
+import kr.s2.ext.util.S2FileUtil;
 import kr.s2.ext.util.S2Util;
 
 /**
@@ -196,7 +197,7 @@ public class WildpathAnalysisService {
      * @return 추론된 문서 타입 (예: "text", "image", "pdf", "docx", "unknown" 등).
      *         contentType 이 null 인 경우 "unknown"을 반환합니다.
      */
-    public static String getDocumentTypeFromContentType(String contentType) {
+    public static String getDocumentTypeFromContentType(String contentType, String fileName) {
         String documentType = "unknown";
         if (contentType != null) {
             String lowerContentType = contentType.toLowerCase();
@@ -220,7 +221,7 @@ public class WildpathAnalysisService {
             } else if (lowerContentType.startsWith("image/")) {
                 documentType = "image";
             } else {
-                documentType = switch (contentType) {
+                documentType = switch (lowerContentType) {
                 case "application/pdf" -> "pdf";
                 case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "docx";
                 case "application/msword" -> "doc";
@@ -231,6 +232,13 @@ public class WildpathAnalysisService {
                 case "application/x-hwp", "application/vnd.hancom.hwp" -> "hwp";
                 default -> "unknown";
                 };
+            }
+
+            if ("unknown".equals(documentType) && S2Util.isNotEmpty(fileName) && "application/octet-stream".equals(lowerContentType)) {
+                String fileExtension = S2FileUtil.getExtension(fileName);
+                if (S2Util.isNotEmpty(fileExtension)) {
+                    documentType = fileExtension;
+                }
             }
         }
         return documentType;
