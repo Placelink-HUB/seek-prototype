@@ -26,6 +26,7 @@ import biz.placelink.seek.com.constants.Constants;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.util.S2ServletUtil;
+import kr.s2.ext.util.S2StreamUtil;
 import kr.s2.ext.util.S2Util;
 
 @Controller
@@ -163,15 +164,17 @@ public class WildpathController {
             return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, request.getContentType()).body(payload);
         } else {
             // 비 텍스트 타입의 경우, 원본 요청을 그대로 반환
-            try (InputStream inputStream = request.getInputStream();
-                    OutputStream outputStream = response.getOutputStream()) {
+            try (BufferedInputStream inputStream = S2StreamUtil.getBufferedInputStream(request.getInputStream());
+                    BufferedOutputStream outputStream = S2StreamUtil.getBufferedOutputStream(response.getOutputStream())) {
                 IOUtils.copy(inputStream, outputStream);
                 outputStream.flush();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
+            logger.info("####### S201000 REQUEST END: " + request.getServletPath());
             return ResponseEntity.ok().build();
         }
+
     }
 
     /**
