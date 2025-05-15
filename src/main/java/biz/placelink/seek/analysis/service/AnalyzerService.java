@@ -211,6 +211,13 @@ public class AnalyzerService {
                                 public String getFilename() {
                                     return fileDetail.getFileName();
                                 }
+
+                                @Override
+                                public long contentLength() {
+                                    // InputStreamResource 를 사용할 때 Content-Length를 미리 계산해 설정하면 Spring이 스트림을 미리 읽지 않는다.
+                                    // !!s2!! 즉 Content-Length 명시하지 않으면 InputStreamResource 를 2번 읽으면서 java.lang.IllegalStateException 예외가 발생한다.
+                                    return fileDetail.getFileSize();
+                                }
                             }));
                         }
                         analysisData = generateAnalysisData(analysisParamList);
