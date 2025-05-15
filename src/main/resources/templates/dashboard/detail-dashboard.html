@@ -646,6 +646,8 @@
                 const requestCountArray = [];
                 const completeCountArray = [];
 
+                let lastAnalysisCompleteDateTimeFlag = true;
+
                 for (let i = 0; i < realtimeAnalysisStatus.xAxisSeriesMaxCount; i++) {
                     // 29분 전부터 현재까지 1분 간격으로 생성
                     const date = dayjs()
@@ -653,7 +655,12 @@
                         .toDate();
                     const dateKey = dayjs(date).format('YYYYMMDDHHmm');
                     const requestCount = realtimeAnalysisStatus.requestCountInfo[dateKey] || 0;
-                    const completeCount = realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr && realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr >= dateKey ? realtimeAnalysisStatus.completeCountInfo[dateKey] || 0 : null;
+                    const completeCount = lastAnalysisCompleteDateTimeFlag ? realtimeAnalysisStatus.completeCountInfo[dateKey] || 0 : null;
+
+                    if (!realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr || realtimeAnalysisStatus.lastAnalysisCompleteDateTimeStr < dateKey) {
+                        // 분석완료 차트는 실제 분석 완료된 일시(dateKey) 보다 한칸 더 찍는다(라인차트 곡선을 맞추기 위해)
+                        lastAnalysisCompleteDateTimeFlag = false;
+                    }
 
                     const maxValue = Math.max(requestCount, completeCount || 0);
                     if (maxValue >= realtimeAnalysisStatus.yAxisRangeMax) {
