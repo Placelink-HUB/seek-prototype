@@ -95,7 +95,6 @@ public class AnalyzerService {
      *
      * @param analysisDetail 작업 상세 정보
      */
-    @SuppressWarnings("unchecked")
     @Async("analysisTaskExecutor")
     @Transactional(readOnly = false) // 상태 변경등을 위하여 readOnly 속성을 철회한다.
     public void asyncAnalysisRequest(AnalysisDetailVO analysisDetail) {
@@ -104,7 +103,6 @@ public class AnalyzerService {
             return;
         }
         if (S2Util.isNotEmpty(analysisDetail.getAnalysisId()) && S2Util.isEmpty(analysisDetail.getAnalysisResultId())) {
-            String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
             String analysisId = analysisDetail.getAnalysisId();
             String analysisModeCcd = analysisDetail.getAnalysisModeCcd();
             String analysisModel = analysisModelName;
@@ -116,11 +114,17 @@ public class AnalyzerService {
             List<Map.Entry<String, Object>> analysisParamList = new ArrayList<>();
 
             try (ByteArrayInputStream analysisModelStream = new ByteArrayInputStream(analysisModel.getBytes(StandardCharsets.UTF_8))) {
+                String analysisHash = "";
+
+                // analysisModelStream 사용: 동일 데이터라도 analysisModel 이 다르면 해시값이 달라지도록 한다. (동일한 데이터라도 분석 모델이 다르면 분석 결과가 다를 수 있다.)
+                hashDataStreamList.addFirst(analysisModelStream);
+
                 if (Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisModeCcd)) {
                     String analyzedContent = analysisDetail.getContent();
                     if (S2Util.isNotEmpty(analyzedContent)) {
                         hashDataStreamList.add(new ByteArrayInputStream(analyzedContent.getBytes(StandardCharsets.UTF_8)));
                     }
+                    analysisHash = generateXXHash64(hashDataStreamList);
                 } else {
                     String body = analysisDetail.getBody();
                     FileDetailVO fileDetail = S2Util.isNotEmpty(analysisDetail.getFileId()) ? analysisDetail.getFileDetail() : null;
@@ -129,24 +133,24 @@ public class AnalyzerService {
                         hashDataStreamList.add(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
                     }
 
-                    if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
-                        /*
-                         * [원격 파일일때 검토 필요사항]
-                         * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
-                         * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 아래의 InputStream 과 같이 사용할 것을 검토해야만 한다.
-                         */
-                        hashDataStreamList.add(fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName()));
+                    InputStream hashFileInputStream = null;
+
+                    try {
+                        if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
+                            /*
+                             * [원격 파일일때 검토 필요사항]
+                             * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
+                             * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 아래의 InputStream 과 같이 사용할 것을 검토해야만 한다.
+                             */
+                            hashDataStreamList.add(fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName()));
+                        }
+
+                        analysisHash = generateXXHash64(hashDataStreamList);
+                    } finally {
+                        S2StreamUtil.closeStream(hashFileInputStream);
                     }
+
                 }
-
-                if (hashDataStreamList.isEmpty()) {
-                    throw new S2RuntimeException("분석할 데이터가 없습니다.");
-                }
-
-                // analysisModelStream 사용: 동일 데이터라도 analysisModel 이 다르면 해시값이 달라지도록 한다. (동일한 데이터라도 분석 모델이 다르면 분석 결과가 다를 수 있다.)
-                hashDataStreamList.addFirst(analysisModelStream);
-
-                String analysisHash = S2HashUtil.generateXXHash64(hashSeed, true, hashDataStreamList.toArray(new InputStream[0]));
 
                 if (S2Util.isEmpty(analysisHash)) {
                     throw new S2RuntimeException("분석 해시값이 존재하지 않습니다.");
@@ -182,33 +186,37 @@ public class AnalyzerService {
 
                 if (Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisDetail.getAnalysisModeCcd())) {
                     analysisParamList.add(Map.entry("user_input", analysisDetail.getContent()));
+                    analysisData = generateAnalysisData(analysisParamList);
                 } else {
-                    String body = analysisDetail.getBody();
-                    FileDetailVO fileDetail = S2Util.isNotEmpty(analysisDetail.getFileId()) ? analysisDetail.getFileDetail() : null;
+                    InputStream fileInputStream = null;
 
-                    if (S2Util.isNotEmpty(body)) {
-                        analysisParamList.add(Map.entry("user_input", body));
+                    try {
+                        String body = analysisDetail.getBody();
+                        FileDetailVO fileDetail = S2Util.isNotEmpty(analysisDetail.getFileId()) ? analysisDetail.getFileDetail() : null;
+
+                        if (S2Util.isNotEmpty(body)) {
+                            analysisParamList.add(Map.entry("user_input", body));
+                        }
+
+                        if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
+                            fileInputStream = fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName());
+
+                            /*
+                             * [원격 파일일때 검토 필요사항]
+                             * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
+                             * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 위의 InputStream 과 같이 사용할 것을 검토해야만 한다.
+                             */
+                            analysisParamList.add(Map.entry("file", new InputStreamResource(fileInputStream) {
+                                @Override
+                                public String getFilename() {
+                                    return fileDetail.getFileName();
+                                }
+                            }));
+                        }
+                        analysisData = generateAnalysisData(analysisParamList);
+                    } finally {
+                        S2StreamUtil.closeStream(fileInputStream);
                     }
-
-                    if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
-                        /*
-                         * [원격 파일일때 검토 필요사항]
-                         * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
-                         * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 위의 InputStream 과 같이 사용할 것을 검토해야만 한다.
-                         */
-                        analysisParamList.add(Map.entry("file", new InputStreamResource(fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName())) {
-                            @Override
-                            public String getFilename() {
-                                return fileDetail.getFileName();
-                            }
-                        }));
-                    }
-                }
-
-                analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.POST, apiTimeout, analysisParamList.toArray(new Map.Entry[0]));
-
-                if (S2Util.isEmpty(analysisData)) {
-                    throw new S2RuntimeException("[API 요청 호출 실패]: 결과 값이 존재하지 않습니다.");
                 }
 
                 JsonNode analysisJsonData = new ObjectMapper().readTree(analysisData);
@@ -239,6 +247,34 @@ public class AnalyzerService {
             }
 
         }
+    }
+
+    private String generateXXHash64(List<InputStream> hashDataStreamList) {
+        if (hashDataStreamList == null || hashDataStreamList.isEmpty()) {
+            throw new S2RuntimeException("분석 해시값이 존재하지 않습니다.");
+        }
+
+        String analysisHash = S2HashUtil.generateXXHash64(hashSeed, true, hashDataStreamList.toArray(new InputStream[0]));
+
+        if (S2Util.isEmpty(analysisHash)) {
+            throw new S2RuntimeException("분석 해시값이 존재하지 않습니다.");
+        }
+        return analysisHash;
+    }
+
+    @SuppressWarnings("unchecked")
+    private String generateAnalysisData(List<Map.Entry<String, Object>> analysisParamList) {
+        if (analysisParamList == null || analysisParamList.isEmpty()) {
+            throw new S2RuntimeException("분석 데이터가 존재하지 않습니다.");
+        }
+
+        String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
+        String analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.POST, apiTimeout, analysisParamList.toArray(new Map.Entry[0]));
+
+        if (S2Util.isEmpty(analysisData)) {
+            throw new S2RuntimeException("[API 요청 호출 실패]: 결과 값이 존재하지 않습니다.");
+        }
+        return analysisData;
     }
 
     /**
