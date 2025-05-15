@@ -186,7 +186,9 @@ public class AnalyzerService {
                     String body = analysisDetail.getBody();
                     FileDetailVO fileDetail = S2Util.isNotEmpty(analysisDetail.getFileId()) ? analysisDetail.getFileDetail() : null;
 
-                    analysisParamList.add(Map.entry("user_input", body));
+                    if (S2Util.isNotEmpty(body)) {
+                        analysisParamList.add(Map.entry("user_input", body));
+                    }
 
                     if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
                         /*
