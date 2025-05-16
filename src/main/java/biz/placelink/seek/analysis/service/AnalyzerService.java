@@ -410,7 +410,7 @@ public class AnalyzerService {
 
                             int sensitiveInformationCount = sensitiveInformationService.insertSensitiveInformationList(sensitiveInformationList);
                             if (sensitiveInformationCount > 0) {
-                                // sensitiveInformationService.insertSensitiveInformationMappingList(analysisResultId, sensitiveInformationList);
+                                sensitiveInformationService.insertSensitiveInformationMappingList(analysisResultId, sensitiveInformationList);
 
                                 if (!sensitiveInformationTypeList.isEmpty()) {
                                     sensitiveInformationService.insertSensitiveInformationTypeList(sensitiveInformationTypeList);
