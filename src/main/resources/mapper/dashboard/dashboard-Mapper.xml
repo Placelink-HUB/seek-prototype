@@ -128,7 +128,7 @@
                     JOIN SEEK_SENSITIVE_INFORMATION_MAPPING ssim
                         ON sar.ANALYSIS_RESULT_ID = ssim.ANALYSIS_RESULT_ID
                     JOIN SEEK_SENSITIVE_INFORMATION ssi
-                        ON ssim.ANALYSIS_RESULT_ID = ssi.SENSITIVE_INFORMATION_ID
+                        ON ssim.SENSITIVE_INFORMATION_ID = ssi.SENSITIVE_INFORMATION_ID
                     JOIN SEEK_SENSITIVE_INFORMATION_TYPES ssit
                         ON ssi.SENSITIVE_INFORMATION_ID = ssit.SENSITIVE_INFORMATION_ID
         <where>
