@@ -70,8 +70,8 @@
 				#{item.escapeText},
 				#{item.hitCount},
 				#{item.severityCcd},
-			 	NOW(),
-			 	NOW()
+                NOW(),
+                NOW()
 			)
         </foreach>
 		ON CONFLICT (SENSITIVE_INFORMATION_ID)
@@ -81,6 +81,22 @@
 			HIT_COUNT = target.HIT_COUNT + EXCLUDED.HIT_COUNT,
 			SEVERITY_CCD = EXCLUDED.SEVERITY_CCD,
 			MODIFY_DT = NOW()
+    </insert>
+
+    <insert id="insertSensitiveInformationMappingList">
+		/** insertSensitiveInformationMappingList : 민감 정보 매핑 목록을 등록한다. */
+		INSERT INTO SEEK_SENSITIVE_INFORMATION_MAPPING (
+			ANALYSIS_RESULT_ID,
+			SENSITIVE_INFORMATION_ID
+		) VALUES
+        <foreach collection="sensitiveInformationList" item="item" separator=",">
+			(
+				#{analysisResultId},
+				#{item.sensitiveInformationId}
+			)
+        </foreach>
+        ON CONFLICT (ANALYSIS_RESULT_ID, SENSITIVE_INFORMATION_ID)
+		DO NOTHING
     </insert>
 
     <insert id="insertSensitiveInformationTypeList">

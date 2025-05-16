@@ -3,7 +3,6 @@ package biz.placelink.seek.analysis.service;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,7 +56,7 @@ public class SensitiveInformationService {
      * @param schSensitiveInformationId 민감 정보 ID
      * @return 민감 정보
      */
-    public SensitiveInformationVO selectSensitiveInformation(@Param("schSensitiveInformationId") String schSensitiveInformationId) {
+    public SensitiveInformationVO selectSensitiveInformation(String schSensitiveInformationId) {
         return sensitiveInformationMapper.selectSensitiveInformation(schSensitiveInformationId);
     }
 
@@ -67,8 +66,19 @@ public class SensitiveInformationService {
      * @param sensitiveInformationList 민감 정보 목록
      * @return 등록 개수
      */
-    public int insertSensitiveInformationList(@Param("sensitiveInformationList") List<SensitiveInformationVO> sensitiveInformationList) {
+    public int insertSensitiveInformationList(List<SensitiveInformationVO> sensitiveInformationList) {
         return sensitiveInformationMapper.insertSensitiveInformationList(sensitiveInformationList);
+    }
+
+    /**
+     * 민감 정보 매핑 목록을 등록한다.
+     *
+     * @param analysisResultId         분석 결과 ID
+     * @param sensitiveInformationList 민감 정보 목록
+     * @return 등록 개수
+     */
+    public int insertSensitiveInformationMappingList(String analysisResultId, List<SensitiveInformationVO> sensitiveInformationList) {
+        return sensitiveInformationMapper.insertSensitiveInformationMappingList(analysisResultId, sensitiveInformationList);
     }
 
     /**
@@ -77,7 +87,7 @@ public class SensitiveInformationService {
      * @param sensitiveInformationTypeList 민감 정보 유형 목록
      * @return 등록 개수
      */
-    public int insertSensitiveInformationTypeList(@Param("sensitiveInformationTypeList") List<Map<String, String>> sensitiveInformationTypeList) {
+    public int insertSensitiveInformationTypeList(List<Map<String, String>> sensitiveInformationTypeList) {
         return sensitiveInformationMapper.insertSensitiveInformationTypeList(sensitiveInformationTypeList);
     }
 

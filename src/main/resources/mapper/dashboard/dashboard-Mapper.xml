@@ -122,12 +122,18 @@
                 SELECT
                     ssit.DETECTION_TYPE_CCD,
                     SUM(COALESCE(ssi.HIT_COUNT, 0)) AS HIT_COUNT
-                FROM SEEK_SENSITIVE_INFORMATION ssi
-                    LEFT JOIN SEEK_SENSITIVE_INFORMATION_TYPES ssit
+                FROM SEEK_ANALYSIS sa
+                    JOIN SEEK_ANALYSIS_RESULT sar
+                        ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
+                    JOIN SEEK_SENSITIVE_INFORMATION_MAPPING ssim
+                        ON sar.ANALYSIS_RESULT_ID = ssim.ANALYSIS_RESULT_ID
+                    JOIN SEEK_SENSITIVE_INFORMATION ssi
+                        ON ssim.ANALYSIS_RESULT_ID = ssi.SENSITIVE_INFORMATION_ID
+                    JOIN SEEK_SENSITIVE_INFORMATION_TYPES ssit
                         ON ssi.SENSITIVE_INFORMATION_ID = ssit.SENSITIVE_INFORMATION_ID
         <where>
             <if test='schDe != null and schDe != ""'>
-                        AND (ssi.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > ssi.CREATE_DT)
+                        AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
             </if>
         </where>
                 GROUP BY ssit.DETECTION_TYPE_CCD

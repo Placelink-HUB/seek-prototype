@@ -56,6 +56,15 @@ public interface SensitiveInformationMapper {
     int insertSensitiveInformationList(@Param("sensitiveInformationList") List<SensitiveInformationVO> sensitiveInformationList);
 
     /**
+     * 민감 정보 매핑 목록을 등록한다.
+     *
+     * @param analysisResultId         분석 결과 ID
+     * @param sensitiveInformationList 민감 정보 목록
+     * @return 등록 개수
+     */
+    int insertSensitiveInformationMappingList(@Param("analysisResultId") String analysisResultId, @Param("sensitiveInformationList") List<SensitiveInformationVO> sensitiveInformationList);
+
+    /**
      * 민감 정보 유형 목록을 등록한다.
      *
      * @param sensitiveInformationTypeList 민감 정보 유형 목록

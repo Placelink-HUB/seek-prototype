@@ -408,10 +408,13 @@ public class AnalyzerService {
                                 analysisResultService.insertAnalysisDetectionList(analysisDetectionList);
                             }
 
-                            sensitiveInformationService.insertSensitiveInformationList(sensitiveInformationList);
+                            int sensitiveInformationCount = sensitiveInformationService.insertSensitiveInformationList(sensitiveInformationList);
+                            if (sensitiveInformationCount > 0) {
+                                // sensitiveInformationService.insertSensitiveInformationMappingList(analysisResultId, sensitiveInformationList);
 
-                            if (!sensitiveInformationTypeList.isEmpty()) {
-                                sensitiveInformationService.insertSensitiveInformationTypeList(sensitiveInformationTypeList);
+                                if (!sensitiveInformationTypeList.isEmpty()) {
+                                    sensitiveInformationService.insertSensitiveInformationTypeList(sensitiveInformationTypeList);
+                                }
                             }
 
                             serviceWorkerService.sendNotificationAll(pushMap);
