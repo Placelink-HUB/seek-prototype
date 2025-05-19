@@ -1,53 +1,442 @@
 plugins {
-    id 'org.springframework.boot' version '3.4.1'
-    id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
     id 'war'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
-group = 'biz.placelink'
-version = 'latest'
+ext {
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+    developmentRepositoryName = "DevelopmentRepository"
+    developmentRepositoryUrl = uri("${System.getProperty("user.home")}/.m2/developository") as URI
+
+    versions = [
+            "java": 21, // 8, 11, 17, 21
+            "servlet": "6.0", // 4.0(Tomcat 9, WildFly 20-26), 5.0(Tomcat 10), 6.0(Tomcat 10.1, Wildfly 27-35), 6.1(Tomcat 11)
+            "spring-boot": project.plugins.getPlugin('org.springframework.boot').class.package.implementationVersion ?: "2.7.18", // 2.7.18, 3.0.13, 3.1.12, 3.2.12, 3.3.7, 3.4.1
+            "spring-dependency-management": project.plugins.getPlugin('io.spring.dependency-management').class.package.implementationVersion ?: "1.1.7",
+            "kotlin": "2.1.10"
+    ]
+
+    versions["jakarta-ee"] =
+            versions["java"] >= 17 && versions["servlet"] == "6.1" && versions["spring-boot"].startsWith("N/A") ? 11 :
+            versions["java"] >= 17 && versions["servlet"] == "6.0" && versions["spring-boot"].startsWith("3.4") ? 10 :
+            versions["java"] >= 17 && versions["servlet"] == "6.0" && versions["spring-boot"].startsWith("3.3") ? 10 :
+            versions["java"] >= 17 && versions["servlet"] == "6.0" && versions["spring-boot"].startsWith("3.2") ? 10 :
+            versions["java"] >= 17 && versions["servlet"] == "6.0" && versions["spring-boot"].startsWith("3.1") ? 10 :
+            versions["java"] >= 17 && versions["servlet"] == "5.0" && versions["spring-boot"].startsWith("3.0") ?  9 :
+            versions["java"] >=  8 && versions["servlet"] == "4.0" && versions["spring-boot"].startsWith("2." ) ?  8 :
+            null
+
+    if (versions["jakarta-ee"] == null) {
+        throw new IllegalStateException("호환성 점검 필요: 'Jakarta EE Compatible Version' 을 결정할 수 없습니다. Java, Servlet, Spring Boot 버전을 확인하십시오.")
+    }
+
+    switch (versions["jakarta-ee"]) {
+        case { it >= 11 }:
+//            versions["logback"] = "1.5.17" // ch.qos.logback:logback-classic
+//            versions["slf4j"] = "2.0.17" // org.slf4j:slf4j-api
+
+            versions["jakarta.servlet-api"] = "6.1.0" // jakarta.servlet:jakarta.servlet-api
+            versions["jakarta.servlet.jsp-api"] = "4.0.0" // jakarta.servlet.jsp:jakarta.servlet.jsp-api
+            versions["jakarta.el-api"] = "6.0.1" // jakarta.el:jakarta.el-api
+            versions["jakarta.el"] = "4.0.2" // org.glassfish:jakarta.el
+            versions["jakarta.validation-api"] = "3.1.1" // jakarta.validation:jakarta.validation-api
+            versions["hibernate-validator"] = "9.0.0.CR1" // org.hibernate.validator:hibernate-validator
+            versions["jakarta.annotation-api"] = "3.0.0" // jakarta.annotation:jakarta.annotation-api
+            versions["jakarta.persistence-api"] = "3.2.0" // jakarta.persistence:jakarta.persistence-api
+
+            versions["jakarta.activation-api"] = "2.1.3" // jakarta.activation:jakarta.activation-api
+            versions["jakarta.activation"] = "2.0.1"
+            versions["jakarta.inject-api"] = "2.0.1"
+            versions["jakarta.json-api"] = "2.1.3"
+            versions["jakarta.transaction-api"] = "2.0.1"
+            versions["jakarta.websocket-api"] = "2.2.0"
+            versions["jakarta.xml.bind-api"] = "4.0.2"
+            break
+        case { it >= 10 }:
+//            versions["logback"] = "1.5.17"
+//            versions["slf4j"] = "2.0.17"
+
+            versions["jakarta.servlet-api"] = "6.1.0"
+            versions["jakarta.servlet.jsp-api"] = "4.0.0"
+            versions["jakarta.el-api"] = "6.0.1"
+            versions["jakarta.el"] = "4.0.2"
+            versions["jakarta.validation-api"] = "3.1.1"
+            versions["hibernate-validator"] = "8.0.2.Final"
+            versions["jakarta.annotation-api"] = "3.0.0"
+            versions["jakarta.persistence-api"] = "3.2.0"
+
+            versions["jakarta.activation-api"] = "2.1.3"
+            versions["jakarta.activation"] = "2.0.1"
+            versions["jakarta.inject-api"] = "2.0.1"
+            versions["jakarta.json-api"] = "2.1.3"
+            versions["jakarta.transaction-api"] = "2.0.1"
+            versions["jakarta.websocket-api"] = "2.2.0"
+            versions["jakarta.xml.bind-api"] = "4.0.2"
+            break
+        case { it >= 9 }:
+//            versions["logback"] = "1.5.17"
+//            versions["slf4j"] = "2.0.17"
+
+            versions["jakarta.servlet-api"] = "5.0.0"
+            versions["jakarta.servlet.jsp-api"] = "3.1.1"
+            versions["jakarta.el-api"] = "5.0.1"
+            versions["jakarta.el"] = "4.0.2"
+            versions["jakarta.validation-api"] = "3.0.2"
+            versions["hibernate-validator"] = "7.0.5.Final"
+            versions["jakarta.annotation-api"] = "2.1.1"
+            versions["jakarta.persistence-api"] = "3.0.0"
+
+            versions["jakarta.activation-api"] = "2.1.3"
+            versions["jakarta.activation"] = "2.0.1"
+            versions["jakarta.inject-api"] = "2.0.1"
+            versions["jakarta.json-api"] = "2.1.3"
+            versions["jakarta.transaction-api"] = "2.0.1"
+            versions["jakarta.websocket-api"] = "2.2.0"
+            versions["jakarta.xml.bind-api"] = "4.0.2"
+            break
+        default:
+            versions["logback"] = "1.2.13"
+            versions["slf4j"] = "1.7.36"
+
+            versions["jakarta.servlet-api"] = "4.0.4"
+            versions["jakarta.servlet.jsp-api"] = "2.3.6"
+            versions["jakarta.el-api"] = "3.0.3"
+            versions["jakarta.el"] = "3.0.4"
+            versions["jakarta.validation-api"] = "2.0.2"
+            versions["hibernate-validator"] = "6.2.5.Final"
+            versions["jakarta.annotation-api"] = "1.3.5"
+            versions["jakarta.persistence-api"] = "2.2.3"
+
+            versions["jakarta.activation-api"] = "1.2.2"
+            versions["jakarta.activation"] = "1.2.2"
+            versions["jakarta.inject-api"] = "1.0.5"
+            versions["jakarta.json-api"] = "1.1.6"
+            versions["jakarta.transaction-api"] = "1.3.3"
+            versions["jakarta.websocket-api"] = "1.1.2"
+            versions["jakarta.xml.bind-api"] = "2.3.3"
+    }
+
+    switch (versions["java"]) {
+        case { it >= 17 }:
+            versions["hazelcast"] = "5.5.0"
+            versions["hazelcast-spring"] = "5.5.0"
+            versions["hazelcast-hibernate53"] = "5.2.0"
+            versions["spring-data-hazelcast"] = "2.4.0"
+
+            versions["hibernate-core"] = "6.6.4.Final"
+            versions["querydsl"] = "5.1.0"
+
+            versions["tika"] = "3.1.0"
+            break
+        case { it >= 11 }:
+            versions["hazelcast"] = "5.3.8"
+            versions["hazelcast-spring"] = "5.3.8"
+            versions["hazelcast-hibernate53"] = "5.2.0"
+            versions["spring-data-hazelcast"] = "2.4.0"
+
+            versions["hibernate-core"] = "6.6.4.Final"
+            versions["querydsl"] = "5.1.0"
+
+            versions["tika"] = "3.1.0"
+            break
+        default:
+            versions["hazelcast"] = "4.2.8"
+            versions["hazelcast-spring"] = "4.2.8"
+            versions["hazelcast-hibernate53"] = "2.3.0"
+            versions["spring-data-hazelcast"] = "2.4.0"
+
+            versions["hibernate-core"] = "5.6.15.Final"
+            versions["querydsl"] = "5.0.0"
+
+            versions["tika"] = "2.9.3"
+    }
+
+}
+
+group = "biz.placelink.seek"
+version = "1.0-SNAPSHOT"
+
+gradle.startParameter.warningMode = WarningMode.All
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << "-Xlint:all"
+    options.encoding = "UTF-8"
+//    options.release.set(versions["java"] as int) // Java 버전 호환 강제
+}
+
+tasks.register("deployBootWar") {
+    dependsOn("bootWar")
+    doLast {
+        def artifactFile = tasks.named("bootWar").get().archiveFile.get().asFile
+        def extension = artifactFile.name.lastIndexOf('.').with {
+            //noinspection GroovyAssignabilityCheck
+            it != -1 ? artifactFile.name[(it + 1)..-1] : ''
+        }
+        def artifactName = "engine" // project.name
+        def artifactVersion = project.version.toString()
+        def timestamp = System.currentTimeMillis()
+        def targetDir = rootProject.projectDir.toPath().resolve("../_macos/gw.placelink.biz/opt/seek/apps/engine/artifacts")
+        def explodedDir = rootProject.projectDir.toPath().resolve("../_macos/gw.placelink.biz/opt/seek/apps/engine/exploded")
+
+        // exploded 디렉토리 비우기
+        delete(explodedDir)
+//        mkdir(explodedDir)
+
+        // 병렬 작업 실행을 위한 스레드 풀 생성
+        //noinspection UnnecessaryQualifiedReference
+        def executor = java.util.concurrent.Executors.newFixedThreadPool(3)
+
+        // 타임스탬프 버전 복사 작업
+        def timestampTask = executor.submit {
+            copy {
+                from(artifactFile)
+                into(targetDir)
+                rename { filename -> "${artifactName}-${artifactVersion}-${timestamp}.${extension}" }
+            }
+        }
+
+        // latest 버전 복사 작업
+        def latestTask = executor.submit {
+            copy {
+                from(artifactFile)
+                into(targetDir)
+                rename { filename -> "${artifactName}-latest.${extension}" }
+            }
+        }
+
+        // WAR 압축 해제 작업
+        def explodeTask = executor.submit {
+            copy {
+                from(zipTree(artifactFile))
+                into(explodedDir)
+            }
+        }
+
+        // 모든 작업이 완료될 때까지 대기
+        timestampTask.get()
+        latestTask.get()
+        explodeTask.get()
+
+        // 스레드 풀 종료
+        executor.shutdown()
+
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(versions["java"] as int)
+    }
+}
+
+if (project.plugins.hasPlugin("org.jetbrains.kotlin.jvm")) {
+    project.compileKotlin {
+        kotlinOptions {
+            jvmTarget = (versions["java"] <= 8) ? "1.${versions["java"]}" : versions["java"]
+            freeCompilerArgs = [ "-Xjsr305=strict" ]
+        }
+    }
+
+    project.compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = (versions["java"] <= 8) ? "1.${versions["java"]}" : versions["java"]
+            freeCompilerArgs = [ "-Xjsr305=strict" ]
+        }
     }
 }
 
 repositories {
     mavenCentral()
+    google()
+    maven {
+        url = "https://maven.egovframe.go.kr/maven/"
+        metadataSources {
+            //noinspection ForeignDelegate
+            artifact()
+        }
+    }
+    maven {
+        name = developmentRepositoryName
+        url = developmentRepositoryUrl
+    }
+}
+
+configurations {
+
+    configureEach {
+        exclude group: "javax.persistence", module: "javax.persistence-api"
+        exclude group: "javax.annotation", module: "javax.annotation-api"
+        exclude group: "javax.servlet", module: "javax.servlet-api"
+        exclude group: "javax.validation", module: "validation-api"
+        exclude module: "spring-boot-starter-tomcat"
+        exclude module: "commons-logging"
+        exclude module: "tomcat-embed-el"
+        exclude module: "tomcat-jdbc"
+        exclude module: "tomcat-embed-websocket"
+        exclude module: "undertow-websockets-jsr"
+        exclude module: "org.apache.logging.log4j"
+        exclude module: "log4j-core"
+        exclude module: "log4j-slf4j-impl"
+        exclude module: "jcl-over-slf4j"
+        exclude module: "log4j-over-slf4j"
+    }
+
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+
+}
+
+dependencyManagement {
+
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${versions["spring-boot"]}")
+        mavenBom("com.querydsl:querydsl-bom:${versions["querydsl"]}")
+    }
+
+    dependencies {
+
+        dependency("org.jetbrains.kotlin:kotlin-stdlib:${versions["kotlin"]}")
+        dependency("org.jetbrains.kotlin:kotlin-test:${versions["kotlin"]}")
+        dependency("org.jetbrains.kotlin:kotlin-test-junit:${versions["kotlin"]}")
+
+//        dependency("ch.qos.logback:logback-classic:${versions["logback"]}")
+//        dependency("org.slf4j:slf4j-api:${versions["slf4j"]}")
+//        dependency("org.slf4j:jul-to-slf4j:${versions["slf4j"]}")
+
+        dependency("javax.cache:cache-api:1.1.1")
+        dependency("javax.servlet:jstl:1.2")
+
+        dependency("jakarta.servlet:jakarta.servlet-api:${versions["jakarta.servlet-api"]}")
+        dependency("jakarta.servlet.jsp:jakarta.servlet.jsp-api:${versions["jakarta.servlet.jsp-api"]}")
+        dependency("jakarta.el:jakarta.el-api:${versions["jakarta.el-api"]}")
+        dependency("org.glassfish:jakarta.el:${versions["jakarta.el"]}")
+        dependency("jakarta.validation:jakarta.validation-api:${versions["jakarta.validation-api"]}")
+        dependency("org.hibernate.validator:hibernate-validator:${versions["hibernate-validator"]}")
+        dependency("jakarta.persistence:jakarta.persistence-api:${versions["jakarta.persistence-api"]}")
+        dependency("jakarta.annotation:jakarta.annotation-api:${versions["jakarta.annotation-api"]}")
+        dependency("com.google.code.findbugs:jsr305:3.0.2")
+
+        dependency("jakarta.activation:jakarta.activation-api:${versions["jakarta.activation-api"]}")
+        dependency("com.sun.activation:jakarta.activation:${versions["jakarta.activation"]}")
+        dependency("jakarta.inject:jakarta.inject-api:${versions["jakarta.inject-api"]}")
+        dependency("jakarta.json:jakarta.json-api:${versions["jakarta.json-api"]}")
+        dependency("jakarta.transaction:jakarta.transaction-api:${versions["jakarta.transaction-api"]}")
+        dependency("jakarta.websocket:jakarta.websocket-api:${versions["jakarta.websocket-api"]}")
+        dependency("jakarta.xml.bind:jakarta.xml.bind-api:${versions["jakarta.xml.bind-api"]}")
+
+        dependency("org.hibernate:hibernate-core:${versions["hibernate-core"]}")
+
+        dependency("com.hazelcast:hazelcast:${versions["hazelcast"]}")
+        dependency("com.hazelcast:hazelcast-spring:${versions["hazelcast-spring"]}")
+        dependency("com.hazelcast:hazelcast-hibernate53:${versions["hazelcast-hibernate53"]}")
+        dependency("com.hazelcast:spring-data-hazelcast:${versions["spring-data-hazelcast"]}")
+
+        dependency("com.querydsl:querydsl-bom:${versions["querydsl"]}")
+        dependency("com.querydsl:querydsl-core:${versions["querydsl"]}")
+        dependency("com.querydsl:querydsl-jpa:${versions["querydsl"]}")
+        dependency("com.querydsl:querydsl-apt:${versions["querydsl"]}")
+
+        dependency("org.apache.tika:tika-core:${versions["tika"]}")
+
+        dependency("com.fasterxml.jackson.core:jackson-core:2.18.2")
+        dependency("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+        dependency("com.fasterxml.jackson.core:jackson-annotations:2.18.2")
+        dependency("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.18.2")
+        dependency("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2")
+        dependency("com.fasterxml.jackson.datatype:jackson-datatype-jsr353:2.18.2")
+        dependency("com.fasterxml.jackson.module:jackson-module-parameter-names:2.18.2")
+        dependency("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
+
+        dependency("org.mapstruct:mapstruct:1.6.3")
+        dependency("org.mapstruct:mapstruct-processor:1.6.3")
+
+        dependency("org.thymeleaf:thymeleaf:3.1.3.RELEASE")
+        dependency("org.thymeleaf.testing:thymeleaf-testing:3.1.3.RELEASE")
+        dependency("org.thymeleaf:thymeleaf-spring5:3.1.3.RELEASE")
+        dependency("org.thymeleaf.extras:thymeleaf-extras-springsecurity5:3.1.3.RELEASE")
+        dependency("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.4.0")
+        dependency("org.attoparser:attoparser:2.0.7.RELEASE")
+
+        dependency("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1")
+        dependency("org.springdoc:springdoc-openapi-ui:1.8.0")
+        dependency("io.springfox:springfox-boot-starter:3.0.0")
+
+        dependency("org.bouncycastle:bcpkix-jdk18on:1.80")
+        dependency("org.apache.commons:commons-lang3:3.17.0")
+        dependency("org.apache.commons:commons-vfs2:2.9.0")
+        dependency("commons-io:commons-io:2.18.0")
+
+        /** html & xml 파서 */
+        dependency("org.jsoup:jsoup:1.18.3")
+
+        dependency("junit:junit:4.13.2")
+        dependency("org.junit:junit-bom:5.11.4")
+        dependency("org.junit.jupiter:junit-jupiter:5.11.4")
+        dependency("org.junit.jupiter:junit-jupiter-api:5.11.4")
+        dependency("org.junit.jupiter:junit-jupiter-engine:5.11.4")
+        dependency("org.junit.jupiter:junit-jupiter-params:5.11.4")
+        dependency("org.junit.platform:junit-platform-commons:1.11.4")
+        dependency("org.junit.platform:junit-platform-engine:1.11.4")
+
+        dependency("org.seleniumhq.selenium:selenium-java:4.27.0")
+
+    }
+
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+    // Spring 어노테이션 프로세서 추가
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // Spring의 구성 자동완성 및 어노테이션 처리를 위한 메타데이터 생성
+    compileOnly("org.springframework.boot:spring-boot-configuration-processor")
+
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.springframework.security:spring-security-test")
+
+    // 외부 컨테이너로 기동시 내장된 컨테이너 엔진관련 의존성을 제거하여야 한다.
+    // scope 를 implementation 에서 provide 로 변경하여 위 문제 우회함.
+    runtimeOnly("org.springframework.boot:spring-boot-starter-undertow")
+
+    implementation("jakarta.servlet:jakarta.servlet-api")
+    implementation("jakarta.el:jakarta.el-api")
+    implementation("org.glassfish:jakarta.el")
+    implementation("jakarta.validation:jakarta.validation-api")
+    implementation("org.hibernate.validator:hibernate-validator")
+    implementation("jakarta.annotation:jakarta.annotation-api")
+    annotationProcessor('jakarta.annotation:jakarta.annotation-api')
+
+    implementation("org.springframework.boot:spring-boot-starter-web")
+
+    implementation("org.mapstruct:mapstruct")
+    annotationProcessor("org.mapstruct:mapstruct-processor")
+
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+
+    implementation("org.thymeleaf:thymeleaf")
+    implementation("org.thymeleaf.testing:thymeleaf-testing")
+    implementation("org.thymeleaf:thymeleaf-spring5")
+    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+    implementation("nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect")
+    implementation("org.attoparser:attoparser")
+
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
+    implementation("commons-io:commons-io")
 
     // DB
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
-    runtimeOnly 'org.postgresql:postgresql'
-    // runtimeOnly 'com.h2database:h2'
-
-
-    // Thymeleaf
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3")
+    implementation("org.postgresql:postgresql")
 
     // Jackson
-    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation("com.fasterxml.jackson.core:jackson-databind")
 
     //Web-Push
     implementation("nl.martijndwars:web-push:5.1.1")
@@ -55,13 +444,37 @@ dependencies {
     implementation("org.bouncycastle:bcprov-jdk18on:1.80")
 
     //
-    implementation 'org.apache.poi:poi:5.2.3'
-    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3")
 
-    providedCompile(fileTree("${projectDir}/src/main/webapp/WEB-INF/lib") { include('*.jar') })
+    if (versions["jakarta-ee"] <= 8 && project.configurations.annotationProcessor.dependencies.find {it.group == "jakarta.annotation" && it.name == "jakarta.annotation-api"} != null) {
+        /* javax.annotation.Nonnull support */
+        if (["java-library"].any { project.plugins.hasPlugin(it) }) {
+            api("com.google.code.findbugs:jsr305")
+        } else {
+            implementation("com.google.code.findbugs:jsr305")
+        }
+    }
+
+    if (["java-library"].any { project.plugins.hasPlugin(it) }) {
+        api("ch.qos.logback:logback-classic")
+        api("org.slf4j:slf4j-api")
+        api("org.slf4j:jul-to-slf4j")
+    } else {
+        implementation("ch.qos.logback:logback-classic")
+        implementation("org.slf4j:slf4j-api")
+        implementation("org.slf4j:jul-to-slf4j")
+    }
+
+    testImplementation(platform("org.junit:junit-bom"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+
+    if (["war"].any { project.plugins.hasPlugin(it) }) {
+        providedCompile(fileTree("${projectDir}/src/main/webapp/WEB-INF/lib") { include("*.jar") })
+    }
+
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
 }
-

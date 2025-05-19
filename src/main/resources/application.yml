@@ -1,3 +1,33 @@
+server:
+    address: 0.0.0.0
+    port: 8090
+    undertow:
+        accesslog:
+            dir: ${logging.file.path}
+            rotate: true
+            enabled: true
+            prefix: ${logging.file.name}_access.
+            suffix: log
+            pattern: '%{i,X-Forwarded-For} %a %A %p %t %s %T %b "%r" %{i,Referer} "%{i,User-Agent}"'
+    servlet:
+        application-display-name: www.placelink.biz
+        context-path: /
+        session:
+            timeout: 30m
+            cookie:
+                name: X-Auth-Token
+                path: /
+                max-age: -1
+        encoding:
+            charset: UTF-8
+    error:
+        include-message: never
+        include-exception: false
+        include-stacktrace: never
+        include-binding-errors: never
+        whitelabel:
+            enabled: true
+
 spring:
     config:
         import:
@@ -20,10 +50,16 @@ spring:
         multipart:
             max-file-size: 20MB # 개별 파일의 최대 크기
             max-request-size: 50MB # 요청 전체의 최대 크기
-server:
-    port: 8080
 
 logging:
+    config: classpath:logback-spring.xml
+    file:
+        path: ./var/logs
+        name: ${spring.application.name}
+    pattern:
+        console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+        file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
     level:
         root: debug
         '[org.springframework.jdbc.support.JdbcTransactionManager]': info

@@ -1,27 +1,51 @@
-<configuration>
-    <property name="LOG_PATH" value="../logs"/>
-    <property name="LOG_FILE_NAME" value="application"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
 
+    <!--
+        Spring boot logback 기본 설정
+        <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+        org/springframework/boot/logging/logback/base.xml
+        org/springframework/boot/logging/logback/defaults.xml
+        org/springframework/boot/logging/logback/console-appender.xml
+        org/springframework/boot/logging/logback/file-appender.xml
+    -->
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <!-- Spring 프로퍼티 연동 -->
+    <springProperty scope="context" name="LOG_PATH" source="logging.file.path" defaultValue="./var/logs"/>
+    <springProperty scope="context" name="LOG_FILE" source="logging.file.name" defaultValue="application"/>
+    <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root" defaultValue="ERROR"/>
+
+    <!-- 파일 Appender 설정 -->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>30</maxHistory>
+        <encoder>
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>${FILE_LOG_CHARSET}</charset>
+        </encoder>
+        <file>${LOG_PATH}/${LOG_FILE}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOGBACK_ROLLINGPOLICY_FILE_NAME_PATTERN:-${LOG_FILE}.%d{yyyy-MM-dd}.%i.log.gz}</fileNamePattern>
+            <cleanHistoryOnStart>${LOGBACK_ROLLINGPOLICY_CLEAN_HISTORY_ON_START:-false}</cleanHistoryOnStart>
+            <maxFileSize>${LOGBACK_ROLLINGPOLICY_MAX_FILE_SIZE:-10MB}</maxFileSize>
+            <totalSizeCap>${LOGBACK_ROLLINGPOLICY_TOTAL_SIZE_CAP:-0}</totalSizeCap>
+            <maxHistory>${LOGBACK_ROLLINGPOLICY_MAX_HISTORY:-7}</maxHistory>
         </rollingPolicy>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
     </appender>
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <!-- 레벨별 컬러 적용 -->
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %highlight(%-5level) %cyan(%logger{36}) - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <root level="DEBUG">
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="CONSOLE"/>
+    <!-- 기본 로거 설정-->
+    <root level="${LOG_LEVEL}">
+        <appender-ref ref="FILE" />
     </root>
+
+    <!-- 프로필별 로거 설정 -->
+    <springProfile name="#DEVELOP | #LOCAL">
+        <root level="${LOG_LEVEL}">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+    </springProfile>
+
 </configuration>
