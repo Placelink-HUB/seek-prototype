@@ -14,10 +14,12 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -166,8 +168,9 @@ public class WildpathController {
             if (!this.isExcludedPath(request, "/postprocess/", true)) {
                 payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_REVERSE_POST, payload, seekMode);
             }
-
-            return ResponseEntity.ok().header(HttpHeaders.CONTENT_TYPE, request.getContentType()).body(payload);
+            return ResponseEntity.ok()
+                    .contentType(new MediaType(MediaType.valueOf(StringUtils.defaultIfEmpty(request.getHeader("X-Origin-Content-Type"), request.getContentType())), StandardCharsets.UTF_8))
+                    .body(payload);
         } else {
             // 비 텍스트 타입의 경우, 원본 요청을 그대로 반환
             try {
