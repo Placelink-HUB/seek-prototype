@@ -295,7 +295,7 @@ public class AnalyzerService {
         if (analysisDetail != null) {
             String analysisId = analysisDetail.getAnalysisId();
             String analysisResultId = analysisDetail.getAnalysisResultId();
-            String analysisData = "";
+            String analysisRawData = "";
 
             try {
                 if (S2Util.isEmpty(analysisId)) {
@@ -307,14 +307,14 @@ public class AnalyzerService {
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisDetail.getAnalysisModel()));
                 JsonNode analysisJsonData = null;
 
-                analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.GET, apiTimeout);
+                analysisRawData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.GET, apiTimeout);
 
-                if (S2Util.isNotEmpty(analysisData)) {
-                    logger.debug("[API 결과 호출 성공] url: {}, analysisId: {}, analysisData: {}", analysisSeServerUrl, analysisId, analysisData);
+                if (S2Util.isNotEmpty(analysisRawData)) {
+                    logger.debug("[API 결과 호출 성공] url: {}, analysisId: {}, analysisData: {}", analysisSeServerUrl, analysisId, analysisRawData);
 
                     // JSON 파싱 시, 제어문자(예: \n, \r 등)를 허용하도록 설정
                     ObjectMapper objectMapper = JsonMapper.builder().enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS).build();
-                    analysisJsonData = objectMapper.readTree(analysisData);
+                    analysisJsonData = objectMapper.readTree(analysisRawData);
                 }
 
                 if (analysisJsonData != null && analysisJsonData.path("status").asText("").equalsIgnoreCase("success")) {
@@ -378,7 +378,7 @@ public class AnalyzerService {
                         analyzedContent = null;
                     }
 
-                    if (analysisResultService.updateAnalysisResult(analysisResultId, analyzedContent, totalDetectionCount) > 0) {
+                    if (analysisResultService.updateAnalysisResult(analysisResultId, analysisRawData, analyzedContent, totalDetectionCount) > 0) {
                         List<AnalysisDetectionVO> analysisDetectionList = new ArrayList<>();
 
                         Map<String, Object> pushMap = new HashMap<>();
@@ -425,7 +425,7 @@ public class AnalyzerService {
                     }
                 }
             } catch (Exception e) {
-                analysisErrorService.insertAnalysisErrorWithNewTransaction(analysisId, analysisData, e.getMessage() + "\n" + S2Exception.getStackTrace(e));
+                analysisErrorService.insertAnalysisErrorWithNewTransaction(analysisId, analysisRawData, e.getMessage() + "\n" + S2Exception.getStackTrace(e));
                 logger.error("asyncPollAnalysisResults Error : {}", e.getMessage(), e);
                 analysisRequestStatus.remove(analysisId);
             } finally {

@@ -65,12 +65,13 @@ public class AnalysisResultService {
      * 분석 결과를 수정한다.
      *
      * @param analysisResultId    분석 결과 ID
+     * @param analysisRawData     분석 원본 데이터
      * @param analyzedContent     분석된 내용
      * @param totalDetectionCount 총 탐지 개수
      * @return 등록 개수
      */
-    public int updateAnalysisResult(String analysisResultId, String analyzedContent, Integer totalDetectionCount) {
-        return analysisResultMapper.updateAnalysisResult(analysisResultId, analyzedContent, totalDetectionCount);
+    public int updateAnalysisResult(String analysisResultId, String analysisRawData, String analyzedContent, Integer totalDetectionCount) {
+        return analysisResultMapper.updateAnalysisResult(analysisResultId, analysisRawData, analyzedContent, totalDetectionCount);
     }
 
     /**

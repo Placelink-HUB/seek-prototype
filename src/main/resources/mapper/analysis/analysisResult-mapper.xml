@@ -50,6 +50,7 @@
         /** updateAnalysisResult : 분석 결과를 수정한다. */
         UPDATE SEEK_ANALYSIS_RESULT
         SET
+            ANALYSIS_RAW_DATA = #{analysisRawData},
             ANALYZED_CONTENT = #{analyzedContent},
             TOTAL_DETECTION_COUNT = #{totalDetectionCount},
             MODIFY_DT = NOW()

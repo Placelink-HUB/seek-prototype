@@ -90,7 +90,7 @@
             });
 
             navigator.serviceWorker.addEventListener('message', (event) => {
-                console.debug('Received Message', event.data);
+                console.debug('ReceiveServiceWorker Data', event.data);
                 const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
 
                 switch (event.data.type) {

@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1094.5742,
-    "scrollLeft": -248.7447,
+    "scrollTop": -839.5742,
+    "scrollLeft": -279.7447,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -239,6 +239,7 @@
         "comment": "분석_결과",
         "columnIds": [
           "6Ae2l0X0PEhK8ZwfwXayu",
+          "lzdwv6aN2bokMI7Rx5HwB",
           "Co4faLzQ7Vp-f3c32xxx5",
           "KCSAX5RxGDitkX6UqkFfW",
           "pMJgwrRSJWnA176de5Nm3"
@@ -260,6 +261,7 @@
           "lamAKGlMiSR3Oppu38YW_",
           "ECRDlsbdm6CyIYpRwNrRw",
           "hcEZhymDFXDI3z1YVnXFh",
+          "lzdwv6aN2bokMI7Rx5HwB",
           "Co4faLzQ7Vp-f3c32xxx5",
           "FPfcgKOtJDJ1Q_fnWnrF7",
           "KCSAX5RxGDitkX6UqkFfW",
@@ -271,15 +273,15 @@
           "pMJgwrRSJWnA176de5Nm3"
         ],
         "ui": {
-          "x": 158.0947,
-          "y": 1002.8025,
+          "x": 149.5582,
+          "y": 1001.583,
           "zIndex": 1264,
           "widthName": 128,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1747371879111,
+          "updateAt": 1747736019262,
           "createAt": 1737704305450
         }
       },
@@ -3945,6 +3947,26 @@
           "updateAt": 1747371897157,
           "createAt": 1747371887808
         }
+      },
+      "lzdwv6aN2bokMI7Rx5HwB": {
+        "id": "lzdwv6aN2bokMI7Rx5HwB",
+        "tableId": "Yb8CUNZWbGFMH-3n8qxAj",
+        "name": "ANALYSIS_RAW_DATA",
+        "comment": "분석_원본_데이터",
+        "dataType": "TEXT",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 117,
+          "widthComment": 96,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1747738104389,
+          "createAt": 1747735949328
+        }
       }
     },
     "relationshipEntities": {
@@ -4014,8 +4036,8 @@
           "columnIds": [
             "6Ae2l0X0PEhK8ZwfwXayu"
           ],
-          "x": 428.5947,
-          "y": 1154.8025,
+          "x": 420.0582,
+          "y": 1177.583,
           "direction": 8
         },
         "end": {
@@ -4154,8 +4176,8 @@
           "columnIds": [
             "6Ae2l0X0PEhK8ZwfwXayu"
           ],
-          "x": 428.5947,
-          "y": 1002.8025,
+          "x": 420.0582,
+          "y": 1001.583,
           "direction": 4
         },
         "end": {
@@ -4210,8 +4232,8 @@
           "columnIds": [
             "6Ae2l0X0PEhK8ZwfwXayu"
           ],
-          "x": 699.0947,
-          "y": 1078.8025,
+          "x": 690.5581999999999,
+          "y": 1089.583,
           "direction": 2
         },
         "end": {

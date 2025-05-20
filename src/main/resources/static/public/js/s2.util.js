@@ -1583,7 +1583,7 @@ const S2Util = (function () {
         // 서비스 워커 푸시 이벤트 수신
         receiveServiceWorkerEvents: function () {
             navigator.serviceWorker.addEventListener('message', (event) => {
-                console.debug('ReceiveServiceWorker Data', event.data);
+                // console.debug('ReceiveServiceWorker JS Data', event.data);
                 if (event.data.type === 'S2_SHOW_TOAST') {
                     S2Util.showToast(event.data.message);
                 }

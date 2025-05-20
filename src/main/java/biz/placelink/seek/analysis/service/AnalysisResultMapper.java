@@ -51,11 +51,12 @@ public interface AnalysisResultMapper {
      * 분석 결과를 수정한다.
      *
      * @param analysisResultId    분석 결과 ID
+     * @param analysisRawData     분석 원본 데이터
      * @param analyzedContent     분석된 내용
      * @param totalDetectionCount 총 탐지 개수
      * @return 등록 개수
      */
-    int updateAnalysisResult(@Param("analysisResultId") String analysisResultId, @Param("analyzedContent") String analyzedContent, @Param("totalDetectionCount") Integer totalDetectionCount);
+    int updateAnalysisResult(@Param("analysisResultId") String analysisResultId, @Param("analysisRawData") String analysisRawData, @Param("analyzedContent") String analyzedContent, @Param("totalDetectionCount") Integer totalDetectionCount);
 
     /**
      * 분석 검출 목록을 등록한다.
