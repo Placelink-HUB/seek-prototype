@@ -6,11 +6,15 @@ import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.util.S2ServletUtil;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.nio.charset.StandardCharsets;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
@@ -20,7 +24,10 @@ public class S2ExceptionHandler {
     public Object s2ExceptionHandler(HttpServletRequest request, S2Exception e) {
         String errorMessage = e.getMessage().replace("S2Exception:", "");
         if (S2ServletUtil.isAjaxRequest(request)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            MediaType mediaType = new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(mediaType)
+                    .body(errorMessage);
         } else {
             ModelAndView mav = new ModelAndView("error");
             mav.addObject("errorMessage", errorMessage);
@@ -32,7 +39,10 @@ public class S2ExceptionHandler {
     public Object s2RuntimeExceptionHandler(HttpServletRequest request, S2RuntimeException e) {
         String errorMessage = e.getMessage().replace("S2RuntimeException:", "");
         if (S2ServletUtil.isAjaxRequest(request)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+            MediaType mediaType = new MediaType(MediaType.TEXT_PLAIN, StandardCharsets.UTF_8);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(mediaType)
+                    .body(errorMessage);
         } else {
             ModelAndView mav = new ModelAndView("error");
             mav.addObject("errorMessage", errorMessage);
