@@ -1,0 +1,19 @@
+# SFTP \uAE30\uBCF8 \uC124\uC815\uD30C\uC77C
+# @author s2
+# @since  2025. 02. 01.
+# @version 1.0
+# * @see
+# * Copyright (C)  All right reserved.
+#-------------------------------------------------------
+
+sftp:
+  host: gw.placelink.biz
+  port: 22
+  user: placelink
+  password: ""
+  private-key-path: /home/placelink/.ssh/placelink_key
+  private-key-passphrase: PL408@redwit
+  session:
+    max-total: 5
+    min-idle: 2
+    max-wait-millis: 30000

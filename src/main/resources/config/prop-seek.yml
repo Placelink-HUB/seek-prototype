@@ -9,3 +9,6 @@ analysis:
   excluded-paths: /public/dashboard/,/public/js/,/public/css/,/public/images/,/public/ico/
 encryption:
   password: PL408@fnw96
+
+# 파일 관리자 구현체 이름
+file.manager.impl.name: fileManagerImpl
