@@ -88,7 +88,7 @@ public class ArticleController {
     /**
      * 게시글 파일 등록
      *
-     * @param file 파일 데이터
+     * @param files 파일 목록
      * @return 게시글 등록 결과
      * @throws IOException IOException
      */
@@ -99,12 +99,12 @@ public class ArticleController {
         if (files.isEmpty()) {
             response.put("message", "파일이 비어있습니다.");
             return ResponseEntity.ok(response);
-        } else if (!FileUtils.checkMultipartFile(files.getFirst(), allowedFileExt.split(","))) {
+        } else if (!FileUtils.checkMultipartFileList(files, allowedFileExt.split(","))) {
             response.put("message", "등록 가능한 파일이 아닙니다.");
             return ResponseEntity.ok(response);
         }
 
-        response.put(Constants.RESULT_CODE, articleService.createArticleFile(files.getFirst()));
+        response.put(Constants.RESULT_CODE, articleService.createArticleFile(files.get(0)));
         return ResponseEntity.ok(response);
     }
 
@@ -129,7 +129,7 @@ public class ArticleController {
      * 게시글 파일 다운로드
      *
      * @param articleId 게시글 ID
-     * @param model      모델 맵
+     * @param model     모델 맵
      * @return 다운로드 뷰 이름
      */
     @PostMapping(value = "/public/sample/downloadFile.ar")
