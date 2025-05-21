@@ -79,18 +79,18 @@ public class ArticleService {
     /**
      * 게시글 파일을 등록한다.
      *
-     * @param file 파일 데이터
+     * @param files 파일 목록
      * @return 등록 개수
      */
     @Transactional
-    public int createArticleFile(MultipartFile file) {
+    public int createArticleFile(List<MultipartFile> files) {
         int result = 0;
 
-        FileDetailVO fileDtlVO = fileService.writeFile(file, null, Constants.CD_ARTICLE_TYPE_FILE, Constants.CD_ARTICLE_TYPE_FILE, allowedFileExt.split(","), 5L);
-        if (fileDtlVO != null && S2Util.isNotEmpty(fileDtlVO.getFileId())) {
+        List<FileDetailVO> successFileList = fileService.writeFile(files, null, Constants.CD_ARTICLE_TYPE_FILE, Constants.CD_ARTICLE_TYPE_FILE, allowedFileExt.split(","), 5L);
+        if (successFileList != null && !successFileList.isEmpty()) {
             ArticleVO articleVO = new ArticleVO();
             articleVO.setArticleId(UUID.randomUUID().toString());
-            articleVO.setFileId(fileDtlVO.getFileId());
+            articleVO.setFileId(successFileList.getFirst().getFileId());
             articleVO.setArticleTypeCcd(Constants.CD_ARTICLE_TYPE_FILE);
             result = articleMapper.createArticle(articleVO);
         }

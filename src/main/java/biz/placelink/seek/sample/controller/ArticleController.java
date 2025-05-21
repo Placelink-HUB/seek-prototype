@@ -104,7 +104,7 @@ public class ArticleController {
             return ResponseEntity.ok(response);
         }
 
-        response.put(Constants.RESULT_CODE, articleService.createArticleFile(files.get(0)));
+        response.put(Constants.RESULT_CODE, articleService.createArticleFile(files));
         return ResponseEntity.ok(response);
     }
 
