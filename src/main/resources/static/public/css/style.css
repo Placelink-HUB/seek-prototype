@@ -543,6 +543,10 @@ table caption {
     background-color: #f0f8ff;
 }
 
+.file-upload-box .upload-file-list {
+    width: 100%;
+}
+
 .file-upload-box .file-upload-box-title {
     font-size: 20px;
     font-weight: bold;
@@ -564,6 +568,7 @@ table caption {
 .file-upload-ok {
     display: flex;
     width: 100%;
+    margin: 5px 0;
     flex-direction: row;
     align-items: center;
 }

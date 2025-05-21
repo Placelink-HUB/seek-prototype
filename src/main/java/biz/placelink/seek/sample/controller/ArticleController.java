@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -92,18 +93,18 @@ public class ArticleController {
      * @throws IOException IOException
      */
     @PostMapping(value = "/public/sample/create-article-file")
-    public ResponseEntity<Map<String, Object>> createArticleFile(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<Map<String, Object>> createArticleFile(@RequestParam("files") List<MultipartFile> files) throws IOException {
         Map<String, Object> response = new HashMap<>();
 
-        if (file.isEmpty()) {
+        if (files.isEmpty()) {
             response.put("message", "파일이 비어있습니다.");
             return ResponseEntity.ok(response);
-        } else if (!FileUtils.checkMultipartFile(file, allowedFileExt.split(","))) {
+        } else if (!FileUtils.checkMultipartFile(files.getFirst(), allowedFileExt.split(","))) {
             response.put("message", "등록 가능한 파일이 아닙니다.");
             return ResponseEntity.ok(response);
         }
 
-        response.put(Constants.RESULT_CODE, articleService.createArticleFile(file));
+        response.put(Constants.RESULT_CODE, articleService.createArticleFile(files.getFirst()));
         return ResponseEntity.ok(response);
     }
 

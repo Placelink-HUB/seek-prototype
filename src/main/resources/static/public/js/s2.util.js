@@ -1517,6 +1517,15 @@ const S2Util = (function () {
             }
             return outputArray;
         },
+        uuid : function() {
+            let d = new Date().getTime();
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
+                function (c) {
+                    const r = (d + Math.random() * 16) % 16 | 0;
+                    d = Math.floor(d / 16);
+                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+                });
+        },
         // 서비스 워커 구독
         subscribeServiceWorker: async function (publicKey) {
             if ('PushManager' in window && 'serviceWorker' in navigator) {
