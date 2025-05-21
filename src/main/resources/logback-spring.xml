@@ -41,7 +41,7 @@
     </root>
 
     <!-- 프로필별 로거 설정 -->
-    <springProfile name="#DEVELOP | #LOCAL">
+    <springProfile name="@DEVELOP | @LOCAL">
         <root level="${LOG_LEVEL}">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>

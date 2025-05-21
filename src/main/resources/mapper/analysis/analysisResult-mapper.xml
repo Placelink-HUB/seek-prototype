@@ -59,18 +59,20 @@
 
     <insert id="insertAnalysisDetectionList">
 		/** insertAnalysisDetectionList : 분석 검출 목록을 등록한다. */
-		INSERT INTO SEEK_ANALYSIS_DETECTIONS (
-			ANALYSIS_RESULT_ID,
-			DETECTION_TYPE_CCD,
-			DETECTION_COUNT
-		) VALUES
+        INSERT INTO SEEK_ANALYSIS_DETECTIONS (
+            ANALYSIS_RESULT_ID,
+            DETECTION_TYPE_CCD,
+            DETECTION_COUNT
+        ) VALUES
         <foreach collection="analysisDetectionList" item="analysisDetection" separator=",">
-			(
-				#{analysisDetection.analysisResultId},
-				#{analysisDetection.detectionTypeCcd},
-				#{analysisDetection.detectionCount}
-			)
+            (
+                #{analysisDetection.analysisResultId},
+                #{analysisDetection.detectionTypeCcd},
+                #{analysisDetection.detectionCount}
+            )
         </foreach>
+        ON CONFLICT (ANALYSIS_RESULT_ID, DETECTION_TYPE_CCD)
+        DO UPDATE SET DETECTION_COUNT = SEEK_ANALYSIS_DETECTIONS.DETECTION_COUNT + EXCLUDED.DETECTION_COUNT
     </insert>
 
     <select id="selectAnalysisDetectionList">

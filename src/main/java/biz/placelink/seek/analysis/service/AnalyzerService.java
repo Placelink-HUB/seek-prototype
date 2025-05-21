@@ -318,7 +318,8 @@ public class AnalyzerService {
                 }
 
                 if (analysisJsonData != null && analysisJsonData.path("status").asText("").equalsIgnoreCase("success")) {
-                    int totalDetectionCount = analysisJsonData.path("total_hit").asInt(0);
+                    // int totalDetectionCount = analysisJsonData.path("total_hit").asInt(0);
+                    int totalDetectionCount = 0;
 
                     String analyzedContent = analysisJsonData.path("content").asText("");
                     long analysisTime = analysisJsonData.path("latency").asLong(0);
@@ -344,6 +345,8 @@ public class AnalyzerService {
                             String sensitiveInformationId = String.format("$PL{%s}", S2HashUtil.generateXXHash64(hashSeed, targetText));
                             String severityCcd = item.path("severity").asText("");
                             int hitCount = item.path("hit").asInt(0);
+
+                            totalDetectionCount += hitCount;
 
                             analyzedContent = analyzedContent.replace(String.format("$PL{%s}", targetText), sensitiveInformationId);
 
