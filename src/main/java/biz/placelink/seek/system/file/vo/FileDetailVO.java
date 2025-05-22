@@ -22,7 +22,7 @@ public class FileDetailVO extends FileVO {
     private Integer sortSn;
 
     /* 확장자를 포함한 파일 명 */
-    public String getFileFullNm() {
+    public String getFileFullName() {
         return this.fileName + (S2Util.isNotEmpty(this.fileExt) ? "." + this.fileExt : "");
     }
 

@@ -147,12 +147,12 @@ public class ArticleController {
 
         if (fileInfoList.size() == 1) {
             FileDetailVO fileInfo = fileInfoList.get(0);
-            model.put("fileName", fileInfo.getFileFullNm());
+            model.put("fileName", fileInfo.getFileFullName());
             model.put("fileData", fileManager.readFile(fileInfo.getSavePath(), fileInfo.getSaveName()));
         } else {
             List<Entry<String, InputStream>> inputStreamList = new ArrayList<>();
             for (FileDetailVO fileInfo : fileInfoList) {
-                inputStreamList.add(Map.entry(fileInfo.getFileFullNm(), fileManager.readFile(fileInfo.getSavePath(), fileInfo.getSaveName())));
+                inputStreamList.add(Map.entry(fileInfo.getFileFullName(), fileManager.readFile(fileInfo.getSavePath(), fileInfo.getSaveName())));
             }
             model.put("fileName", "download.zip");
             model.put("fileData", inputStreamList);

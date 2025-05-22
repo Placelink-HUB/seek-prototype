@@ -1,14 +1,15 @@
 package biz.placelink.seek.system.file.controller;
 
-import biz.placelink.seek.system.file.service.FileService;
-import biz.placelink.seek.system.file.vo.FileDetailVO;
-import kr.s2.ext.file.FileManager;
+import java.util.List;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.List;
+import biz.placelink.seek.system.file.service.FileService;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
+import kr.s2.ext.file.FileManager;
 
 /**
  * <pre>
@@ -45,7 +46,7 @@ public class FileController {
         if (fileDetailList != null && fileDetailList.size() == 1) {
             FileDetailVO fileDetail = fileDetailList.getFirst();
             if (fileDetail != null) {
-                model.put("fileName", fileDetail.getFileFullNm());
+                model.put("fileName", fileDetail.getFileFullName());
                 model.put("fileData", fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName()));
             }
         }

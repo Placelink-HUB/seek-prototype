@@ -15,7 +15,6 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -206,19 +205,7 @@ public class AnalyzerService {
                              * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
                              * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 위의 InputStream 과 같이 사용할 것을 검토해야만 한다.
                              */
-                            analysisParamList.add(Map.entry("files", new InputStreamResource(fileInputStream) {
-                                @Override
-                                public String getFilename() {
-                                    return fileDetail.getFileName();
-                                }
-
-                                @Override
-                                public long contentLength() {
-                                    // InputStreamResource 를 사용할 때 Content-Length를 미리 계산해 설정하면 Spring이 스트림을 미리 읽지 않는다.
-                                    // !!s2!! 즉 Content-Length 명시하지 않으면 InputStreamResource 를 2번 읽으면서 java.lang.IllegalStateException 예외가 발생한다.
-                                    return fileDetail.getFileSize();
-                                }
-                            }));
+                            analysisParamList.add(Map.entry("files", RestApiUtil.createInputStreamResource(fileInputStream, fileDetail.getFileFullName(), fileDetail.getFileSize())));
                         }
                     }
                 }

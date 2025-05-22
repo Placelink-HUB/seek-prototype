@@ -1,11 +1,13 @@
 package biz.placelink.seek.com.util;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +22,9 @@ import org.springframework.web.client.RestTemplate;
 import kr.s2.ext.util.S2Util;
 
 /**
+ * REST API 호출 및 관련 유틸리티 기능을 제공하는 클래스.
+ * HTTP 요청을 처리하고, {@link InputStreamResource}를 생성하는 메서드를 포함한다.
+ *
  * <pre>
  * << 개정이력(Modification Information) >>
  *
@@ -34,16 +39,56 @@ public class RestApiUtil {
 
     private static final Logger logger = LoggerFactory.getLogger(RestApiUtil.class);
 
+    /**
+     * 지정된 URL로 REST API를 호출하여 응답을 문자열로 반환한다.
+     * 기본 타임아웃(30,000ms)을 사용하며, HTTP 메서드와 매개변수를 받아 요청을 처리한다.
+     *
+     * @param url    호출할 REST API의 URL. (필수)
+     * @param method 사용할 HTTP 메서드 (예: {@link HttpMethod#POST}, {@link HttpMethod#GET}). (필수)
+     * @param params 요청에 포함할 매개변수로, 키-값 쌍의 배열. (선택)
+     * @return API 호출 결과로 반환된 문자열 응답. 응답이 없거나 오류 발생 시 null을 반환.
+     *
+     *         <pre>{@code
+     * String result = S2RestApiUtil.callApi("request.api", HttpMethod.POST,
+     *     Map.entry("param1", value1),
+     *     Map.entry("param2", value2),
+     *     Map.entry("files", S2RestApiUtil.createInputStreamResource(fileInputStream, "file1.text", 1213)),
+     *     Map.entry("files", S2RestApiUtil.createInputStreamResource(fileInputStream, "file2.pdf", 3121))
+     * );
+     * }</pre>
+     */
     @SafeVarargs
     public static String callApi(String url, HttpMethod method, Map.Entry<String, Object>... params) {
         return RestApiUtil.callApi(url, method, null, params);
     }
 
+    /**
+     * 지정된 URL로 REST API를 호출하여 응답을 문자열로 반환한다.
+     * 사용자 지정 타임아웃을 설정할 수 있으며, HTTP 메서드와 매개변수를 받아 요청을 처리한다.
+     *
+     * @param url     호출할 REST API의 URL. (필수)
+     * @param method  사용할 HTTP 메서드 (예: {@link HttpMethod#POST}, {@link HttpMethod#GET}). (필수)
+     * @param timeout 연결 및 읽기 타임아웃(밀리초 단위). null인 경우 기본값 30,000ms 사용. (선택)
+     * @param params  요청에 포함할 매개변수로, 키-값 쌍의 배열. (선택)
+     * @return API 호출 결과로 반환된 문자열 응답. 응답이 없거나 오류 발생 시 null을 반환.
+     * @example
+     *
+     *          <pre>{@code
+     * String result = S2RestApiUtil.callApi("request.api", HttpMethod.POST, 10000,
+     *     Map.entry("param1", value1),
+     *     Map.entry("param2", value2),
+     *     Map.entry("files", S2RestApiUtil.createInputStreamResource(fileInputStream, "file1.text", 1213)),
+     *     Map.entry("files", S2RestApiUtil.createInputStreamResource(fileInputStream, "file2.pdf", 3121))
+     * );
+     * }</pre>
+     */
     @SafeVarargs
     public static String callApi(String url, HttpMethod method, Integer timeout, Map.Entry<String, Object>... params) {
+        int vTimeout = timeout != null && timeout > 0 ? timeout : 30000;
+
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(timeout != null ? timeout : 600000);
-        requestFactory.setReadTimeout(timeout != null ? timeout : 600000);
+        requestFactory.setConnectTimeout(vTimeout);
+        requestFactory.setReadTimeout(vTimeout);
 
         RestTemplate restTemplate = new RestTemplate(requestFactory);
 
@@ -81,6 +126,46 @@ public class RestApiUtil {
         }
 
         return result;
+    }
+
+    /**
+     * 주어진 {@link InputStream}, 파일명, 콘텐츠 길이를 이용하여 {@link InputStreamResource}를 생성.
+     * 생성된 {@code InputStreamResource}는 {@link #getFilename()}과 {@link #contentLength()} 메서드를 오버라이드하여 파일명과 콘텐츠 길이를 명시적으로 반환.
+     *
+     * @param inputStream   전송할 데이터의 {@link InputStream}. (필수)
+     * @param filename      다운로드될 확장자를 포함한 파일 이름. (필수)
+     * @param contentLength 전송할 데이터의 총 길이 (바이트 단위). (필수, 0 이상)
+     *                      !!s2!! contentLength 가 없는 경우 InputStream 을 두번읽으면서 오류나 날수 있어 반드시 넣어야 한다.
+     * @return 파일명과 콘텐츠 길이가 설정된 새로운 {@link InputStreamResource} 객체.
+     * @throws IllegalArgumentException {@code inputStream} 또는 {@code filename}이 null이거나 {@code contentLength}가 음수인 경우.
+     * @details
+     *          <dl>
+     *          <dd>InputStreamResource 를 사용할 때 Content-Length를 미리 계산해 설정하면 Spring 이 스트림을 미리 읽지 않는다.</dd>
+     *          <dd>!!s2!! 즉 Content-Length 명시하지 않으면 InputStreamResource 를 2번 읽으면서 java.lang.IllegalStateException 예외가 발생한다.</dd>
+     *          </dl>
+     */
+    public static InputStreamResource createInputStreamResource(InputStream inputStream, String filename, long contentLength) {
+        if (inputStream == null) {
+            throw new IllegalArgumentException("InputStream must not be null");
+        }
+        if (filename == null) {
+            throw new IllegalArgumentException("Filename must not be null");
+        }
+        if (contentLength < 0) {
+            throw new IllegalArgumentException("Content length must not be negative");
+        }
+        return new InputStreamResource(inputStream) {
+
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+
+            @Override
+            public long contentLength() {
+                return contentLength;
+            }
+        };
     }
 
 }
