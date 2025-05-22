@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,7 +24,6 @@ import biz.placelink.seek.system.file.vo.FileDetailVO;
 import biz.placelink.seek.system.file.vo.FileVO;
 import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
-import kr.s2.ext.util.S2FileUtil;
 import kr.s2.ext.util.S2Util;
 import kr.s2.ext.util.vo.S2RemoteFile;
 
@@ -265,11 +263,13 @@ public class FileService {
         FileDetailVO result = null;
         String savePath = S2Util.joinPaths(fileRootPath, fileSeCcd, new SimpleDateFormat("yyyy/MM/dd/HH/mm").format(new Date()));
         String saveName = FileUtils.makeFileId(saveNameSuffix);
-        if (fileManager.writeFile(fileData, savePath, saveName)) {
+
+        long writeFileSize = fileManager.writeFile(fileData, savePath, saveName);
+        if (writeFileSize != -1) {
             result = new FileDetailVO();
             result.setSavePath(savePath);
             result.setSaveName(saveName);
-            result.setFileSize(S2FileUtil.getSize(Paths.get(savePath, saveName)));
+            result.setFileSize(writeFileSize);
         }
         return result;
     }
@@ -292,7 +292,8 @@ public class FileService {
                     String savePath = S2Util.joinPaths(fileRootPath, fileSeCcd, new SimpleDateFormat("yyyy/MM/dd/HH/mm").format(new Date()));
                     String saveName = FileUtils.makeFileId(fileSeCcd);
 
-                    if (fileManager.writeFile(fileData, savePath, saveName)) {
+                    long writeFileSize = fileManager.writeFile(fileData, savePath, saveName);
+                    if (writeFileSize != -1) {
                         S2RemoteFile remoteFileInfo = new S2RemoteFile(url);
                         fileDtlVO = new FileDetailVO();
 
@@ -301,7 +302,7 @@ public class FileService {
                         fileDtlVO.setFileDetailId(FileUtils.makeFileId());
                         fileDtlVO.setFileName(remoteFileInfo.getName());
                         fileDtlVO.setFileExt(remoteFileInfo.getExtension());
-                        fileDtlVO.setFileSize(remoteFileInfo.getSize());
+                        fileDtlVO.setFileSize(writeFileSize);
                         fileDtlVO.setContentType(remoteFileInfo.getContentType());
                         fileDtlVO.setSavePath(savePath);
                         fileDtlVO.setSaveName(saveName);
