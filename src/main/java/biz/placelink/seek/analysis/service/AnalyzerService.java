@@ -34,6 +34,7 @@ import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import biz.placelink.seek.com.util.RestApiUtil;
+import biz.placelink.seek.system.file.service.FileService;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.exception.S2Exception;
 import kr.s2.ext.exception.S2RuntimeException;
@@ -67,8 +68,9 @@ public class AnalyzerService {
     private final AnalysisErrorService analysisErrorService;
     private final SensitiveInformationService sensitiveInformationService;
     private final FileManager fileManager;
+    private final FileService fileService;
 
-    public AnalyzerService(ServiceWorkerService serviceWorkerService, AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, AnalysisResultService analysisResultService, AnalysisErrorService analysisErrorService, SensitiveInformationService sensitiveInformationService, FileManager fileManager) {
+    public AnalyzerService(ServiceWorkerService serviceWorkerService, AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, AnalysisResultService analysisResultService, AnalysisErrorService analysisErrorService, SensitiveInformationService sensitiveInformationService, FileManager fileManager, FileService fileService) {
         this.serviceWorkerService = serviceWorkerService;
         this.analysisRequestStatus = analysisRequestStatus;
         this.analysisService = analysisService;
@@ -76,6 +78,7 @@ public class AnalyzerService {
         this.analysisErrorService = analysisErrorService;
         this.sensitiveInformationService = sensitiveInformationService;
         this.fileManager = fileManager;
+        this.fileService = fileService;
     }
 
     @Value("${analysis.server.url}")
@@ -111,10 +114,12 @@ public class AnalyzerService {
             analysisService.updateAnalysisStatusWithNewTransaction(analysisId, Constants.CD_ANALYSIS_STATUS_PROCESSING, analysisModel);
 
             List<InputStream> hashDataStreamList = new ArrayList<>();
+            List<InputStream> dataStreamList = new ArrayList<>();
             List<Map.Entry<String, Object>> analysisParamList = new ArrayList<>();
 
             try (ByteArrayInputStream analysisModelStream = new ByteArrayInputStream(analysisModel.getBytes(StandardCharsets.UTF_8))) {
                 String analysisHash = "";
+                List<FileDetailVO> fileDetailList = null;
 
                 // analysisModelStream 사용: 동일 데이터라도 analysisModel 이 다르면 해시값이 달라지도록 한다. (동일한 데이터라도 분석 모델이 다르면 분석 결과가 다를 수 있다.)
                 hashDataStreamList.addFirst(analysisModelStream);
@@ -127,29 +132,25 @@ public class AnalyzerService {
                     analysisHash = generateXXHash64(hashDataStreamList);
                 } else {
                     String body = analysisDetail.getBody();
-                    FileDetailVO fileDetail = S2Util.isNotEmpty(analysisDetail.getFileId()) ? analysisDetail.getFileDetail() : null;
-
                     if (S2Util.isNotEmpty(body)) {
                         hashDataStreamList.add(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
                     }
 
-                    InputStream hashFileInputStream = null;
-
-                    try {
-                        if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
-                            /*
-                             * [원격 파일일때 검토 필요사항]
-                             * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
-                             * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 아래의 InputStream 과 같이 사용할 것을 검토해야만 한다.
-                             */
-                            hashDataStreamList.add(fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName()));
+                    fileDetailList = fileService.selectFileDetailList(analysisDetail.getFileId());
+                    if (fileDetailList != null && !fileDetailList.isEmpty()) {
+                        for (FileDetailVO fileDetail : fileDetailList) {
+                            if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
+                                /*
+                                 * [원격 파일일때 검토 필요사항]
+                                 * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
+                                 * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 아래의 InputStream 과 같이 사용할 것을 검토해야만 한다.
+                                 */
+                                hashDataStreamList.add(fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName()));
+                            }
                         }
-
-                        analysisHash = generateXXHash64(hashDataStreamList);
-                    } finally {
-                        S2StreamUtil.closeStream(hashFileInputStream);
                     }
 
+                    analysisHash = generateXXHash64(hashDataStreamList);
                 }
 
                 if (S2Util.isEmpty(analysisHash)) {
@@ -188,42 +189,40 @@ public class AnalyzerService {
                     analysisParamList.add(Map.entry("user_input", analysisDetail.getContent()));
                     analysisData = generateAnalysisData(analysisParamList);
                 } else {
-                    InputStream fileInputStream = null;
-
-                    try {
-                        String body = analysisDetail.getBody();
-                        FileDetailVO fileDetail = S2Util.isNotEmpty(analysisDetail.getFileId()) ? analysisDetail.getFileDetail() : null;
-
-                        if (S2Util.isNotEmpty(body)) {
-                            analysisParamList.add(Map.entry("user_input", body));
-                        }
-
-                        if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
-                            fileInputStream = fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName());
-
-                            /*
-                             * [원격 파일일때 검토 필요사항]
-                             * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
-                             * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 위의 InputStream 과 같이 사용할 것을 검토해야만 한다.
-                             */
-                            analysisParamList.add(Map.entry("file", new InputStreamResource(fileInputStream) {
-                                @Override
-                                public String getFilename() {
-                                    return fileDetail.getFileName();
-                                }
-
-                                @Override
-                                public long contentLength() {
-                                    // InputStreamResource 를 사용할 때 Content-Length를 미리 계산해 설정하면 Spring이 스트림을 미리 읽지 않는다.
-                                    // !!s2!! 즉 Content-Length 명시하지 않으면 InputStreamResource 를 2번 읽으면서 java.lang.IllegalStateException 예외가 발생한다.
-                                    return fileDetail.getFileSize();
-                                }
-                            }));
-                        }
-                        analysisData = generateAnalysisData(analysisParamList);
-                    } finally {
-                        S2StreamUtil.closeStream(fileInputStream);
+                    String body = analysisDetail.getBody();
+                    if (S2Util.isNotEmpty(body)) {
+                        analysisParamList.add(Map.entry("user_input", body));
                     }
+
+                    if (fileDetailList != null && !fileDetailList.isEmpty()) {
+                        for (FileDetailVO fileDetail : fileDetailList) {
+                            if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
+                                InputStream fileInputStream = fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName());
+                                dataStreamList.add(fileInputStream);
+
+                                /*
+                                 * [원격 파일일때 검토 필요사항]
+                                 * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
+                                 * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 위의 InputStream 과 같이 사용할 것을 검토해야만 한다.
+                                 */
+                                analysisParamList.add(Map.entry("files", new InputStreamResource(fileInputStream) {
+                                    @Override
+                                    public String getFilename() {
+                                        return fileDetail.getFileName();
+                                    }
+
+                                    @Override
+                                    public long contentLength() {
+                                        // InputStreamResource 를 사용할 때 Content-Length를 미리 계산해 설정하면 Spring이 스트림을 미리 읽지 않는다.
+                                        // !!s2!! 즉 Content-Length 명시하지 않으면 InputStreamResource 를 2번 읽으면서 java.lang.IllegalStateException 예외가 발생한다.
+                                        return fileDetail.getFileSize();
+                                    }
+                                }));
+                            }
+                        }
+                    }
+
+                    analysisData = generateAnalysisData(analysisParamList);
                 }
 
                 JsonNode analysisJsonData = new ObjectMapper().readTree(analysisData);
@@ -242,6 +241,9 @@ public class AnalyzerService {
                 logger.error("asyncAnalysisRequest Error : {}", e.getMessage(), e);
             } finally {
                 for (InputStream stream : hashDataStreamList) {
+                    S2StreamUtil.closeStream(stream);
+                }
+                for (InputStream stream : dataStreamList) {
                     S2StreamUtil.closeStream(stream);
                 }
 
@@ -310,8 +312,6 @@ public class AnalyzerService {
                 analysisRawData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.GET, apiTimeout);
 
                 if (S2Util.isNotEmpty(analysisRawData)) {
-                    logger.debug("[API 결과 호출 성공] url: {}, analysisId: {}, analysisData: {}", analysisSeServerUrl, analysisId, analysisRawData);
-
                     // JSON 파싱 시, 제어문자(예: \n, \r 등)를 허용하도록 설정
                     ObjectMapper objectMapper = JsonMapper.builder().enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS).build();
                     analysisJsonData = objectMapper.readTree(analysisRawData);

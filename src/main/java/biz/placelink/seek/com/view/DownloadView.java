@@ -1,19 +1,23 @@
 package biz.placelink.seek.com.view;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import kr.s2.ext.exception.S2RuntimeException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.view.AbstractView;
-
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.AbstractView;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import kr.s2.ext.exception.S2RuntimeException;
+import kr.s2.ext.util.S2FileUtil;
 
 /**
  * <pre>
@@ -31,6 +35,7 @@ public class DownloadView extends AbstractView {
 
     private static final Logger logger = LoggerFactory.getLogger(DownloadView.class);
 
+    @SuppressWarnings({"unchecked", "null"})
     @Override
     protected void renderMergedOutputModel(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String fileName = (String) model.get("fileName");
@@ -69,6 +74,18 @@ public class DownloadView extends AbstractView {
                         }
                         response.setContentLengthLong(totalBytes); // InputStream 은 ContentLengthLong 사용
                     }
+                } else if (fileData instanceof List) {
+                    List<?> fileDataList = (List<?>) fileData;
+                    if (fileDataList == null || fileDataList.isEmpty()) {
+                        throw new IllegalArgumentException("fileDataList 가 비었습니다.");
+                    }
+
+                    Object filObject = fileDataList.get(0);
+                    if (!(filObject instanceof Entry)) {
+                        throw new IllegalArgumentException("fileDataList 는 Entry 타입이어야 합니다.");
+                    }
+
+                    S2FileUtil.zipFiles((List<Entry<String, InputStream>>) fileDataList, os);
                 } else {
                     throw new IllegalArgumentException("fileData 는 byte[] 또는 InputStream 이어야 합니다.");
                 }

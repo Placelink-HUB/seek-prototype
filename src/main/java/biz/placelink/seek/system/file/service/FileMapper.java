@@ -1,11 +1,12 @@
 package biz.placelink.seek.system.file.service;
 
-import biz.placelink.seek.system.file.vo.FileDetailVO;
-import biz.placelink.seek.system.file.vo.FileVO;
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.List;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
+import biz.placelink.seek.system.file.vo.FileVO;
 
 /**
  * <pre>
@@ -30,15 +31,6 @@ public interface FileMapper {
      * @return 파일 상세 정보
      */
     List<FileDetailVO> selectFileDetailList(@Param("fileId") String fileId, @Param("fileDetailId") String fileDetailId, @Param("sortSn") Integer sortSn);
-
-
-    /**
-     * 파일 상세를 조회한다.
-     *
-     * @param fileId 파일 ID
-     * @return 파일 상세 정보
-     */
-    FileDetailVO selectFileDetail(@Param("fileId") String fileId);
 
     /**
      * 파일 정보를 등록한다.

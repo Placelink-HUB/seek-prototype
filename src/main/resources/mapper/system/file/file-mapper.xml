@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.system.file.service.FileMapper">
 
-	<select id="selectFileDetailList" resultType="fileDetailVO">
+    <select id="selectFileDetailList" resultType="fileDetailVO">
 		/** selectFileDetailList : 파일 상세 목록을 조회한다. */
 		SELECT
 			f.FILE_ID,
@@ -24,39 +24,15 @@
 			ON f.FILE_SE_CCD = cc1.COM_CD
 			AND cc1.GROUP_CD = 'FILE_SE_CCD'
 		WHERE f.FILE_ID = #{fileId}
-			<if test='fileDetailId neq null and fileDetailId neq ""'>
-		    	AND fd.FILE_DETAIL_ID = #{fileDetailId}
-			</if>
-			<if test='sortSn neq null'>
-		    	AND fd.SORT_SN = #{sortSn}
-			</if>
-	</select>
+        <if test='fileDetailId neq null and fileDetailId neq ""'>
+            AND fd.FILE_DETAIL_ID = #{fileDetailId}
+        </if>
+        <if test='sortSn neq null'>
+            AND fd.SORT_SN = #{sortSn}
+        </if>
+    </select>
 
-	<select id="selectFileDetail" resultType="fileDetailVO">
-		/** selectFileDetail : 파일 상세를 조회한다. */
-		SELECT
-			f.FILE_ID,
-			fd.FILE_DETAIL_ID,
-			f.FILE_SE_CCD,
-			cc1.COM_CD_NM AS FILE_SE_CCD_NM,
-			fd.FILE_NAME,
-			fd.FILE_EXT,
-			fd.FILE_SIZE,
-			fd.CONTENT_TYPE,
-			fd.SAVE_PATH,
-			fd.SAVE_NAME,
-			fd.SORT_SN,
-			f.CREATE_DT
-		FROM SEEK_FILE f
-			JOIN SEEK_FILE_DETAIL fd
-				ON f.FILE_ID = fd.FILE_ID
-			LEFT JOIN SEEK_COM_CD cc1
-				ON f.FILE_SE_CCD = cc1.COM_CD
-				AND cc1.GROUP_CD = 'FILE_SE_CCD'
-		WHERE f.FILE_ID = #{fileId}
-	</select>
-
-	<insert id="insertFile" parameterType="fileVO">
+    <insert id="insertFile" parameterType="fileVO">
 		/** insertFile : 파일 정보를 등록한다. */
 		INSERT INTO SEEK_FILE (
 			FILE_ID,
@@ -67,15 +43,15 @@
 			#{fileSeCcd},
 			NOW()
 		)
-	</insert>
+    </insert>
 
-	<insert id="insertFileDtl" parameterType="fileDetailVO">
+    <insert id="insertFileDtl" parameterType="fileDetailVO">
 		/** insertFileDtl : 파일 상세 정보를 등록한다. */
-		<selectKey keyProperty="sortSn" resultType="integer" order="BEFORE">
+        <selectKey keyProperty="sortSn" resultType="integer" order="BEFORE">
 			SELECT COALESCE(MAX(SORT_SN), 0) + 1 AS SORT_SN
 			FROM SEEK_FILE_DETAIL
 			WHERE FILE_ID = #{fileId}
-		</selectKey>
+        </selectKey>
 		INSERT INTO SEEK_FILE_DETAIL (
 			FILE_DETAIL_ID,
 			FILE_ID,
@@ -99,12 +75,12 @@
 			#{sortSn},
 			NOW()
 		)
-	</insert>
+    </insert>
 
-	<insert id="insertFileList">
+    <insert id="insertFileList">
 		/** insertFileList : 파일 정보 목록을 등록한다.(중복 제거) */
-		<choose>
-			<when test='fileList neq null and fileList.size gt 0'>
+        <choose>
+            <when test='fileList neq null and fileList.size gt 0'>
 				INSERT INTO SEEK_FILE (
 					FILE_ID,
 					FILE_SE_CCD,
@@ -115,23 +91,23 @@
 					x.FILE_SE_CCD,
 					NOW()
 				FROM (
-					<foreach collection="fileList" item="file" separator="UNION ALL">
+                <foreach collection="fileList" item="file" separator="UNION ALL">
 						SELECT
 							#{file.fileId} AS FILE_ID,
 							#{file.fileSeCcd} AS FILE_SE_CCD
-					</foreach>
+                </foreach>
 				) x
-			</when>
-			<otherwise>
+            </when>
+            <otherwise>
 				SELECT 0
-			</otherwise>
-		</choose>
-	</insert>
+            </otherwise>
+        </choose>
+    </insert>
 
-	<insert id="insertFileDetailList">
+    <insert id="insertFileDetailList">
 		/** insertFileDetailList : 파일 상세 정보 목록을 등록한다. */
-		<choose>
-			<when test='fileDetailList neq null and fileDetailList.size > 0'>
+        <choose>
+            <when test='fileDetailList neq null and fileDetailList.size > 0'>
 				INSERT INTO SEEK_FILE_DETAIL (
 					FILE_DETAIL_ID,
 					FILE_ID,
@@ -144,7 +120,7 @@
 					SORT_SN,
 					CREATE_DT
 				) VALUES
-				<foreach collection="fileDetailList" item="file" separator=",">
+                <foreach collection="fileDetailList" item="file" separator=",">
 					(
 						#{file.fileDetailId},
 						#{file.fileId},
@@ -157,12 +133,12 @@
 						#{file.sortSn},
 						NOW()
 						)
-				</foreach>
-			</when>
-			<otherwise>
+                </foreach>
+            </when>
+            <otherwise>
 				SELECT 0
-			</otherwise>
-		</choose>
-	</insert>
-	
+            </otherwise>
+        </choose>
+    </insert>
+
 </mapper>

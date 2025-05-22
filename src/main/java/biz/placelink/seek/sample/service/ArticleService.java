@@ -1,19 +1,19 @@
 package biz.placelink.seek.sample.service;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.PaginationInfo;
 import biz.placelink.seek.sample.vo.ArticleVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
 import biz.placelink.seek.system.file.service.FileService;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
-import kr.s2.ext.util.S2Util;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-import java.util.UUID;
 
 /**
  * <pre>

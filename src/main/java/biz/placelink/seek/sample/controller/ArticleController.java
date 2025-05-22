@@ -1,5 +1,23 @@
 package biz.placelink.seek.sample.controller;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
 import biz.placelink.seek.sample.service.ArticleService;
@@ -13,20 +31,6 @@ import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2Util;
 import kr.s2.ext.util.vo.S2Field;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <pre>
@@ -136,15 +140,23 @@ public class ArticleController {
     public String downloadFile(@RequestParam String articleId, ModelMap model) {
         ArticleVO articleVO = articleService.selectArticle(articleId);
 
-        FileDetailVO fileInfo = fileService.selectFileDetail(articleVO.getFileId());
-        if (fileInfo == null) {
+        List<FileDetailVO> fileInfoList = fileService.selectFileDetailList(articleVO.getFileId());
+        if (fileInfoList == null || fileInfoList.isEmpty()) {
             throw new S2RuntimeException("파일이 비어있습니다");
         }
 
-        model.put("fileName", fileInfo.getFileFullNm());
-        model.put("fileData", fileManager.readFile(fileInfo.getSavePath(), fileInfo.getSaveName()));
-        model.put("fileExt", fileInfo.getFileExt());
-        model.put("contentType", fileInfo.getContentType());
+        if (fileInfoList.size() == 1) {
+            FileDetailVO fileInfo = fileInfoList.get(0);
+            model.put("fileName", fileInfo.getFileFullNm());
+            model.put("fileData", fileManager.readFile(fileInfo.getSavePath(), fileInfo.getSaveName()));
+        } else {
+            List<Entry<String, InputStream>> inputStreamList = new ArrayList<>();
+            for (FileDetailVO fileInfo : fileInfoList) {
+                inputStreamList.add(Map.entry(fileInfo.getFileFullNm(), fileManager.readFile(fileInfo.getSavePath(), fileInfo.getSaveName())));
+            }
+            model.put("fileName", "download.zip");
+            model.put("fileData", inputStreamList);
+        }
         model.addAttribute(Constants.RESULT_CODE, 1);
         return "downloadView";
     }

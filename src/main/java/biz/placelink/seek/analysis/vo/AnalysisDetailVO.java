@@ -1,7 +1,5 @@
 package biz.placelink.seek.analysis.vo;
 
-import biz.placelink.seek.system.file.vo.FileDetailVO;
-
 public class AnalysisDetailVO extends AnalysisVO {
 
     // ---------- 프록시 ----------//
@@ -20,8 +18,6 @@ public class AnalysisDetailVO extends AnalysisVO {
     private String body;
     /* 파일 ID */
     private String fileId;
-    /* 파일 상세 */
-    private FileDetailVO fileDetail;
 
     // ---------- 데이터베이스 ----------//
 
@@ -84,14 +80,6 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     public void setFileId(String fileId) {
         this.fileId = fileId;
-    }
-
-    public FileDetailVO getFileDetail() {
-        return fileDetail;
-    }
-
-    public void setFileDetail(FileDetailVO fileDetail) {
-        this.fileDetail = fileDetail;
     }
 
     public String getTargetInformation() {

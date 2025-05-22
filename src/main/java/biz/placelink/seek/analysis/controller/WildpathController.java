@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -235,6 +234,7 @@ public class WildpathController {
         case "pptx":
         case "ppt":
         case "hwp":
+        case "zip":
             try (InputStream fileData = request.getInputStream()) {
                 wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
             }

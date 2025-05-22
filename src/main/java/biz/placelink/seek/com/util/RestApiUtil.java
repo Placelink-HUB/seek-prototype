@@ -1,18 +1,23 @@
 package biz.placelink.seek.com.util;
 
-import kr.s2.ext.util.S2Util;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.converter.StringHttpMessageConverter;
 
-import java.util.Collections;
-import java.util.Map;
-import java.nio.charset.StandardCharsets;
+import kr.s2.ext.util.S2Util;
 
 /**
  * <pre>
@@ -30,14 +35,12 @@ public class RestApiUtil {
     private static final Logger logger = LoggerFactory.getLogger(RestApiUtil.class);
 
     @SafeVarargs
-    public static String callApi(String url, HttpMethod method,
-            Map.Entry<String, Object>... params) {
+    public static String callApi(String url, HttpMethod method, Map.Entry<String, Object>... params) {
         return RestApiUtil.callApi(url, method, null, params);
     }
 
     @SafeVarargs
-    public static String callApi(String url, HttpMethod method, Integer timeout,
-            Map.Entry<String, Object>... params) {
+    public static String callApi(String url, HttpMethod method, Integer timeout, Map.Entry<String, Object>... params) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(timeout != null ? timeout : 600000);
         requestFactory.setReadTimeout(timeout != null ? timeout : 600000);
@@ -71,10 +74,10 @@ public class RestApiUtil {
         }
 
         if (responseEntity != null && responseEntity.getBody() != null) {
-            logger.debug("Response charset: {}", responseEntity.getHeaders().getContentType());
-            logger.debug("Raw response: {}", responseEntity.getBody());
-
             result = S2Util.decodeUnicode(responseEntity.getBody());
+
+            logger.debug("Call URL: {}, Method: {}", url, method);
+            logger.debug("Raw Response: {}", result);
         }
 
         return result;

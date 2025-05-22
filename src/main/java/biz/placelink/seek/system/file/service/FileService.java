@@ -74,7 +74,7 @@ public class FileService {
      * @param fileDetailId 파일 상세 ID
      * @return 파일 상세 정보
      */
-    public List<FileDetailVO> selectFileDetailList(String fileId, String fileDetailId) {
+    public List<FileDetailVO> selectFileDetail(String fileId, String fileDetailId) {
         return fileMapper.selectFileDetailList(fileId, fileDetailId, null);
     }
 
@@ -87,16 +87,6 @@ public class FileService {
      */
     public List<FileDetailVO> selectFileDetailList(String fileId, Integer sortSn) {
         return fileMapper.selectFileDetailList(fileId, null, sortSn);
-    }
-
-    /**
-     * 파일 상세를 조회한다.
-     *
-     * @param fileId 파일 ID
-     * @return 파일 상세 정보
-     */
-    public FileDetailVO selectFileDetail(String fileId) {
-        return fileMapper.selectFileDetail(fileId);
     }
 
     /**

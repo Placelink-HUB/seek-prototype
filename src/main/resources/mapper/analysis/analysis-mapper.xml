@@ -2,36 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.analysis.service.AnalysisMapper">
 
-    <resultMap id="analysisDetailMap" type="biz.placelink.seek.analysis.vo.AnalysisDetailVO">
-        <!-- AnalysisDetailVO의 기본 필드 매핑 -->
-        <result property="analysisId" column="ANALYSIS_ID"/>
-        <result property="analysisModeCcd" column="ANALYSIS_MODE_CCD"/>
-        <result property="analysisResultId" column="ANALYSIS_RESULT_ID"/>
-        <result property="requestId" column="REQUEST_ID"/>
-        <result property="url" column="URL"/>
-        <result property="header" column="HEADER"/>
-        <result property="queryString" column="QUERY_STRING"/>
-        <result property="body" column="BODY"/>
-        <result property="fileId" column="FILE_ID"/>
-        <result property="targetInformation" column="TARGET_INFORMATION"/>
-        <result property="content" column="CONTENT"/>
-        <result property="createDt" column="CREATE_DT"/>
-
-        <!-- fileDetail 필드 매핑 -->
-        <association property="fileDetail" javaType="biz.placelink.seek.system.file.vo.FileDetailVO">
-            <result property="fileDetailId" column="fileDetail.FILE_DETAIL_ID"/>
-            <result property="fileId" column="fileDetail.FILE_ID"/>
-            <result property="fileName" column="fileDetail.FILE_NAME"/>
-            <result property="fileExt" column="fileDetail.FILE_EXT"/>
-            <result property="fileSize" column="fileDetail.FILE_SIZE"/>
-            <result property="fileHash" column="fileDetail.FILE_HASH"/>
-            <result property="contentType" column="fileDetail.CONTENT_TYPE"/>
-            <result property="savePath" column="fileDetail.SAVE_PATH"/>
-            <result property="saveName" column="fileDetail.SAVE_NAME"/>
-        </association>
-    </resultMap>
-
-    <select id="selectAnalysisHistListToExecuted" parameterType="integer" resultMap="analysisDetailMap">
+    <select id="selectAnalysisHistListToExecuted" parameterType="integer" resultType="analysisDetailVO">
 		/** selectAnalysisHistListToExecuted : 실행하려는 분석 목록을 조회한다. */
 		WITH PROCESSING AS (
 			/* 현재 진행중인 분석 요청을 포함하여 분석 서버에 요청할 수 있는 최대(스레드) 수 만큼 조회 */
@@ -49,15 +20,6 @@
 			spa.QUERY_STRING,
 			spa.BODY,
 			spa.FILE_ID,
-			sfd.FILE_DETAIL_ID AS "fileDetail.FILE_DETAIL_ID",
-			sfd.FILE_ID AS "fileDetail.FILE_ID",
-			sfd.FILE_NAME AS "fileDetail.FILE_NAME",
-			sfd.FILE_EXT AS "fileDetail.FILE_EXT",
-			sfd.FILE_SIZE AS "fileDetail.FILE_SIZE",
-			sfd.FILE_HASH AS "fileDetail.FILE_HASH",
-			sfd.CONTENT_TYPE AS "fileDetail.CONTENT_TYPE",
-			sfd.SAVE_PATH AS "fileDetail.SAVE_PATH",
-			sfd.SAVE_NAME AS "fileDetail.SAVE_NAME",
 			sda.TARGET_INFORMATION,
 			sda.CONTENT,
 			sa.CREATE_DT
@@ -65,8 +27,6 @@
             LEFT JOIN SEEK_PROXY_ANALYSIS spa
                 ON sa.ANALYSIS_ID = spa.ANALYSIS_ID
                 AND COALESCE(sa.ANALYSIS_MODE_CCD, '') != 'DATABASE'
-            LEFT JOIN SEEK_FILE_DETAIL sfd
-                ON spa.FILE_ID = sfd.FILE_ID
             LEFT JOIN SEEK_DATABASE_ANALYSIS sda
                 ON sa.ANALYSIS_ID = sda.ANALYSIS_ID
                 AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DATABASE'
