@@ -89,8 +89,26 @@
                 S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
             });
 
+            const checkIdList = [];
+            const checkIdMaxSize = 1000;
+
             navigator.serviceWorker.addEventListener('message', (event) => {
+                const checkId = `${event.data.data.pushTypeCcd}${event.data.data.checkId}`;
+                if (checkIdList.includes(checkId)) {
+                    // 동시에 다른 서버로 부터 동일 푸시를 받는 경우가 있어 중복 메시지는 무시한다.
+                    return;
+                }
+
                 console.debug('ReceiveServiceWorker Data', event.data);
+
+                checkIdList.push(checkId);
+                if (checkIdList.length > checkIdMaxSize) {
+                    // 첫 번째 요소 제거
+                    checkIdList.shift();
+                }
+
+                console.log('event.data.type', event.data.type);
+
                 const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
 
                 switch (event.data.type) {
