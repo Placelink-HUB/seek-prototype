@@ -160,6 +160,10 @@ public class Constants {
     public static final String CD_DETECTION_TYPE_LOW = "low";
 
     /**
+     * 푸시_타입_공통코드 - 알림
+     */
+    public static final String CD_PUSH_TYPE_NOTIFICATION = "notification";
+    /**
      * 푸시_타입_공통코드 - 분석 요청
      */
     public static final String CD_PUSH_TYPE_ANALYSIS_REQUEST = "analysis_request";

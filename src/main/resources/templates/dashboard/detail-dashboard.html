@@ -112,6 +112,9 @@
                 const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
 
                 switch (event.data.type) {
+                    case '[[${Constants.CD_PUSH_TYPE_NOTIFICATION}]]':
+                        S2Util.showToast(event.data.data.message);
+                        break;
                     case '[[${Constants.CD_PUSH_TYPE_ANALYSIS_REQUEST}]]':
                         // 분석 요청
                         const requestCount = event.data.data.count;
