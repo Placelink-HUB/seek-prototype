@@ -40,16 +40,16 @@
   "editor.fontFamily": "Consolas, 'Courier New', monospace", // 에디터 글꼴
   "editor.fontSize": 14, // 에디터 글꼴 크기
   "editor.lineHeight": 1.5, // 줄 높이 (배수)
-  "editor.formatOnSave": true, // 저장 시 자동 포맷팅 활성화 (true: 활성화)
-  "editor.formatOnPaste": false, // 붙여넣기 시 포맷팅 비활성화 (false: 비활성화)
+  "editor.formatOnSave": true, // 저장 시 자동 포맷팅 여부
+  "editor.formatOnPaste": false, // 붙여넣기 시 포맷팅 여부
   "editor.defaultFormatter": "esbenp.prettier-vscode", // 기본 포맷터 ("esbenp.prettier-vscode": Prettier)
-  "editor.detectIndentation": false, // 자동 들여쓰기 감지 비활성화 (false: 비활성화)
-  "editor.tabSize": 4, // 탭 크기 (칸 수)
+  "editor.detectIndentation": false, // 자동 들여쓰기 감지 여부부
+  "editor.tabSize": 2, // 탭 크기 (칸 수)
   "editor.insertSpaces": true, // 탭 대신 스페이스 사용 (true: 활성화)
   "editor.minimap.enabled": true, // 미니맵 활성화 (true: 활성화)
   "editor.cursorSmoothCaretAnimation": "on", // 커서 이동 애니메이션 활성화 ("on": 활성화)
-  "editor.renderWhitespace": "none", // 공백 문자 표시 안 함 ("none": 표시 안 함)
-  "editor.wordWrap": "off", // 긴 줄 자동 줄바꿈 비활성화 ("off": 줄바꿈 안 함)
+  "editor.renderWhitespace": "none", // 공백 문자 표시 ("none": 표시 안 함)
+  "editor.wordWrap": "off", // 긴 줄 자동 줄바꿈 ("off": 줄바꿈 안 함)
   "editor.wordWrapColumn": 9999, // wordWrapColumn 사용 시 기준 열 설정 (120자)
   // "editor.rulers": [120], // 줄 길이 (120자에 세로선 표시)
   "editor.unicodeHighlight.ambiguousCharacters": false, // 유니코드 문자 경고 비활성화 (false: 비활성화)
@@ -81,12 +81,7 @@
     "**/node_modules/*/**": true, // Node.js 모듈 (true: 제외)
     "**/build/**": true // Gradle 빌드 폴더 (true: 제외)
   },
-  /*
-    "files.associations": {
-        "*.xml": "ex-xml", // *-mapper.xml를 제외한 xml 파일
-        "*-mapper.xml": "xml" // *-mapper.xml
-    },
-    */
+  "files.associations": {},
 
   /* 검색 설정 */
   "search.exclude": {
@@ -101,19 +96,26 @@
 
   /* 언어별 포맷터 설정 */
   "[java]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
     "editor.defaultFormatter": "redhat.java" // Java 파일에서 Red Hat 포맷터 사용
   },
   "[html]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
     // "editor.defaultFormatter": "vscode.html-language-features" // HTML 파일에서 VSCode HTML 포맷터 사용
   },
   "[xml]": {
-    "editor.defaultFormatter": "DotJoshJohnson.xml" // XML Tools 포맷터 사용
-  },
-  "[*mapper.xml]": {
+    // "editor.defaultFormatter": "DotJoshJohnson.xml" // XML Tools 포맷터 사용
     "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode" // Prettier SQL 포맷터 사용
   },
   "[sql]": {
     // "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode" // SQL 파일에서 Prettier SQL 포맷터 사용
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode" // JSONC 파일에서 Prettier 사용
@@ -128,7 +130,7 @@
   /** Prettier 설정 (// prettier-ignore: Prettier 포맷팅 무시 주석) */
   "prettier.useEditorConfig": true, // Prettier 에서 .editorconfig 사용 (true: 활성화, .prettierrc / prettier.config.js > .editorconfig > settings.json 순으로 적용)
   "prettier.printWidth": 9999, // 한 줄에 출력되는 코드의 최대 길이 (120자)
-  "prettier.tabWidth": 4, // 탭 간격 (기본값: 2)
+  "prettier.tabWidth": 2, // 탭 간격 (기본값: 2)
   "prettier.useTabs": false, // 탭 대신 스페이스 사용 (기본값: false)
   "prettier.semi": true, // 세미콜론 사용 (기본값: true)
   "prettier.singleQuote": true, // 작은 따옴표 사용 (기본값: false)
@@ -140,7 +142,7 @@
   "prettier.jsxSingleQuote": false, // JSX에 작은 따옴표 사용 여부 (false: 사용 안 함)
   "prettier.proseWrap": "preserve", // Markdown 텍스트의 줄바꿈 방식 ("preserve": 원본 유지)
   "prettier.htmlWhitespaceSensitivity": "css", // HTML 공백 감도 설정 ("css": CSS 규칙에 따름)
-  "Prettier-SQL.tabSizeOverride": 4,
+  "Prettier-SQL.tabSizeOverride": 2,
   "Prettier-SQL.ignoreTabSettings": false,
   "Prettier-SQL.insertSpacesOverride": true,
 
