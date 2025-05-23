@@ -3,8 +3,6 @@
     <th:block layout:fragment="bodyScript">
         <script th:src="@{/public/js/echarts.min.js}"></script>
         <script type="text/javascript">
-            let isRegistering = false;
-
             const doughnutChart = {};
             const semicircleChart = {};
             const lineChart = {};
@@ -299,8 +297,6 @@
 
                 for (const targetChartName in doughnutChartInfo) {
                     const chartInfo = doughnutChartInfo[targetChartName];
-                    const count = chartInfo.count;
-                    const totalCount = chartInfo.totalCount;
 
                     doughnutChart[targetChartName].setOption({
                         title: {
@@ -382,7 +378,6 @@
             function initSemicircleChart() {
                 semicircleChart['koreaDetectionStatus'] = echarts.init(document.getElementById('semicircleChart1'));
                 semicircleChart['overseasDetectionStatus'] = echarts.init(document.getElementById('semicircleChart2'));
-
                 const count = 0;
                 const totalCount = 0;
 
@@ -732,7 +727,7 @@
                 lineChart['realtimeAnalysis'].setOption(updateSeries, false); // false로 설정하여 기존 값은 유지
             }
 
-            function initBarChart(hitRankDataList) {
+            function initBarChart() {
                 barChart['sensitiveInfoType'] = echarts.init(document.getElementById('barChart1'));
 
                 option = {

@@ -144,6 +144,7 @@ const S2Util = (function () {
                             break;
                         case 'JSON':
                             if (Object.keys(param).length > 0) {
+                                /* empty */
                             }
                             option['body'] = dataType === 'JSON' ? JSON.stringify(param) : S2Util.jsonToFormData(param);
                             break;
@@ -205,7 +206,7 @@ const S2Util = (function () {
                     };
 
                     switch (result.type) {
-                        case 'BLOB':
+                        case 'BLOB': {
                             let filename = '';
 
                             const contentDisposition = response.headers.get('Content-Disposition');
@@ -220,6 +221,7 @@ const S2Util = (function () {
                             result['data'] = response.blob();
                             result['filename'] = decodeURIComponent(filename);
                             break;
+                        }
                         case 'HTML':
                             result['data'] = response.text();
                             break;
@@ -427,7 +429,7 @@ const S2Util = (function () {
                     }
                     JSON.parse(data);
                     return true;
-                } catch (e) {
+                } catch {
                     return false;
                 }
             }
@@ -588,7 +590,7 @@ const S2Util = (function () {
                             break;
                     }
                 }
-            } catch (e) {
+            } catch {
                 errMsg = '날짜형식이 올바르지 않습니다.';
             }
 
@@ -607,10 +609,10 @@ const S2Util = (function () {
                         dateStr = dateStr.replace(/(\d{4})(\d{2})(\d{2})/, `$1${delimiter}$2${delimiter}$3`);
                     } else {
                         dateStr = '';
-                        if ($('#dialog-confirm').length === 0) {
+                        if (document.getElementById('dialog-confirm') === null) {
                             try {
                                 S2Util.alert(errMsg);
-                            } catch (e) {
+                            } catch {
                                 alert(errMsg);
                             }
                         }
@@ -626,7 +628,7 @@ const S2Util = (function () {
         setLocalStorage: function (key, value) {
             try {
                 localStorage.setItem(key, value);
-            } catch (e) {
+            } catch {
                 const d = new Date();
                 d.setTime(d.getTime() + 30 * 24 * 60 * 60 * 1000);
                 const expires = `expires=${d.toUTCString()}`;
@@ -638,7 +640,7 @@ const S2Util = (function () {
             let value = '';
             try {
                 value = localStorage.getItem(key);
-            } catch (e) {
+            } catch {
                 const cookie = `; ${document.cookie}`;
                 const parts = cookie.split(`; ${key}=`);
                 if (parts.length === 2) value = parts.pop().split(';').shift();
@@ -648,7 +650,7 @@ const S2Util = (function () {
         removeLocalStorage: function (key) {
             try {
                 localStorage.removeItem(key);
-            } catch (e) {
+            } catch {
                 const d = new Date();
                 d.setTime(d.getTime() - 1);
                 const expires = `expires=${d.toUTCString()}`;
@@ -758,7 +760,6 @@ const S2Util = (function () {
 
                     if (checkList.length > 0) {
                         for (const check of checkList) {
-                            const tagName = element.tagName.toLowerCase();
                             const type = element.type;
                             const title = element.getAttribute('title') || formElement.querySelector(`.datepicker[name="${element.getAttribute('name')}_text"]`)?.getAttribute('title');
                             let checkValid = true;
@@ -789,7 +790,7 @@ const S2Util = (function () {
 
                                 case 'length':
                                 case 'maxlength':
-                                case 'minlength':
+                                case 'minlength': {
                                     const length = Number(element.getAttribute(check).replace(/[^0-9]/g, ''));
                                     if (length) {
                                         if (type === 'checkbox') {
@@ -824,8 +825,9 @@ const S2Util = (function () {
                                         }
                                     }
                                     break;
+                                }
 
-                                case 'minValue':
+                                case 'minValue': {
                                     const minValue = Number(element.getAttribute(check).replace(/[^0-9]/g, ''));
                                     if (minValue) {
                                         let value = '$undefined';
@@ -848,7 +850,8 @@ const S2Util = (function () {
                                         }
                                     }
                                     break;
-                                case 'mask':
+                                }
+                                case 'mask': {
                                     const value = element.value;
                                     let mask = element.getAttribute(check);
 
@@ -862,6 +865,7 @@ const S2Util = (function () {
                                             break;
                                         case 'CHK_TEXT_COMBINE':
                                             // 특수문자 제외 텍스트
+                                            // eslint-disable-next-line no-useless-escape
                                             mask = /^[가-힣a-zA-Z0-9\s\-\(\)\,\.]*$/;
                                             break;
                                         case 'CHK_MPHONE_NO':
@@ -890,6 +894,7 @@ const S2Util = (function () {
                                             break;
                                         case 'CHK_EMAIL':
                                             // 이메일
+                                            // eslint-disable-next-line no-useless-escape
                                             mask = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
                                             break;
                                     }
@@ -902,7 +907,8 @@ const S2Util = (function () {
                                         }
                                     }
                                     break;
-                                case 'dataType':
+                                }
+                                case 'dataType': {
                                     const dataTypeInfo = String(element.getAttribute(check)).split(':');
                                     const dataType = dataTypeInfo[0];
 
@@ -913,7 +919,7 @@ const S2Util = (function () {
                                                     break;
                                                 case 'radio':
                                                     break;
-                                                default:
+                                                default: {
                                                     const startDate = element.value;
                                                     const errMsg = S2Util.validateDate(startDate);
                                                     if (errMsg) {
@@ -937,11 +943,13 @@ const S2Util = (function () {
                                                         S2Util.setFormErrorMessage(checkMessage, formElement.querySelector(`[data-form-error="${element.name}"]`), messageArr);
                                                     }
                                                     break;
+                                                }
                                             }
                                             break;
                                     }
                                     break;
-                                case 'group':
+                                }
+                                case 'group': {
                                     let chkVal = element.value;
                                     let chkFlag = true;
                                     const groupNmList = String(element.getAttribute(check)).split(',');
@@ -969,6 +977,7 @@ const S2Util = (function () {
                                         S2Util.setFormErrorMessage(checkMessage, formElement.querySelector(`[data-form-error="${element.name}"]`), messageArr);
                                     }
                                     break;
+                                }
                             }
                         }
                     }
@@ -1007,7 +1016,7 @@ const S2Util = (function () {
                     if (data instanceof jQuery) {
                         type = 'jquery';
                     }
-                } catch (e) {
+                } catch {
                     // jQuery 객체가 없다면 오류가 발생하여 확인할 수 없음
                     type = '';
                 }
@@ -1066,14 +1075,14 @@ const S2Util = (function () {
                                         JSON.parse(chkData);
                                         type = 'json';
                                     }
-                                } catch (e) {
+                                } catch {
                                     // JSON.parse 가 실패하면 detailType 이(typeof 값) type 이 되고 detailType 은 초기화 한다.
                                     type = detailType;
                                     detailType = '';
                                 }
                                 break;
                         }
-                    } catch (e) {
+                    } catch {
                         type = '';
                     }
                 }
@@ -1155,7 +1164,7 @@ const S2Util = (function () {
                 const query = param.startsWith('?') ? param : `?${param}`;
                 const params = new URLSearchParams(query);
                 return params.toString().length > 0;
-            } catch (e) {
+            } catch {
                 return false;
             }
         },
@@ -1307,7 +1316,7 @@ const S2Util = (function () {
          * null 치환: value 가 null 이라면 defaultValue 로 치환해준다
          */
         cast(value, defaultValue = '') {
-            return !!value ? value : defaultValue;
+            return value ? value : defaultValue;
         },
         downloadFile: function (url, param) {
             const frames = document.getElementsByName('hiddenIframe');
@@ -1440,34 +1449,6 @@ const S2Util = (function () {
 
             document.body.appendChild(confirmDiv);
         },
-        toasts: function (message, option) {
-            const opt = {
-                title: '<i class="fa fa-check-circle mr-1" style="color: #28a745;"></i>[[#{i18n.common.save.ok}]]',
-                autohide: true,
-                delay: 2000,
-                close: false,
-                class: 'Toast-bottom-web',
-                body: message,
-                position: 'bottomRight'
-            };
-
-            if (option) {
-                if (option.title) {
-                    opt.title = option.title;
-                }
-                if (option.delay) {
-                    opt.delay = option.delay;
-                }
-                if (option.class) {
-                    opt.class = option.class;
-                }
-                if (option.position) {
-                    opt.position = option.position;
-                }
-            }
-
-            $(document).Toasts('create', opt);
-        },
         showToast: function (message, option) {
             S2Util.hideToast();
             document.body.insertAdjacentHTML(
@@ -1517,14 +1498,13 @@ const S2Util = (function () {
             }
             return outputArray;
         },
-        uuid : function() {
+        uuid: function () {
             let d = new Date().getTime();
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,
-                function (c) {
-                    const r = (d + Math.random() * 16) % 16 | 0;
-                    d = Math.floor(d / 16);
-                    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-                });
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = (d + Math.random() * 16) % 16 | 0;
+                d = Math.floor(d / 16);
+                return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+            });
         },
         // 서비스 워커 구독
         subscribeServiceWorker: async function (publicKey) {

@@ -39,10 +39,12 @@
 
             document.addEventListener('DOMContentLoaded', () => {});
 
+            // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
                 location.href = `/public/sample/test?pageNo=${pageNo}`;
             }
 
+            // eslint-disable-next-line no-unused-vars
             function openCreateArticle() {
                 showModal(
                     `
@@ -166,6 +168,7 @@
                 );
             }
 
+            // eslint-disable-next-line no-unused-vars
             function openModalArticleContents(articleId, seekMode) {
                 S2Util.fetch(
                     `/public/sample/article-info` + (seekMode ? `?seek_mode=${seekMode}` : ''),
@@ -204,6 +207,7 @@
                 );
             }
 
+            // eslint-disable-next-line no-unused-vars
             function downloadFile(articleId) {
                 S2Util.fetch(
                     '/public/sample/downloadFile.ar',
@@ -213,7 +217,7 @@
                         articleId: articleId
                     },
                     function () {
-                        S2Util.toasts('다운로드 성공하였습니다.');
+                        S2Util.showToast('다운로드 성공하였습니다.');
                     }
                 );
             }
@@ -313,6 +317,7 @@
             /**
              * 파일 삭제
              */
+            // eslint-disable-next-line no-unused-vars
             function deleteFile(target) {
                 const delElement = target.closest('li');
 
