@@ -21,8 +21,8 @@ export default defineConfig([
                 // 브라우저 전역 변수 (window, document, console, fetch 등)
                 ...globals.browser,
                 // 전역으로 사용되는 다른 변수가 있다면 여기에 추가:
-                dayjs: true,
-                jQuery: true
+                jQuery: true,
+                dayjs: true
             }
         }
     },
