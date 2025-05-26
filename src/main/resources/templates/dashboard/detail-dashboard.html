@@ -93,13 +93,16 @@
             const checkIdMaxSize = 1000;
 
             navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data.type === '[[${Constants.CD_PUSH_TYPE_NOTIFICATION}]]') {
+                    console.log('ReceiveServiceWorker Data', event.data);
+                    S2Util.showToast(event.data.data.message);
+                }
+
                 const checkId = `${event.data.data.pushTypeCcd}${event.data.data.checkId}`;
                 if (checkIdList.includes(checkId)) {
                     // 동시에 다른 서버로 부터 동일 푸시를 받는 경우가 있어 중복 메시지는 무시한다.
                     return;
                 }
-
-                console.debug('ReceiveServiceWorker Data', event.data);
 
                 checkIdList.push(checkId);
                 if (checkIdList.length > checkIdMaxSize) {
@@ -107,14 +110,9 @@
                     checkIdList.shift();
                 }
 
-                console.log('event.data.type', event.data.type);
-
                 const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
 
                 switch (event.data.type) {
-                    case '[[${Constants.CD_PUSH_TYPE_NOTIFICATION}]]':
-                        S2Util.showToast(event.data.data.message);
-                        break;
                     case '[[${Constants.CD_PUSH_TYPE_ANALYSIS_REQUEST}]]':
                         // 분석 요청
                         const requestCount = event.data.data.count;

@@ -1,97 +1,197 @@
-const notiIcon = 'https://goono.placelink.biz/lib/eln/img/img_gnb_profile.svg';
-const notiOption = {
+const notificationIcon = 'https://goono.placelink.biz/lib/eln/img/img_gnb_profile.svg';
+const defaultNotificationOptions = {
     tag: 'pl-notification',
-    icon: notiIcon,
-    badge: notiIcon,
-    vibrate: [200, 100, 200]
+    icon: notificationIcon,
+    badge: notificationIcon,
+    vibrate: [200, 100, 200],
+    requireInteraction: false // 알림 자동 닫기 허용
 };
 
+// 최근 알림 메시지 캐싱
+const notificationCache = new Set();
+
+// 알림 타이머 관리
+const activeNotifications = new Map();
+
 self.addEventListener('push', function (event) {
-    // console.debug('Push event received:', event, event.data);
-    const jsonData = event.data.json();
-    const pushTypeCcd = jsonData.pushTypeCcd;
-    const message = jsonData.message;
-
-    if (message) {
-        notiOption['body'] = message;
-        if (jsonData.link) {
-            notiOption['data'] = {
-                link: jsonData.link
-            };
-
-            // link 가 있다면 추가적인 액션을 할 수 있는 버튼 추가
-            notiOption['actions'] = [
-                {action: 'explore', title: '자세히 보기'},
-                {action: 'close', title: '닫기'}
-            ];
-        }
-
+    // 푸시 이벤트 수신 처리
+    let payload;
+    try {
+        payload = event.data.json();
+    } catch (e) {
+        console.error('푸시 데이터 파싱 실패:', event.data.text(), e);
+        const notificationOptions = { ...defaultNotificationOptions, body: '새 알림이 도착했습니다.' };
         event.waitUntil(
-            // 서비스워커 알림(Notification) 사용
-            self.registration.showNotification('【SEEK】', notiOption)
+            self.registration.showNotification('【SEEK】', notificationOptions).then((notification) => {
+                // 10초 후 알림 닫기
+                const timerId = setTimeout(() => {
+                    notification.close();
+                    activeNotifications.delete(notification);
+                }, 10000);
+                activeNotifications.set(notification, timerId);
+            }).catch((err) => {
+                console.error('알림 표시 실패:', err);
+                // 에러를 클라이언트로 전송
+                self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then((clientList) => {
+                    clientList.forEach((client) => {
+                        client.postMessage({
+                            type: 'error',
+                            message: '알림 표시 중 오류 발생',
+                            error: err.message
+                        });
+                    });
+                });
+            })
         );
+        return;
+    }
+
+    // 페이로드 유효성 검사
+    if (!payload || typeof payload !== 'object') {
+        console.error('유효하지 않은 페이로드:', payload);
+        return;
+    }
+
+    const pushTypeCode = payload.pushTypeCode || 'default';
+    const message = payload.message || '알림 내용이 없습니다.';
+    const title = payload.title || '【SEEK】';
+    const locale = payload.locale || 'en'; // 다국어 지원 준비
+
+    // 중복 알림 방지
+    const cacheKey = `${title}:${message}`;
+    if (notificationCache.has(cacheKey)) {
+        console.log('중복 알림 무시:', cacheKey);
+        return;
+    }
+    notificationCache.add(cacheKey);
+    // 캐시 크기 제한 (최대 50개)
+    if (notificationCache.size > 50) {
+        const oldest = notificationCache.values().next().value;
+        notificationCache.delete(oldest);
+    }
+
+    // 알림 옵션 동적 생성
+    const notificationOptions = { ...defaultNotificationOptions };
+    notificationOptions.body = locale === 'ko' ? message : `Notification: ${message}`; // 다국어 처리
+    notificationOptions.tag = `pl-notification-${Date.now()}`; // 고유 태그
+    if (payload.link) {
+        notificationOptions.data = { link: payload.link };
+        notificationOptions.actions = [
+            { action: 'explore', title: locale === 'ko' ? '자세히 보기' : 'View Details' },
+            { action: 'close', title: locale === 'ko' ? '닫기' : 'Close' }
+        ];
     }
 
     event.waitUntil(
-        // 클라이언트 메인 스크립트 토스트 사용
-        self.clients.matchAll({includeUncontrolled: true, type: 'window'}).then((clientList) => {
-            clientList.forEach((client) => {
-                client.postMessage({
-                    type: pushTypeCcd,
-                    message: message,
-                    data: jsonData
+        Promise.all([
+            // 알림 표시
+            self.registration.showNotification(title, notificationOptions).then((notification) => {
+                // 10초 후 알림 닫기
+                const timerId = setTimeout(() => {
+                    notification.close();
+                    activeNotifications.delete(notification);
+                }, 10000);
+                activeNotifications.set(notification, timerId);
+            }).catch((err) => {
+                console.error('알림 표시 실패:', err);
+                // 에러를 클라이언트로 전송
+                self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then((clientList) => {
+                    clientList.forEach((client) => {
+                        client.postMessage({
+                            type: 'error',
+                            message: '알림 표시 중 오류 발생',
+                            error: err.message
+                        });
+                    });
                 });
-            });
-        })
+            }),
+            // 클라이언트로= window' }).then((clientList) => {
+                clientList.forEach((client) => {
+                    client.postMessage({
+                        type: pushTypeCode,
+                        message: message,
+                        title: title,
+                        data: payload
+                    });
+                });
+            })
+        ])
     );
 });
 
-// 알림 클릭 시 동작 정의
 self.addEventListener('notificationclick', function (event) {
-    event.notification.close(); // 알림 닫기
-    let openLink = event.notification.data && event.notification.data.link ? event.notification.data.link : 'https://goono.placelink.biz';
+    // 알림 클릭 처리
+    event.notification.close();
+    // 활성 타이머 정리
+    const timerId = activeNotifications.get(event.notification);
+    if (timerId) {
+        clearTimeout(timerId);
+        activeNotifications.delete(event.notification);
+    }
+
+    let openLink = event.notification.data?.link || 'https://goono.placelink.biz';
+
     if (!openLink.startsWith('http://') && !openLink.startsWith('https://')) {
         openLink = `https://${openLink}`;
     }
 
     switch (event.action) {
         case 'close':
-            // '닫기' 액션 처리
             break;
         case 'explore':
         default:
-            // 알림 자체를 클릭한 경우(action이 없는 경우) 액션 처리
             event.waitUntil(
-                self.clients.matchAll({includeUncontrolled: true, type: 'window'}).then((clientList) => {
+                self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then((clientList) => {
                     const openUrl = new URL(openLink);
-
-                    for (const client of clientList) {
-                        // 클라이언트에서 같은 도메인의 탭이 있는지 확인한다.
-                        if (new URL(client.url).origin === openUrl.origin) {
-                            // 같은 도메인의 탭을 찾았으면 해당 탭에서 URL 열기
-                            return client
-                                .navigate(openUrl.href)
-                                .then((client) => client.focus())
-                                .catch((err) => {
-                                    console.error('탭을 여는 중 오류 발생:', err);
-                                    // 오류가 발생하면 새 탭에서 열기
-                                    return self.clients.openWindow(openUrl.href);
-                                });
-                        }
+                    // 클라이언트 검색 최적화
+                    const matchingClient = clientList.find((client) => new URL(client.url).origin === openUrl.origin);
+                    if (matchingClient) {
+                        return matchingClient
+                            .navigate(openUrl.href)
+                            .then((client) => client.focus())
+                            .catch((err) => {
+                                console.error('탭 이동 실패:', err);
+                                return self.clients.openWindow(openUrl.href);
+                            });
                     }
-
-                    // 같은 도메인의 탭이 없으면 새 탭에서 열기
                     return self.clients.openWindow(openUrl.href);
+                }).catch((err) => {
+                    console.error('클라이언트 검색 실패:', err);
+                    // 에러를 클라이언트로 전송
+                    self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then((clientList) => {
+                        clientList.forEach((client) => {
+                            client.postMessage({
+                                type: 'error',
+                                message: '알림 클릭 처리 중 오류 발생',
+                                error: err.message
+                            });
+                        });
+                    });
                 })
             );
             break;
     }
 });
 
-// 서비스 워커 즉시 활성화
+self.addEventListener('message', function (event) {
+    // 클라이언트로부터 메시지 수신 처리
+    if (event.data && event.data.type === 'clearNotifications') {
+        // 모든 활성 알림 정리
+        activeNotifications.forEach((timerId, notification) => {
+            clearTimeout(timerId);
+            notification.close();
+        });
+        activeNotifications.clear();
+        console.log('모든 알림 타이머 정리 완료:', new Date().toISOString());
+    }
+});
+
 self.addEventListener('install', (event) => {
+    // 서비스 워커 즉시 활성화
     event.waitUntil(self.skipWaiting());
 });
+
 self.addEventListener('activate', (event) => {
+    // 클라이언트 즉시 제어
     event.waitUntil(self.clients.claim());
 });

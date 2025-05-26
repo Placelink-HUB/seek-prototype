@@ -2,6 +2,8 @@ package biz.placelink.seek.analysis.controller;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -10,7 +12,13 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -26,8 +34,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import biz.placelink.seek.analysis.service.WildpathAnalysisService;
 import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.util.S2ServletUtil;
@@ -39,9 +51,11 @@ public class WildpathController {
 
     private static final Logger logger = LoggerFactory.getLogger(WildpathController.class);
 
+    private final ServiceWorkerService serviceWorkerService;
     private final WildpathAnalysisService wildpathAnalysisService;
 
-    public WildpathController(WildpathAnalysisService wildpathAnalysisService) {
+    public WildpathController(ServiceWorkerService serviceWorkerService, WildpathAnalysisService wildpathAnalysisService) {
+        this.serviceWorkerService = serviceWorkerService;
         this.wildpathAnalysisService = wildpathAnalysisService;
     }
 
@@ -240,6 +254,112 @@ public class WildpathController {
             }
             break;
         }
+    }
+
+    /**
+     * 순방향 프록시 후처리 비동기 처리
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @throws IOException 예외 발생 시
+     */
+    @PostMapping(path = "/response/async2/**", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void onAfterPostprocess2(@RequestParam(value = "attachments", required = false) List<MultipartFile> attachments, @RequestParam(value = "url", required = false) String url, @RequestParam(value = "decrypted_body", required = false) String decryptedBody, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (this.isExcludedPath(request, "/response/async2/", true)) {
+            return;
+        }
+
+        logger.info("📩 URL: " + url);
+        logger.info("📩 Body: " + decryptedBody);
+        logger.info("📎 첨부파일 개수: " + (attachments != null ? attachments.size() : "null"));
+
+        // 저장 경로 설정
+
+        String uploadDir = "C:/test";
+        Path uploadPath = Paths.get(uploadDir);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        // attachments 저장
+        if (attachments != null) {
+            for (MultipartFile file : attachments) {
+                String fileName = file.getOriginalFilename();
+                if (fileName == null) {
+                    fileName = "";
+                }
+                Long fileSize = file.getSize();
+
+                Map<String, Object> pushMap = new HashMap<>();
+                pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_NOTIFICATION);
+                pushMap.put("message", "[" + fileName + "]" + (file.getName() != null ? "[" + file.getName() + "]" : "") + " 수신 사이즈: " + fileSize);
+                serviceWorkerService.sendNotificationAll(pushMap);
+
+                if (fileName != null && !fileName.isEmpty()) {
+                    try {
+                        Path filePath = uploadPath.resolve(fileName);
+                        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                        logger.info("📁 저장 완료: " + fileName + ", size: " + fileSize + " bytes");
+                    } catch (Exception e) {
+                        logger.error("파일 저장 오류: ", e);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 순방향 프록시 후처리 비동기 처리
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @throws IOException 예외 발생 시
+     */
+    @PostMapping(path = "/response/async3/**")
+    protected void onAfterPostprocess3(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (this.isExcludedPath(request, "/response/async2/", true)) {
+            return;
+        }
+
+        BufferedReader reader = request.getReader();
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+        }
+
+        JsonNode json = new ObjectMapper().readTree(sb.toString());
+
+        String url = json.path("url").asText();
+        String decryptedBody = json.path("decrypted_body").asText();
+        System.out.println("📩 URL: " + url);
+        System.out.println("📄 본문: " + decryptedBody);
+
+        // attachments 처리
+        if (json.has("attachments") && json.get("attachments").isArray()) {
+            JsonNode attachments = json.get("attachments");
+            if (attachments.size() == 0) {
+                System.out.println("⚠️ attachments는 비어 있음");
+            } else {
+                for (JsonNode file : attachments) {
+                    String filename = file.path("filename").asText();
+                    String base64Content = file.path("content_base64").asText();
+
+                    try {
+                        byte[] fileBytes = Base64.getDecoder().decode(base64Content);
+                        FileOutputStream fos = new FileOutputStream("C:/test/" + filename);
+                        fos.write(fileBytes);
+                        fos.close();
+                        System.out.println("✅ 저장된 파일: " + filename);
+                    } catch (Exception e) {
+                        System.err.println("❌ 저장 실패: " + filename + " → " + e.getMessage());
+                    }
+                }
+            }
+        } else {
+            System.out.println("📦 attachments 필드가 없음 또는 배열이 아님");
+        }
+
     }
 
     /**
