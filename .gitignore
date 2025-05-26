@@ -9,6 +9,12 @@ build/
 ### Backup Files ###
 *~
 
+### Node.js ###
+node_modules/
+
+### VS Code ###
+.vscode/
+
 ### STS ###
 .apt_generated
 .classpath
@@ -37,8 +43,4 @@ out/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
-.vscode/
-
 var/
-node_modules/
