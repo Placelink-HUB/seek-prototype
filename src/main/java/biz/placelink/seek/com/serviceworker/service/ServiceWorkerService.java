@@ -6,6 +6,7 @@ import java.security.Security;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -114,24 +115,7 @@ public class ServiceWorkerService {
      * @param messageMap 전송할 알림 메시지 Map
      */
     public void sendNotificationAll(Map<String, Object> messageMap) {
-        if (messageMap != null) {
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                String jsonMessage = mapper.writeValueAsString(messageMap);
-                this.sendNotification(jsonMessage, (Long[]) null);
-            } catch (JsonProcessingException e) {
-                logger.error("알림 메시지 JSON 파싱 실패");
-            }
-        }
-    }
-
-    /**
-     * 전체 사용자들에게 푸시 알림을 전송합니다.
-     *
-     * @param jsonMessage 전송할 알림 메시지 (JSON 문자열)
-     */
-    public void sendNotificationAll(String jsonMessage) {
-        this.sendNotification(jsonMessage, (Long[]) null);
+        this.sendNotification(messageMap, null);
     }
 
     /**
@@ -140,7 +124,27 @@ public class ServiceWorkerService {
      * @param jsonMessage 전송할 알림 메시지 (JSON 문자열)
      * @param userIdArr   알림을 받을 사용자 관리 번호 배열
      */
-    public void sendNotification(String jsonMessage, Long... userIdArr) {
+    private void sendNotification(Map<String, Object> messageMap, Long... userIdArr) {
+        if (messageMap != null) {
+            messageMap.put("pushId", UUID.randomUUID().toString());
+
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                String jsonMessage = mapper.writeValueAsString(messageMap);
+                this.sendNotification(jsonMessage, userIdArr);
+            } catch (JsonProcessingException e) {
+                logger.error("알림 메시지 JSON 파싱 실패");
+            }
+        }
+    }
+
+    /**
+     * 지정된 사용자들에게 푸시 알림을 전송합니다.
+     *
+     * @param jsonMessage 전송할 알림 메시지 (JSON 문자열)
+     * @param userIdArr   알림을 받을 사용자 관리 번호 배열
+     */
+    private void sendNotification(String jsonMessage, Long... userIdArr) {
         if (S2Util.isNotEmpty(jsonMessage)) {
             CompletableFuture.runAsync(() -> {
                 List<SubscriptionVO> subscriptionList = serviceWorkerMapper.selectSubscriptionList(userIdArr);

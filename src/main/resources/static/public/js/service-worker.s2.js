@@ -1,18 +1,37 @@
 const notiIcon = 'https://goono.placelink.biz/lib/eln/img/img_gnb_profile.svg';
-const notiOption = {
-    tag: 'pl-notification',
+const defaultNotiOption = {
+    tag: 's2-notification',
     icon: notiIcon,
     badge: notiIcon,
     vibrate: [200, 100, 200]
 };
 
+// 최근 알림 메시지 캐싱
+const notificationCache = [];
+const notificationCacheMaxSize = 500;
+
 self.addEventListener('push', function (event) {
-    // console.debug('Push event received:', event, event.data);
     const jsonData = event.data.json();
+    const pushId = jsonData.pushId;
     const pushTypeCcd = jsonData.pushTypeCcd;
     const message = jsonData.message;
 
+    // console.debug('Push event received:', jsonData);
+
+    if (notificationCache.includes(pushId)) {
+        // 동시에 다른 서버로 부터 동일 푸시를 받는 경우가 있어 중복 메시지는 무시한다.
+        return;
+    }
+
+    notificationCache.push(pushId);
+    if (notificationCache.length > notificationCacheMaxSize) {
+        // 첫 번째 요소 제거
+        notificationCache.shift();
+    }
+
     if (message) {
+        const notiOption = {...defaultNotiOption};
+        notiOption['tag'] = `s2-notification-${pushId}`; // 고유 태그
         notiOption['body'] = message;
         if (jsonData.link) {
             notiOption['data'] = {

@@ -2,13 +2,16 @@ let g_interval;
 
 function controlProgressBar(timeout) {
     let progress = 0;
-    g_interval = setInterval(function () {
-        if (progress >= 98) {
-            clearInterval(g_interval);
-            return;
-        }
-        setProgressBar(++progress);
-    }, timeout && !isNaN(timeout) ? timeout : 1200);
+    g_interval = setInterval(
+        function () {
+            if (progress >= 98) {
+                clearInterval(g_interval);
+                return;
+            }
+            setProgressBar(++progress);
+        },
+        timeout && !isNaN(timeout) ? timeout : 1200
+    );
 }
 
 function setProgressBar(percent) {
@@ -18,6 +21,7 @@ function setProgressBar(percent) {
     progressPercent.textContent = percent + '%';
 }
 
+// eslint-disable-next-line no-unused-vars
 function showLoadingPage(options) {
     const loadingOverlay = document.createElement('div');
     loadingOverlay.id = 'loading-overlay';
@@ -62,6 +66,7 @@ function showLoadingPage(options) {
     }
 }
 
+// eslint-disable-next-line no-unused-vars
 function hideLoadingPage() {
     document.querySelectorAll('#loading-overlay').forEach((element) => {
         if (element) element.remove();

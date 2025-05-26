@@ -1,8 +1,7 @@
 package biz.placelink.seek;
 
+import java.io.File;
 
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 import org.mybatis.spring.annotation.MapperScan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +15,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.StringUtils;
 
-import java.io.File;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 
 @EnableAsync
 @EnableCaching
 @EnableScheduling
-@SpringBootApplication(scanBasePackages = { "biz.placelink.seek" })
+@SpringBootApplication(scanBasePackages = {"biz.placelink.seek"})
 @MapperScan(basePackages = "biz.placelink.seek.**.service")
 public class ApplicationBootstrap extends SpringBootServletInitializer {
 
@@ -33,27 +33,28 @@ public class ApplicationBootstrap extends SpringBootServletInitializer {
         File stateFile = null;
         String pidFilePath = System.getProperty("pid.file.path", "./var/run/pid");
         String stateFilePath = System.getProperty("state.file.path", "./var/run/state");
-        if (StringUtils.hasText(pidFilePath)) pidFile = new File(pidFilePath);
+        if (StringUtils.hasText(pidFilePath))
+            pidFile = new File(pidFilePath);
         if (StringUtils.hasText(stateFilePath)) {
             stateFile = new File(stateFilePath);
             stateFile.deleteOnExit();
         }
         SpringApplicationBuilder builder = new SpringApplicationBuilder(ApplicationBootstrap.class);
-        if (pidFile != null) builder.listeners(
-                new ApplicationPidFileWriter(pidFile)
-        );
-        if (stateFile != null) builder.listeners(
-                new ApplicationStartingListener(stateFile), // SpringApplicationEvent 1
-                new ApplicationEnvironmentPreparedListener(stateFile), // SpringApplicationEvent 2
-                new ApplicationContextInitializedListener(stateFile), // SpringApplicationEvent 3
-                new ApplicationPreparedListener(stateFile), // SpringApplicationEvent 4
-                new ContextRefreshedListener(stateFile), // ApplicationContextEvent 5
-                new ApplicationStartedListener(stateFile), // SpringApplicationEvent 6
-                new ApplicationReadyListener(stateFile), // SpringApplicationEvent 7
-                new ContextClosedListener(stateFile), // ApplicationContextEvent 8
-                new ApplicationFailedListener(stateFile) // SpringApplicationEvent
-        );
-        //noinspection unused
+        if (pidFile != null)
+            builder.listeners(new ApplicationPidFileWriter(pidFile));
+        if (stateFile != null)
+            builder.listeners(new ApplicationStartingListener(stateFile), // SpringApplicationEvent 1
+                    new ApplicationEnvironmentPreparedListener(stateFile), // SpringApplicationEvent 2
+                    new ApplicationContextInitializedListener(stateFile), // SpringApplicationEvent 3
+                    new ApplicationPreparedListener(stateFile), // SpringApplicationEvent 4
+                    new ContextRefreshedListener(stateFile), // ApplicationContextEvent 5
+                    new ApplicationStartedListener(stateFile), // SpringApplicationEvent 6
+                    new ApplicationReadyListener(stateFile), // SpringApplicationEvent 7
+                    new ContextClosedListener(stateFile), // ApplicationContextEvent 8
+                    new ApplicationFailedListener(stateFile) // SpringApplicationEvent
+            );
+        // noinspection unused
+        @SuppressWarnings("unused")
         ConfigurableApplicationContext applicationContext = builder.run(args);
     }
 

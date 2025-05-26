@@ -1,0 +1,156 @@
+/* ===================================================================================================
+    Modal
+=================================================================================================== */
+.s2-modal {
+  position: fixed; /* 화면 전체를 덮도록 설정 */
+  z-index: 7700;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* 필요에 따라 스크롤바 표시 */
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex; /* Flexbox 사용 */
+  justify-content: center; /* 수평 가운데 정렬 */
+  align-items: center; /* 수직 가운데 정렬 */
+}
+
+.s2-modal > .modal-content {
+  display: flex; /* Flexbox 사용 */
+  flex-direction: column; /* 수직 방향으로 요소 배치 */
+  max-height: 90vh; /* 브라우저 창 높이의 90%로 최대 높이 설정 */
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 4px 4px 8px 2px #0000000f;
+  font-family: 'Pretendard', sans-serif;
+}
+
+.s2-modal > .modal-content > .modal-header {
+  display: flex;
+  position: relative;
+  padding: 10px;
+  background-color: #1a5df4;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  color: #fff;
+  align-items: center;
+  background-image: url(../images/SEEK_logo.png);
+  background-repeat: no-repeat;
+  background-position: top 17px left 20px;
+  background-size: 80px;
+}
+
+.s2-modal > .modal-content > .modal-header > .modal-title {
+  margin: 10px 0 10px 10px;
+  padding-left: 90px;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: -1px;
+}
+
+.s2-modal > .modal-content > .modal-header > .close-button {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  right: 15px;
+  font-size: 25px;
+  color: #fff;
+  cursor: pointer;
+  border: 0;
+  background-color: transparent;
+}
+
+.s2-modal > .modal-content > .modal-body {
+  min-height: 250px;
+  padding: 20px; /* body padding 추가 */
+  overflow-y: auto; /* body 부분만 스크롤 가능하도록 설정 */
+  flex-grow: 1; /* body가 남은 공간을 모두 차지하도록 설정 */
+}
+
+/* ===================================================================================================
+    Toast
+=================================================================================================== */
+.s2-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 300px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow: hidden;
+  animation: toast-slide-in 0.5s ease-out;
+  transition: all 0.3s ease;
+}
+
+.s2-toast .flex-sty04 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.s2-toast .flex-sty04 strong {
+  font-size: 14px;
+  color: #333;
+}
+
+.s2-toast .fa-close {
+  color: #888;
+  text-decoration: none;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.s2-toast .fa-close:hover {
+  color: #333;
+}
+
+.s2-toast .ma-t15 {
+  padding: 15px;
+  font-size: 14px;
+  color: #555;
+}
+
+.s2-toast.fade-out {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.s2-toast .close-btn {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.s2-toast .close-btn::before,
+.s2-toast .close-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 2px;
+  background: #333;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.s2-toast .close-btn::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

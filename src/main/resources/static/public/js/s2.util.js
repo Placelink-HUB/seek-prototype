@@ -1449,15 +1449,51 @@ const S2Util = (function () {
 
             document.body.appendChild(confirmDiv);
         },
+        showModal(content, option, callback) {
+            if (!option) {
+                option = {};
+            }
+
+            const modelNo = document.querySelectorAll('.s2modal').length + 1;
+
+            document.body.innerHTML += `
+                <div id="s2-modal-${modelNo}" class="s2-modal" role="dialog" aria-modal="true" aria-labelledby="s2-modal-title-${modelNo}" aria-describedby="s2-modal-description-${modelNo}">
+                    <div class="modal-content" style="width: ${option.width ? option.width : '80%'}">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="s2-modal-title-${modelNo}" style="text-align: ${option.titleAlign ? option.titleAlign : 'center'}; font-size: ${option.titleSize ? option.titleSize : '18px'}">${option.title || ''}&nbsp;</h2>
+                            ${option.headerHtml ? option.headerHtml : ''}
+                            <button class="close-button" aria-label="닫기">&times;</button>
+                        </div>
+                        <div class="modal-body" id="s2-modal-description-${modelNo}">
+                            ${content}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.querySelector('.s2-modal > .modal-content > .modal-header > .close-button').addEventListener('click', (event) => {
+                if (event.target.closest('.s2-modal')) {
+                    event.target.closest('.s2-modal').remove();
+                }
+            });
+
+            const modalSelector = `#s2-modal-${modelNo}`;
+
+            if (typeof callback === 'function') {
+                callback(modalSelector, option);
+            }
+
+            return modalSelector;
+        },
         showToast: function (message, option) {
-            S2Util.hideToast();
+            const toastId = S2Util.uuid();
             document.body.insertAdjacentHTML(
                 'beforeend',
                 `
-                    <div id="notificationToast" class="toast-sty01 no-select">
+                    <div class="s2-toast" id="${toastId}" class="toast-sty01 no-select">
                         <div class="flex-sty04">
                             <strong class="ma-r10">${option && option.title ? option.title : '알림'}</strong>
-                            <a href="#" class="fa-close close-sty02" onclick="S2Util.hideToast()"></a>
+                            <a href="#" class="fa-close close-sty02" onclick="S2Util.hideToast('${toastId}')"><span class="close-btn" aria-label="닫기"></span></a>
                         </div>
                         <div class="ma-t15">
                             <span id="toastMessage">${message}</span>
@@ -1468,23 +1504,50 @@ const S2Util = (function () {
 
             setTimeout(
                 () => {
-                    S2Util.hideToast();
+                    S2Util.hideToast(toastId);
                 },
-                option && !isNaN(option.delay) ? option.delay : 3000
+                option && !isNaN(option.delay) ? option.delay : 30000
             );
         },
-        hideToast: function () {
-            const notificationToast = document.querySelector('#notificationToast');
-            if (notificationToast) {
-                notificationToast.classList.add('fade-out');
-                notificationToast.addEventListener(
-                    'transitionend',
-                    function () {
-                        notificationToast.remove();
-                    },
-                    {once: true}
-                );
+        hideToast: function (toastId) {
+            const toastList = document.querySelectorAll('.s2-toast');
+            if (toastList) {
+                for (const toast of toastList) {
+                    if (toast && (!toastId || toast.id === toastId)) {
+                        toast.classList.add('fade-out');
+                        toast.addEventListener(
+                            'transitionend',
+                            function () {
+                                toast.remove();
+                            },
+                            {once: true}
+                        );
+                    }
+                }
             }
+        },
+        uuid: function () {
+            let uuid = '';
+            try {
+                const cryptoObj = typeof crypto !== 'undefined' ? crypto : window.msCrypto;
+
+                if (cryptoObj.randomUUID) {
+                    uuid = cryptoObj.randomUUID();
+                } else {
+                    const bytes = cryptoObj.getRandomValues(new Uint8Array(16));
+                    // UUID v4: 버전 4 (6번째 바이트 상위 4비트 0100)
+                    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+                    // UUID v4: 변형 (8번째 바이트 상위 2비트 10)
+                    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+                    const hex = Array.from(bytes)
+                        .map((b) => b.toString(16).padStart(2, '0'))
+                        .join('');
+                    uuid = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+                }
+            } catch (e) {
+                console.error('UUID 생성 실패:', e);
+            }
+            return uuid;
         },
         urlBase64ToUint8Array: function (base64String) {
             const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -1497,14 +1560,6 @@ const S2Util = (function () {
                 outputArray[i] = rawData.charCodeAt(i);
             }
             return outputArray;
-        },
-        uuid: function () {
-            let d = new Date().getTime();
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-                const r = (d + Math.random() * 16) % 16 | 0;
-                d = Math.floor(d / 16);
-                return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
-            });
         },
         // 서비스 워커 구독
         subscribeServiceWorker: async function (publicKey) {
@@ -1520,14 +1575,14 @@ const S2Util = (function () {
                     return;
                 } else if (today === lastSubscriptionsDate) {
                     console.debug('금일 구독 완료');
-                    return;
+                    //return;
                 }
 
                 // 금일 구독을 안했다면 구독을 신청(갱신)한다.
                 try {
                     let confirmResult = !!lastSubscriptionsDate;
 
-                    const registration = await navigator.serviceWorker.register('/public/js/service-worker.pl.js', {scope: '/public/js/'}).then((reg) => {
+                    const registration = await navigator.serviceWorker.register('/public/js/service-worker.s2.js', {scope: '/public/js/'}).then((reg) => {
                         reg.update();
                         return reg;
                     });
@@ -1573,8 +1628,8 @@ const S2Util = (function () {
         receiveServiceWorkerEvents: function () {
             navigator.serviceWorker.addEventListener('message', (event) => {
                 if (event.data.type === 'notification') {
-                    // console.debug('ReceiveServiceWorker Notification', event.data);
-                    // S2Util.showToast(event.data.message);
+                    console.debug('ReceiveServiceWorker Notification', event.data);
+                    S2Util.showToast(event.data.message);
                 }
             });
         }
