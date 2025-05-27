@@ -6,7 +6,8 @@
  * @see
  * Copyright (C)  All right reserved.
  */
-class CoreDropZone {
+// eslint-disable-next-line no-unused-vars
+class S2DropZone {
     /**
      * 생성자
      * @param {Object} options - 드롭존 설정 옵션
@@ -15,8 +16,31 @@ class CoreDropZone {
      * @param {Function} [options.dragleave] - 드래그 리브 이벤트 발생 시 호출될 콜백 함수
      * @param {Function} [options.dragover] - 드래그 오버 이벤트 발생 시 호출될 콜백 함수
      * @param {Function} [options.drop] - 파일이 드롭됐을 때 호출될 콜백 함수
+     * @example
+     *
+     *          <pre>{@code
+     * const dropZone = new S2DropZone({
+     *     dropZone: document.querySelector('.dropZone'),
+     *     dragenter: function (event, dropZoneElement) {
+     *         // 드래그 엔터 이벤트 발생 시 호출
+     *         // event: 드래그 이벤트 객체, dropZoneElement: 드롭존 DOM 요소 (dropZone)
+     *     },
+     *     dragover: function (event, dropZoneElement) {
+     *         // 드래그 오버 이벤트 발생 시 호출
+     *         // event: 드래그 이벤트 객체, dropZoneElement: 드롭존 DOM 요소 (dropZone)
+     *     },
+     *     dragleave: function (event, dropZoneElement) {
+     *         // 드래그 리브 이벤트 발생 시 호출
+     *         // event: 드래그 이벤트 객체, dropZoneElement: 드롭존 DOM 요소 (dropZone)
+     *     },
+     *     drop: function (event, dropZoneElement, dropFiles) {
+     *         // 드롭 이벤트 발생 시 호출
+     *         // event: 드래그 이벤트 객체, dropZoneElement: 드롭존 DOM 요소 (dropZone)
+     *         // dropFiles: 드롭된 파일 목록 (File 객체 배열)
+     *     }
+     * });
+     * }</pre>
      */
-
     constructor(options = {}) {
         let dropZone = options.dropZone;
 

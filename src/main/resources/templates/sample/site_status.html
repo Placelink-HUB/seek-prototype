@@ -1,548 +1,546 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{_layout/basic/layout}">
-<th:block layout:fragment="bodyScript">
-    <script type="text/javascript">
-        let isRegistering = false;
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
+    <th:block layout:fragment="bodyScript">
+        <script type="text/javascript">
+            // eslint-disable-next-line no-unused-vars
+            let isRegistering = false;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initDoughnutChart();
-            initSemicircleChart();
-            initLineChart();
-            initBarChart();
-            initBarChart2();
+            document.addEventListener('DOMContentLoaded', () => {
+                initDoughnutChart();
+                initSemicircleChart();
+                initLineChart();
+                initBarChart();
+                initBarChart2();
+            });
 
-        });
+            function initDoughnutChart() {
+                const doughnutChart1 = echarts.init(document.getElementById('doughnutChart1'));
+                const doughnutChart2 = echarts.init(document.getElementById('doughnutChart2'));
+                const doughnutChart3 = echarts.init(document.getElementById('doughnutChart3'));
+                const doughnutChart4 = echarts.init(document.getElementById('doughnutChart4'));
 
-        function initDoughnutChart() {
-            const doughnutChart1 = echarts.init(document.getElementById('doughnutChart1'));
-            const doughnutChart2 = echarts.init(document.getElementById('doughnutChart2'));
-            const doughnutChart3 = echarts.init(document.getElementById('doughnutChart3'));
-            const doughnutChart4 = echarts.init(document.getElementById('doughnutChart4'));
-
-            doughnutChart1.setOption(createDoughnutOption(25, 1136, '#6eb7ff'));
-            doughnutChart2.setOption(createDoughnutOption(65, 459, '#04f0fb'));
-            doughnutChart3.setOption(createDoughnutOption(50, 357, '#b4b4fc'));
-            doughnutChart4.setOption(createDoughnutOption(87, 563, '#5eefa6'));
-
-        }
-
-        function createDoughnutOption(value, count, color) {
-            const formattedCount = count.toLocaleString('en-US');
-
-            return {
-                title: {
-                    text: String(formattedCount),
-                    left: 'center',
-                    top: 'center',
-                    textStyle: {
-                        fontSize: 20,
-                        fontWeight: 'bold',
-                        color: '#fff',
-                        fontFamily: 'Pretendard'
-                    }
-                },
-                series: [
-                    {
-                        type: 'pie',
-                        radius: ['75%', '100%'],
-                        avoidLabelOverlap: false,
-                        label: {
-                            show: false,
-                            position: 'center'
-                        },
-                        labelLine: {
-                            show: false
-                        },
-                        data: [
-                            { value: value, name: 'value', itemStyle: { color: color } },
-                            { value: 100 - value, name: 'rest', itemStyle: { color: '#858688', opacity: 1 } }
-                        ]
-                    }
-                ]
-            };
-        }
-
-
-        function initSemicircleChart() {
-            const semicircleChart1 = echarts.init(document.getElementById('semicircleChart1'));
-            const semicircleChart2 = echarts.init(document.getElementById('semicircleChart2'));
-
-            semicircleChart1.setOption(createSemicircleChart(50, 3871, '#c900e4', '#fa0050', '#61082b', '한국'));
-            semicircleChart2.setOption(createSemicircleChart(30, 409, '#3134ff', '#a40aff', '#460C63', '해외'));
-        }
-
-        function createSemicircleChart(value, count, color1, color2, backColor, text) {
-            const formattedCount = count.toLocaleString('en-US');
-            return {
-                title: [
-                    {
-                        text: text,
-                        left: 'center',
-                        top: '40%',
-                        textStyle: {
-                            color: '#fff',
-                            fontSize: 20,
-                            fontWeight: 'bold',
-                            fontFamily: 'Pretendard'
-                        },
-                    }
-                ],
-                graphic: [
-                    {
-                        type: 'line',
-                        left: 'center',
-                        top: '65%',
-                        shape: {
-                            x1: -75,
-                            y1: 0,
-                            x2: 75,
-                            y2: 0
-                        },
-                        style: {
-                            stroke: color2,
-                            lineWidth: 1,
-                            shadowBlur: 0
-                        }
-                    },
-                    {
-                        type: 'text',
-                        left: 'center',
-                        top: '74%',
-                        style: {
-                            text: '{big|' + formattedCount + '}{small|건}',
-                            rich: {
-                                big: {
-                                    fontSize: 28,
-                                    fontWeight: 'bold',
-                                    fill: '#fff',
-                                    fontFamily: 'Pretendard'
-                                },
-                                small: {
-                                    fontSize: 16,
-                                    fontWeight: '300',
-                                    fill: '#fff',
-                                    padding: [8, 0, 0, 4],
-                                    fontFamily: 'Pretendard'
-                                }
-                            }
-                        }
-                    }
-                ],
-                series: [
-                    {
-                        type: 'pie',
-                        radius: ['70%', '100%'],
-                        center: ['50%', '58%'],
-                        startAngle: 180,
-                        endAngle: 0,
-                        avoidLabelOverlap: false,
-                        label: { show: false },
-                        labelLine: { show: false },
-                        data: [
-                            {
-                                value: value,
-                                itemStyle: {
-                                    color: {
-                                        type: 'linear',
-                                        x: 0, y: 0, x2: 1, y2: 0,
-                                        colorStops: [
-                                            { offset: 0, color: color1 },
-                                            { offset: 1, color: color2 }
-                                        ]
-                                    }
-                                }
-                            }, // 실제 값
-                            { value: 100 - value, itemStyle: { color: backColor } }
-                        ]
-                    }
-                ]
-            };
-        }
-
-        function initLineChart() {
-            const lineChart = echarts.init(document.getElementById('lineChart'));
-
-            // x축을 time 타입으로 설정
-            const now = new Date();
-            // 예시: 1분 간격의 시간 데이터 5개 생성
-            const xAxisData = [];
-            for (let i = 0; i < 10; i++) {
-                // 9분 전부터 현재까지 1분 간격으로 생성
-                xAxisData.push(new Date(now.getTime() - (9 - i) * 60 * 1000));
+                doughnutChart1.setOption(createDoughnutOption(25, 1136, '#6eb7ff'));
+                doughnutChart2.setOption(createDoughnutOption(65, 459, '#04f0fb'));
+                doughnutChart3.setOption(createDoughnutOption(50, 357, '#b4b4fc'));
+                doughnutChart4.setOption(createDoughnutOption(87, 563, '#5eefa6'));
             }
 
-            // [시간, 값] 쌍으로 데이터 준비
-            const data1 = [
-                [xAxisData[0], 0],
-                [xAxisData[1], 20],
-                [xAxisData[2], 40],
-                [xAxisData[3], 70],
-                [xAxisData[4], 80],
-            ];
-            const data2 = [
-                [xAxisData[0], 0],
-                [xAxisData[1], 40],
-                [xAxisData[2], 70],
-                [xAxisData[3], 80],
-                [xAxisData[4], 90],
-                [xAxisData[5], 90],
-                [xAxisData[6], 100],
-                [xAxisData[7], 80],
-                [xAxisData[8], 120],
-                [xAxisData[9], 140]
-            ];
+            function createDoughnutOption(value, count, color) {
+                const formattedCount = count.toLocaleString('en-US');
 
-            // 마커 인덱스 (마지막 값)
-            const marker1Index = data1.length - 1;
-            const marker2Index = data2.length - 1;
-
-            // 마커 데이터 생성 (마지막 값만 표시)
-            const markerData1 = Array(data1.length).fill(null);
-            markerData1[marker1Index] = data1[marker1Index];
-            const markerData2 = Array(data2.length).fill(null);
-            markerData2[marker2Index] = data2[marker2Index];
-
-            const option = {
-                grid: { left: 50, right: 30, top: 20, bottom: 30 },
-                tooltip: {
-                    trigger: 'axis',
-                    // axisPointer: { type: 'cross' },
-                },
-                xAxis: {
-                    type: 'time',
-                    max: now,
-                    // min: new Date(now.getTime() - 60 * 60 * 1000),
-                    boundaryGap: false,
-                    axisLine: { show: false },
-                    axisTick: { show: false },
-                    axisLabel: {
-                        interval: 0,
-                        color: '#fff',
-                        fontSize: 12,
-                        margin: 10,
-                        formatter: function (value) {
-                            const date = new Date(value);
-                            return date.getHours().toString().padStart(2, '0') + ':' +
-                                date.getMinutes().toString().padStart(2, '0');
-                        },
-                    },
-                    splitLine: { show: false }
-                },
-                yAxis: {
-                    type: 'value',
-                    min: 0,
-                    max: 150,
-                    splitNumber: 5,
-                    axisLine: { show: false },
-                    axisTick: { show: false },
-                    axisLabel: {
-                        color: '#fff',
-                        fontSize: 12,
-                        margin: 10
-                    },
-                    splitLine: {
-                        show: true,
-                        lineStyle: {
+                return {
+                    title: {
+                        text: String(formattedCount),
+                        left: 'center',
+                        top: 'center',
+                        textStyle: {
+                            fontSize: 20,
+                            fontWeight: 'bold',
                             color: '#fff',
-                            opacity: 0.25,
-                            type: 'solid'
-                        }
-                    }
-                },
-                series: [
-                    // 첫 번째 면적그래프
-                    {
-                        type: 'line',
-                        data: data1,
-                        smooth: true,
-                        symbol: 'none',
-                        lineStyle: { width: 0 },
-                        itemStyle: { color: '#d600b8' },
-                        areaStyle: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                { offset: 0, color: '#29b0ea' },
-                                { offset: 1, color: '#48368a' }
-                            ]),
-                            opacity: 0.9
+                            fontFamily: 'Pretendard'
                         }
                     },
-                    // 첫 번째 그래프 마커 (보라색)
-                    {
-                        type: 'scatter',
-                        data: markerData1,
-                        tooltip: { show: false },
-                        symbolSize: 12,
-                        itemStyle: {
-                            color: '#d600b8',
-                            borderColor: '#2e4068',
-                            borderWidth: 2
-                        },
-                        z: 10
-                    },
-                    // 두 번째 면적그래프
-                    {
-                        type: 'line',
-                        data: data2,
-                        smooth: true,
-                        symbol: 'none',
-                        lineStyle: { width: 0 },
-                        itemStyle: { color: '#ddd' },
-                        areaStyle: {
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                { offset: 0, color: '#69acf0' },
-                                { offset: 1, color: '#2d3945' }
-                            ]),
-                            opacity: 0.6
+                    series: [
+                        {
+                            type: 'pie',
+                            radius: ['75%', '100%'],
+                            avoidLabelOverlap: false,
+                            label: {
+                                show: false,
+                                position: 'center'
+                            },
+                            labelLine: {
+                                show: false
+                            },
+                            data: [
+                                {value: value, name: 'value', itemStyle: {color: color}},
+                                {value: 100 - value, name: 'rest', itemStyle: {color: '#858688', opacity: 1}}
+                            ]
                         }
-                    },
-                    // 두 번째 그래프 마커 (흰색)
-                    {
-                        type: 'scatter',
-                        data: markerData2,
-                        tooltip: { show: false },
-                        symbolSize: 12,
-                        itemStyle: {
-                            color: '#fff',
-                            borderColor: '#2e4068',
-                            borderWidth: 2
-                        },
-                        z: 10
-                    }
-                ]
-            };
+                    ]
+                };
+            }
 
-            lineChart.setOption(option);
-        }
+            function initSemicircleChart() {
+                const semicircleChart1 = echarts.init(document.getElementById('semicircleChart1'));
+                const semicircleChart2 = echarts.init(document.getElementById('semicircleChart2'));
 
-        function initBarChart() {
-            const barChart1 = echarts.init(document.getElementById('barChart1'));
-            option = {
-                grid: { left: 0, right: 0, top: 20, bottom: 50 },
-                tooltip: {
-                    trigger: 'axis'
+                semicircleChart1.setOption(createSemicircleChart(50, 3871, '#c900e4', '#fa0050', '#61082b', '한국'));
+                semicircleChart2.setOption(createSemicircleChart(30, 409, '#3134ff', '#a40aff', '#460C63', '해외'));
+            }
 
-                },
-                xAxis: {
-                    type: 'category',
-                    data: ['rrn', 'phone', 'account', 'ssh', 'document'],
-                    axisLine: { show: false },
-                    axisTick: { show: false },
-                    axisLabel: {
-                        color: '#fff',
-                        fontSize: 12,
-                        fontWeight: 200,
-                        formatter: function(value) {
-                            // return value.length > 8 ? value.slice(0, 8) + '...' : value; // 말줄임
-                            return value.length > 8 ? value.slice(0, 6) + '\n' + value.slice(6) : value; // 줄바꿈
-                        }
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    axisLine: { show: false },
-                    axisTick: { show: false },
-                    splitLine: { show: false },
-                    axisLabel: { show: false }
-                },
-                series: [
-                    {
-                        type: 'bar',
-                        data: [90, 120, 100, 70, 110],
-                        barWidth: 28,
-                        itemStyle: {
-                            borderRadius: [10, 10, 10, 10],
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                { offset: 0, color: '#097bdd' },
-                                { offset: 1, color: '#04e6f8' }
-                            ])
-                        }
-                    }
-                ]
-            };
-            barChart1.setOption(option);
-        }
-
-        function initBarChart2() {
-            const barChart2 = echarts.init(document.getElementById('barChart2'));
-            option = {
-                grid: { left: 0, right: 0, top: 20, bottom: 50},
-                tooltip: {
-                    trigger: 'axis',
-                },
-                xAxis: {
-                    type: 'category',
-                    data: ['PDF', 'HWP', 'WORD', 'EXCEL'],
-                    axisLine: { show: false },
-                    axisTick: { show: false },
-                    axisLabel: {
-                        color: '#fff',
-                        fontSize: 13,
-                        fontWeight: 200,
-                        margin: 16
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    axisLine: { show: false },
-                    axisTick: { show: false },
-                    splitLine: { show: false },
-                    axisLabel: { show: false }
-                },
-                series: [
-                    {
-                        type: 'bar',
-                        data: [100, 60, 80, 90],
-                        barWidth: 34,
-                        itemStyle: {
-                            borderRadius: [10, 10, 10, 10],
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                { offset: 0, color: '#6cf9ff' },
-                                { offset: 0.5, color: '#21d1e6' },
-                                { offset: 1, color: '#1b7fa6' }
-                            ])
-                        },
-                        emphasis: {
-                            itemStyle: {
-                                opacity: 1
+            function createSemicircleChart(value, count, color1, color2, backColor, text) {
+                const formattedCount = count.toLocaleString('en-US');
+                return {
+                    title: [
+                        {
+                            text: text,
+                            left: 'center',
+                            top: '40%',
+                            textStyle: {
+                                color: '#fff',
+                                fontSize: 20,
+                                fontWeight: 'bold',
+                                fontFamily: 'Pretendard'
                             }
                         }
-                    }
-                ]
-            };
-            barChart2.setOption(option);
+                    ],
+                    graphic: [
+                        {
+                            type: 'line',
+                            left: 'center',
+                            top: '65%',
+                            shape: {
+                                x1: -75,
+                                y1: 0,
+                                x2: 75,
+                                y2: 0
+                            },
+                            style: {
+                                stroke: color2,
+                                lineWidth: 1,
+                                shadowBlur: 0
+                            }
+                        },
+                        {
+                            type: 'text',
+                            left: 'center',
+                            top: '74%',
+                            style: {
+                                text: '{big|' + formattedCount + '}{small|건}',
+                                rich: {
+                                    big: {
+                                        fontSize: 28,
+                                        fontWeight: 'bold',
+                                        fill: '#fff',
+                                        fontFamily: 'Pretendard'
+                                    },
+                                    small: {
+                                        fontSize: 16,
+                                        fontWeight: '300',
+                                        fill: '#fff',
+                                        padding: [8, 0, 0, 4],
+                                        fontFamily: 'Pretendard'
+                                    }
+                                }
+                            }
+                        }
+                    ],
+                    series: [
+                        {
+                            type: 'pie',
+                            radius: ['70%', '100%'],
+                            center: ['50%', '58%'],
+                            startAngle: 180,
+                            endAngle: 0,
+                            avoidLabelOverlap: false,
+                            label: {show: false},
+                            labelLine: {show: false},
+                            data: [
+                                {
+                                    value: value,
+                                    itemStyle: {
+                                        color: {
+                                            type: 'linear',
+                                            x: 0,
+                                            y: 0,
+                                            x2: 1,
+                                            y2: 0,
+                                            colorStops: [
+                                                {offset: 0, color: color1},
+                                                {offset: 1, color: color2}
+                                            ]
+                                        }
+                                    }
+                                }, // 실제 값
+                                {value: 100 - value, itemStyle: {color: backColor}}
+                            ]
+                        }
+                    ]
+                };
+            }
 
-        }
+            function initLineChart() {
+                const lineChart = echarts.init(document.getElementById('lineChart'));
 
-    </script>
-</th:block>
-<th:block layout:fragment="bodyFragment">
-    <div class="main-contents-contents">
-        <div class="wrap-top">
-            <img id="site-logo" src="/public/images/aicas_logo.png" alt="site-logo" class="site-logo"/>
-            <span class="main-title">사이트별 현황</span>
-        </div>
-        <div class="wrap-contents">
-            <div class="top">
-                <div class="flex-sty01">
-                    <div class="arrow-left"></div>
-                    <div class="data-date"><div class="date">2025년 04월 18일</div><div class="icon-today">TODAY</div></div>
-                    <div class="arrow-right"></div>
+                // x축을 time 타입으로 설정
+                const now = new Date();
+                // 예시: 1분 간격의 시간 데이터 5개 생성
+                const xAxisData = [];
+                for (let i = 0; i < 10; i++) {
+                    // 9분 전부터 현재까지 1분 간격으로 생성
+                    xAxisData.push(new Date(now.getTime() - (9 - i) * 60 * 1000));
+                }
+
+                // [시간, 값] 쌍으로 데이터 준비
+                const data1 = [
+                    [xAxisData[0], 0],
+                    [xAxisData[1], 20],
+                    [xAxisData[2], 40],
+                    [xAxisData[3], 70],
+                    [xAxisData[4], 80]
+                ];
+                const data2 = [
+                    [xAxisData[0], 0],
+                    [xAxisData[1], 40],
+                    [xAxisData[2], 70],
+                    [xAxisData[3], 80],
+                    [xAxisData[4], 90],
+                    [xAxisData[5], 90],
+                    [xAxisData[6], 100],
+                    [xAxisData[7], 80],
+                    [xAxisData[8], 120],
+                    [xAxisData[9], 140]
+                ];
+
+                // 마커 인덱스 (마지막 값)
+                const marker1Index = data1.length - 1;
+                const marker2Index = data2.length - 1;
+
+                // 마커 데이터 생성 (마지막 값만 표시)
+                const markerData1 = Array(data1.length).fill(null);
+                markerData1[marker1Index] = data1[marker1Index];
+                const markerData2 = Array(data2.length).fill(null);
+                markerData2[marker2Index] = data2[marker2Index];
+
+                const option = {
+                    grid: {left: 50, right: 30, top: 20, bottom: 30},
+                    tooltip: {
+                        trigger: 'axis'
+                        // axisPointer: { type: 'cross' },
+                    },
+                    xAxis: {
+                        type: 'time',
+                        max: now,
+                        // min: new Date(now.getTime() - 60 * 60 * 1000),
+                        boundaryGap: false,
+                        axisLine: {show: false},
+                        axisTick: {show: false},
+                        axisLabel: {
+                            interval: 0,
+                            color: '#fff',
+                            fontSize: 12,
+                            margin: 10,
+                            formatter: function (value) {
+                                const date = new Date(value);
+                                return date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
+                            }
+                        },
+                        splitLine: {show: false}
+                    },
+                    yAxis: {
+                        type: 'value',
+                        min: 0,
+                        max: 150,
+                        splitNumber: 5,
+                        axisLine: {show: false},
+                        axisTick: {show: false},
+                        axisLabel: {
+                            color: '#fff',
+                            fontSize: 12,
+                            margin: 10
+                        },
+                        splitLine: {
+                            show: true,
+                            lineStyle: {
+                                color: '#fff',
+                                opacity: 0.25,
+                                type: 'solid'
+                            }
+                        }
+                    },
+                    series: [
+                        // 첫 번째 면적그래프
+                        {
+                            type: 'line',
+                            data: data1,
+                            smooth: true,
+                            symbol: 'none',
+                            lineStyle: {width: 0},
+                            itemStyle: {color: '#d600b8'},
+                            areaStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: '#29b0ea'},
+                                    {offset: 1, color: '#48368a'}
+                                ]),
+                                opacity: 0.9
+                            }
+                        },
+                        // 첫 번째 그래프 마커 (보라색)
+                        {
+                            type: 'scatter',
+                            data: markerData1,
+                            tooltip: {show: false},
+                            symbolSize: 12,
+                            itemStyle: {
+                                color: '#d600b8',
+                                borderColor: '#2e4068',
+                                borderWidth: 2
+                            },
+                            z: 10
+                        },
+                        // 두 번째 면적그래프
+                        {
+                            type: 'line',
+                            data: data2,
+                            smooth: true,
+                            symbol: 'none',
+                            lineStyle: {width: 0},
+                            itemStyle: {color: '#ddd'},
+                            areaStyle: {
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: '#69acf0'},
+                                    {offset: 1, color: '#2d3945'}
+                                ]),
+                                opacity: 0.6
+                            }
+                        },
+                        // 두 번째 그래프 마커 (흰색)
+                        {
+                            type: 'scatter',
+                            data: markerData2,
+                            tooltip: {show: false},
+                            symbolSize: 12,
+                            itemStyle: {
+                                color: '#fff',
+                                borderColor: '#2e4068',
+                                borderWidth: 2
+                            },
+                            z: 10
+                        }
+                    ]
+                };
+
+                lineChart.setOption(option);
+            }
+
+            function initBarChart() {
+                const barChart1 = echarts.init(document.getElementById('barChart1'));
+                option = {
+                    grid: {left: 0, right: 0, top: 20, bottom: 50},
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: ['rrn', 'phone', 'account', 'ssh', 'document'],
+                        axisLine: {show: false},
+                        axisTick: {show: false},
+                        axisLabel: {
+                            color: '#fff',
+                            fontSize: 12,
+                            fontWeight: 200,
+                            formatter: function (value) {
+                                // return value.length > 8 ? value.slice(0, 8) + '...' : value; // 말줄임
+                                return value.length > 8 ? value.slice(0, 6) + '\n' + value.slice(6) : value; // 줄바꿈
+                            }
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLine: {show: false},
+                        axisTick: {show: false},
+                        splitLine: {show: false},
+                        axisLabel: {show: false}
+                    },
+                    series: [
+                        {
+                            type: 'bar',
+                            data: [90, 120, 100, 70, 110],
+                            barWidth: 28,
+                            itemStyle: {
+                                borderRadius: [10, 10, 10, 10],
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: '#097bdd'},
+                                    {offset: 1, color: '#04e6f8'}
+                                ])
+                            }
+                        }
+                    ]
+                };
+                barChart1.setOption(option);
+            }
+
+            function initBarChart2() {
+                const barChart2 = echarts.init(document.getElementById('barChart2'));
+                option = {
+                    grid: {left: 0, right: 0, top: 20, bottom: 50},
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: ['PDF', 'HWP', 'WORD', 'EXCEL'],
+                        axisLine: {show: false},
+                        axisTick: {show: false},
+                        axisLabel: {
+                            color: '#fff',
+                            fontSize: 13,
+                            fontWeight: 200,
+                            margin: 16
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLine: {show: false},
+                        axisTick: {show: false},
+                        splitLine: {show: false},
+                        axisLabel: {show: false}
+                    },
+                    series: [
+                        {
+                            type: 'bar',
+                            data: [100, 60, 80, 90],
+                            barWidth: 34,
+                            itemStyle: {
+                                borderRadius: [10, 10, 10, 10],
+                                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                                    {offset: 0, color: '#6cf9ff'},
+                                    {offset: 0.5, color: '#21d1e6'},
+                                    {offset: 1, color: '#1b7fa6'}
+                                ])
+                            },
+                            emphasis: {
+                                itemStyle: {
+                                    opacity: 1
+                                }
+                            }
+                        }
+                    ]
+                };
+                barChart2.setOption(option);
+            }
+        </script>
+    </th:block>
+    <th:block layout:fragment="bodyFragment">
+        <div class="main-contents-contents">
+            <div class="wrap-top">
+                <img id="site-logo" src="/public/images/aicas_logo.png" alt="site-logo" class="site-logo" />
+                <span class="main-title">사이트별 현황</span>
+            </div>
+            <div class="wrap-contents">
+                <div class="top">
+                    <div class="flex-sty01">
+                        <div class="arrow-left"></div>
+                        <div class="data-date">
+                            <div class="date">2025년 04월 18일</div>
+                            <div class="icon-today">TODAY</div>
+                        </div>
+                        <div class="arrow-right"></div>
+                    </div>
+                    <div class="button-wrap-po-a">
+                        <button class="btn-sty-02 btn-download">보고서 다운로드</button>
+                    </div>
                 </div>
-                <div class="button-wrap-po-a">
-                    <button class="btn-sty-02 btn-download">보고서 다운로드</button>
+                <div class="contents">
+                    <div class="status-card">
+                        <div class="card card1">
+                            <div class="text">
+                                <span class="card-title">분석</span>
+                                <span class="card-desc">전체 데이터 분석 수</span>
+                            </div>
+                            <div id="doughnutChart1" class="graph"></div>
+                        </div>
+                        <div class="card card2">
+                            <div class="text">
+                                <span class="card-title">탐지</span>
+                                <span class="card-desc">민감정보 탐지 횟수</span>
+                            </div>
+                            <div id="doughnutChart2" class="graph"></div>
+                        </div>
+                        <div class="card card3">
+                            <div class="text">
+                                <span class="card-title">마스킹</span>
+                                <span class="card-desc">비식별 처리된 정보 수</span>
+                            </div>
+                            <div id="doughnutChart3" class="graph"></div>
+                        </div>
+                        <div class="card card4">
+                            <div class="text">
+                                <span class="card-title">언마스킹</span>
+                                <span class="card-desc">복호화된 정보 횟수</span>
+                            </div>
+                            <div id="doughnutChart4" class="graph"></div>
+                        </div>
+                    </div>
+                    <div class="status-box">
+                        <div class="box box1">
+                            <div class="box-top">국내 접속자 탐지 현황</div>
+                            <div class="box-contents">
+                                <div id="semicircleChart1" class="graph"></div>
+                                <div class="data-wrap">
+                                    <div class="data data1">
+                                        <div class="data-title">낮음</div>
+                                        <div class="data-contents">
+                                            <div><span>2,021</span><span> 건</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="data data2">
+                                        <div class="data-title">보통</div>
+                                        <div class="data-contents">
+                                            <div><span>1,812</span><span> 건</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="data data3">
+                                        <div class="data-title">위험</div>
+                                        <div class="data-contents">
+                                            <div><span>34</span><span> 건</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box box2">
+                            <div class="box-top">해외 접속자 탐지 현황</div>
+                            <div class="box-contents">
+                                <div id="semicircleChart2" class="graph"></div>
+                                <div class="data-wrap">
+                                    <div class="data data1">
+                                        <div class="data-title">낮음</div>
+                                        <div class="data-contents">
+                                            <div><span>813</span><span> 건</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="data data2">
+                                        <div class="data-title">보통</div>
+                                        <div class="data-contents">
+                                            <div><span>589</span><span> 건</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="data data3">
+                                        <div class="data-title">위험</div>
+                                        <div class="data-contents">
+                                            <div><span>5</span><span> 건</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-box2">
+                        <div class="box box1">
+                            <div class="box-top">실시간 분석 현황</div>
+                            <div class="box-contents">
+                                <div id="lineChart" class="graph"></div>
+                            </div>
+                        </div>
+                        <div class="box box2">
+                            <div class="box-box box-box1">
+                                <div class="box-top">상위 5개 항목</div>
+                                <div class="box-contents">
+                                    <div id="barChart1" class="graph"></div>
+                                </div>
+                            </div>
+                            <div class="box-box box-box2">
+                                <div class="box-top">문서별 탐지 수</div>
+                                <div class="box-contents">
+                                    <div id="barChart2" class="graph"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="contents">
-                <div class="status-card">
-                    <div class="card card1">
-                        <div class="text">
-                            <span class="card-title">분석</span>
-                            <span class="card-desc">전체 데이터 분석 수</span>
-                        </div>
-                        <div id="doughnutChart1" class="graph"></div>
-                    </div>
-                    <div class="card card2">
-                        <div class="text">
-                            <span class="card-title">탐지</span>
-                            <span class="card-desc">민감정보 탐지 횟수</span>
-                        </div>
-                        <div id="doughnutChart2" class="graph"></div>
-                    </div>
-                    <div class="card card3">
-                        <div class="text">
-                            <span class="card-title">마스킹</span>
-                            <span class="card-desc">비식별 처리된 정보 수</span>
-                        </div>
-                        <div id="doughnutChart3" class="graph"></div>
-                    </div>
-                    <div class="card card4">
-                        <div class="text">
-                            <span class="card-title">언마스킹</span>
-                            <span class="card-desc">복호화된 정보 횟수</span>
-                        </div>
-                        <div id="doughnutChart4" class="graph"></div>
-                    </div>
-                </div>
-                <div class="status-box">
-                    <div class="box box1">
-                        <div class="box-top">국내 접속자 탐지 현황</div>
-                        <div class="box-contents">
-                            <div id="semicircleChart1" class="graph"></div>
-                            <div class="data-wrap">
-                                <div class="data data1">
-                                    <div class="data-title">낮음</div>
-                                    <div class="data-contents">
-                                        <div><span>2,021</span><span> 건</span></div>
-                                    </div>
-                                </div>
-                                <div class="data data2">
-                                    <div class="data-title">보통</div>
-                                    <div class="data-contents">
-                                        <div><span>1,812</span><span> 건</span></div>
-                                    </div>
-                                </div>
-                                <div class="data data3">
-                                    <div class="data-title">위험</div>
-                                    <div class="data-contents">
-                                        <div><span>34</span><span> 건</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="box box2">
-                        <div class="box-top">해외 접속자 탐지 현황</div>
-                        <div class="box-contents">
-                            <div id="semicircleChart2" class="graph"></div>
-                            <div class="data-wrap">
-                                <div class="data data1">
-                                    <div class="data-title">낮음</div>
-                                    <div class="data-contents">
-                                        <div><span>813</span><span> 건</span></div>
-                                    </div>
-                                </div>
-                                <div class="data data2">
-                                    <div class="data-title">보통</div>
-                                    <div class="data-contents">
-                                        <div><span>589</span><span> 건</span></div>
-                                    </div>
-                                </div>
-                                <div class="data data3">
-                                    <div class="data-title">위험</div>
-                                    <div class="data-contents">
-                                        <div><span>5</span><span> 건</span></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="status-box2">
-                    <div class="box box1">
-                        <div class="box-top">실시간 분석 현황</div>
-                        <div class="box-contents">
-                            <div id="lineChart" class="graph"></div>
-                        </div>
-                    </div>
-                    <div class="box box2">
-                        <div class="box-box box-box1">
-                            <div class="box-top">상위 5개 항목</div>
-                            <div class="box-contents">
-                                <div id="barChart1" class="graph"></div>
-                            </div>
-                        </div>
-                        <div class="box-box box-box2">
-                            <div class="box-top">문서별 탐지 수</div>
-                            <div class="box-contents">
-                                <div id="barChart2" class="graph"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
-
-    </div>
-</th:block>
+    </th:block>
 </html>
