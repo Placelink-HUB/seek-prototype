@@ -286,6 +286,7 @@
                     },
                     drop: function (event, dropZoneElement, dropFiles) {
                         dropZoneElement.classList.remove('highlight');
+
                         if (dropFiles.length > 0 && checkFileExtension(dropFiles)) {
                             for (const file of dropFiles) {
                                 g_uploadFiles.push(file);
