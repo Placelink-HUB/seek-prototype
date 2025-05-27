@@ -1575,7 +1575,7 @@ const S2Util = (function () {
                     return;
                 } else if (today === lastSubscriptionsDate) {
                     console.debug('금일 구독 완료');
-                    //return;
+                    return;
                 }
 
                 // 금일 구독을 안했다면 구독을 신청(갱신)한다.
