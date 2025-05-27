@@ -2,93 +2,95 @@
     Scroll
 =================================================================================================== */
 ::-webkit-scrollbar {
-	width: 0.438rem;
-	height: 0.438rem;
+  width: 0.438rem;
+  height: 0.438rem;
 }
 
 ::-webkit-scrollbar-thumb {
-	/* background: #d9d9d9; 0110 */
-	background:#bfbfbf;
+  /* background: #d9d9d9; 0110 */
+  background: #bfbfbf;
 }
 
 ::-webkit-scrollbar-track {
-	background: transparent;
+  background: transparent;
 }
 
 a:active {
-	box-shadow: none !important;
+  /* eslint-disable-next-line css/no-important */
+  box-shadow: none !important;
 }
 
 /* ===================================================================================================
      Wrapper
 =================================================================================================== */
 .content-wrapper {
-	min-height: calc(100% - 115px) !important;
-	background: #000;
+  /* eslint-disable-next-line css/no-important */
+  min-height: calc(100% - 115px) !important;
+  background: #000;
 }
 .wrapper {
-	max-width: 1920px;
-	margin: 0 auto;
+  max-width: 1920px;
+  margin: 0 auto;
 }
 
 .wrapper .content_wrap {
-	display: flex;
-	position: relative;
-	height: 100vh;
-	margin: 0 auto;
-	 box-sizing: border-box;
-	flex-direction: column;
+  display: flex;
+  position: relative;
+  height: 100vh;
+  margin: 0 auto;
+  box-sizing: border-box;
+  flex-direction: column;
 }
 
 /* ===================================================================================================
     Header 영역
 =================================================================================================== */
 .header-wrapper {
-	position: sticky;
-	display: flex;
-	top: 0;
-	width: 100%;
-	flex-direction: column;
-	z-index: 2;
+  position: sticky;
+  display: flex;
+  top: 0;
+  width: 100%;
+  flex-direction: column;
+  z-index: 2;
 }
 
 /* ===================================================================================================
-    Main 영역 
+    Main 영역
 =================================================================================================== */
 #main {
-	position: relative;
-    max-width: 1920px !important;
-    margin: 0 auto;
-	transition: .5s;
-	background: #000;
+  position: relative;
+  /* eslint-disable-next-line css/no-important */
+  max-width: 1920px !important;
+  margin: 0 auto;
+  transition: 0.5s;
+  background: #000;
 }
 /* ===================================================================================================
     Sidebar 영역
 =================================================================================================== */
 .sidebar-wrapper {
-	position: fixed;
-	width: 60px;
-	height: 100%;
-	background-color: #212429;
-	border-right: 1px solid #7E7E7E;
+  position: fixed;
+  width: 60px;
+  height: 100%;
+  background-color: #212429;
+  border-right: 1px solid #7e7e7e;
 }
-
 
 /* ===================================================================================================
     Footer 영역
 =================================================================================================== */
 .footer-wrapper {
-	display: flex;
-	position: fixed;
-	bottom: 0;
-	width: 100%;
-	height: 45px;
-	max-width: 1920px;
-	padding: 15px 50px;
-	margin: 0 auto;
-	color: #a6a7aa;
-	background: #191919;
-	font-weight: 200;
-	font-size: 12px;
-	align-items: center;
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 45px;
+  max-width: 1920px;
+  padding: 15px 50px;
+  margin: 0 auto;
+  color: #a6a7aa;
+  background: #191919;
+  font-weight: 200;
+  font-size: 12px;
+  align-items: center;
 }

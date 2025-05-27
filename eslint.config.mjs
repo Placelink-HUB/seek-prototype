@@ -7,7 +7,7 @@ import globals from 'globals';
 export default defineConfig([
     {
         // ESLint의 검사(린팅) 대상에서 제외할 파일 및 디렉토리 설정(글로벌 설정, 각 패일 패턴 별로 설정 가능)
-        ignores: ['node_modules/', 'build/', 'dist/', 'bin/', '**/*.min.js', '**/*.bundle.js', '**/*.map.js']
+        ignores: ['node_modules/', 'build/', 'dist/', 'bin/', '**/*.min.js', '**/*.umd.js', '**/*.bundle.js', '**/*.map.js']
     },
     {
         files: ['**/*.{js,mjs,cjs}'],
