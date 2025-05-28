@@ -34,7 +34,7 @@ public class AnalysisResultService {
      * (동일 데이터에 대한 중복 분석 방지)
      *
      * @param analysisResultId 분석 결과 ID
-     * @return 분석 해시값의 개수
+     * @return 분석 데이터 해시 값의 개수
      */
     public boolean checkAnalysisHashExists(String analysisResultId) {
         return analysisResultMapper.selectAnalysisResultCountByHash(analysisResultId) > 0;
@@ -54,24 +54,14 @@ public class AnalysisResultService {
     /**
      * 분석 결과를 등록한다.
      *
-     * @param analysisResultId 분석 결과 ID
-     * @return 등록 개수
-     */
-    public int insertAnalysisResult(String analysisResultId) {
-        return analysisResultMapper.insertAnalysisResult(analysisResultId);
-    }
-
-    /**
-     * 분석 결과를 수정한다.
-     *
      * @param analysisResultId    분석 결과 ID
      * @param analysisRawData     분석 원본 데이터
      * @param analyzedContent     분석된 내용
      * @param totalDetectionCount 총 탐지 개수
      * @return 등록 개수
      */
-    public int updateAnalysisResult(String analysisResultId, String analysisRawData, String analyzedContent, Integer totalDetectionCount) {
-        return analysisResultMapper.updateAnalysisResult(analysisResultId, analysisRawData, analyzedContent, totalDetectionCount);
+    public int insertAnalysisResult(String analysisResultId, String analysisRawData, String analyzedContent, int totalDetectionCount) {
+        return analysisResultMapper.insertAnalysisResult(analysisResultId, analysisRawData, analyzedContent, totalDetectionCount);
     }
 
     /**

@@ -13,6 +13,7 @@
         SELECT
 			sa.ANALYSIS_ID,
 			sa.ANALYSIS_MODE_CCD,
+			sa.ANALYSIS_DATA_HASH,
 			sa.ANALYSIS_RESULT_ID,
 			spa.REQUEST_ID,
 			spa.URL,
@@ -49,6 +50,7 @@
 			sa.ANALYSIS_MODE_CCD,
 			sa.ANALYSIS_STATUS_CCD,
 			sa.ANALYSIS_MODEL,
+			sa.ANALYSIS_DATA_HASH,
 			sa.ANALYSIS_RESULT_ID,
 			sa.ANALYSIS_START_DT,
 			sa.ANALYSIS_END_DT,
@@ -96,6 +98,7 @@
 		SET
 			ANALYSIS_STATUS_CCD = COALESCE(#{analysisStatusCcd}, ANALYSIS_STATUS_CCD),
             ANALYSIS_MODEL = COALESCE(#{analysisModel}, ANALYSIS_MODEL),
+            ANALYSIS_DATA_HASH = COALESCE(#{analysisDataHash}, ANALYSIS_DATA_HASH),
             ANALYSIS_RESULT_ID = COALESCE(#{analysisResultId}, ANALYSIS_RESULT_ID),
         <choose>
             <when test='analysisStatusCcd eq "PROCESSING"'>

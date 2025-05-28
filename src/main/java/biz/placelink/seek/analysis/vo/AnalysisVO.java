@@ -16,6 +16,8 @@ public class AnalysisVO extends DefaultVO {
     private String analysisStatusCcdNm;
     /* 분석 모델 */
     private String analysisModel;
+    /* 분석 모델을 포함한 데이터 해시 값 */
+    private String analysisDataHash;
     /* 분석 결과 ID (해시 값) */
     private String analysisResultId;
     /* 분석 시작 일시 */
@@ -76,6 +78,14 @@ public class AnalysisVO extends DefaultVO {
 
     public void setAnalysisModel(String analysisModel) {
         this.analysisModel = analysisModel;
+    }
+
+    public String getAnalysisDataHash() {
+        return analysisDataHash;
+    }
+
+    public void setAnalysisDataHash(String analysisDataHash) {
+        this.analysisDataHash = analysisDataHash;
     }
 
     public String getAnalysisResultId() {

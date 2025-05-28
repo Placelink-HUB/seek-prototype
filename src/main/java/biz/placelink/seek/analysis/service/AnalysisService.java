@@ -93,16 +93,16 @@ public class AnalysisService {
     }
 
     /**
-     * 분석 결과 ID 를 수정한다.
+     * 분석 모델을 포함한 데이터 해시 값을 수정한다.
      *
      * @param analysisId       분석 ID
-     * @param analysisResultId 분석 결과 ID
+     * @param analysisDataHash 분석 모델을 포함한 데이터 해시 값
      * @return 수정 개수
      */
-    public int updateAnalysisResultId(String analysisId, String analysisResultId) {
+    public int updateAnalysisDataHash(String analysisId, String analysisDataHash) {
         AnalysisVO paramVO = new AnalysisVO();
         paramVO.setAnalysisId(analysisId);
-        paramVO.setAnalysisResultId(analysisResultId);
+        paramVO.setAnalysisDataHash(analysisDataHash);
 
         return this.updateAnalysis(paramVO);
     }
@@ -150,6 +150,7 @@ public class AnalysisService {
         AnalysisVO paramVO = new AnalysisVO();
         paramVO.setAnalysisId(analysisId);
         paramVO.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_COMPLETE);
+        paramVO.setAnalysisDataHash(analysisResultId);
         paramVO.setAnalysisResultId(analysisResultId);
         paramVO.setAnalysisTime(analysisTime);
 

@@ -116,7 +116,7 @@ public class AnalyzerService {
         List<Map.Entry<String, Object>> analysisParamList = new ArrayList<>();
 
         try (ByteArrayInputStream analysisModelStream = new ByteArrayInputStream(analysisModel.getBytes(StandardCharsets.UTF_8))) {
-            String analysisHash = "";
+            String analysisDataHash = ""; // 분석 모델을 포함한 데이터 해시 값
             List<FileDetailVO> fileDetailList = null;
 
             // analysisModelStream 사용: 동일 데이터라도 analysisModel 이 다르면 해시값이 달라지도록 한다. (동일한 데이터라도 분석 모델이 다르면 분석 결과가 다를 수 있다.)
@@ -127,7 +127,7 @@ public class AnalyzerService {
                 if (S2Util.isNotEmpty(analyzedContent)) {
                     hashDataStreamList.add(new ByteArrayInputStream(analyzedContent.getBytes(StandardCharsets.UTF_8)));
                 }
-                analysisHash = generateXXHash64(hashDataStreamList);
+                analysisDataHash = generateXXHash64(hashDataStreamList);
             } else {
                 String body = analysisDetail.getBody();
                 if (S2Util.isNotEmpty(body)) {
@@ -148,18 +148,19 @@ public class AnalyzerService {
                     }
                 }
 
-                analysisHash = generateXXHash64(hashDataStreamList);
+                analysisDataHash = generateXXHash64(hashDataStreamList);
             }
 
-            if (S2Util.isEmpty(analysisHash)) {
-                throw new S2RuntimeException("분석 해시값이 존재하지 않습니다.");
+            if (S2Util.isEmpty(analysisDataHash)) {
+                throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.");
             }
 
-            if (analysisResultService.checkAnalysisHashExists(analysisHash)) {
+            if (analysisResultService.checkAnalysisHashExists(analysisDataHash)) {
                 // 이미 분석된 데이터인 경우, 중복 분석 할 필요가 없으므로 해당 해시 값을 분석 결과 ID 로 완료 처리한다.
-                AnalysisResultVO existingAnalysisResult = analysisResultService.selectAnalysisResult(analysisId, analysisHash);
+                AnalysisResultVO existingAnalysisResult = analysisResultService.selectAnalysisResult(analysisId, analysisDataHash);
 
-                if (analysisService.updateAnalysisCompleted(analysisId, analysisHash, 0, analysisModeCcd, existingAnalysisResult) > 0 && existingAnalysisResult != null) {
+                if (analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, 0, analysisModeCcd, existingAnalysisResult) > 0 && existingAnalysisResult != null) {
+                    // 분석 완료 정보를 실시간으로 푸시한다.
                     Map<String, Object> pushMap = new HashMap<>();
 
                     pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE);
@@ -169,7 +170,7 @@ public class AnalyzerService {
                     pushMap.put("totalDetectionCount", existingAnalysisResult.getTotalDetectionCount());
                     pushMap.put("createDtStr", this.getCreateDtStr(existingAnalysisResult.getCreateDt()));
 
-                    List<AnalysisDetectionVO> existingDetectionList = analysisResultService.selectAnalysisDetectionList(analysisHash);
+                    List<AnalysisDetectionVO> existingDetectionList = analysisResultService.selectAnalysisDetectionList(analysisDataHash);
                     if (existingDetectionList != null) {
                         for (AnalysisDetectionVO existingDetection : existingDetectionList) {
                             pushMap.put(existingDetection.getDetectionTypeCcd(), existingDetection.getDetectionCount());
@@ -219,10 +220,8 @@ public class AnalyzerService {
                 throw new S2RuntimeException("[API 요청 호출 실패]: API 요청 호출 결과 값이 틀립니다.");
             }
 
-            // 분석 데이터 해시 값으로 분석 결과 ID 를 등록한다.
-            if (analysisResultService.insertAnalysisResult(analysisHash) > 0) {
-                analysisService.updateAnalysisResultId(analysisId, analysisHash);
-            }
+            // 분석 모델을 포함한 데이터 해시 값을 등록한다.
+            analysisService.updateAnalysisDataHash(analysisId, analysisDataHash);
         } catch (Exception e) {
             analysisErrorService.insertAnalysisErrorWithNewTransaction(analysisId, analysisData, e.getMessage() + "\n" + S2Exception.getStackTrace(e));
             logger.error("asyncAnalysisRequest Error : {}", e.getMessage(), e);
@@ -245,13 +244,13 @@ public class AnalyzerService {
 
     private String generateXXHash64(List<InputStream> hashDataStreamList) {
         if (hashDataStreamList == null || hashDataStreamList.isEmpty()) {
-            throw new S2RuntimeException("분석 해시값이 존재하지 않습니다.");
+            throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.");
         }
 
         String analysisHash = S2HashUtil.generateXXHash64(hashSeed, true, hashDataStreamList.toArray(new InputStream[0]));
 
         if (S2Util.isEmpty(analysisHash)) {
-            throw new S2RuntimeException("분석 해시값이 존재하지 않습니다.");
+            throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.");
         }
         return analysisHash;
     }
@@ -281,14 +280,14 @@ public class AnalyzerService {
     public void asyncPollAnalysisResults(AnalysisDetailVO analysisDetail) {
         if (analysisDetail != null) {
             String analysisId = analysisDetail.getAnalysisId();
-            String analysisResultId = analysisDetail.getAnalysisResultId();
+            String analysisDataHash = analysisDetail.getAnalysisDataHash(); // 분석 모델을 포함한 데이터 해시 값, 최초 분석 완료 시 analysisResultId 값으로 등록한다.
             String analysisRawData = "";
 
             try {
                 if (S2Util.isEmpty(analysisId)) {
                     throw new S2RuntimeException("분석 ID 가 존재하지 않습니다.");
-                } else if (S2Util.isEmpty(analysisResultId)) {
-                    throw new S2RuntimeException("분석 결과 ID 가 존재하지 않습니다.");
+                } else if (S2Util.isEmpty(analysisDataHash)) {
+                    throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.");
                 }
 
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisDetail.getAnalysisModel()));
@@ -301,9 +300,25 @@ public class AnalyzerService {
                     analysisJsonData = S2JsonUtil.parseJson(analysisRawData, JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS);
                 }
 
-                if (analysisJsonData == null || !analysisJsonData.path("status").asText("").equalsIgnoreCase("success")) {
-                    // 분석 결과가 성공이 아니라면
+                if (analysisJsonData == null) {
                     throw new S2RuntimeException(analysisRawData);
+                }
+
+                /**
+                 * 분석 상태
+                 * success: 성공
+                 * fail: 실패 (분석 대상이 파일인 경우는 모든 파일이 분석 불가능 일때)
+                 * warning: 실패 (분석 대상이 파일인 경우는 일부 파일이 분석 불가능 일때)
+                 */
+                String status = analysisJsonData.path("status").asText("");
+                if (!"success".equalsIgnoreCase(status)) {
+                    if ("fail".equalsIgnoreCase(status) || "warning".equalsIgnoreCase(status)) {
+                        // 오류 상황이라면 (!!s2!! 파일 분석일때 warning 상황을 어떻게 처리할지 고민하자)
+                        throw new S2RuntimeException(analysisRawData);
+                    } else {
+                        // 분석이 완료 될때까지 다시 시도한다.
+                        return;
+                    }
                 }
 
                 // int totalDetectionCount = analysisJsonData.path("total_hit").asInt(0);
@@ -369,7 +384,7 @@ public class AnalyzerService {
                     analyzedContent = null;
                 }
 
-                if (analysisResultService.updateAnalysisResult(analysisResultId, analysisRawData, analyzedContent, totalDetectionCount) > 0) {
+                if (analysisResultService.insertAnalysisResult(analysisDataHash, analysisRawData, analyzedContent, totalDetectionCount) > 0) {
                     List<AnalysisDetectionVO> analysisDetectionList = new ArrayList<>();
 
                     Map<String, Object> pushMap = new HashMap<>();
@@ -385,7 +400,7 @@ public class AnalyzerService {
                             Integer detectionCount = analysisDetectionsMap.get(detectionTypeCcd);
                             if (detectionCount != null && detectionCount > 0) {
                                 AnalysisDetectionVO item = new AnalysisDetectionVO();
-                                item.setAnalysisResultId(analysisResultId);
+                                item.setAnalysisResultId(analysisDataHash);
                                 item.setDetectionTypeCcd(detectionTypeCcd);
                                 item.setDetectionCount(detectionCount);
 
@@ -402,7 +417,7 @@ public class AnalyzerService {
 
                         int sensitiveInformationCount = sensitiveInformationService.insertSensitiveInformationList(sensitiveInformationList);
                         if (sensitiveInformationCount > 0) {
-                            sensitiveInformationService.insertSensitiveInformationMappingList(analysisResultId, sensitiveInformationList);
+                            sensitiveInformationService.insertSensitiveInformationMappingList(analysisDataHash, sensitiveInformationList);
 
                             if (!sensitiveInformationTypeList.isEmpty()) {
                                 sensitiveInformationService.insertSensitiveInformationTypeList(sensitiveInformationTypeList);
@@ -412,7 +427,7 @@ public class AnalyzerService {
                         serviceWorkerService.sendNotificationAll(pushMap);
                     }
 
-                    analysisService.updateAnalysisCompleted(analysisId, analysisResultId, analysisTime, analysisDetail.getAnalysisModeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
+                    analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, analysisTime, analysisDetail.getAnalysisModeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
                     analysisRequestStatus.remove(analysisId);
                 }
             } catch (Exception e) {
