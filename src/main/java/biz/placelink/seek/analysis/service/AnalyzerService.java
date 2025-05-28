@@ -22,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 
 import biz.placelink.seek.analysis.schedule.AnalysisRequestStatus;
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
@@ -40,6 +38,7 @@ import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2HashUtil;
+import kr.s2.ext.util.S2JsonUtil;
 import kr.s2.ext.util.S2StreamUtil;
 import kr.s2.ext.util.S2Util;
 
@@ -213,7 +212,7 @@ public class AnalyzerService {
                 analysisData = generateAnalysisData(analysisParamList);
             }
 
-            JsonNode analysisJsonData = new ObjectMapper().readTree(analysisData);
+            JsonNode analysisJsonData = S2JsonUtil.parseJson(analysisData);
 
             if (analysisJsonData == null || !analysisJsonData.path("request_id").asText("").equals(analysisId)) {
                 // API 요청 응답의 request_id 와 분석 요청 ID 가 일치하지 않으면 하면 분석 요청이 실패한 것으로 판단한다.
@@ -298,9 +297,8 @@ public class AnalyzerService {
                 analysisRawData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.GET, apiTimeout);
 
                 if (S2Util.isNotEmpty(analysisRawData)) {
-                    // JSON 파싱 시, 제어문자(예: \n, \r 등)를 허용하도록 설정
-                    ObjectMapper objectMapper = JsonMapper.builder().enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS).build();
-                    analysisJsonData = objectMapper.readTree(analysisRawData);
+                    // JSON 문자열 내에서 이스케이프되지 않은 제어 문자(예: \n, \t, \r 등, ASCII 0-31)를 허용하도록 설정
+                    analysisJsonData = S2JsonUtil.parseJson(analysisRawData, JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS);
                 }
 
                 if (analysisJsonData == null || !analysisJsonData.path("status").asText("").equalsIgnoreCase("success")) {

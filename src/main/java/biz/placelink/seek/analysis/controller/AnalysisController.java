@@ -13,10 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.s2.ext.util.S2JsonUtil;
 
 /**
  * <pre>
@@ -65,8 +65,7 @@ public class AnalysisController {
                 while ((line = reader.readLine()) != null) {
                     json.append(line);
                 }
-                ObjectMapper objectMapper = new ObjectMapper();
-                Map<String, Object> map = objectMapper.readValue(json.toString(), new TypeReference<Map<String, Object>>() {
+                Map<String, Object> map = S2JsonUtil.parseJsonTo(json.toString(), new TypeReference<Map<String, Object>>() {
                 });
                 System.out.println("JSON 요청(getInputStream): " + map);
             }

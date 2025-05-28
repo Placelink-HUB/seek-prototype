@@ -35,13 +35,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import biz.placelink.seek.analysis.service.WildpathAnalysisService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.s2.ext.util.S2JsonUtil;
 import kr.s2.ext.util.S2ServletUtil;
 import kr.s2.ext.util.S2Util;
 
@@ -226,7 +226,7 @@ public class WildpathController {
         String documentTypeFromContentType = WildpathAnalysisService.getDocumentTypeFromContentType(contentType, fileName);
         String countryCcd = request.getHeader("X-Country_Code");
         String url = request.getRequestURL().toString();
-        String header = S2ServletUtil.getHeadersAsJsonString(request);
+        String header = S2JsonUtil.toJsonString(S2ServletUtil.convertHeadersToMap(request));
         String queryString = S2ServletUtil.parameterToQueryString(request, true);
 
         if (S2Util.isEmpty(countryCcd)) {
@@ -328,7 +328,7 @@ public class WildpathController {
             sb.append(line);
         }
 
-        JsonNode json = new ObjectMapper().readTree(sb.toString());
+        JsonNode json = S2JsonUtil.parseJson(sb.toString());
 
         String url = json.path("url").asText();
         String decryptedBody = json.path("decrypted_body").asText();

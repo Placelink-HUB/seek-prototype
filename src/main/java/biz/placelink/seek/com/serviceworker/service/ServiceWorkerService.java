@@ -17,13 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import biz.placelink.seek.com.serviceworker.vo.SubscriptionVO;
 import groovy.util.logging.Slf4j;
 import jakarta.annotation.PostConstruct;
 import kr.s2.ext.exception.S2RuntimeException;
+import kr.s2.ext.util.S2JsonUtil;
 import kr.s2.ext.util.S2Util;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
@@ -115,7 +113,7 @@ public class ServiceWorkerService {
      * @param messageMap 전송할 알림 메시지 Map
      */
     public void sendNotificationAll(Map<String, Object> messageMap) {
-        this.sendNotification(messageMap, null);
+        this.sendNotification(messageMap, new Long[] {});
     }
 
     /**
@@ -128,13 +126,8 @@ public class ServiceWorkerService {
         if (messageMap != null) {
             messageMap.put("pushId", UUID.randomUUID().toString());
 
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                String jsonMessage = mapper.writeValueAsString(messageMap);
-                this.sendNotification(jsonMessage, userIdArr);
-            } catch (JsonProcessingException e) {
-                logger.error("알림 메시지 JSON 파싱 실패");
-            }
+            String jsonMessage = S2JsonUtil.toJsonString(messageMap);
+            this.sendNotification(jsonMessage, userIdArr);
         }
     }
 
