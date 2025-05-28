@@ -157,6 +157,7 @@ public class AnalyzerService {
 
             if (analysisResultService.checkAnalysisHashExists(analysisDataHash)) {
                 // 이미 분석된 데이터인 경우, 중복 분석 할 필요가 없으므로 해당 해시 값을 분석 결과 ID 로 완료 처리한다.
+                // !!s2!! 분석이 완료되기 전에는 동일 데이터를 중복 요청할 수 있는데 이 부분을 어떻게 처리할지 고민 하자
                 AnalysisResultVO existingAnalysisResult = analysisResultService.selectAnalysisResult(analysisId, analysisDataHash);
 
                 if (analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, 0, analysisModeCcd, existingAnalysisResult) > 0 && existingAnalysisResult != null) {
