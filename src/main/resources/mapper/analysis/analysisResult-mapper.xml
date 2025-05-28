@@ -47,7 +47,7 @@
             #{analyzedContent},
             #{totalDetectionCount},
             NOW()
-        )
+        ) ON CONFLICT (ANALYSIS_RESULT_ID) DO NOTHING
     </insert>
 
     <insert id="insertAnalysisDetectionList">
