@@ -86,6 +86,10 @@ public class AnalysisScheduler {
 
     @Scheduled(fixedRate = 2000)
     public void analysisResult() {
+        if (!analysisScheduleEnabled) {
+            return;
+        }
+
         AnalysisDetailVO analysisDetail = analysisRequestStatus.get();
         while (analysisDetail != null) {
             AnalyzerService.asyncPollAnalysisResults(analysisDetail);
