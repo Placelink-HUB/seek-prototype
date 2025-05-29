@@ -16,10 +16,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -39,8 +41,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import biz.placelink.seek.analysis.service.WildpathAnalysisService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.s2.ext.util.S2FileUtil;
 import kr.s2.ext.util.S2JsonUtil;
 import kr.s2.ext.util.S2ServletUtil;
 import kr.s2.ext.util.S2Util;
@@ -257,7 +261,7 @@ public class WildpathController {
     }
 
     /**
-     * 순방향 프록시 후처리 비동기 처리
+     * 순방향 프록시 후처리 비동기 처리(테스트용)
      *
      * @param request  HttpServletRequest
      * @param response HttpServletResponse
@@ -306,6 +310,63 @@ public class WildpathController {
                 }
             }
         }
+    }
+
+    /**
+     * 순방향 프록시 후처리 비동기 처리
+     *
+     * @param request  HttpServletRequest
+     * @param response HttpServletResponse
+     * @throws IOException 예외 발생 시
+     */
+    @PostMapping(path = "/forward/response/async/**", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void forwardOnAfterPostprocess(@RequestParam(value = "attachments", required = false) List<MultipartFile> attachments, @RequestParam(value = "url", required = false) String url, @RequestParam(value = "decrypted_body", required = false) String decryptedBody, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (this.isExcludedPath(request, "/forward/response/async/", true)) {
+            return;
+        }
+
+        if (S2Util.isEmpty(decryptedBody) && S2Util.isEmpty(attachments)) {
+            // 분석할 내용이 없음
+            return;
+        }
+
+        String requestId = UUID.randomUUID().toString();
+        String countryCcd = request.getHeader("X-Country_Code");
+        String header = S2JsonUtil.toJsonString(S2ServletUtil.convertHeadersToMap(request));
+        String queryString = S2ServletUtil.parameterToQueryString(request, true);
+
+        if (S2Util.isEmpty(countryCcd)) {
+            // 아직 국가 코드를 보내주지 않아 임시로 한국으로 설정
+            countryCcd = Constants.CD_COUNTRY_KR;
+        }
+
+        logger.info("📩 URL: " + url);
+        logger.info("📩 Body: " + decryptedBody);
+        logger.info("📎 첨부파일 개수: " + (attachments != null ? attachments.size() : "null"));
+
+        List<FileDetailVO> fileList = new ArrayList<>();
+
+        if (attachments != null) {
+            for (MultipartFile file : attachments) {
+                String fileFullName = file.getOriginalFilename();
+
+                FileDetailVO fileInfo = new FileDetailVO();
+                fileInfo.setFileName(S2FileUtil.getBaseName(fileFullName));
+                fileInfo.setFileExt(S2FileUtil.getExtension(fileFullName));
+                fileInfo.setContentType(file.getContentType());
+                fileInfo.setFileData(file.getInputStream());
+
+                fileList.add(fileInfo);
+
+                // 테스트용 알림
+                Map<String, Object> pushMap = new HashMap<>();
+                pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_NOTIFICATION);
+                pushMap.put("message", "[" + fileFullName + "]" + (file.getName() != null ? "[" + file.getName() + "]" : "") + " 수신 사이즈: " + file.getSize());
+                serviceWorkerService.sendNotificationAll(pushMap);
+            }
+        }
+
+        wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_FORWARD_ASYNC_POST, requestId, countryCcd, url, header, queryString, decryptedBody, fileList);
     }
 
     /**

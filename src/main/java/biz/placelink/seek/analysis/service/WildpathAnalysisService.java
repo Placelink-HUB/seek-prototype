@@ -61,6 +61,19 @@ public class WildpathAnalysisService {
 
     @Transactional(readOnly = false)
     public int createProxyAnalysis(String analysisModeCcd, String requestId, String countryCcd, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
+        List<FileDetailVO> fileList = new ArrayList<>();
+
+        FileDetailVO fileInfo = new FileDetailVO();
+        fileInfo.setFileName(fileName);
+        fileInfo.setContentType(contentType);
+        fileInfo.setFileData(fileData);
+
+        fileList.add(fileInfo);
+        return this.createProxyAnalysis(analysisModeCcd, requestId, countryCcd, url, header, queryString, body, fileList);
+    }
+
+    @Transactional(readOnly = false)
+    public int createProxyAnalysis(String analysisModeCcd, String requestId, String countryCcd, String url, String header, String queryString, String body, List<FileDetailVO> fileList) {
         int result = 0;
         String analysisId = UUID.randomUUID().toString();
 
@@ -82,37 +95,35 @@ public class WildpathAnalysisService {
             analysisDetail.setQueryString(queryString);
             analysisDetail.setBody(body);
 
-            if (fileData != null) {
-                FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisModeCcd(), Constants.CD_FILE_SE_1010);
+            if (S2Util.isNotEmpty(fileList)) {
+                List<FileDetailVO> createFileDetailList = new ArrayList<>();
+                String fileId = UUID.randomUUID().toString();
 
-                if (fileDetailVO != null) {
-                    String fileId = UUID.randomUUID().toString();
-                    String baseFileName = "";
-                    String fileExtension = "";
+                for (FileDetailVO fileInfo : fileList) {
+                    String fileFullName = fileInfo.getFileFullName();
+                    String contentType = fileInfo.getContentType();
+                    InputStream fileData = fileInfo.getFileData();
 
-                    if (S2Util.isNotEmpty(fileName)) {
-                        int lastIndex = fileName.lastIndexOf(".");
-                        if (lastIndex > 0) {
-                            baseFileName = fileName.substring(0, lastIndex);
-                            fileExtension = fileName.substring(lastIndex + 1);
-                        } else {
-                            baseFileName = fileName;
+                    if (fileData != null) {
+                        FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisModeCcd(), Constants.CD_FILE_SE_1010);
+                        if (fileDetailVO != null) {
+                            // 파일 정보
+                            fileDetailVO.setFileId(fileId);
+                            fileDetailVO.setFileSeCcd(Constants.CD_FILE_SE_1010);
+
+                            // 파일 상세 정보
+                            fileDetailVO.setFileDetailId(fileId);
+                            fileDetailVO.setFileName(S2FileUtil.getBaseName(fileFullName));
+                            fileDetailVO.setFileExt(S2FileUtil.getExtension(fileFullName));
+                            fileDetailVO.setContentType(contentType);
+
+                            createFileDetailList.add(fileDetailVO);
                         }
                     }
+                }
 
-                    // 파일 정보
-                    fileDetailVO.setFileId(fileId);
-                    fileDetailVO.setFileSeCcd(Constants.CD_FILE_SE_1010);
-
-                    // 파일 상세 정보
-                    fileDetailVO.setFileDetailId(fileId);
-                    fileDetailVO.setFileName(baseFileName);
-                    fileDetailVO.setFileExt(fileExtension);
-                    fileDetailVO.setContentType(contentType);
-
-                    if (fileService.insertFileWithDetail(fileDetailVO, Constants.SYSTEM_UID) > 0) {
-                        analysisDetail.setFileId(fileId);
-                    }
+                if (fileService.insertFileWithDetailList(createFileDetailList, Constants.SYSTEM_UID) > 0) {
+                    analysisDetail.setFileId(fileId);
                 }
             }
 

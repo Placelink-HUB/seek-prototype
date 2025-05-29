@@ -1,5 +1,7 @@
 package biz.placelink.seek.system.file.vo;
 
+import java.io.InputStream;
+
 import kr.s2.ext.util.S2Util;
 
 public class FileDetailVO extends FileVO {
@@ -20,6 +22,8 @@ public class FileDetailVO extends FileVO {
     private String saveName;
     /* 정렬 순번 */
     private Integer sortSn;
+    /* 파일 데이터(InputStream) */
+    private InputStream fileData;
 
     /* 확장자를 포함한 파일 명 */
     public String getFileFullName() {
@@ -88,6 +92,14 @@ public class FileDetailVO extends FileVO {
 
     public void setSortSn(Integer sortSn) {
         this.sortSn = sortSn;
+    }
+
+    public InputStream getFileData() {
+        return fileData;
+    }
+
+    public void setFileData(InputStream fileData) {
+        this.fileData = fileData;
     }
 
 }

@@ -59,7 +59,11 @@
                 LEFT JOIN SEEK_ANALYSIS_DETECTIONS sad
                     ON sar.ANALYSIS_RESULT_ID = sad.ANALYSIS_RESULT_ID
             WHERE sa.analysis_status_ccd = 'COMPLETE'
+                /*
+                 * 국내를 내부로 임시 변경(!!s2!!)
                 AND COALESCE(spa.country_ccd, 'KR') = 'KR'
+                */
+                AND ANALYSIS_MODE_CCD NOT LIKE 'FORWARD%'
         <if test='schDe != null and schDe != ""'>
                 AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
         </if>
@@ -81,7 +85,11 @@
                 LEFT JOIN SEEK_ANALYSIS_DETECTIONS sad
                     ON sar.ANALYSIS_RESULT_ID = sad.ANALYSIS_RESULT_ID
             WHERE sa.analysis_status_ccd = 'COMPLETE'
+                /*
+                 * 해외를 외부로 임시 변경(!!s2!!)
                 AND  COALESCE(spa.country_ccd, 'KR') != 'KR'
+                */
+                AND ANALYSIS_MODE_CCD LIKE 'FORWARD%'
         <if test='schDe != null and schDe != ""'>
                 AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
         </if>

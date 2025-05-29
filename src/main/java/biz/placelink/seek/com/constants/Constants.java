@@ -80,6 +80,10 @@ public class Constants {
     public static final String SYSTEM_UID = "00000000-0000-0000-0000-000000000000";
 
     /**
+     * 분석_모드_공통코드 - 역방향
+     */
+    public static final String CD_ANALYSIS_MODE_REVERSE = "REVERSE";
+    /**
      * 분석_모드_공통코드 - 역방향 전처리
      */
     public static final String CD_ANALYSIS_MODE_REVERSE_PRE = "REVERSE_PRE";
@@ -95,6 +99,10 @@ public class Constants {
      * 분석_모드_공통코드 - 역방향 후처리(비동기)
      */
     public static final String CD_ANALYSIS_MODE_REVERSE_ASYNC_POST = "REVERSE_ASYNC_POST";
+    /**
+     * 분석_모드_공통코드 - 순방향
+     */
+    public static final String CD_ANALYSIS_MODE_FORWARD = "FORWARD";
     /**
      * 분석_모드_공통코드 - 순방향 전처리
      */

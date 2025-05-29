@@ -166,6 +166,7 @@ public class AnalyzerService {
 
                     pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE);
                     pushMap.put("checkId", analysisId);
+                    pushMap.put("analysisModeSe", existingAnalysisResult.getAnalysisModeCcd().startsWith(Constants.CD_ANALYSIS_MODE_FORWARD) ? Constants.CD_ANALYSIS_MODE_FORWARD : Constants.CD_ANALYSIS_MODE_REVERSE);
                     pushMap.put("analysisModeCcd", existingAnalysisResult.getAnalysisModeCcd());
                     pushMap.put("countryCcd", existingAnalysisResult.getCountryCcd());
                     pushMap.put("totalDetectionCount", existingAnalysisResult.getTotalDetectionCount());
@@ -391,6 +392,7 @@ public class AnalyzerService {
                     Map<String, Object> pushMap = new HashMap<>();
                     pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE);
                     pushMap.put("checkId", analysisId);
+                    pushMap.put("analysisModeSe", analysisDetail.getAnalysisModeCcd().startsWith(Constants.CD_ANALYSIS_MODE_FORWARD) ? Constants.CD_ANALYSIS_MODE_FORWARD : Constants.CD_ANALYSIS_MODE_REVERSE);
                     pushMap.put("analysisModeCcd", analysisDetail.getAnalysisModeCcd());
                     pushMap.put("countryCcd", analysisDetail.getCountryCcd());
                     pushMap.put("totalDetectionCount", totalDetectionCount);

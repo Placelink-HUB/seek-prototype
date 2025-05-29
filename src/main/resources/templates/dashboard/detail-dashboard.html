@@ -41,8 +41,9 @@
 
             const semicircleChartInfo = {
                 // 국내 접속자 탐지 현황
+                // 한국 내부로 임시 변경(!!s2!!)
                 koreaDetectionStatus: {
-                    text: '한국',
+                    text: '내부',
                     low: 0,
                     mid: 0,
                     high: 0,
@@ -51,8 +52,9 @@
                     backColor: '#61082b'
                 },
                 // 해외 접속자 탐지 현황
+                // 해외 외부로 임시 변경(!!s2!!)
                 overseasDetectionStatus: {
-                    text: '해외',
+                    text: '외부',
                     low: 0,
                     mid: 0,
                     high: 0,
@@ -113,7 +115,9 @@
                             doughnutChartInfo.detection.count++;
 
                             if (event.data.data.analysisModeCcd !== '[[${Constants.CD_ANALYSIS_MODE_DATABASE}]]') {
-                                if (event.data.data.countryCcd === '[[${Constants.CD_COUNTRY_KR}]]') {
+                                // if (event.data.data.countryCcd === '[[${Constants.CD_COUNTRY_KR}]]') {
+                                // 국내를 내부로 해외를 외부로 임시 변경(!!s2!!)
+                                if (event.data.data.countryCcd === '[[${Constants.CD_ANALYSIS_MODE_REVERSE}]]') {
                                     semicircleChartInfo.koreaDetectionStatus.low += event.data.data['[[${Constants.CD_DETECTION_TYPE_LOW}]]'] || 0;
                                     semicircleChartInfo.koreaDetectionStatus.mid += event.data.data['[[${Constants.CD_DETECTION_TYPE_MID}]]'] || 0;
                                     semicircleChartInfo.koreaDetectionStatus.high += event.data.data['[[${Constants.CD_DETECTION_TYPE_HIGH}]]'] || 0;
@@ -216,12 +220,12 @@
                         {
                             const detectionData = response.detectionData;
 
-                            // 국내 접속자 탐지 현황
+                            // 국내 접속자 탐지 현황 => 내부로 임시 변경(!!s2!!)
                             semicircleChartInfo['koreaDetectionStatus'].low = detectionData.koreaLowCount;
                             semicircleChartInfo['koreaDetectionStatus'].mid = detectionData.koreaMidCount;
                             semicircleChartInfo['koreaDetectionStatus'].high = detectionData.koreaHighCount;
 
-                            // 해외 접속자 탐지 현황
+                            // 해외 접속자 탐지 현황 => 외부 임시 변경(!!s2!!)
                             semicircleChartInfo['overseasDetectionStatus'].low = detectionData.otherLowCount;
                             semicircleChartInfo['overseasDetectionStatus'].mid = detectionData.otherMidCount;
                             semicircleChartInfo['overseasDetectionStatus'].high = detectionData.otherHighCount;
@@ -884,7 +888,8 @@
                     </div>
                     <div class="status-box">
                         <div class="box box1">
-                            <div class="box-top">국내 접속자 탐지 현황</div>
+                            <!-- 국내를 내부로 임시 변경(!!s2!!) -->
+                            <div class="box-top">내부 접속자 탐지 현황</div>
                             <div class="box-contents domestic-users koreaDetectionStatus">
                                 <div id="semicircleChart1" class="graph"></div>
                                 <div class="data-wrap">
@@ -910,7 +915,8 @@
                             </div>
                         </div>
                         <div class="box box2">
-                            <div class="box-top">해외 접속자 탐지 현황</div>
+                            <!-- 해외를 외부로 임시 변경(!!s2!!) -->
+                            <div class="box-top">외부 접속자 탐지 현황</div>
                             <div class="box-contents overseas-users overseasDetectionStatus">
                                 <div id="semicircleChart2" class="graph"></div>
                                 <div class="data-wrap">
