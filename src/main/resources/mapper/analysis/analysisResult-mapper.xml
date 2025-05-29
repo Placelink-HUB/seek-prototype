@@ -65,7 +65,7 @@
             )
         </foreach>
         ON CONFLICT (ANALYSIS_RESULT_ID, DETECTION_TYPE_CCD)
-        DO UPDATE SET DETECTION_COUNT = SEEK_ANALYSIS_DETECTIONS.DETECTION_COUNT + EXCLUDED.DETECTION_COUNT
+        DO NOTHING
     </insert>
 
     <select id="selectAnalysisDetectionList">
