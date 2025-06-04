@@ -8,11 +8,10 @@
             COUNT(1) AS REQUEST_COUNT,
             COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS COMPLETE_COUNT
         FROM SEEK_ANALYSIS
-        <where>
+        WHERE ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
             <if test='schDe != null and schDe != ""'>
                 AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
             </if>
-        </where>
     </select>
 
     <select id="selectAnalysisResultCount" resultType="analysisStatisticsVO">
@@ -23,10 +22,11 @@
         FROM SEEK_ANALYSIS sa
             LEFT JOIN SEEK_ANALYSIS_RESULT sar
                 ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
-        WHERE sa.analysis_status_ccd = 'COMPLETE'
-        <if test='schDe != null and schDe != ""'>
-            AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
-        </if>
+        WHERE sa.ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+            AND sa.analysis_status_ccd = 'COMPLETE'
+            <if test='schDe != null and schDe != ""'>
+                AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
+            </if>
     </select>
 
     <select id="selectDetectionStatistics" resultType="analysisStatisticsVO">
@@ -58,15 +58,16 @@
                     ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
                 LEFT JOIN SEEK_ANALYSIS_DETECTIONS sad
                     ON sar.ANALYSIS_RESULT_ID = sad.ANALYSIS_RESULT_ID
-            WHERE sa.analysis_status_ccd = 'COMPLETE'
+            WHERE sa.ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+                AND sa.analysis_status_ccd = 'COMPLETE'
                 /*
                  * 국내를 내부로 임시 변경(!!s2!!)
                 AND COALESCE(spa.country_ccd, 'KR') = 'KR'
                 */
                 AND ANALYSIS_MODE_CCD NOT LIKE 'FORWARD%'
-        <if test='schDe != null and schDe != ""'>
-                AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
-        </if>
+                <if test='schDe != null and schDe != ""'>
+                    AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
+                </if>
 
             UNION ALL
 
@@ -84,15 +85,16 @@
                     ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
                 LEFT JOIN SEEK_ANALYSIS_DETECTIONS sad
                     ON sar.ANALYSIS_RESULT_ID = sad.ANALYSIS_RESULT_ID
-            WHERE sa.analysis_status_ccd = 'COMPLETE'
+            WHERE sa.ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+                AND sa.analysis_status_ccd = 'COMPLETE'
                 /*
                  * 해외를 외부로 임시 변경(!!s2!!)
                 AND  COALESCE(spa.country_ccd, 'KR') != 'KR'
                 */
                 AND ANALYSIS_MODE_CCD LIKE 'FORWARD%'
-        <if test='schDe != null and schDe != ""'>
-                AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
-        </if>
+                <if test='schDe != null and schDe != ""'>
+                    AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
+                </if>
         ) x
     </select>
 
@@ -103,11 +105,10 @@
             COUNT(1) AS REQUEST_COUNT,
             COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS COMPLETE_COUNT
         FROM SEEK_ANALYSIS
-        <where>
+        WHERE ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
             <if test='schDe != null and schDe != ""'>
                 AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
             </if>
-        </where>
         GROUP BY MINUTE_GROUP
         ORDER BY MINUTE_GROUP
     </select>
@@ -117,10 +118,11 @@
         SELECT
             TO_CHAR(MAX(CREATE_DT), 'YYYYMMDDHH24MI')
         FROM SEEK_ANALYSIS
-        WHERE ANALYSIS_STATUS_CCD = 'COMPLETE'
-        <if test='schDe != null and schDe != ""'>
+        WHERE ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+            AND ANALYSIS_STATUS_CCD = 'COMPLETE'
+            <if test='schDe != null and schDe != ""'>
                 AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
-        </if>
+            </if>
     </select>
 
     <select id="selectTopSensitiveInformation" resultType="analysisStatisticsVO">
@@ -139,11 +141,10 @@
                         ON ssim.SENSITIVE_INFORMATION_ID = ssi.SENSITIVE_INFORMATION_ID
                     JOIN SEEK_SENSITIVE_INFORMATION_TYPES ssit
                         ON ssi.SENSITIVE_INFORMATION_ID = ssit.SENSITIVE_INFORMATION_ID
-        <where>
-            <if test='schDe != null and schDe != ""'>
+                WHERE sa.ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+                    <if test='schDe != null and schDe != ""'>
                         AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
-            </if>
-        </where>
+                    </if>
                 GROUP BY ssit.DETECTION_TYPE_CCD
         ) x
         ORDER BY x.HIT_COUNT DESC

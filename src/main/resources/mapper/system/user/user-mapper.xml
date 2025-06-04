@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.system.user.service.UserMapper">
+
+    <select id="selectUser" parameterType="string" resultType="userVO">
+        SELECT
+            USER_UID,
+            USER_ID,
+            PASSWORD,
+            NAME,
+            USE_YN,
+            DELETE_DT
+        FROM SEEK_USER
+        WHERE USER_ID = #{userId}
+    </select>
+
+</mapper>

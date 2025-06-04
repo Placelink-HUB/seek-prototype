@@ -123,6 +123,10 @@ public class Constants {
      * 분석_모드_공통코드 - 데이터베이스
      */
     public static final String CD_ANALYSIS_MODE_DATABASE = "DATABASE";
+    /**
+     * 분석_모드_공통코드 - 파일 탐지 (집계/이력에서 제외)
+     */
+    public static final String CD_ANALYSIS_MODE_EXCLUDE_DETECTION_FILE = "EXCLUDE_DETECTION_FILE";
 
     /**
      * 분석_상태_공통코드 - 대기

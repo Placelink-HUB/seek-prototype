@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -82,6 +84,17 @@ public class AnalysisController {
             // 기타 요청 처리
             System.out.println("기타 요청");
         }
+    }
+
+    /**
+     * 파일 검증 목록
+     *
+     * @param model ModelMap
+     * @return 파일 검증 목록
+     */
+    @GetMapping(value = "/analysis/detection-file-list")
+    public String file(ModelMap model) {
+        return "/analysis/detection-file-list";
     }
 
 }

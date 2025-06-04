@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
+    <th:block layout:fragment="bodyStyle">
+        <style>
+            #login #login-title {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100px;
+                font-size: 30px;
+                font-weight: bold;
+                color: #464646;
+                margin-bottom: 25px;
+                margin-top: 165px;
+                font-family: 'Inter', sans-serif;
+            }
+
+            #login #login-inform {
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+                align-items: center;
+                margin: 0 auto;
+            }
+
+            #login #login-inform .login-button {
+                width: 440px;
+                height: 40px;
+                border-radius: 5px;
+                background-color: #4a90e2;
+                color: white;
+                font-size: 15px;
+                font-weight: 500;
+                border: none;
+                cursor: pointer;
+                outline: none;
+                margin-top: 30px;
+            }
+
+            #login #id-email {
+                border: 1px solid #bdbdbd;
+                border-radius: 5px;
+                height: 40px;
+                padding: 5px;
+                padding-left: 50px;
+                width: 440px;
+                outline: none;
+                font-size: 15px;
+                font-weight: 300;
+                color: #313131;
+                letter-spacing: -0.5px;
+                background-color: rgba(255, 255, 255, 0);
+            }
+
+            #login #password {
+                border: 1px solid #bdbdbd;
+                border-radius: 5px;
+                height: 40px;
+                padding: 5px;
+                padding-left: 50px;
+                width: 440px;
+                outline: none;
+                font-size: 15px;
+                font-weight: 300;
+                color: #313131;
+                letter-spacing: -0.5px;
+                background-color: rgba(255, 255, 255, 0);
+            }
+
+            #login .input-container {
+                position: relative;
+                margin: 7px auto;
+            }
+
+            #login .input-container::before {
+                content: '';
+                position: absolute;
+                background-size: cover;
+            }
+
+            #login .input-container.id::before {
+                left: 12px;
+                top: 8px;
+                width: 25px;
+                height: 25px;
+                background-image: url('/public/images/id_icon.png');
+            }
+
+            #login .input-container.password::before {
+                left: 15px;
+                top: 9px;
+                width: 20px;
+                height: 20px;
+                background-image: url('/public/images/password_icon.png');
+            }
+        </style>
+    </th:block>
+    <th:block layout:fragment="bodyScript">
+        <script type="text/javascript"></script>
+    </th:block>
+    <th:block layout:fragment="bodyFragment">
+        <div id="login">
+            <div id="login-title">
+                <h1>LOGIN</h1>
+            </div>
+            <form th:action="@{/login-process}" method="post">
+                <div id="login-inform">
+                    <div class="input-container id">
+                        <input name="id" id="id-email" type="text" placeholder="이메일을 입력해주세요." />
+                    </div>
+                    <div class="input-container password">
+                        <input name="password" id="password" type="password" placeholder="비밀번호를 입력해주세요." />
+                    </div>
+                    <button type="submit" class="login-button">로그인</button>
+                </div>
+            </form>
+        </div>
+    </th:block>
+</html>

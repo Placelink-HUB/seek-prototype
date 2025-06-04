@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
+    <th:block layout:fragment="bodyStyle">
+        <style>
+            .header-wrapper .header-wrap {
+                border-right: 0;
+            }
+
+            .content-wrapper.contents-type2 #main .main-contents {
+                margin-top: 0;
+                padding-top: 0;
+            }
+
+            #main .main-contents .btn-sty-02 {
+                margin: 10px 0 10px calc(100% - 180px);
+            }
+
+            #main .main-contents .main-contents-contents .contents-box {
+                margin-top: 0;
+            }
+
+            .table-wrap .table-sty01 th,
+            .table-wrap .table-sty01 td {
+                height: 49px;
+            }
+
+            .table-wrap .pagination-wrapper {
+                margin-top: 16px;
+            }
+
+            .content-wrapper.contents-type2 {
+                overflow-y: hidden;
+            }
+        </style>
+    </th:block>
+    <th:block layout:fragment="bodyScript">
+        <script type="text/javascript">
+            let isRegistering = false;
+
+            document.addEventListener('DOMContentLoaded', () => {});
+
+            // eslint-disable-next-line no-unused-vars
+            function openValidateFile() {
+                S2Util.showModal(
+                    `
+                        <div class="risk-inspection-wrap modal">
+                            <div class="tab-container">
+                                <div>
+                                    <div id="tab-file" class="tab-contents active">
+                                        <div class="contents file-upload">
+                                            <div class="file-upload-box">
+                                                <input type="file" class="file-upload d-none" multiple accept=".pdf, .hwpx, .docx, .xlsx, .pptx, .zip, .7z"/>
+                                                <div class="file-upload-icon">
+                                                    <img src="/public/images/file_upload_icon.png" alt="파일아이콘"/>
+                                                </div>
+                                                <ul class="upload-file-list">
+                                                </ul>
+                                                <div class="file-upload-text">
+                                                    <p>첨부할 파일을 여기에 끌어다 놓거나, 파일 선택 버튼을 직접 선택해주세요.</p>
+                                                </div>
+                                                <button class="file-upload-button">파일선택</button>
+                                            </div>
+                                        </div>
+                                        <div class="button-wrap ma-t30">
+                                            <button class="btn-sty-01 create-article-btn">등록</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `,
+                    {
+                        width: '800px',
+                        title: '파일 검증'
+                    },
+                    function (modalSelector) {
+                        // 탭
+                        const tabButtons = document.querySelectorAll('.tab-container .tab-buttons .tab-btn');
+                        const tabContents = document.querySelectorAll('.tab-container .tab-contents');
+
+                        tabButtons.forEach((selectedTabButton) => {
+                            selectedTabButton.addEventListener('click', () => {
+                                tabButtons.forEach((tabButton) => {
+                                    tabButton.classList.remove('active');
+                                });
+                                tabContents.forEach((tabContent) => {
+                                    tabContent.classList.remove('active');
+                                });
+
+                                selectedTabButton.classList.add('active');
+                                const targetContent = document.getElementById(selectedTabButton.dataset.tab);
+                                targetContent.classList.add('active');
+
+                                const activeTabButton = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
+                                if (activeTabButton === 'tab-file') {
+                                    initDropZone();
+                                }
+                            });
+                        });
+
+                        // 등록 버튼 클릭 이벤트 처리
+                        document.body.addEventListener('click', (event) => {
+                            if (event.target.classList.contains('create-article-btn') && !isRegistering) {
+                                isRegistering = true;
+                                const activeTab = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
+                                if (activeTab === 'tab-text') {
+                                    // 글 등록
+                                    const desc = document.querySelector(`${modalSelector} [name=desc]`);
+
+                                    S2Util.fetch(
+                                        `/public/sample/create-article`,
+                                        {
+                                            method: 'post',
+                                            content: desc.value
+                                        },
+                                        function () {
+                                            S2Util.showToast('등록되었습니다.');
+                                            setTimeout(function () {
+                                                location.reload();
+                                            }, 500);
+                                        }
+                                    );
+                                } else if (activeTab === 'tab-file') {
+                                    if (g_uploadFiles.length === 0) {
+                                        S2Util.alert('파일이 없습니다.');
+                                        isRegistering = false;
+                                        return;
+                                    }
+
+                                    // 파일 등록
+                                    S2Util.fetch(
+                                        `/public/sample/create-article-file`,
+                                        {
+                                            method: 'post',
+                                            dataType: 'multipart/form-data',
+                                            files: g_uploadFiles
+                                        },
+                                        function () {
+                                            S2Util.showToast('등록되었습니다.');
+                                            setTimeout(function () {
+                                                location.reload();
+                                            }, 500);
+                                        }
+                                    );
+                                }
+                            }
+                        });
+                    }
+                );
+            }
+
+            // eslint-disable-next-line no-unused-vars
+            function openModalArticleContents(articleId, seekMode) {
+                S2Util.fetch(
+                    `/public/sample/article-info` + (seekMode ? `?seek_mode=${seekMode}` : ''),
+                    {
+                        method: 'get',
+                        dataType: 'json',
+                        articleId: articleId
+                    },
+                    function (response) {
+                        const data = response.articleData;
+                        let innerHtml = '';
+
+                        if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_TEXT}]]') {
+                            innerHtml = `<pre class="detail_contents">${data.content}</pre>`;
+                        } else if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_FILE}]]') {
+                            data.serverUrl = '';
+                            innerHtml = S2Util.s2Template('template_contents_file', data);
+                        }
+
+                        S2Util.showModal(
+                            `
+                            <div class="risk-inspection-wrap modal">
+                                <div class="box1">
+                                    <div class="contents">
+                                        ${innerHtml}
+                                    </div>
+                                </div>
+                            </div>
+                        `,
+                            {
+                                width: '800px',
+                                title: '상세'
+                            }
+                        );
+                    }
+                );
+            }
+
+            // eslint-disable-next-line no-unused-vars
+            function downloadFile(articleId) {
+                S2Util.fetch(
+                    '/public/sample/downloadFile.ar',
+                    {
+                        method: 'POST',
+                        responseType: 'blob',
+                        articleId: articleId
+                    },
+                    function () {
+                        S2Util.showToast('다운로드 성공하였습니다.');
+                    }
+                );
+            }
+
+            let g_uploadFiles = [];
+
+            function checkFileExtension(fileList) {
+                let result = true;
+                const allowedExtensions = ['pdf', 'hwpx', 'docx', 'xlsx', 'pptx', 'zip', '7z'];
+                for (let file of fileList) {
+                    const ext = file.name.split('.').pop().toLowerCase();
+                    if (!allowedExtensions.includes(ext)) {
+                        S2Util.alert('허용되지 않은 파일 형식입니다: ' + file.name);
+                        result = false;
+                        break;
+                    }
+                }
+                return result;
+            }
+
+            /**
+             * 업로드 파일 추가 UI
+             * @param {FileList} fileList - 파일 목록
+             */
+            function addUploadFileUI(fileList) {
+                const uploadFileList = document.querySelector('.upload-file-list');
+
+                if (fileList.length > 0) {
+                    document.querySelector('.file-upload .file-upload-box').classList.add('active');
+                    document.querySelector('.file-upload .file-upload-icon').classList.add('d-none');
+
+                    for (const file of fileList) {
+                        uploadFileList.innerHTML += `
+                            <li class="file-upload-ok">
+                                <img class="checked-file" src="/public/images/icon_file_chk.png" alt="파일선택완료"/>
+                                <div class="file-info">
+                                    <div class="flex-sty02">
+                                        <div class="file-border"></div>
+                                        <div class="file-title file-name">${file.name}</div>
+                                    </div>
+                                    <div class="file-remove">
+                                        <a onClick="deleteFile(this);"><img src="/public/images/icon_remove.png" alt="삭제아이콘"/></a>
+                                    </div>
+                                </div>
+                            </li>
+                        `;
+                    }
+                }
+            }
+
+            function initDropZone() {
+                g_uploadFiles = [];
+                const dropZone = document.querySelector('.file-upload .file-upload-box');
+                const fileUpload = document.querySelector('.file-upload .file-upload');
+
+                new S2DropZone({
+                    dropZone: dropZone,
+                    dragenter: function (event, dropZoneElement) {
+                        dropZoneElement.classList.add('highlight');
+                    },
+                    dragover: function (event, dropZoneElement) {
+                        dropZoneElement.classList.add('highlight');
+                    },
+                    dragleave: function (event, dropZoneElement) {
+                        dropZoneElement.classList.remove('highlight');
+                    },
+                    drop: function (event, dropZoneElement, dropFiles) {
+                        dropZoneElement.classList.remove('highlight');
+
+                        if (dropFiles.length > 0 && checkFileExtension(dropFiles)) {
+                            for (const file of dropFiles) {
+                                g_uploadFiles.push(file);
+                            }
+                            addUploadFileUI(dropFiles);
+                        }
+                    }
+                });
+
+                // 파일 선택 버튼 클릭 이벤트
+                const fileUploadButton = dropZone.querySelector('.file-upload-button');
+                if (fileUploadButton) {
+                    fileUploadButton.addEventListener('click', () => fileUpload.click());
+                }
+
+                // 파일 선택 이벤트
+                if (fileUpload) {
+                    fileUpload.addEventListener('change', () => {
+                        if (fileUpload.files.length > 0 && checkFileExtension(fileUpload.files)) {
+                            for (const file of fileUpload.files) {
+                                g_uploadFiles.push(file);
+                            }
+                            addUploadFileUI(fileUpload.files);
+                        }
+                    });
+                }
+            }
+
+            /**
+             * 파일 삭제
+             */
+            // eslint-disable-next-line no-unused-vars
+            function deleteFile(target) {
+                const delElement = target.closest('li');
+
+                const parentUl = delElement.parentElement;
+                const allLiElements = Array.from(parentUl.children);
+                const delIndex = allLiElements.indexOf(delElement);
+
+                g_uploadFiles.splice(delIndex, 1);
+                delElement.remove();
+
+                if (g_uploadFiles.length === 0) {
+                    document.querySelector('.file-upload .file-upload-box').classList.remove('active');
+                    document.querySelector('.file-upload .file-upload-icon').classList.remove('d-none');
+                }
+            }
+        </script>
+    </th:block>
+    <th:block layout:fragment="bodyFragment">
+        <div class="main-btn">
+            <button class="btn-sty-02" onclick="openValidateFile();">파일 검증</button>
+        </div>
+        <div class="main-contents-contents">
+            <div class="contents-box">
+                <div class="table-wrap">
+                    <table class="table-sty01">
+                        <caption>
+                            위험성 탐지 목록
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th>등록 일시</th>
+                                <th>게시글 타입</th>
+                                <th>raw 보기</th>
+                                <th>내용 보기</th>
+                                <th>원본 보기</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${articleListPagination.isEmpty}">
+                                <td colspan="5">데이터가 없습니다.</td>
+                            </tr>
+                            <tr th:each="article : ${articleListPagination.dataList}">
+                                <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
+                                <td th:text="${article.articleTypeCcdNm}"></td>
+                                <td>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>
+                                </td>
+                                <td>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
+                                </td>
+                                <td>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination-wrapper">
+                        <ul th:if="${articleListPagination.isNotEmpty}" class="pagination">
+                            <li th:if="${articleListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
+                                <a href="#" th:onclick="goPage([[${articleListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
+                            </li>
+                            <th:block th:each="pageNo : ${#numbers.sequence(articleListPagination.firstPageNoOnPageList, articleListPagination.lastPageNoOnPageList)}">
+                                <li th:if="${pageNo eq articleListPagination.pageNo}" class="paginate_button active">
+                                    <a href="#" th:text="${pageNo}"></a>
+                                </li>
+                                <li th:if="${pageNo ne articleListPagination.pageNo}" class="paginate_button">
+                                    <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
+                                </li>
+                            </th:block>
+                            <li th:if="${articleListPagination.lastPageNoOnPageList lt articleListPagination.lastPageNo}" class="paginate_button next">
+                                <a href="#" th:onclick="goPage([[${articleListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <script id="template_contents_file" type="text/template">
+                <img th:src="@{{{=serverUrl}}/file/image/view/{{=fileId}}}" alt="파일이미지"/>
+            </script>
+        </div>
+    </th:block>
+</html>

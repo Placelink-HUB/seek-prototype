@@ -68,7 +68,7 @@ public class ArticleController {
      *
      * @return Sample 페이지 경로
      */
-    @GetMapping(value = "/public/sample/test")
+    @GetMapping(value = "/sample/test")
     public String tissue(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, Model model) {
         SchArticleVO searchVO = new SchArticleVO();
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
