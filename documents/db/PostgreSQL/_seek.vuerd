@@ -4049,20 +4049,20 @@
       "BO65-kx1iHqilRMBZ0MNp": {
         "id": "BO65-kx1iHqilRMBZ0MNp",
         "tableId": "TpbaLEAj2H9DyZBdp2b71",
-        "name": "FILE_ID",
-        "comment": "파일_ID",
+        "name": "DETECTION_FILE_ID",
+        "comment": "탐지_파일_ID",
         "dataType": "CHAR(36)",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 0,
-          "widthName": 60,
-          "widthComment": 60,
+          "widthName": 106,
+          "widthComment": 72,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1748857271825,
+          "updateAt": 1749024902461,
           "createAt": 1748857257216
         }
       },

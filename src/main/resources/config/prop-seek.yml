@@ -2,6 +2,8 @@ analysis:
   server:
     url: http://43.200.240.163:8000 # 분석기 서버 URL
   model-name: llama3_8b_seek_common_model
+  file-signed-server:
+    url: http://43.200.240.163:8090 # 파일 서명 URL
   schedule:
     enabled: true
     request:

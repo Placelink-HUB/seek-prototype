@@ -43,15 +43,25 @@
 		/** insertFileAnalysis : 파일 분석 정보를 등록한다. */
 		INSERT INTO SEEK_FILE_ANALYSIS (
 			ANALYSIS_ID,
-			FILE_ID,
+			DETECTION_FILE_ID,
 			SIGNED_FILE_ID,
 			REQUESTER_UID
 		) VALUES (
 			#{analysisId},
-			#{fileId},
+			#{detectionFileId},
 			#{signedFileId},
 			#{requesterUid}
 		)
+    </insert>
+
+    <insert id="updateFileAnalysis" parameterType="analysisDetailVO">
+		/** updateFileAnalysis : 파일 분석 정보를 수정한다. */
+		UPDATE SEEK_FILE_ANALYSIS
+        SET
+            DETECTION_FILE_ID = COALESCE(#{detectionFileId}, DETECTION_FILE_ID),
+            SIGNED_FILE_ID = COALESCE(#{signedFileId}, SIGNED_FILE_ID),
+            REQUESTER_UID = COALESCE(#{requesterUid}, REQUESTER_UID)
+        WHERE ANALYSIS_ID = #{analysisId}
     </insert>
 
 </mapper>

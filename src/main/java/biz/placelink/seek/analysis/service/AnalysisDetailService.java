@@ -71,11 +71,21 @@ public class AnalysisDetailService {
     /**
      * 파일 분석 정보를 등록한다.
      *
-     * @param paramVO 파일 작업 정보
+     * @param paramVO 파일 분석 정보
      * @return 등록 개수
      */
     public int insertFileAnalysis(AnalysisDetailVO paramVO) {
         return analysisDetailMapper.insertFileAnalysis(paramVO);
+    }
+
+    /**
+     * 파일 분석 정보를 수정한다.
+     *
+     * @param paramVO 파일 분석 정보
+     * @return 등록 개수
+     */
+    public int updateFileAnalysis(AnalysisDetailVO paramVO) {
+        return analysisDetailMapper.updateFileAnalysis(paramVO);
     }
 
 }

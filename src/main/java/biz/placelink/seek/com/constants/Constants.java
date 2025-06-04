@@ -199,6 +199,11 @@ public class Constants {
     public static final String CD_FILE_SE_1010 = "1010";
 
     /**
+     * 파일_구분_공통코드 - 서명 완료 파일
+     */
+    public static final String CD_FILE_SE_2010 = "2010";
+
+    /**
      * 국가_공통코드 - 한국
      */
     public static final String CD_COUNTRY_KR = "KR";

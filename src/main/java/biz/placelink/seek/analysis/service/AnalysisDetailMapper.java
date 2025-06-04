@@ -55,4 +55,12 @@ public interface AnalysisDetailMapper {
      */
     int insertFileAnalysis(AnalysisDetailVO paramVO);
 
+    /**
+     * 파일 분석 정보를 수정한다.
+     *
+     * @param paramVO 파일 분석 정보
+     * @return 등록 개수
+     */
+    int updateFileAnalysis(AnalysisDetailVO paramVO);
+
 }

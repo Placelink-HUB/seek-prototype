@@ -28,6 +28,8 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     // ---------- 파일 ----------//
 
+    /* 탐지 파일 ID */
+    private String detectionFileId;
     /* 서명된 파일 ID */
     private String signedFileId;
     /* 요청자 식별자 */
@@ -103,6 +105,14 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getDetectionFileId() {
+        return detectionFileId;
+    }
+
+    public void setDetectionFileId(String detectionFileId) {
+        this.detectionFileId = detectionFileId;
     }
 
     public String getSignedFileId() {

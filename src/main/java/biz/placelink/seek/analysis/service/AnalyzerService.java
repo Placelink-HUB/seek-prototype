@@ -3,9 +3,11 @@ package biz.placelink.seek.analysis.service;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
+import biz.placelink.seek.com.util.FileUtils;
 import biz.placelink.seek.com.util.RestApiUtil;
 import biz.placelink.seek.system.file.service.FileService;
 import biz.placelink.seek.system.file.vo.FileDetailVO;
@@ -37,10 +40,12 @@ import kr.s2.ext.exception.S2Exception;
 import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2EncryptionUtil;
+import kr.s2.ext.util.S2FileUtil;
 import kr.s2.ext.util.S2HashUtil;
 import kr.s2.ext.util.S2JsonUtil;
 import kr.s2.ext.util.S2StreamUtil;
 import kr.s2.ext.util.S2Util;
+import kr.s2.ext.util.vo.S2RemoteFile;
 
 /**
  * <pre>
@@ -62,16 +67,18 @@ public class AnalyzerService {
     private final ServiceWorkerService serviceWorkerService;
     private final AnalysisRequestStatus analysisRequestStatus;
     private final AnalysisService analysisService;
+    private final AnalysisDetailService analysisDetailService;
     private final AnalysisResultService analysisResultService;
     private final AnalysisErrorService analysisErrorService;
     private final SensitiveInformationService sensitiveInformationService;
     private final FileManager fileManager;
     private final FileService fileService;
 
-    public AnalyzerService(ServiceWorkerService serviceWorkerService, AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, AnalysisResultService analysisResultService, AnalysisErrorService analysisErrorService, SensitiveInformationService sensitiveInformationService, FileManager fileManager, FileService fileService) {
+    public AnalyzerService(ServiceWorkerService serviceWorkerService, AnalysisRequestStatus analysisRequestStatus, AnalysisService analysisService, AnalysisDetailService analysisDetailService, AnalysisResultService analysisResultService, AnalysisErrorService analysisErrorService, SensitiveInformationService sensitiveInformationService, FileManager fileManager, FileService fileService) {
         this.serviceWorkerService = serviceWorkerService;
         this.analysisRequestStatus = analysisRequestStatus;
         this.analysisService = analysisService;
+        this.analysisDetailService = analysisDetailService;
         this.analysisResultService = analysisResultService;
         this.analysisErrorService = analysisErrorService;
         this.sensitiveInformationService = sensitiveInformationService;
@@ -87,6 +94,12 @@ public class AnalyzerService {
 
     @Value("${encryption.password}")
     public String encryptionPassword;
+
+    @Value("${analysis.file-signed-server.url}")
+    public String fileSignedServer;
+
+    @Value("${file.root.path}")
+    private String fileRootPath;
 
     private final long hashSeed = 0;
     private final int apiTimeout = 60000; // API 요청 타임아웃 (60초)
@@ -189,7 +202,7 @@ public class AnalyzerService {
 
             if (Constants.CD_ANALYSIS_MODE_DATABASE.equals(analysisDetail.getAnalysisModeCcd())) {
                 analysisParamList.add(Map.entry("user_input", analysisDetail.getContent()));
-                analysisData = generateAnalysisData(analysisParamList);
+                analysisData = requestRestApi(S2Util.joinPaths(analyzerUrl, "/generate"), analysisParamList);
             } else {
                 String body = analysisDetail.getBody();
                 if (S2Util.isNotEmpty(body)) {
@@ -212,7 +225,7 @@ public class AnalyzerService {
                     }
                 }
 
-                analysisData = generateAnalysisData(analysisParamList);
+                analysisData = requestRestApi(S2Util.joinPaths(analyzerUrl, "/generate"), analysisParamList);
             }
 
             JsonNode analysisJsonData = S2JsonUtil.parseJson(analysisData);
@@ -258,13 +271,12 @@ public class AnalyzerService {
     }
 
     @SuppressWarnings("unchecked")
-    private String generateAnalysisData(List<Map.Entry<String, Object>> analysisParamList) {
-        if (analysisParamList == null || analysisParamList.isEmpty()) {
-            throw new S2RuntimeException("분석 데이터가 존재하지 않습니다.");
+    private String requestRestApi(String analysisSeServerUrl, List<Map.Entry<String, Object>> requestParamList) {
+        if (requestParamList == null || requestParamList.isEmpty()) {
+            throw new S2RuntimeException("요청 데이터가 존재하지 않습니다.");
         }
 
-        String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, "/generate");
-        String analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.POST, apiTimeout, analysisParamList.toArray(new Map.Entry[0]));
+        String analysisData = RestApiUtil.callApi(analysisSeServerUrl, HttpMethod.POST, apiTimeout, requestParamList.toArray(new Map.Entry[0]));
 
         if (S2Util.isEmpty(analysisData)) {
             throw new S2RuntimeException("[API 요청 호출 실패]: 결과 값이 존재하지 않습니다.");
@@ -282,6 +294,7 @@ public class AnalyzerService {
     public void asyncPollAnalysisResults(AnalysisDetailVO analysisDetail) {
         if (analysisDetail != null) {
             String analysisId = analysisDetail.getAnalysisId();
+            String analysisModeCcd = analysisDetail.getAnalysisModeCcd();
             String analysisDataHash = analysisDetail.getAnalysisDataHash(); // 분석 모델을 포함한 데이터 해시 값, 최초 분석 완료 시 analysisResultId 값으로 등록한다.
             String analysisRawData = "";
 
@@ -392,8 +405,8 @@ public class AnalyzerService {
                     Map<String, Object> pushMap = new HashMap<>();
                     pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE);
                     pushMap.put("checkId", analysisId);
-                    pushMap.put("analysisModeSe", analysisDetail.getAnalysisModeCcd().startsWith(Constants.CD_ANALYSIS_MODE_PROXY_FORWARD) ? Constants.CD_ANALYSIS_MODE_PROXY_FORWARD : Constants.CD_ANALYSIS_MODE_PROXY_REVERSE);
-                    pushMap.put("analysisModeCcd", analysisDetail.getAnalysisModeCcd());
+                    pushMap.put("analysisModeSe", analysisModeCcd.startsWith(Constants.CD_ANALYSIS_MODE_PROXY_FORWARD) ? Constants.CD_ANALYSIS_MODE_PROXY_FORWARD : Constants.CD_ANALYSIS_MODE_PROXY_REVERSE);
+                    pushMap.put("analysisModeCcd", analysisModeCcd);
                     pushMap.put("countryCcd", analysisDetail.getCountryCcd());
                     pushMap.put("totalDetectionCount", totalDetectionCount);
                     pushMap.put("createDtStr", this.getCreateDtStr(analysisDetail.getCreateDt()));
@@ -430,7 +443,12 @@ public class AnalyzerService {
                         serviceWorkerService.sendNotificationAll(pushMap);
                     }
 
-                    analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, analysisTime, analysisDetail.getAnalysisModeCcd(), totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
+                    if (totalDetectionCount == 0 && Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd)) {
+                        // 파일 탐지인 경우 민감 정보가 없는 파일은 서명을 받는다.
+                        requestRemoteFileSigning(analysisId, analysisDetail.getDetectionFileId());
+                    }
+
+                    analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, analysisTime, analysisModeCcd, totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
                     analysisRequestStatus.remove(analysisId);
                 }
             } catch (Exception e) {
@@ -449,6 +467,76 @@ public class AnalyzerService {
             return createDt.format(formatter);
         } else {
             return LocalDateTime.now().format(formatter);
+        }
+    }
+
+    private void requestRemoteFileSigning(String analysisId, String fileId) {
+        List<Map.Entry<String, Object>> requestParamList = new ArrayList<>();
+        List<InputStream> dataStreamList = new ArrayList<>();
+
+        try {
+            List<FileDetailVO> fileDetailList = fileService.selectFileDetailList(fileId);
+            if (fileDetailList != null && !fileDetailList.isEmpty()) {
+                for (FileDetailVO fileDetail : fileDetailList) {
+                    if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
+                        InputStream fileInputStream = fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName());
+                        dataStreamList.add(fileInputStream);
+
+                        /*
+                         * [원격 파일일때 검토 필요사항]
+                         * 지금은 fileManager 가 로컬의 파일을 읽어와서 직접 사용한다.
+                         * 만약 fileManager 가 원격의 파일을 읽어 온다면 임시 파일로 저장하여 위의 InputStream 과 같이 사용할 것을 검토해야만 한다.
+                         */
+                        requestParamList.add(Map.entry("files", RestApiUtil.createInputStreamResource(fileInputStream, fileDetail.getFileFullName(), fileDetail.getFileSize())));
+                    }
+                }
+            }
+
+            JsonNode resultData = S2JsonUtil.parseJson(requestRestApi(fileSignedServer, requestParamList));
+            if (resultData != null) {
+                String downloadUrl = resultData.path("download_url").asText("");
+                if (S2Util.isNotEmpty(downloadUrl)) {
+                    // 파일 다운로드 저장 후 signedFileId 업데이트 필요
+                    String savePath = S2Util.joinPaths(fileRootPath, Constants.CD_FILE_SE_2010, new SimpleDateFormat("yyyy/MM/dd/HH/mm").format(new Date()));
+                    String saveName = FileUtils.makeFileId();
+
+                    S2RemoteFile remoteFileInfo = S2FileUtil.downloadRemoteFile(S2Util.joinPaths(fileSignedServer, downloadUrl), savePath, saveName);
+                    if (remoteFileInfo != null) {
+                        FileDetailVO fileDetailVO = new FileDetailVO();
+
+                        String signedFileId = FileUtils.makeFileId();
+                        String fileDetailId = FileUtils.makeFileId();
+
+                        // 파일 정보
+                        fileDetailVO.setFileId(signedFileId);
+                        fileDetailVO.setFileSeCcd(Constants.CD_FILE_SE_2010);
+
+                        // 파일 상세 정보
+                        fileDetailVO.setFileDetailId(fileDetailId);
+                        fileDetailVO.setFileName(remoteFileInfo.getBaseName());
+                        fileDetailVO.setFileExt(remoteFileInfo.getExtension());
+                        fileDetailVO.setContentType(remoteFileInfo.getContentType());
+                        fileDetailVO.setFileSize(remoteFileInfo.getSize());
+                        fileDetailVO.setSavePath(savePath);
+                        fileDetailVO.setSaveName(saveName);
+
+                        if (fileService.insertFileWithDetail(fileDetailVO, Constants.SYSTEM_UID) > 0) {
+                            // SEEK_FILE_ANALYSIS 테이블에 signedFileId 업데이트 필요
+                            AnalysisDetailVO fileAnalysisParam = new AnalysisDetailVO();
+                            fileAnalysisParam.setAnalysisId(analysisId);
+                            fileAnalysisParam.setSignedFileId(signedFileId);
+
+                            analysisDetailService.updateFileAnalysis(fileAnalysisParam);
+                        }
+                    }
+                }
+            }
+        } finally {
+            if (dataStreamList != null) {
+                for (InputStream dataStream : dataStreamList) {
+                    S2StreamUtil.closeStream(dataStream);
+                }
+            }
         }
     }
 

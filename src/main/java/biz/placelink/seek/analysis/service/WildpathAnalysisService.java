@@ -107,12 +107,14 @@ public class WildpathAnalysisService {
                     if (fileData != null) {
                         FileDetailVO fileDetailVO = fileService.writeFile(fileData, analysisDetail.getAnalysisModeCcd(), Constants.CD_FILE_SE_1010);
                         if (fileDetailVO != null) {
+                            String fileDetailId = UUID.randomUUID().toString();
+
                             // 파일 정보
                             fileDetailVO.setFileId(fileId);
                             fileDetailVO.setFileSeCcd(Constants.CD_FILE_SE_1010);
 
                             // 파일 상세 정보
-                            fileDetailVO.setFileDetailId(fileId);
+                            fileDetailVO.setFileDetailId(fileDetailId);
                             fileDetailVO.setFileName(S2FileUtil.getBaseName(fileFullName));
                             fileDetailVO.setFileExt(S2FileUtil.getExtension(fileFullName));
                             fileDetailVO.setContentType(contentType);
