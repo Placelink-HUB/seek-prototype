@@ -183,7 +183,7 @@ public class WildpathController {
             }
 
             if (!this.isExcludedPath(request, "/postprocess/", true)) {
-                payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_REVERSE_POST, payload, seekMode);
+                payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_POST, payload, seekMode);
             }
             return ResponseEntity.ok()
                     .contentType(new MediaType(MediaType.valueOf(StringUtils.defaultIfEmpty(request.getHeader("X-Origin-Content-Type"), request.getContentType())), StandardCharsets.UTF_8))
@@ -241,7 +241,7 @@ public class WildpathController {
         switch (documentTypeFromContentType) {
         case "text":
             String body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-            wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, body, null, null, null);
+            wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, body, null, null, null);
             break;
         case "image":
         case "pdf":
@@ -254,7 +254,7 @@ public class WildpathController {
         case "hwp":
         case "zip":
             try (InputStream fileData = request.getInputStream()) {
-                wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
+                wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
             }
             break;
         }
@@ -366,7 +366,7 @@ public class WildpathController {
             }
         }
 
-        wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_FORWARD_ASYNC_POST, requestId, countryCcd, url, header, queryString, decryptedBody, fileList);
+        wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_FORWARD_ASYNC_POST, requestId, countryCcd, url, header, queryString, decryptedBody, fileList);
     }
 
     /**

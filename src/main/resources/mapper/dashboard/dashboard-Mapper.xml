@@ -8,7 +8,7 @@
             COUNT(1) AS REQUEST_COUNT,
             COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS COMPLETE_COUNT
         FROM SEEK_ANALYSIS
-        WHERE ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+        WHERE ANALYSIS_MODE_CCD LIKE 'PROXY_%'
             <if test='schDe != null and schDe != ""'>
                 AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
             </if>
@@ -22,7 +22,7 @@
         FROM SEEK_ANALYSIS sa
             LEFT JOIN SEEK_ANALYSIS_RESULT sar
                 ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
-        WHERE sa.ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+        WHERE sa.ANALYSIS_MODE_CCD LIKE 'PROXY_%'
             AND sa.analysis_status_ccd = 'COMPLETE'
             <if test='schDe != null and schDe != ""'>
                 AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
@@ -58,13 +58,13 @@
                     ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
                 LEFT JOIN SEEK_ANALYSIS_DETECTIONS sad
                     ON sar.ANALYSIS_RESULT_ID = sad.ANALYSIS_RESULT_ID
-            WHERE sa.ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+            WHERE sa.ANALYSIS_MODE_CCD LIKE 'PROXY_%'
                 AND sa.analysis_status_ccd = 'COMPLETE'
                 /*
                  * 국내를 내부로 임시 변경(!!s2!!)
                 AND COALESCE(spa.country_ccd, 'KR') = 'KR'
                 */
-                AND ANALYSIS_MODE_CCD NOT LIKE 'FORWARD%'
+                AND ANALYSIS_MODE_CCD LIKE 'PROXY_REVERSE_%'
                 <if test='schDe != null and schDe != ""'>
                     AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
                 </if>
@@ -85,13 +85,13 @@
                     ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
                 LEFT JOIN SEEK_ANALYSIS_DETECTIONS sad
                     ON sar.ANALYSIS_RESULT_ID = sad.ANALYSIS_RESULT_ID
-            WHERE sa.ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+            WHERE sa.ANALYSIS_MODE_CCD LIKE 'PROXY_%'
                 AND sa.analysis_status_ccd = 'COMPLETE'
                 /*
                  * 해외를 외부로 임시 변경(!!s2!!)
                 AND  COALESCE(spa.country_ccd, 'KR') != 'KR'
                 */
-                AND ANALYSIS_MODE_CCD LIKE 'FORWARD%'
+                AND ANALYSIS_MODE_CCD LIKE 'PROXY_FORWARD_%'
                 <if test='schDe != null and schDe != ""'>
                     AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
                 </if>
@@ -105,7 +105,7 @@
             COUNT(1) AS REQUEST_COUNT,
             COALESCE(SUM(CASE WHEN ANALYSIS_STATUS_CCD = 'COMPLETE' THEN 1 ELSE 0 END), 0) AS COMPLETE_COUNT
         FROM SEEK_ANALYSIS
-        WHERE ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+        WHERE ANALYSIS_MODE_CCD LIKE 'PROXY_%'
             <if test='schDe != null and schDe != ""'>
                 AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
             </if>
@@ -118,7 +118,7 @@
         SELECT
             TO_CHAR(MAX(CREATE_DT), 'YYYYMMDDHH24MI')
         FROM SEEK_ANALYSIS
-        WHERE ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+        WHERE ANALYSIS_MODE_CCD LIKE 'PROXY_%'
             AND ANALYSIS_STATUS_CCD = 'COMPLETE'
             <if test='schDe != null and schDe != ""'>
                 AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
@@ -141,7 +141,7 @@
                         ON ssim.SENSITIVE_INFORMATION_ID = ssi.SENSITIVE_INFORMATION_ID
                     JOIN SEEK_SENSITIVE_INFORMATION_TYPES ssit
                         ON ssi.SENSITIVE_INFORMATION_ID = ssit.SENSITIVE_INFORMATION_ID
-                WHERE sa.ANALYSIS_MODE_CCD != 'EXCLUDE_DETECTION_FILE'
+                WHERE sa.ANALYSIS_MODE_CCD LIKE 'PROXY_%'
                     <if test='schDe != null and schDe != ""'>
                         AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
                     </if>

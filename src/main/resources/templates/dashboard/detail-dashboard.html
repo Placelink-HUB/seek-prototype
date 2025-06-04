@@ -114,10 +114,10 @@
                         if (event.data.data.totalDetectionCount > 0) {
                             doughnutChartInfo.detection.count++;
 
-                            if (event.data.data.analysisModeCcd !== '[[${Constants.CD_ANALYSIS_MODE_DATABASE}]]' && event.data.data.analysisModeCcd !== '[[${Constants.CD_ANALYSIS_MODE_EXCLUDE_DETECTION_FILE}]]') {
+                            if (event.data.data.analysisModeCcd.startsWith('[[${Constants.CD_ANALYSIS_MODE_PROXY}]]')) {
                                 // if (event.data.data.countryCcd === '[[${Constants.CD_COUNTRY_KR}]]') {
                                 // 국내를 내부로 해외를 외부로 임시 변경(!!s2!!)
-                                if (event.data.data.analysisModeSe === '[[${Constants.CD_ANALYSIS_MODE_REVERSE}]]') {
+                                if (event.data.data.analysisModeSe === '[[${Constants.CD_ANALYSIS_MODE_PROXY_REVERSE}]]') {
                                     semicircleChartInfo.koreaDetectionStatus.low += event.data.data['[[${Constants.CD_DETECTION_TYPE_LOW}]]'] || 0;
                                     semicircleChartInfo.koreaDetectionStatus.mid += event.data.data['[[${Constants.CD_DETECTION_TYPE_MID}]]'] || 0;
                                     semicircleChartInfo.koreaDetectionStatus.high += event.data.data['[[${Constants.CD_DETECTION_TYPE_HIGH}]]'] || 0;

@@ -80,53 +80,58 @@ public class Constants {
     public static final String SYSTEM_UID = "00000000-0000-0000-0000-000000000000";
 
     /**
-     * 분석_모드_공통코드 - 역방향
+     * 분석_모드_공통코드 - 프록시
      */
-    public static final String CD_ANALYSIS_MODE_REVERSE = "REVERSE";
+    public static final String CD_ANALYSIS_MODE_PROXY = "PROXY";
+
     /**
-     * 분석_모드_공통코드 - 역방향 전처리
+     * 분석_모드_공통코드 - 프록시 역방향
      */
-    public static final String CD_ANALYSIS_MODE_REVERSE_PRE = "REVERSE_PRE";
+    public static final String CD_ANALYSIS_MODE_PROXY_REVERSE = "PROXY_REVERSE";
     /**
-     * 분석_모드_공통코드 - 역방향 전처리(비동기)
+     * 분석_모드_공통코드 - 프록시 역방향 전처리
      */
-    public static final String CD_ANALYSIS_MODE_REVERSE_ASYNC_PRE = "REVERSE_ASYNC_PRE";
+    public static final String CD_ANALYSIS_MODE_PROXY_REVERSE_PRE = "PROXY_REVERSE_PRE";
     /**
-     * 분석_모드_공통코드 - 역방향 후처리
+     * 분석_모드_공통코드 - 프록시 역방향 전처리(비동기)
      */
-    public static final String CD_ANALYSIS_MODE_REVERSE_POST = "REVERSE_POST";
+    public static final String CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_PRE = "PROXY_REVERSE_ASYNC_PRE";
     /**
-     * 분석_모드_공통코드 - 역방향 후처리(비동기)
+     * 분석_모드_공통코드 - 프록시 역방향 후처리
      */
-    public static final String CD_ANALYSIS_MODE_REVERSE_ASYNC_POST = "REVERSE_ASYNC_POST";
+    public static final String CD_ANALYSIS_MODE_PROXY_REVERSE_POST = "PROXY_REVERSE_POST";
     /**
-     * 분석_모드_공통코드 - 순방향
+     * 분석_모드_공통코드 - 프록시 역방향 후처리(비동기)
      */
-    public static final String CD_ANALYSIS_MODE_FORWARD = "FORWARD";
+    public static final String CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST = "PROXY_REVERSE_ASYNC_POST";
     /**
-     * 분석_모드_공통코드 - 순방향 전처리
+     * 분석_모드_공통코드 - 프록시 순방향
      */
-    public static final String CD_ANALYSIS_MODE_FORWARD_PRE = "FORWARD_PRE";
+    public static final String CD_ANALYSIS_MODE_PROXY_FORWARD = "PROXY_FORWARD";
     /**
-     * 분석_모드_공통코드 - 순방향 전처리(비동기)
+     * 분석_모드_공통코드 - 프록시 순방향 전처리
      */
-    public static final String CD_ANALYSIS_MODE_FORWARD_ASYNC_PRE = "FORWARD_ASYNC_PRE";
+    public static final String CD_ANALYSIS_MODE_PROXY_FORWARD_PRE = "PROXY_FORWARD_PRE";
     /**
-     * 분석_모드_공통코드 - 순방향 후처리
+     * 분석_모드_공통코드 - 프록시 순방향 전처리(비동기)
      */
-    public static final String CD_ANALYSIS_MODE_FORWARD_POST = "FORWARD_POST";
+    public static final String CD_ANALYSIS_MODE_PROXY_FORWARD_ASYNC_PRE = "PROXY_FORWARD_ASYNC_PRE";
     /**
-     * 분석_모드_공통코드 - 순방향 후처리(비동기)
+     * 분석_모드_공통코드 - 프록시 순방향 후처리
      */
-    public static final String CD_ANALYSIS_MODE_FORWARD_ASYNC_POST = "FORWARD_ASYNC_POST";
+    public static final String CD_ANALYSIS_MODE_PROXY_FORWARD_POST = "PROXY_FORWARD_POST";
+    /**
+     * 분석_모드_공통코드 - 프록시 순방향 후처리(비동기)
+     */
+    public static final String CD_ANALYSIS_MODE_PROXY_FORWARD_ASYNC_POST = "PROXY_FORWARD_ASYNC_POST";
     /**
      * 분석_모드_공통코드 - 데이터베이스
      */
     public static final String CD_ANALYSIS_MODE_DATABASE = "DATABASE";
     /**
-     * 분석_모드_공통코드 - 파일 탐지 (집계/이력에서 제외)
+     * 분석_모드_공통코드 - 파일 탐지
      */
-    public static final String CD_ANALYSIS_MODE_EXCLUDE_DETECTION_FILE = "EXCLUDE_DETECTION_FILE";
+    public static final String CD_ANALYSIS_MODE_DETECTION_FILE = "DETECTION_FILE";
 
     /**
      * 분석_상태_공통코드 - 대기
