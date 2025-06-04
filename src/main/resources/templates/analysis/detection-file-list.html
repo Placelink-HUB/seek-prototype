@@ -73,76 +73,35 @@
                         width: '800px',
                         title: '파일 검증'
                     },
-                    function (modalSelector) {
-                        // 탭
-                        const tabButtons = document.querySelectorAll('.tab-container .tab-buttons .tab-btn');
-                        const tabContents = document.querySelectorAll('.tab-container .tab-contents');
-
-                        tabButtons.forEach((selectedTabButton) => {
-                            selectedTabButton.addEventListener('click', () => {
-                                tabButtons.forEach((tabButton) => {
-                                    tabButton.classList.remove('active');
-                                });
-                                tabContents.forEach((tabContent) => {
-                                    tabContent.classList.remove('active');
-                                });
-
-                                selectedTabButton.classList.add('active');
-                                const targetContent = document.getElementById(selectedTabButton.dataset.tab);
-                                targetContent.classList.add('active');
-
-                                const activeTabButton = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
-                                if (activeTabButton === 'tab-file') {
-                                    initDropZone();
-                                }
-                            });
-                        });
+                    function () {
+                        initDropZone();
 
                         // 등록 버튼 클릭 이벤트 처리
                         document.body.addEventListener('click', (event) => {
                             if (event.target.classList.contains('create-article-btn') && !isRegistering) {
                                 isRegistering = true;
-                                const activeTab = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
-                                if (activeTab === 'tab-text') {
-                                    // 글 등록
-                                    const desc = document.querySelector(`${modalSelector} [name=desc]`);
 
-                                    S2Util.fetch(
-                                        `/public/sample/create-article`,
-                                        {
-                                            method: 'post',
-                                            content: desc.value
-                                        },
-                                        function () {
-                                            S2Util.showToast('등록되었습니다.');
-                                            setTimeout(function () {
-                                                location.reload();
-                                            }, 500);
-                                        }
-                                    );
-                                } else if (activeTab === 'tab-file') {
-                                    if (g_uploadFiles.length === 0) {
-                                        S2Util.alert('파일이 없습니다.');
-                                        isRegistering = false;
-                                        return;
-                                    }
-
-                                    // 파일 등록
-                                    S2Util.fetch(
-                                        `/public/sample/create-article-file`,
-                                        {
-                                            method: 'post',
-                                            dataType: 'multipart/form-data',
-                                            files: g_uploadFiles
-                                        },
-                                        function () {
-                                            S2Util.showToast('등록되었습니다.');
-                                            setTimeout(function () {
-                                                location.reload();
-                                            }, 500);
-                                        }
-                                    );
+                                if (g_uploadFiles.length === 0) {
+                                    S2Util.alert('파일이 없습니다.');
+                                    isRegistering = false;
+                                    return;
                                 }
+
+                                // 파일 등록
+                                S2Util.fetch(
+                                    '/analysis/create-detection-file',
+                                    {
+                                        method: 'post',
+                                        dataType: 'multipart/form-data',
+                                        files: g_uploadFiles
+                                    },
+                                    function () {
+                                        S2Util.showToast('등록되었습니다.');
+                                        setTimeout(function () {
+                                            location.reload();
+                                        }, 500);
+                                    }
+                                );
                             }
                         });
                     }

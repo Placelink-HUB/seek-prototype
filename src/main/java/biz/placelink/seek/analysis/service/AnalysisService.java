@@ -1,15 +1,21 @@
 package biz.placelink.seek.analysis.service;
 
 import java.util.List;
+import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.com.util.SessionUtil;
+import biz.placelink.seek.system.file.service.FileService;
+import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.util.S2Util;
 
 /**
@@ -29,11 +35,16 @@ public class AnalysisService {
 
     private final AnalysisMapper analysisMapper;
     private final AnalysisDetailService analysisDetailService;
+    private final FileService fileService;
 
-    public AnalysisService(AnalysisMapper analysisMapper, AnalysisDetailService analysisDetailService) {
+    public AnalysisService(AnalysisMapper analysisMapper, AnalysisDetailService analysisDetailService, FileService fileService) {
         this.analysisMapper = analysisMapper;
         this.analysisDetailService = analysisDetailService;
+        this.fileService = fileService;
     }
+
+    @Value("${fs.file.ext}")
+    private String allowedFileExt;
 
     /**
      * 실행하려는 작업 이력 목록을 조회한다.
@@ -179,6 +190,40 @@ public class AnalysisService {
     @Transactional(readOnly = false)
     public void updateAnalysisTimeoutError(int maxMinutes) {
         analysisMapper.updateAnalysisTimeoutError(maxMinutes);
+    }
+
+    /**
+     * 검증 파일을 등록한다.
+     *
+     * @param files 파일 목록
+     * @return 등록 개수
+     */
+    @Transactional
+    public int createDetectionFile(List<MultipartFile> files) {
+        int result = 0;
+
+        List<FileDetailVO> successFileList = fileService.writeFile(files, null, Constants.CD_ARTICLE_TYPE_FILE, Constants.CD_ARTICLE_TYPE_FILE, allowedFileExt.split(","), 5L);
+        if (successFileList != null && !successFileList.isEmpty()) {
+            String analysisId = UUID.randomUUID().toString();
+
+            // 분석 등록 (분석 모델은 AnalyzerService 에서 분석 요청시 결정)
+            AnalysisVO analysis = new AnalysisVO();
+            analysis.setAnalysisId(analysisId);
+            analysis.setAnalysisModeCcd(Constants.CD_ANALYSIS_MODE_DETECTION_FILE);
+            analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
+
+            result = this.insertAnalysis(analysis);
+
+            if (result > 0) {
+                AnalysisDetailVO analysisDetail = new AnalysisDetailVO();
+                analysisDetail.setAnalysisId(analysisId);
+                analysisDetail.setRequesterUid(SessionUtil.getSessionUserUid());
+
+                analysisDetailService.insertFileAnalysis(analysisDetail);
+            }
+        }
+
+        return result;
     }
 
 }

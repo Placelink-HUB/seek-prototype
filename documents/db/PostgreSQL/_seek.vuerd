@@ -4,7 +4,7 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -811.5742,
+    "scrollTop": -911.5742,
     "scrollLeft": -638.7447,
     "zoomLevel": 0.82,
     "show": 511,
@@ -736,8 +736,8 @@
       },
       "TpbaLEAj2H9DyZBdp2b71": {
         "id": "TpbaLEAj2H9DyZBdp2b71",
-        "name": "SEEK_FILE_DETECTION",
-        "comment": "파일_탐지",
+        "name": "SEEK_FILE_ANALYSIS",
+        "comment": "파일_분석",
         "columnIds": [
           "TiAWRZP4FhNSfHTEio-Bx",
           "BO65-kx1iHqilRMBZ0MNp",
@@ -755,12 +755,12 @@
           "x": 871.6399,
           "y": 1050.7001,
           "zIndex": 3128,
-          "widthName": 120,
+          "widthName": 110,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1749010436032,
+          "updateAt": 1749017951567,
           "createAt": 1748857169332
         }
       }

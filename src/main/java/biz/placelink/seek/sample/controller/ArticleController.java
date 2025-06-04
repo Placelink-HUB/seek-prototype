@@ -107,7 +107,7 @@ public class ArticleController {
      * @return 게시글 등록 결과
      * @throws IOException IOException
      */
-    @PostMapping(value = "/public/sample/create-article-file")
+    @PostMapping(value = "/sample/create-article-file")
     public ResponseEntity<Map<String, Object>> createArticleFile(@RequestParam("files") List<MultipartFile> files) throws IOException {
         Map<String, Object> response = new HashMap<>();
 

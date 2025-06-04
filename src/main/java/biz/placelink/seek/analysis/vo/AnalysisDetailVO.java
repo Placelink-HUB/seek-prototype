@@ -26,6 +26,13 @@ public class AnalysisDetailVO extends AnalysisVO {
     /* 내용 */
     private String content;
 
+    // ---------- 파일 ----------//
+
+    /* 서명된 파일 ID */
+    private String signedFileId;
+    /* 요청자 식별자 */
+    private String requesterUid;
+
     public String getRequestId() {
         return requestId;
     }
@@ -96,6 +103,22 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getSignedFileId() {
+        return signedFileId;
+    }
+
+    public void setSignedFileId(String signedFileId) {
+        this.signedFileId = signedFileId;
+    }
+
+    public String getRequesterUid() {
+        return requesterUid;
+    }
+
+    public void setRequesterUid(String requesterUid) {
+        this.requesterUid = requesterUid;
     }
 
 }

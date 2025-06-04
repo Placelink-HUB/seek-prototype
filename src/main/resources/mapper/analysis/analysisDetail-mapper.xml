@@ -39,4 +39,19 @@
 		)
     </insert>
 
+    <insert id="insertFileAnalysis" parameterType="analysisDetailVO">
+		/** insertFileAnalysis : 파일 분석 정보를 등록한다. */
+		INSERT INTO SEEK_FILE_ANALYSIS (
+			ANALYSIS_ID,
+			FILE_ID,
+			SIGNED_FILE_ID,
+			REQUESTER_UID
+		) VALUES (
+			#{analysisId},
+			#{fileId},
+			#{signedFileId},
+			#{requesterUid}
+		)
+    </insert>
+
 </mapper>
