@@ -1,9 +1,13 @@
 package biz.placelink.seek.analysis.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.com.util.PaginationInfo;
+import biz.placelink.seek.com.vo.SearchVO;
 import kr.s2.ext.util.S2Util;
 
 /**
@@ -86,6 +90,18 @@ public class AnalysisDetailService {
      */
     public int updateFileAnalysis(AnalysisDetailVO paramVO) {
         return analysisDetailMapper.updateFileAnalysis(paramVO);
+    }
+
+    /**
+     * 파일 분석 목록을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 파일 분석 목록
+     */
+    public PaginationInfo selectFileAnalysisListWithPagination(SearchVO searchVO) {
+        List<AnalysisDetailVO> list = analysisDetailMapper.selectFileAnalysisList(searchVO);
+        int count = analysisDetailMapper.selectFileAnalysisListCount(searchVO);
+        return new PaginationInfo(searchVO, list, count);
     }
 
 }

@@ -64,4 +64,42 @@
         WHERE ANALYSIS_ID = #{analysisId}
     </insert>
 
+    <sql id="sqlFileAnalysis">
+        SELECT
+            sa.ANALYSIS_ID,
+            sa.ANALYSIS_MODE_CCD,
+            sa.ANALYSIS_STATUS_CCD,
+            cc1.COM_CD_NM AS ANALYSIS_STATUS_CCD_NM,
+            sa.ANALYSIS_RESULT_ID,
+            sfa.DETECTION_FILE_ID,
+            sfa.SIGNED_FILE_ID,
+            sfa.REQUESTER_UID,
+            sa.CREATE_DT,
+            sa.MODIFY_DT
+        FROM SEEK_ANALYSIS sa
+            JOIN SEEK_FILE_ANALYSIS sfa
+                ON sa.ANALYSIS_ID = sfa.ANALYSIS_ID
+                AND sa.ANALYSIS_MODE_CCD = 'DETECTION_FILE'
+            LEFT JOIN SEEK_ANALYSIS_RESULT sar
+                ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
+            LEFT JOIN SEEK_COM_CD cc1
+                ON sa.ANALYSIS_STATUS_CCD = cc1.COM_CD
+                AND cc1.GROUP_CD = 'ANALYSIS_STATUS_CCD'
+    </sql>
+
+    <select id="selectFileAnalysisList" parameterType="searchVO" resultType="analysisDetailVO">
+        /** selectFileAnalysisList : 파일 분석 목록을 조회한다. */
+        <include refid="common.sql.paging_header"/>
+        <include refid="sqlFileAnalysis"/>
+        <include refid="common.sql.paging_footer"/>
+    </select>
+
+    <select id="selectFileAnalysisListCount" parameterType="searchVO" resultType="integer">
+        /** selectFileAnalysisListCount : 파일 분석 목록 개수를 조회한다. */
+        SELECT COUNT(*)
+        FROM (
+            <include refid="sqlFileAnalysis"/>
+        )
+    </select>
+
 </mapper>

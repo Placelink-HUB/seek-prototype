@@ -1149,6 +1149,13 @@ table caption {
 .sidebar-wrap .sidebar-nav .sidebar-menu.SITE_STATUS.active {
   background-image: url(../images/menu3_on.png);
 }
+.sidebar-wrap .sidebar-nav .sidebar-menu.DETECTION_FILE {
+  background-image: url(../images/menu_file.png);
+}
+.sidebar-wrap .sidebar-nav .sidebar-menu.DETECTION_FILE:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.DETECTION_FILE.active {
+  background-image: url(../images/menu_file_on.png);
+}
 .sidebar-wrap .sidebar-nav .sidebar-menu.MENU4 {
   background-image: url(../images/menu4.png);
 }

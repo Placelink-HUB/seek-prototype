@@ -1,9 +1,12 @@
 package biz.placelink.seek.analysis.service;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.com.vo.SearchVO;
 
 /**
  * <pre>
@@ -62,5 +65,21 @@ public interface AnalysisDetailMapper {
      * @return 등록 개수
      */
     int updateFileAnalysis(AnalysisDetailVO paramVO);
+
+    /**
+     * 파일 분석 목록을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 파일 분석 목록
+     */
+    List<AnalysisDetailVO> selectFileAnalysisList(SearchVO searchVO);
+
+    /**
+     * 파일 분석 목록 개수를 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 파일 분석 목록 개수
+     */
+    int selectFileAnalysisListCount(SearchVO searchVO);
 
 }

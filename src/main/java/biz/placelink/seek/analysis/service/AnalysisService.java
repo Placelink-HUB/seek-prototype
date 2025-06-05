@@ -217,6 +217,7 @@ public class AnalysisService {
             if (result > 0) {
                 AnalysisDetailVO analysisDetail = new AnalysisDetailVO();
                 analysisDetail.setAnalysisId(analysisId);
+                analysisDetail.setDetectionFileId(successFileList.get(0).getFileId());
                 analysisDetail.setRequesterUid(SessionUtil.getSessionUserUid());
 
                 analysisDetailService.insertFileAnalysis(analysisDetail);

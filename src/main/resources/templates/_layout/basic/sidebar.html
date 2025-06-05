@@ -7,9 +7,9 @@
                 <ul>
                     <li class="sidebar-menu MENU1"><a href="#"></a></li>
                     <li class="sidebar-menu ALL_STATUS"><a href="#"></a></li>
-                    <li class="sidebar-menu active SITE_STATUS"><a href="/public/dashboard/sample"></a></li>
-                    <li class="sidebar-menu MENU4"><a href="/sample/test"></a></li>
-                    <li class="sidebar-menu MENU4"><a href="/analysis/detection-file-list"></a></li>
+                    <li class="sidebar-menu SITE_STATUS" th:classappend="${Constants.SERVLET_PATH.startsWith('/public/dashboard/')} ? 'active'"><a href="/public/dashboard/sample"></a></li>
+                    <li class="sidebar-menu MENU4" th:classappend="${Constants.SERVLET_PATH == '/sample/test'} ? 'active'"><a href="/sample/test"></a></li>
+                    <li class="sidebar-menu DETECTION_FILE" th:classappend="${Constants.SERVLET_PATH == '/analysis/detection-file-list'} ? 'active'"><a href="/analysis/detection-file-list"></a></li>
                     <li class="sidebar-menu MENU5"><a href="#"></a></li>
                 </ul>
             </nav>

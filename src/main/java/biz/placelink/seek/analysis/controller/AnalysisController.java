@@ -21,9 +21,11 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.AnalysisService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
+import biz.placelink.seek.sample.vo.SchArticleVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.util.S2JsonUtil;
@@ -43,9 +45,11 @@ import kr.s2.ext.util.S2JsonUtil;
 public class AnalysisController {
 
     private final AnalysisService analysisService;
+    private final AnalysisDetailService analysisDetailService;
 
-    public AnalysisController(AnalysisService analysisService) {
+    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService) {
         this.analysisService = analysisService;
+        this.analysisDetailService = analysisDetailService;
     }
 
     @Value("${fs.file.ext}")
@@ -110,7 +114,12 @@ public class AnalysisController {
      * @return 파일 검증 목록
      */
     @GetMapping(value = "/analysis/detection-file-list")
-    public String file(ModelMap model) {
+    public String file(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setOrderBy("CREATE_DT DESC");
+        model.addAttribute("fileAnalysisList", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        response.setHeader("X-Seek-Mode", seekMode);
         return "/analysis/detection-file-list";
     }
 
