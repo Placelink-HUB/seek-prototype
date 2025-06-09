@@ -74,6 +74,7 @@
             sfa.DETECTION_FILE_ID,
             sfa.SIGNED_FILE_ID,
             sfa.REQUESTER_UID,
+            COALESCE(sar.TOTAL_DETECTION_COUNT, 0) AS TOTAL_DETECTION_COUNT,
             sa.CREATE_DT,
             sa.MODIFY_DT
         FROM SEEK_ANALYSIS sa
@@ -87,7 +88,7 @@
                 AND cc1.GROUP_CD = 'ANALYSIS_STATUS_CCD'
     </sql>
 
-    <select id="selectFileAnalysisList" parameterType="searchVO" resultType="analysisDetailVO">
+    <select id="selectFileAnalysisList" parameterType="searchVO" resultType="analysisResultVO">
         /** selectFileAnalysisList : 파일 분석 목록을 조회한다. */
         <include refid="common.sql.paging_header"/>
         <include refid="sqlFileAnalysis"/>

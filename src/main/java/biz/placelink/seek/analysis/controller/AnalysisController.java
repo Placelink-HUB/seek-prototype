@@ -118,7 +118,7 @@ public class AnalysisController {
         SchArticleVO searchVO = new SchArticleVO();
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
-        model.addAttribute("fileAnalysisList", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
         return "/analysis/detection-file-list";
     }

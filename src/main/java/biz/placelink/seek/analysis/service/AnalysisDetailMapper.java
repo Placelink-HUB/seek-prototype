@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.com.vo.SearchVO;
 
 /**
@@ -72,7 +73,7 @@ public interface AnalysisDetailMapper {
      * @param searchVO 조회 조건
      * @return 파일 분석 목록
      */
-    List<AnalysisDetailVO> selectFileAnalysisList(SearchVO searchVO);
+    List<AnalysisResultVO> selectFileAnalysisList(SearchVO searchVO);
 
     /**
      * 파일 분석 목록 개수를 조회한다.

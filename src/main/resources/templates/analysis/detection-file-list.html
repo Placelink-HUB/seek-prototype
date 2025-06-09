@@ -290,22 +290,20 @@
                         <thead>
                             <tr>
                                 <th>등록 일시</th>
-                                <th>게시글 타입</th>
-                                <th>raw 보기</th>
+                                <th>상태</th>
+                                <th>민감정보개수</th>
                                 <th>내용 보기</th>
                                 <th>원본 보기</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:if="${articleListPagination.isEmpty}">
+                            <tr th:if="${fileAnalysisListPagination.isEmpty}">
                                 <td colspan="5">데이터가 없습니다.</td>
                             </tr>
-                            <tr th:each="article : ${articleListPagination.dataList}">
+                            <tr th:each="article : ${fileAnalysisListPagination.dataList}">
                                 <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
-                                <td th:text="${article.articleTypeCcdNm}"></td>
-                                <td>
-                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>
-                                </td>
+                                <td th:text="${article.analysisStatusCcdNm}"></td>
+                                <td th:text="${#numbers.formatInteger(article.totalDetectionCount, 0, 'COMMA')}"></td>
                                 <td>
                                     <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
                                 </td>
@@ -317,20 +315,20 @@
                         </tbody>
                     </table>
                     <div class="pagination-wrapper">
-                        <ul th:if="${articleListPagination.isNotEmpty}" class="pagination">
-                            <li th:if="${articleListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
-                                <a href="#" th:onclick="goPage([[${articleListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
+                        <ul th:if="${fileAnalysisListPagination.isNotEmpty}" class="pagination">
+                            <li th:if="${fileAnalysisListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
+                                <a href="#" th:onclick="goPage([[${fileAnalysisListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
                             </li>
-                            <th:block th:each="pageNo : ${#numbers.sequence(articleListPagination.firstPageNoOnPageList, articleListPagination.lastPageNoOnPageList)}">
-                                <li th:if="${pageNo eq articleListPagination.pageNo}" class="paginate_button active">
+                            <th:block th:each="pageNo : ${#numbers.sequence(fileAnalysisListPagination.firstPageNoOnPageList, fileAnalysisListPagination.lastPageNoOnPageList)}">
+                                <li th:if="${pageNo eq fileAnalysisListPagination.pageNo}" class="paginate_button active">
                                     <a href="#" th:text="${pageNo}"></a>
                                 </li>
-                                <li th:if="${pageNo ne articleListPagination.pageNo}" class="paginate_button">
+                                <li th:if="${pageNo ne fileAnalysisListPagination.pageNo}" class="paginate_button">
                                     <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
                                 </li>
                             </th:block>
-                            <li th:if="${articleListPagination.lastPageNoOnPageList lt articleListPagination.lastPageNo}" class="paginate_button next">
-                                <a href="#" th:onclick="goPage([[${articleListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
+                            <li th:if="${fileAnalysisListPagination.lastPageNoOnPageList lt fileAnalysisListPagination.lastPageNo}" class="paginate_button next">
+                                <a href="#" th:onclick="goPage([[${fileAnalysisListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
                             </li>
                         </ul>
                     </div>

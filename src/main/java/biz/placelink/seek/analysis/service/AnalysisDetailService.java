@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.com.util.PaginationInfo;
 import biz.placelink.seek.com.vo.SearchVO;
 import kr.s2.ext.util.S2Util;
@@ -99,7 +100,7 @@ public class AnalysisDetailService {
      * @return 파일 분석 목록
      */
     public PaginationInfo selectFileAnalysisListWithPagination(SearchVO searchVO) {
-        List<AnalysisDetailVO> list = analysisDetailMapper.selectFileAnalysisList(searchVO);
+        List<AnalysisResultVO> list = analysisDetailMapper.selectFileAnalysisList(searchVO);
         int count = analysisDetailMapper.selectFileAnalysisListCount(searchVO);
         return new PaginationInfo(searchVO, list, count);
     }
