@@ -175,6 +175,13 @@ public class AnalyzerService {
                 // !!s2!! 분석이 완료되기 전에는 동일 데이터를 중복 요청할 수 있는데 이 부분을 어떻게 처리할지 고민 하자
                 AnalysisResultVO existingAnalysisResult = analysisResultService.selectAnalysisResult(analysisId, analysisDataHash);
 
+                int totalDetectionCount = existingAnalysisResult.getTotalDetectionCount();
+
+                if (totalDetectionCount == 0 && Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd)) {
+                    // 파일 탐지인 경우 민감 정보가 없는 파일은 서명을 받는다. (!!s2!! 이미 분석된 데이터의 파일을 중복 서명할지 고민해보자.)
+                    requestRemoteFileSigning(analysisId, analysisDetail.getDetectionFileId());
+                }
+
                 if (analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, 0, analysisModeCcd, existingAnalysisResult) > 0 && existingAnalysisResult != null) {
                     // 분석 완료 정보를 실시간으로 푸시한다.
                     Map<String, Object> pushMap = new HashMap<>();
@@ -184,7 +191,7 @@ public class AnalyzerService {
                     pushMap.put("analysisModeSe", existingAnalysisResult.getAnalysisModeCcd().startsWith(Constants.CD_ANALYSIS_MODE_PROXY_FORWARD) ? Constants.CD_ANALYSIS_MODE_PROXY_FORWARD : Constants.CD_ANALYSIS_MODE_PROXY_REVERSE);
                     pushMap.put("analysisModeCcd", existingAnalysisResult.getAnalysisModeCcd());
                     pushMap.put("countryCcd", existingAnalysisResult.getCountryCcd());
-                    pushMap.put("totalDetectionCount", existingAnalysisResult.getTotalDetectionCount());
+                    pushMap.put("totalDetectionCount", totalDetectionCount);
                     pushMap.put("createDtStr", this.getCreateDtStr(existingAnalysisResult.getCreateDt()));
 
                     List<AnalysisDetectionVO> existingDetectionList = analysisResultService.selectAnalysisDetectionList(analysisDataHash);

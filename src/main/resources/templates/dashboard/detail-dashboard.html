@@ -96,7 +96,7 @@
                 const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
 
                 switch (event.data.type) {
-                    case '[[${Constants.CD_PUSH_TYPE_ANALYSIS_REQUEST}]]':
+                    case '[[${@Constants.CD_PUSH_TYPE_ANALYSIS_REQUEST}]]':
                         // 분석 요청
                         const requestCount = event.data.data.count;
                         if (requestCount > 0) {
@@ -105,7 +105,7 @@
                             updateLineChart();
                         }
                         break;
-                    case '[[${Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE}]]':
+                    case '[[${@Constants.CD_PUSH_TYPE_ANALYSIS_COMPLETE}]]':
                         // 분석 완료
                         doughnutChartInfo.analysis.count++;
                         doughnutChartInfo.analysis.totalCount++;
@@ -114,17 +114,17 @@
                         if (event.data.data.totalDetectionCount > 0) {
                             doughnutChartInfo.detection.count++;
 
-                            if (event.data.data.analysisModeCcd.startsWith('[[${Constants.CD_ANALYSIS_MODE_PROXY}]]')) {
-                                // if (event.data.data.countryCcd === '[[${Constants.CD_COUNTRY_KR}]]') {
+                            if (event.data.data.analysisModeCcd.startsWith('[[${@Constants.CD_ANALYSIS_MODE_PROXY}]]')) {
+                                // if (event.data.data.countryCcd === '[[${@Constants.CD_COUNTRY_KR}]]') {
                                 // 국내를 내부로 해외를 외부로 임시 변경(!!s2!!)
-                                if (event.data.data.analysisModeSe === '[[${Constants.CD_ANALYSIS_MODE_PROXY_REVERSE}]]') {
-                                    semicircleChartInfo.koreaDetectionStatus.low += event.data.data['[[${Constants.CD_DETECTION_TYPE_LOW}]]'] || 0;
-                                    semicircleChartInfo.koreaDetectionStatus.mid += event.data.data['[[${Constants.CD_DETECTION_TYPE_MID}]]'] || 0;
-                                    semicircleChartInfo.koreaDetectionStatus.high += event.data.data['[[${Constants.CD_DETECTION_TYPE_HIGH}]]'] || 0;
+                                if (event.data.data.analysisModeSe === '[[${@Constants.CD_ANALYSIS_MODE_PROXY_REVERSE}]]') {
+                                    semicircleChartInfo.koreaDetectionStatus.low += event.data.data['[[${@Constants.CD_DETECTION_TYPE_LOW}]]'] || 0;
+                                    semicircleChartInfo.koreaDetectionStatus.mid += event.data.data['[[${@Constants.CD_DETECTION_TYPE_MID}]]'] || 0;
+                                    semicircleChartInfo.koreaDetectionStatus.high += event.data.data['[[${@Constants.CD_DETECTION_TYPE_HIGH}]]'] || 0;
                                 } else {
-                                    semicircleChartInfo.overseasDetectionStatus.low += event.data.data['[[${Constants.CD_DETECTION_TYPE_LOW}]]'] || 0;
-                                    semicircleChartInfo.overseasDetectionStatus.mid += event.data.data['[[${Constants.CD_DETECTION_TYPE_MID}]]'] || 0;
-                                    semicircleChartInfo.overseasDetectionStatus.high += event.data.data['[[${Constants.CD_DETECTION_TYPE_HIGH}]]'] || 0;
+                                    semicircleChartInfo.overseasDetectionStatus.low += event.data.data['[[${@Constants.CD_DETECTION_TYPE_LOW}]]'] || 0;
+                                    semicircleChartInfo.overseasDetectionStatus.mid += event.data.data['[[${@Constants.CD_DETECTION_TYPE_MID}]]'] || 0;
+                                    semicircleChartInfo.overseasDetectionStatus.high += event.data.data['[[${@Constants.CD_DETECTION_TYPE_HIGH}]]'] || 0;
                                 }
 
                                 updateSemicircleChartAll();
@@ -143,7 +143,7 @@
                         }
                         updateLineChart();
                         break;
-                    case '[[${Constants.CD_PUSH_TYPE_MASKING}]]':
+                    case '[[${@Constants.CD_PUSH_TYPE_MASKING}]]':
                         // 마스킹
                         const maskCount = event.data.data.count;
                         if (maskCount > 0) {

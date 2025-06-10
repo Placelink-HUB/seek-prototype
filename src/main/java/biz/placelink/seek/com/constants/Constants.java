@@ -1,10 +1,8 @@
 package biz.placelink.seek.com.constants;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import org.springframework.stereotype.Component;
 
+@Component("Constants")
 public class Constants {
 
     public static final String RESULT_STATUS = "status";
@@ -220,39 +218,5 @@ public class Constants {
      * 게시글_타입_공통코드 - FILE
      */
     public static final String CD_ARTICLE_TYPE_FILE = "FILE";
-
-    public static void setConstsMap(Map<String, Object> consts) {
-        if (consts == null) {
-            consts = new HashMap<>();
-        }
-
-        Field[] fields = Constants.class.getFields();
-        if (fields != null) {
-            for (Field field : fields) {
-                try {
-                    switch (field.getType().getName()) {
-                    case Constants.TYPE_WRAPPER_STRING:
-                    case Constants.TYPE_WRAPPER_INTEGER:
-                    case Constants.TYPE_DATA_INT:
-                    case Constants.TYPE_WRAPPER_LONG:
-                    case Constants.TYPE_DATA_LONG:
-                    case Constants.TYPE_WRAPPER_FLOAT:
-                    case Constants.TYPE_DATA_FLOAT:
-                    case Constants.TYPE_WRAPPER_DOUBLE:
-                    case Constants.TYPE_DATA_DOUBLE:
-                        consts.put(field.getName(), field.get(Constants.class));
-                        break;
-                    case Constants.TYPE_ARRAY_STRING:
-                        consts.put(field.getName(), Arrays.toString((String[]) field.get(Constants.class)).replaceAll("[]\\[\\s]", ""));
-                        break;
-                    default:
-                        break;
-                    }
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    continue;
-                }
-            }
-        }
-    }
 
 }

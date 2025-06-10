@@ -181,9 +181,9 @@
                         const data = response.articleData;
                         let innerHtml = '';
 
-                        if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_TEXT}]]') {
+                        if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_TEXT}]]') {
                             innerHtml = `<pre class="detail_contents">${data.content}</pre>`;
-                        } else if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_FILE}]]') {
+                        } else if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_FILE}]]') {
                             data.serverUrl = '';
                             innerHtml = S2Util.s2Template('template_contents_file', data);
                         }
@@ -364,13 +364,13 @@
                                 <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
                                 <td th:text="${article.articleTypeCcdNm}"></td>
                                 <td>
-                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>
                                 </td>
                                 <td>
                                     <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
                                 </td>
                                 <td>
-                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
+                                    <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
                                     <button th:if="${article.articleTypeCcd eq Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
                                 </td>
                             </tr>

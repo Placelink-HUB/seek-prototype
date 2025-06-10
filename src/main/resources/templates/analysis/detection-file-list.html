@@ -121,9 +121,9 @@
                         const data = response.articleData;
                         let innerHtml = '';
 
-                        if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_TEXT}]]') {
+                        if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_TEXT}]]') {
                             innerHtml = `<pre class="detail_contents">${data.content}</pre>`;
-                        } else if (data.articleTypeCcd === '[[${Constants.CD_ARTICLE_TYPE_FILE}]]') {
+                        } else if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_FILE}]]') {
                             data.serverUrl = '';
                             innerHtml = S2Util.s2Template('template_contents_file', data);
                         }
