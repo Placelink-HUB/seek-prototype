@@ -147,7 +147,9 @@ public class AnalyzerService {
                     hashDataStreamList.add(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
                 }
 
-                fileDetailList = fileService.selectFileDetailList(analysisDetail.getFileId());
+                String fileId = Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd) ? analysisDetail.getDetectionFileId() : analysisDetail.getFileId();
+
+                fileDetailList = fileService.selectFileDetailList(fileId);
                 if (fileDetailList != null && !fileDetailList.isEmpty()) {
                     for (FileDetailVO fileDetail : fileDetailList) {
                         if (fileDetail != null && S2Util.isNotEmpty(fileDetail.getSavePath()) && S2Util.isNotEmpty(fileDetail.getSaveName())) {
@@ -165,7 +167,7 @@ public class AnalyzerService {
             }
 
             if (S2Util.isEmpty(analysisDataHash)) {
-                throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.");
+                throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.[1]");
             }
 
             if (analysisResultService.checkAnalysisHashExists(analysisDataHash)) {
@@ -259,13 +261,13 @@ public class AnalyzerService {
 
     private String generateXXHash64(List<InputStream> hashDataStreamList) {
         if (hashDataStreamList == null || hashDataStreamList.isEmpty()) {
-            throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.");
+            throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.[2]");
         }
 
         String analysisHash = S2HashUtil.generateXXHash64(hashSeed, true, hashDataStreamList.toArray(new InputStream[0]));
 
         if (S2Util.isEmpty(analysisHash)) {
-            throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.");
+            throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.[3]");
         }
         return analysisHash;
     }
@@ -302,7 +304,7 @@ public class AnalyzerService {
                 if (S2Util.isEmpty(analysisId)) {
                     throw new S2RuntimeException("분석 ID 가 존재하지 않습니다.");
                 } else if (S2Util.isEmpty(analysisDataHash)) {
-                    throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.");
+                    throw new S2RuntimeException("분석 데이터 해시 값이 존재하지 않습니다.[4]");
                 }
 
                 String analysisSeServerUrl = S2Util.joinPaths(analyzerUrl, String.format("/result?request_id=%s&model=%s", analysisId, analysisDetail.getAnalysisModel()));
