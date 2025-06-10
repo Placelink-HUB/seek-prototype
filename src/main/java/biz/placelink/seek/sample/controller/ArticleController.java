@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import biz.placelink.seek.com.constants.Constants;
-import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import biz.placelink.seek.com.util.FileUtils;
 import biz.placelink.seek.sample.service.ArticleService;
 import biz.placelink.seek.sample.vo.ArticleVO;
@@ -51,13 +50,10 @@ public class ArticleController {
     private final FileService fileService;
     private final FileManager fileManager;
 
-    private final ServiceWorkerService serviceWorkerService;
-
-    public ArticleController(ArticleService articleService, FileService fileService, FileManager fileManager, ServiceWorkerService serviceWorkerService) {
+    public ArticleController(ArticleService articleService, FileService fileService, FileManager fileManager) {
         this.articleService = articleService;
         this.fileService = fileService;
         this.fileManager = fileManager;
-        this.serviceWorkerService = serviceWorkerService;
     }
 
     @Value("${fs.file.ext}")
@@ -75,13 +71,6 @@ public class ArticleController {
         searchVO.setOrderBy("MODIFY_DT DESC");
         model.addAttribute("articleListPagination", articleService.selectArticleListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
-
-        Map<String, Object> pushMap = new HashMap<>();
-        pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_NOTIFICATION);
-        pushMap.put("message", "테스트 푸시 메시지1");
-        serviceWorkerService.sendNotificationAll(pushMap);
-        pushMap.put("message", "테스트 푸시 메시지2");
-        serviceWorkerService.sendNotificationAll(pushMap);
         return "sample/test";
     }
 
