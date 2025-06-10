@@ -484,6 +484,8 @@ public class AnalyzerService {
         List<InputStream> dataStreamList = new ArrayList<>();
 
         try {
+            requestParamList.add(Map.entry("user_id", analysisId));
+
             List<FileDetailVO> fileDetailList = fileService.selectFileDetailList(fileId);
             if (fileDetailList != null && !fileDetailList.isEmpty()) {
                 for (FileDetailVO fileDetail : fileDetailList) {
