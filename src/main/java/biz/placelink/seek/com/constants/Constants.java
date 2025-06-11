@@ -5,9 +5,10 @@ import org.springframework.stereotype.Component;
 @Component("Constants")
 public class Constants {
 
-    public static final String RESULT_STATUS = "status";
+    public static final String RESULT_STATUS = "STATUS";
     public static final String RESULT_SUCCESS = "SUCCESS";
     public static final String RESULT_FAIL = "FAIL";
+    public static final String RESULT_WARNING = "WARNING";
 
     /**
      * CommonHelper.setReturnCode - 1이상: 성공, 0이하: 실패

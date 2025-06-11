@@ -40,6 +40,11 @@
             document.addEventListener('DOMContentLoaded', () => {});
 
             // eslint-disable-next-line no-unused-vars
+            function goPage(pageNo) {
+                location.href = `/analysis/detection-file-list?pageNo=${pageNo}`;
+            }
+
+            // eslint-disable-next-line no-unused-vars
             function openValidateFile() {
                 S2Util.showModal(
                     `
@@ -109,52 +114,12 @@
             }
 
             // eslint-disable-next-line no-unused-vars
-            function openModalArticleContents(articleId, seekMode) {
+            function downloadFile(fileId) {
                 S2Util.fetch(
-                    `/public/sample/article-info` + (seekMode ? `?seek_mode=${seekMode}` : ''),
+                    `/file/image/view/${fileId}`,
                     {
-                        method: 'get',
-                        dataType: 'json',
-                        articleId: articleId
-                    },
-                    function (response) {
-                        const data = response.articleData;
-                        let innerHtml = '';
-
-                        if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_TEXT}]]') {
-                            innerHtml = `<pre class="detail_contents">${data.content}</pre>`;
-                        } else if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_FILE}]]') {
-                            data.serverUrl = '';
-                            innerHtml = S2Util.s2Template('template_contents_file', data);
-                        }
-
-                        S2Util.showModal(
-                            `
-                            <div class="risk-inspection-wrap modal">
-                                <div class="box1">
-                                    <div class="contents">
-                                        ${innerHtml}
-                                    </div>
-                                </div>
-                            </div>
-                        `,
-                            {
-                                width: '800px',
-                                title: '상세'
-                            }
-                        );
-                    }
-                );
-            }
-
-            // eslint-disable-next-line no-unused-vars
-            function downloadFile(articleId) {
-                S2Util.fetch(
-                    '/public/sample/downloadFile.ar',
-                    {
-                        method: 'POST',
-                        responseType: 'blob',
-                        articleId: articleId
+                        method: 'GET',
+                        responseType: 'blob'
                     },
                     function () {
                         S2Util.showToast('다운로드 성공하였습니다.');
@@ -304,7 +269,7 @@
                                 <td th:text="${fileAnalysis.analysisStatusCcdNm}"></td>
                                 <td th:text="${#numbers.formatInteger(fileAnalysis.totalDetectionCount, 0, 'COMMA')}"></td>
                                 <td>
-                                    <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${fileAnalysis.signedFileId}]]);">다운로드</button>
+                                    <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
                                 </td>
                             </tr>
                         </tbody>

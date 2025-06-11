@@ -1,11 +1,7 @@
 package biz.placelink.seek.system.file.service;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,7 +21,6 @@ import biz.placelink.seek.system.file.vo.FileVO;
 import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2Util;
-import kr.s2.ext.util.vo.S2RemoteFile;
 
 /**
  * <pre>
@@ -272,48 +267,6 @@ public class FileService {
             result.setFileSize(writeFileSize);
         }
         return result;
-    }
-
-    /**
-     * 파일을 다운로드 하고 해당 정보를 리턴한다.
-     *
-     * @param fileSeCcd 파일 구분
-     * @param fileUrl   파일 경로
-     * @param fileId    파일 ID
-     */
-    public FileDetailVO downloadRemoteFile(String fileSeCcd, String fileUrl, String fileId) throws IOException {
-        FileDetailVO fileDtlVO = null;
-
-        if (S2Util.isNotEmpty(fileUrl)) {
-            try {
-                URL url = new URI(fileUrl).toURL();
-
-                try (InputStream fileData = url.openStream()) {
-                    String savePath = S2Util.joinPaths(fileRootPath, fileSeCcd, new SimpleDateFormat("yyyy/MM/dd/HH/mm").format(new Date()));
-                    String saveName = FileUtils.makeFileId(fileSeCcd);
-
-                    long writeFileSize = fileManager.writeFile(fileData, savePath, saveName);
-                    if (writeFileSize != -1) {
-                        S2RemoteFile remoteFileInfo = new S2RemoteFile(url);
-                        fileDtlVO = new FileDetailVO();
-
-                        fileDtlVO.setFileId(S2Util.isNotEmpty(fileId) ? fileId : FileUtils.makeFileId());
-                        fileDtlVO.setFileSeCcd(fileSeCcd);
-                        fileDtlVO.setFileDetailId(FileUtils.makeFileId());
-                        fileDtlVO.setFileName(remoteFileInfo.getName());
-                        fileDtlVO.setFileExt(remoteFileInfo.getExtension());
-                        fileDtlVO.setFileSize(writeFileSize);
-                        fileDtlVO.setContentType(remoteFileInfo.getContentType());
-                        fileDtlVO.setSavePath(savePath);
-                        fileDtlVO.setSaveName(saveName);
-                    }
-                }
-            } catch (URISyntaxException | FileNotFoundException e) {
-                logger.error("원격 파일을 찾을 수 없습니다. {}", fileUrl, e);
-            }
-        }
-
-        return fileDtlVO;
     }
 
 }

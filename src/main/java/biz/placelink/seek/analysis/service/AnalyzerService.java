@@ -335,8 +335,8 @@ public class AnalyzerService {
                  * warning: 실패 (분석 대상이 파일인 경우는 일부 파일이 분석 불가능 일때)
                  */
                 String status = analysisJsonData.path("status").asText("");
-                if (!"success".equalsIgnoreCase(status)) {
-                    if ("fail".equalsIgnoreCase(status) || "warning".equalsIgnoreCase(status)) {
+                if (!Constants.RESULT_STATUS.equalsIgnoreCase(status)) {
+                    if (Constants.RESULT_FAIL.equalsIgnoreCase(status) || Constants.RESULT_WARNING.equalsIgnoreCase(status)) {
                         // 오류 상황이라면 (!!s2!! 파일 분석일때 warning 상황을 어떻게 처리할지 고민하자)
                         throw new S2RuntimeException(analysisRawData);
                     } else {
@@ -504,14 +504,14 @@ public class AnalyzerService {
             }
 
             JsonNode resultData = S2JsonUtil.parseJson(requestRestApi(fileSignedServer, requestParamList));
-            if (resultData != null) {
-                String downloadUrl = resultData.path("download_url").asText("");
-                if (S2Util.isNotEmpty(downloadUrl)) {
+            if (resultData != null && Constants.RESULT_SUCCESS.equalsIgnoreCase(resultData.path("status").asText(""))) {
+                String remoteFilePath = resultData.path("final_zip_path").asText("");
+                if (S2Util.isNotEmpty(remoteFilePath)) {
                     // 파일 다운로드 저장 후 signedFileId 업데이트 필요
                     String savePath = S2Util.joinPaths(fileRootPath, Constants.CD_FILE_SE_2010, new SimpleDateFormat("yyyy/MM/dd/HH/mm").format(new Date()));
                     String saveName = FileUtils.makeFileId();
 
-                    S2RemoteFile remoteFileInfo = S2FileUtil.downloadRemoteFile(S2Util.joinPaths(fileSignedServer, downloadUrl), savePath, saveName);
+                    S2RemoteFile remoteFileInfo = S2FileUtil.downloadRemoteFile(S2Util.joinPaths(fileSignedServer, "/download", remoteFilePath), savePath, saveName, fileManager);
                     if (remoteFileInfo != null) {
                         FileDetailVO fileDetailVO = new FileDetailVO();
 
@@ -538,6 +538,9 @@ public class AnalyzerService {
                             fileAnalysisParam.setSignedFileId(signedFileId);
 
                             analysisDetailService.updateFileAnalysis(fileAnalysisParam);
+
+                            // 다운로드 완료한 원격 파일을 삭제 요청한다.
+                            RestApiUtil.callApi(S2Util.joinPaths(fileSignedServer, "/delete_file?file_name=" + remoteFilePath), HttpMethod.GET, apiTimeout);
                         }
                     }
                 }

@@ -41,7 +41,7 @@
 
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
-                location.href = `/public/sample/test?pageNo=${pageNo}`;
+                location.href = `/sample/test?pageNo=${pageNo}`;
             }
 
             // eslint-disable-next-line no-unused-vars
@@ -210,7 +210,7 @@
             // eslint-disable-next-line no-unused-vars
             function downloadFile(articleId) {
                 S2Util.fetch(
-                    '/public/sample/downloadFile.ar',
+                    '/sample/downloadFile.ar',
                     {
                         method: 'POST',
                         responseType: 'blob',
