@@ -16,6 +16,7 @@
             sa.ANALYSIS_MODE_CCD,
             sar.ANALYSIS_RESULT_ID,
             sar.ANALYZED_CONTENT,
+            sar.MAX_DETECTION_TYPE_CCD,
             COALESCE(sar.TOTAL_DETECTION_COUNT, 0) AS TOTAL_DETECTION_COUNT,
             spa.COUNTRY_CCD,
             sda.TARGET_INFORMATION,
@@ -39,12 +40,14 @@
             ANALYSIS_RESULT_ID,
             ANALYSIS_RAW_DATA,
             ANALYZED_CONTENT,
+            MAX_DETECTION_TYPE_CCD,
             TOTAL_DETECTION_COUNT,
             CREATE_DT
         ) VALUES (
             #{analysisResultId},
             #{analysisRawData},
             #{analyzedContent},
+            #{maxDetectionTypeCcd},
             #{totalDetectionCount},
             NOW()
         ) ON CONFLICT (ANALYSIS_RESULT_ID) DO NOTHING

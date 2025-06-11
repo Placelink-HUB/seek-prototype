@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1057.5742,
-    "scrollLeft": -587.7447,
+    "scrollTop": -1037.5742,
+    "scrollLeft": -556.7447,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -150,6 +150,7 @@
           "6Ae2l0X0PEhK8ZwfwXayu",
           "lzdwv6aN2bokMI7Rx5HwB",
           "Co4faLzQ7Vp-f3c32xxx5",
+          "Xt0y_v7sC6_uR2m5VDWum",
           "43rS7_lDjVj_sNEuviv_x",
           "KCSAX5RxGDitkX6UqkFfW"
         ],
@@ -172,6 +173,7 @@
           "hcEZhymDFXDI3z1YVnXFh",
           "lzdwv6aN2bokMI7Rx5HwB",
           "Co4faLzQ7Vp-f3c32xxx5",
+          "Xt0y_v7sC6_uR2m5VDWum",
           "FPfcgKOtJDJ1Q_fnWnrF7",
           "43rS7_lDjVj_sNEuviv_x",
           "KCSAX5RxGDitkX6UqkFfW",
@@ -183,15 +185,15 @@
           "pMJgwrRSJWnA176de5Nm3"
         ],
         "ui": {
-          "x": 133.7046,
-          "y": 1106.461,
+          "x": 117.8508,
+          "y": 1101.583,
           "zIndex": 1264,
           "widthName": 128,
           "widthComment": 60,
           "color": ""
         },
         "meta": {
-          "updateAt": 1749010204975,
+          "updateAt": 1749631474520,
           "createAt": 1737704305450
         }
       },
@@ -690,6 +692,7 @@
           "TiAWRZP4FhNSfHTEio-Bx",
           "BO65-kx1iHqilRMBZ0MNp",
           "3TWNwNi-MlTam0RYOjwGX",
+          "ieuX02GCkdCOPHoWUAcy7",
           "d3meAVuY9b47wqizFcfco"
         ],
         "seqColumnIds": [
@@ -697,6 +700,7 @@
           "FXmf2VjQWesJsFQwpsKCn",
           "BO65-kx1iHqilRMBZ0MNp",
           "3TWNwNi-MlTam0RYOjwGX",
+          "ieuX02GCkdCOPHoWUAcy7",
           "d3meAVuY9b47wqizFcfco"
         ],
         "ui": {
@@ -708,7 +712,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1749017951567,
+          "updateAt": 1749634603192,
           "createAt": 1748857169332
         }
       }
@@ -3773,6 +3777,46 @@
           "updateAt": 1749010454337,
           "createAt": 1749010436032
         }
+      },
+      "Xt0y_v7sC6_uR2m5VDWum": {
+        "id": "Xt0y_v7sC6_uR2m5VDWum",
+        "tableId": "Yb8CUNZWbGFMH-3n8qxAj",
+        "name": "MAX_DETECTION_TYPE_CCD ",
+        "comment": "최대_검출_타입_공통코드",
+        "dataType": "VARCHAR(30)",
+        "default": "",
+        "options": 8,
+        "ui": {
+          "keys": 0,
+          "widthName": 156,
+          "widthComment": 137,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1749631465521,
+          "createAt": 1749631433637
+        }
+      },
+      "ieuX02GCkdCOPHoWUAcy7": {
+        "id": "ieuX02GCkdCOPHoWUAcy7",
+        "tableId": "TpbaLEAj2H9DyZBdp2b71",
+        "name": "SIGNED_FILE_HASH",
+        "comment": "서명된_파일_해시",
+        "dataType": "CHAR(128)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 105,
+          "widthComment": 96,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1749634622600,
+          "createAt": 1749634593221
+        }
       }
     },
     "relationshipEntities": {
@@ -3814,8 +3858,8 @@
           "columnIds": [
             "6Ae2l0X0PEhK8ZwfwXayu"
           ],
-          "x": 420.2046,
-          "y": 1282.461,
+          "x": 420.8508,
+          "y": 1301.583,
           "direction": 8
         },
         "end": {
@@ -3954,8 +3998,8 @@
           "columnIds": [
             "6Ae2l0X0PEhK8ZwfwXayu"
           ],
-          "x": 420.2046,
-          "y": 1106.461,
+          "x": 420.8508,
+          "y": 1101.583,
           "direction": 4
         },
         "end": {
@@ -4010,8 +4054,8 @@
           "columnIds": [
             "6Ae2l0X0PEhK8ZwfwXayu"
           ],
-          "x": 706.7046,
-          "y": 1194.461,
+          "x": 723.8508,
+          "y": 1201.583,
           "direction": 2
         },
         "end": {
@@ -4076,7 +4120,7 @@
             "TiAWRZP4FhNSfHTEio-Bx"
           ],
           "x": 871.6399,
-          "y": 1126.7001,
+          "y": 1138.7001,
           "direction": 1
         },
         "meta": {

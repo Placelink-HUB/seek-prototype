@@ -57,11 +57,12 @@ public class AnalysisResultService {
      * @param analysisResultId    분석 결과 ID
      * @param analysisRawData     분석 원본 데이터
      * @param analyzedContent     분석된 내용
+     * @param maxDetectionTypeCcd 최대 검출 타입 공통코드
      * @param totalDetectionCount 총 탐지 개수
      * @return 등록 개수
      */
-    public int insertAnalysisResult(String analysisResultId, String analysisRawData, String analyzedContent, int totalDetectionCount) {
-        return analysisResultMapper.insertAnalysisResult(analysisResultId, analysisRawData, analyzedContent, totalDetectionCount);
+    public int insertAnalysisResult(String analysisResultId, String analysisRawData, String analyzedContent, String maxDetectionTypeCcd, int totalDetectionCount) {
+        return analysisResultMapper.insertAnalysisResult(analysisResultId, analysisRawData, analyzedContent, maxDetectionTypeCcd, totalDetectionCount);
     }
 
     /**

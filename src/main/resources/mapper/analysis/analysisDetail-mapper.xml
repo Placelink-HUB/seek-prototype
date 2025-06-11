@@ -45,11 +45,13 @@
 			ANALYSIS_ID,
 			DETECTION_FILE_ID,
 			SIGNED_FILE_ID,
+			SIGNED_FILE_HASH,
 			REQUESTER_UID
 		) VALUES (
 			#{analysisId},
 			#{detectionFileId},
 			#{signedFileId},
+			#{signedFileHash},
 			#{requesterUid}
 		)
     </insert>
@@ -60,6 +62,7 @@
         SET
             DETECTION_FILE_ID = COALESCE(#{detectionFileId}, DETECTION_FILE_ID),
             SIGNED_FILE_ID = COALESCE(#{signedFileId}, SIGNED_FILE_ID),
+            SIGNED_FILE_HASH = COALESCE(#{signedFileHash}, SIGNED_FILE_HASH),
             REQUESTER_UID = COALESCE(#{requesterUid}, REQUESTER_UID)
         WHERE ANALYSIS_ID = #{analysisId}
     </insert>
@@ -73,7 +76,10 @@
             sa.ANALYSIS_RESULT_ID,
             sfa.DETECTION_FILE_ID,
             sfa.SIGNED_FILE_ID,
+            sfa.SIGNED_FILE_HASH,
             sfa.REQUESTER_UID,
+            sar.MAX_DETECTION_TYPE_CCD,
+            cc2.COM_CD_NM AS MAX_DETECTION_TYPE_CCD_NM,
             COALESCE(sar.TOTAL_DETECTION_COUNT, 0) AS TOTAL_DETECTION_COUNT,
             sa.CREATE_DT,
             sa.MODIFY_DT
@@ -86,6 +92,9 @@
             LEFT JOIN SEEK_COM_CD cc1
                 ON sa.ANALYSIS_STATUS_CCD = cc1.COM_CD
                 AND cc1.GROUP_CD = 'ANALYSIS_STATUS_CCD'
+            LEFT JOIN SEEK_COM_CD cc2
+                ON sar.MAX_DETECTION_TYPE_CCD = cc2.COM_CD
+                AND cc2.GROUP_CD = 'DETECTION_TYPE_CCD'
     </sql>
 
     <select id="selectFileAnalysisList" parameterType="searchVO" resultType="analysisResultVO">

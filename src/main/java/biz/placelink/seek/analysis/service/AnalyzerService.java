@@ -177,9 +177,9 @@ public class AnalyzerService {
 
                 int totalDetectionCount = existingAnalysisResult.getTotalDetectionCount();
 
-                if (totalDetectionCount == 0 && Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd)) {
-                    // 파일 탐지인 경우 민감 정보가 없는 파일은 서명을 받는다. (!!s2!! 이미 분석된 데이터의 파일을 중복 서명할지 고민해보자.)
-                    requestRemoteFileSigning(analysisId, analysisDetail.getDetectionFileId());
+                if (Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd)) {
+                    // 파일 탐지인 경우 파일 서명을 받는다. (!!s2!! 이미 분석된 데이터의 파일을 중복 서명할지 고민해보자.)
+                    requestRemoteFileSigning(analysisId, this.detectionTypePriority(existingAnalysisResult.getMaxDetectionTypeCcd()), analysisDetail.getDetectionFileId());
                 }
 
                 if (analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, 0, analysisModeCcd, existingAnalysisResult) > 0 && existingAnalysisResult != null) {
@@ -335,7 +335,7 @@ public class AnalyzerService {
                  * warning: 실패 (분석 대상이 파일인 경우는 일부 파일이 분석 불가능 일때)
                  */
                 String status = analysisJsonData.path("status").asText("");
-                if (!Constants.RESULT_STATUS.equalsIgnoreCase(status)) {
+                if (!Constants.RESULT_SUCCESS.equalsIgnoreCase(status)) {
                     if (Constants.RESULT_FAIL.equalsIgnoreCase(status) || Constants.RESULT_WARNING.equalsIgnoreCase(status)) {
                         // 오류 상황이라면 (!!s2!! 파일 분석일때 warning 상황을 어떻게 처리할지 고민하자)
                         throw new S2RuntimeException(analysisRawData);
@@ -347,6 +347,7 @@ public class AnalyzerService {
 
                 // int totalDetectionCount = analysisJsonData.path("total_hit").asInt(0);
                 int totalDetectionCount = 0;
+                int maxDetectionTypePriority = 0;
 
                 String analyzedContent = analysisJsonData.path("content").asText("");
                 long analysisTime = analysisJsonData.path("latency").asLong(0);
@@ -374,6 +375,12 @@ public class AnalyzerService {
                         int hitCount = item.path("hit").asInt(0);
 
                         totalDetectionCount += hitCount;
+                        if (hitCount > 0) {
+                            int detectionTypePriority = this.detectionTypePriority(severityCcd);
+                            if (maxDetectionTypePriority < detectionTypePriority) {
+                                maxDetectionTypePriority = detectionTypePriority;
+                            }
+                        }
 
                         analyzedContent = analyzedContent.replace(String.format("$PL{%s}", targetText), sensitiveInformationId);
 
@@ -408,7 +415,7 @@ public class AnalyzerService {
                     analyzedContent = null;
                 }
 
-                if (analysisResultService.insertAnalysisResult(analysisDataHash, analysisRawData, analyzedContent, totalDetectionCount) > 0) {
+                if (analysisResultService.insertAnalysisResult(analysisDataHash, analysisRawData, analyzedContent, this.priorityToDetectionType(maxDetectionTypePriority), totalDetectionCount) > 0) {
                     List<AnalysisDetectionVO> analysisDetectionList = new ArrayList<>();
 
                     Map<String, Object> pushMap = new HashMap<>();
@@ -452,9 +459,9 @@ public class AnalyzerService {
                         serviceWorkerService.sendNotificationAll(pushMap);
                     }
 
-                    if (totalDetectionCount == 0 && Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd)) {
-                        // 파일 탐지인 경우 민감 정보가 없는 파일은 서명을 받는다.
-                        requestRemoteFileSigning(analysisId, analysisDetail.getDetectionFileId());
+                    if (Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd)) {
+                        // 파일 탐지인 경우 파일 서명을 받는다.
+                        requestRemoteFileSigning(analysisId, maxDetectionTypePriority, analysisDetail.getDetectionFileId());
                     }
 
                     analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, analysisTime, analysisModeCcd, totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
@@ -479,7 +486,30 @@ public class AnalyzerService {
         }
     }
 
-    private void requestRemoteFileSigning(String analysisId, String fileId) {
+    private int detectionTypePriority(String detectionTypeCcd) {
+        return switch (detectionTypeCcd) {
+        case "high" -> 3;
+        case "mid" -> 2;
+        case "low" -> 1;
+        default -> 0; // 없을 경우
+        };
+    }
+
+    private String priorityToDetectionType(Integer priority) {
+        return switch (priority) {
+        case 3 -> "high";
+        case 2 -> "mid";
+        case 1 -> "low";
+        default -> ""; // 없을 경우
+        };
+    }
+
+    private void requestRemoteFileSigning(String analysisId, int maxDetectionTypePriority, String fileId) {
+        if (maxDetectionTypePriority > 1) {
+            // low 또는 민감정보가 없을때만 파일 서명을 받는다.
+            return;
+        }
+
         List<Map.Entry<String, Object>> requestParamList = new ArrayList<>();
         List<InputStream> dataStreamList = new ArrayList<>();
 
@@ -505,6 +535,7 @@ public class AnalyzerService {
 
             JsonNode resultData = S2JsonUtil.parseJson(requestRestApi(fileSignedServer, requestParamList));
             if (resultData != null && Constants.RESULT_SUCCESS.equalsIgnoreCase(resultData.path("status").asText(""))) {
+                String signedFileHash = resultData.path("signature_hex ").asText("");
                 String remoteFilePath = resultData.path("final_zip_path").asText("");
                 if (S2Util.isNotEmpty(remoteFilePath)) {
                     // 파일 다운로드 저장 후 signedFileId 업데이트 필요
@@ -536,6 +567,7 @@ public class AnalyzerService {
                             AnalysisDetailVO fileAnalysisParam = new AnalysisDetailVO();
                             fileAnalysisParam.setAnalysisId(analysisId);
                             fileAnalysisParam.setSignedFileId(signedFileId);
+                            fileAnalysisParam.setSignedFileHash(signedFileHash);
 
                             analysisDetailService.updateFileAnalysis(fileAnalysisParam);
 

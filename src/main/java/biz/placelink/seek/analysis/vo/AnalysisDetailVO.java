@@ -32,6 +32,8 @@ public class AnalysisDetailVO extends AnalysisVO {
     private String detectionFileId;
     /* 서명된 파일 ID */
     private String signedFileId;
+    /* 서명된 파일 해시 */
+    private String signedFileHash;
     /* 요청자 식별자 */
     private String requesterUid;
 
@@ -121,6 +123,14 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     public void setSignedFileId(String signedFileId) {
         this.signedFileId = signedFileId;
+    }
+
+    public String getSignedFileHash() {
+        return signedFileHash;
+    }
+
+    public void setSignedFileHash(String signedFileHash) {
+        this.signedFileHash = signedFileHash;
     }
 
     public String getRequesterUid() {

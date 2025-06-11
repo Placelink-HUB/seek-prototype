@@ -45,10 +45,11 @@ public interface AnalysisResultMapper {
      * @param analysisResultId    분석 결과 ID
      * @param analysisRawData     분석 원본 데이터
      * @param analyzedContent     분석된 내용
+     * @param maxDetectionTypeCcd 최대 검출 타입 공통코드
      * @param totalDetectionCount 총 탐지 개수
      * @return 등록 개수
      */
-    int insertAnalysisResult(@Param("analysisResultId") String analysisResultId, @Param("analysisRawData") String analysisRawData, @Param("analyzedContent") String analyzedContent, @Param("totalDetectionCount") int totalDetectionCount);
+    int insertAnalysisResult(@Param("analysisResultId") String analysisResultId, @Param("analysisRawData") String analysisRawData, @Param("analyzedContent") String analyzedContent, @Param("maxDetectionTypeCcd") String maxDetectionTypeCcd, @Param("totalDetectionCount") int totalDetectionCount);
 
     /**
      * 분석 검출 목록을 등록한다.

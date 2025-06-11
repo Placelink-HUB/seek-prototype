@@ -257,6 +257,7 @@
                                 <th>등록 일시</th>
                                 <th>상태</th>
                                 <th>민감정보개수</th>
+                                <th>민감정보등급</th>
                                 <th>다운로드</th>
                             </tr>
                         </thead>
@@ -268,6 +269,7 @@
                                 <td th:text="${#temporals.format(fileAnalysis.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
                                 <td th:text="${fileAnalysis.analysisStatusCcdNm}"></td>
                                 <td th:text="${#numbers.formatInteger(fileAnalysis.totalDetectionCount, 0, 'COMMA')}"></td>
+                                <td th:text="${fileAnalysis.maxDetectionTypeCcdNm}"></td>
                                 <td>
                                     <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
                                 </td>
