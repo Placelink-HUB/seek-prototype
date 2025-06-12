@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -875.5742,
-    "scrollLeft": -320.7447,
+    "scrollTop": -1178.5742,
+    "scrollLeft": -811.7447,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -3803,18 +3803,18 @@
         "tableId": "TpbaLEAj2H9DyZBdp2b71",
         "name": "SIGNED_FILE_HASH",
         "comment": "서명된_파일_해시",
-        "dataType": "CHAR(128)",
+        "dataType": "VARCHAR(64)",
         "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
           "widthName": 105,
           "widthComment": 96,
-          "widthDataType": 60,
+          "widthDataType": 75,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1749634622600,
+          "updateAt": 1749706012507,
           "createAt": 1749634593221
         }
       }

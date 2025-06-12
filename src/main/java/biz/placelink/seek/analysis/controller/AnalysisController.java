@@ -120,7 +120,7 @@ public class AnalysisController {
         searchVO.setOrderBy("CREATE_DT DESC");
         model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
-        return "/analysis/detection-file-list";
+        return "analysis/detection-file-list";
     }
 
     /**
