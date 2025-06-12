@@ -2,20 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.analysis.service.AnalysisMapper">
 
-    <select id="selectAnalysisHistListToExecuted" parameterType="integer" resultType="analysisDetailVO">
-		/** selectAnalysisHistListToExecuted : 실행하려는 분석 목록을 조회한다. */
-		WITH PROCESSING AS (
-			/* 현재 진행중인 분석 요청을 포함하여 분석 서버에 요청할 수 있는 최대(스레드) 수 만큼 조회 */
-			SELECT COALESCE(#{maxCount} - COUNT(1), 0) AS SEL_COUNT
-			FROM SEEK_ANALYSIS
-			WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
-		)
-        SELECT
+    <sql id="sqlAnalysis">
+		SELECT
 			sa.ANALYSIS_ID,
 			sa.ANALYSIS_MODE_CCD,
+			sa.ANALYSIS_STATUS_CCD,
+			sa.ANALYSIS_MODEL,
 			sa.ANALYSIS_DATA_HASH,
 			sa.ANALYSIS_RESULT_ID,
+			sa.ANALYSIS_START_DT,
+			sa.ANALYSIS_END_DT,
+			sa.ANALYSIS_TIME,
 			spa.REQUEST_ID,
+			spa.COUNTRY_CCD,
 			spa.URL,
 			spa.HEADER,
 			spa.QUERY_STRING,
@@ -23,7 +22,7 @@
 			spa.FILE_ID,
 			sda.TARGET_INFORMATION,
 			sda.CONTENT,
-			sfa.DETECTION_FILE_ID,
+            sfa.DETECTION_FILE_ID,
 			sfa.SIGNED_FILE_ID,
 			sfa.REQUESTER_UID,
 			sa.CREATE_DT
@@ -37,6 +36,17 @@
             LEFT JOIN SEEK_FILE_ANALYSIS sfa
                 ON sa.ANALYSIS_ID = sfa.ANALYSIS_ID
                 AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DETECTION_FILE'
+    </sql>
+
+    <select id="selectAnalysisHistListToExecuted" parameterType="integer" resultType="analysisDetailVO">
+		/** selectAnalysisHistListToExecuted : 실행하려는 분석 목록을 조회한다. */
+		WITH PROCESSING AS (
+			/* 현재 진행중인 분석 요청을 포함하여 분석 서버에 요청할 수 있는 최대(스레드) 수 만큼 조회 */
+			SELECT COALESCE(#{maxCount} - COUNT(1), 0) AS SEL_COUNT
+			FROM SEEK_ANALYSIS
+			WHERE ANALYSIS_STATUS_CCD = 'PROCESSING'
+		)
+		<include refid="sqlAnalysis"/>
 		WHERE sa.ANALYSIS_STATUS_CCD = 'WAIT'
 		ORDER BY sa.CREATE_DT
 		LIMIT (
@@ -51,27 +61,7 @@
 
     <select id="selectProcessingAnalysisList" parameterType="integer" resultType="analysisDetailVO">
 		/** selectProcessingAnalysisList : 실행중인 분석 정보 목록을 조회한다. */
-		SELECT
-			sa.ANALYSIS_ID,
-			sa.ANALYSIS_MODE_CCD,
-			sa.ANALYSIS_STATUS_CCD,
-			sa.ANALYSIS_MODEL,
-			sa.ANALYSIS_DATA_HASH,
-			sa.ANALYSIS_RESULT_ID,
-			sa.ANALYSIS_START_DT,
-			sa.ANALYSIS_END_DT,
-			sa.ANALYSIS_TIME,
-			spa.COUNTRY_CCD,
-			sda.TARGET_INFORMATION,
-			sda.CONTENT,
-			sa.CREATE_DT
-		FROM SEEK_ANALYSIS sa
-            LEFT JOIN SEEK_PROXY_ANALYSIS spa
-                ON sa.ANALYSIS_ID = spa.ANALYSIS_ID
-                AND COALESCE(sa.ANALYSIS_MODE_CCD, '') != 'DATABASE'
-            LEFT JOIN SEEK_DATABASE_ANALYSIS sda
-                ON sa.ANALYSIS_ID = sda.ANALYSIS_ID
-                AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DATABASE'
+		<include refid="sqlAnalysis"/>
 		WHERE sa.ANALYSIS_STATUS_CCD = 'PROCESSING'
 		ORDER BY sa.CREATE_DT
     </select>

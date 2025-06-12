@@ -340,7 +340,13 @@ const S2Util = (function () {
                              * ※ 그외의 상황이 있는지 확인 필요
                              */
                             const tempDiv = document.createElement(innerHtml.startsWith('<tr') ? 'tbody' : 'div');
-                            tempDiv.innerHTML = innerHtml;
+
+                            // XSS 방지를 위해 DOMParser 사용 (innerHTML 미사용)
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(innerHtml, 'text/html');
+                            while (doc.body.firstChild) {
+                                tempDiv.appendChild(doc.body.firstChild);
+                            }
 
                             const elements = tempDiv.querySelectorAll('[if], [else]');
                             elements.forEach((element) => {
