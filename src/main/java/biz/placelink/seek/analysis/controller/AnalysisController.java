@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +29,7 @@ import biz.placelink.seek.com.util.FileUtils;
 import biz.placelink.seek.sample.vo.SchArticleVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2JsonUtil;
 
 /**
@@ -46,10 +48,12 @@ public class AnalysisController {
 
     private final AnalysisService analysisService;
     private final AnalysisDetailService analysisDetailService;
+    private final FileManager fileManager;
 
-    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService) {
+    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService, FileManager fileManager) {
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
+        this.fileManager = fileManager;
     }
 
     @Value("${fs.file.ext}")
@@ -144,6 +148,28 @@ public class AnalysisController {
 
         response.put(Constants.RESULT_CODE, analysisService.createDetectionFile(files));
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 보고서 다운로드
+     *
+     * @return 보고서 다운로드
+     * @throws IOException IOException
+     */
+    @GetMapping(value = "/analysis/download-report")
+    public String downloadReport(Model model) throws IOException {
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        String fileName = "보안점검결과보고서.pdf";
+
+        model.addAttribute("fileName", fileName);
+        model.addAttribute("fileData", fileManager.readFile("/opt/seek/var/files", fileName));
+        model.addAttribute(Constants.RESULT_CODE, 1);
+        return "downloadView";
     }
 
 }

@@ -136,7 +136,7 @@ public class ArticleController {
      * @param model     모델 맵
      * @return 다운로드 뷰 이름
      */
-    @PostMapping(value = "/sample/downloadFile.ar")
+    @PostMapping(value = "/sample/downloadFile")
     public String downloadFile(@RequestParam String articleId, ModelMap model) {
         ArticleVO articleVO = articleService.selectArticle(articleId);
 

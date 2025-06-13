@@ -833,6 +833,20 @@
                 };
                 barChart['documentType'].setOption(option);
             }
+
+            // eslint-disable-next-line no-unused-vars
+            function downloadReport() {
+                S2Util.fetch(
+                    '/analysis/download-report',
+                    {
+                        method: 'GET',
+                        responseType: 'blob'
+                    },
+                    function () {
+                        S2Util.showToast('다운로드 성공하였습니다.');
+                    }
+                );
+            }
         </script>
     </th:block>
     <th:block layout:fragment="bodyFragment">
@@ -852,7 +866,7 @@
                         <div class="arrow-right"></div>
                     </div>
                     <div class="button-wrap-po-a">
-                        <button class="btn-sty-02 btn-download">보고서 다운로드</button>
+                        <button class="btn-sty-02 btn-download" onclick="downloadReport();">보고서 다운로드</button>
                     </div>
                 </div>
                 <div class="contents">
