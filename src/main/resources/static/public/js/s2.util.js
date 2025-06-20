@@ -326,32 +326,83 @@ const S2Util = (function () {
                 if (propsArr && Array.isArray(propsArr) && propsArr.length > 0) {
                     propsArr.forEach((props) => {
                         if (props && props instanceof Object) {
-                            let innerHtml = template;
+                            let replacedHtml = template;
 
+                            // 템플릿 변수 치환
                             for (const key in props) {
                                 const value = props[key];
-                                innerHtml = innerHtml.replace(new RegExp(`{{=${key}}}`, 'g'), value || value === 0 ? value : '');
+                                replacedHtml = replacedHtml.replace(new RegExp(`{{=${key}}}`, 'g'), value || value === 0 ? value : '');
                             }
 
                             /**
-                             * document.createElement 를 사용하는 경우
+                             * document.createElement 를 사용하는 경우 비표준 태그를 보정한다.
                              * - innerHtml 이 tr 태그로 시작될때 tbody 외 다른 태그를 사용하면 해당 태그가 삭제 되어 아래와 같이 수정했었으나
                              * - 반대로 tbody 태그 안에 form 태그 등을 넣어도 해당 태그가 삭제됨
                              * ※ 그외의 상황이 있는지 확인 필요
                              */
-                            const tempDiv = document.createElement(innerHtml.startsWith('<tr') ? 'tbody' : 'div');
+                            const trimmedHtml = replacedHtml.trim();
+                            const resultContainer = document.createElement(trimmedHtml.startsWith('<tr') ? 'tbody' : 'div');
 
-                            // XSS 방지를 위해 DOMParser 사용 (innerHTML 미사용)
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(innerHtml, 'text/html');
-                            while (doc.body.firstChild) {
-                                tempDiv.appendChild(doc.body.firstChild);
+                            /**
+                             * XSS 방지를 위해 innerHTML 대신 DOMParser 사용
+                             * (innerHTML 사용할 때 기존 코드 "tempDiv.innerHTML = innerHtml;"를 변경 함)
+                             */
+                            {
+                                // DOMParser 사용을 위해 비표준 태그를 보정한다.
+                                let normalizedHtml, normalizedParentTag;
+                                if (trimmedHtml.startsWith('<tbody')) {
+                                    normalizedHtml = `<table>${replacedHtml}</table>`;
+                                    normalizedParentTag = 'table';
+                                } else if (trimmedHtml.startsWith('<tr')) {
+                                    normalizedHtml = `<table><tbody>${replacedHtml}</tbody></table>`;
+                                    normalizedParentTag = 'tbody';
+                                } else if (trimmedHtml.startsWith('<td')) {
+                                    normalizedHtml = `<table><tbody><tr>${replacedHtml}</tr></tbody></table>`;
+                                    normalizedParentTag = 'tr';
+                                } else {
+                                    normalizedHtml = replacedHtml;
+                                }
+
+                                // htmlParentTag에 따라 파싱된 DOM에서 원하는 노드를 선택
+                                const parser = new DOMParser();
+                                const parsedDocument = parser.parseFromString(normalizedHtml, 'text/html');
+                                let targetElement;
+                                switch (normalizedParentTag) {
+                                    case 'table':
+                                        // <tbody>로 시작한 경우 <table> 에서 추출
+                                        targetElement = parsedDocument.body.firstChild.querySelector('table');
+                                        break;
+                                    case 'tbody':
+                                        // <tr>로 시작한 경우 <table><tbody> 에서 추출
+                                        targetElement = parsedDocument.body.firstChild.querySelector('table > tbody');
+                                        break;
+                                    case 'tr':
+                                        // <td>로 시작한 경우 <table><tbody><tr> 에서 추출
+                                        targetElement = parsedDocument.body.firstChild.querySelector('table > tbody > tr');
+                                        break;
+                                    default:
+                                        targetElement = parsedDocument.body;
+                                        break;
+                                }
+
+                                // DOMParser를 사용하여 HTML 문자열을 파싱한다.
+                                while (targetElement.firstChild) {
+                                    resultContainer.appendChild(targetElement.firstChild);
+                                }
                             }
 
-                            const elements = tempDiv.querySelectorAll('[if], [else]');
+                            const elements = resultContainer.querySelectorAll('[if], [else]');
                             elements.forEach((element) => {
                                 if (element.hasAttribute('if')) {
-                                    if (props[element.getAttribute('if')]) {
+                                    // if 속성에 공백으로 2개 이상의 속성을 줄수도 있음
+                                    const conditionAttributes = element.getAttribute('if').split(/\s+/);
+                                    let validCount = 0;
+
+                                    for (const conditionAttribute of conditionAttributes) {
+                                        validCount += props[conditionAttribute] ? 1 : 0;
+                                    }
+
+                                    if (conditionAttributes.length > 0 && conditionAttributes.length === validCount) {
                                         element.removeAttribute('if');
                                     } else {
                                         element.remove();
@@ -359,7 +410,15 @@ const S2Util = (function () {
                                 }
 
                                 if (element.hasAttribute('else')) {
-                                    if (!props[element.getAttribute('else')]) {
+                                    // else 속성에 공백으로 2개 이상의 속성을 줄수도 있음
+                                    const conditionAttributes = element.getAttribute('else').split(/\s+/);
+                                    let validCount = 0;
+
+                                    for (const conditionAttribute of conditionAttributes) {
+                                        validCount += !props[conditionAttribute] ? 1 : 0;
+                                    }
+
+                                    if (conditionAttributes.length > 0 && conditionAttributes.length === validCount) {
                                         element.removeAttribute('else');
                                     } else {
                                         element.remove();
@@ -367,7 +426,7 @@ const S2Util = (function () {
                                 }
                             });
 
-                            resultHtml += tempDiv.innerHTML;
+                            resultHtml += resultContainer.innerHTML;
                         }
                     });
                 }
