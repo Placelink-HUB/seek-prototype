@@ -63,6 +63,8 @@
             DETECTION_FILE_ID = COALESCE(#{detectionFileId}, DETECTION_FILE_ID),
             SIGNED_FILE_ID = COALESCE(#{signedFileId}, SIGNED_FILE_ID),
             SIGNED_FILE_HASH = COALESCE(#{signedFileHash}, SIGNED_FILE_HASH),
+            FILE_COUNT = COALESCE(#{fileCount}, FILE_COUNT),
+            TOTAL_FILE_SIZE = COALESCE(#{totalFileSize}, TOTAL_FILE_SIZE),
             REQUESTER_UID = COALESCE(#{requesterUid}, REQUESTER_UID)
         WHERE ANALYSIS_ID = #{analysisId}
     </insert>
@@ -77,6 +79,8 @@
             sfa.DETECTION_FILE_ID,
             sfa.SIGNED_FILE_ID,
             sfa.SIGNED_FILE_HASH,
+            sfa.FILE_COUNT,
+            sfa.TOTAL_FILE_SIZE,
             sfa.REQUESTER_UID,
             sar.MAX_DETECTION_TYPE_CCD,
             cc2.COM_CD_NM AS MAX_DETECTION_TYPE_CCD_NM,
@@ -110,6 +114,12 @@
         FROM (
             <include refid="sqlFileAnalysis"/>
         )
+    </select>
+
+    <select id="selectFileAnalysis" resultType="analysisResultVO">
+        /** selectFileAnalysis : 파일 분석 정보를 조회한다. */
+        <include refid="sqlFileAnalysis"/>
+        WHERE sa.ANALYSIS_ID = #{analysisId}
     </select>
 
 </mapper>

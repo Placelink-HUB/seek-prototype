@@ -105,4 +105,14 @@ public class AnalysisDetailService {
         return new PaginationInfo(searchVO, list, count);
     }
 
+    /**
+     * 파일 분석 목록을 조회한다.
+     *
+     * @param analysisId 분석 ID
+     * @return 파일 분석 목록
+     */
+    public AnalysisResultVO selectFileAnalysis(String analysisId) {
+        return analysisDetailMapper.selectFileAnalysis(analysisId);
+    }
+
 }

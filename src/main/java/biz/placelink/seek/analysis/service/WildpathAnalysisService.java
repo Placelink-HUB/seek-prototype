@@ -237,15 +237,15 @@ public class WildpathAnalysisService {
                 documentType = "image";
             } else {
                 documentType = switch (lowerContentType) {
-                case "application/pdf" -> "pdf";
-                case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "docx";
-                case "application/msword" -> "doc";
-                case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "xlsx";
-                case "application/vnd.ms-excel" -> "xls";
-                case "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> "pptx";
-                case "application/vnd.ms-powerpoint" -> "ppt";
-                case "application/x-hwp", "application/vnd.hancom.hwp" -> "hwp";
-                default -> "unknown";
+                    case "application/pdf" -> "pdf";
+                    case "application/vnd.openxmlformats-officedocument.wordprocessingml.document" -> "docx";
+                    case "application/msword" -> "doc";
+                    case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" -> "xlsx";
+                    case "application/vnd.ms-excel" -> "xls";
+                    case "application/vnd.openxmlformats-officedocument.presentationml.presentation" -> "pptx";
+                    case "application/vnd.ms-powerpoint" -> "ppt";
+                    case "application/x-hwp", "application/vnd.hancom.hwp" -> "hwp";
+                    default -> "unknown";
                 };
             }
 

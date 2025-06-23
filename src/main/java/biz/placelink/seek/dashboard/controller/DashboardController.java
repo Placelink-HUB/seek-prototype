@@ -41,7 +41,12 @@ public class DashboardController {
     @GetMapping(value = "/public/dashboard/{siteId}")
     protected String detailDashboard(@PathVariable String siteId, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
-        return "dashboard/detail-dashboard";
+
+        String viewName = switch (siteId) {
+            case "mail" -> "dashboard/mail-dashboard";
+            default -> "dashboard/detail-dashboard";
+        };
+        return viewName;
     }
 
     /**

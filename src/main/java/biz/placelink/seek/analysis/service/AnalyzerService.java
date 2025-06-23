@@ -488,19 +488,19 @@ public class AnalyzerService {
 
     private int detectionTypePriority(String detectionTypeCcd) {
         return switch (detectionTypeCcd) {
-        case "high" -> 3;
-        case "mid" -> 2;
-        case "low" -> 1;
-        default -> 0; // 없을 경우
+            case "high" -> 3;
+            case "mid" -> 2;
+            case "low" -> 1;
+            default -> 0; // 없을 경우
         };
     }
 
     private String priorityToDetectionType(Integer priority) {
         return switch (priority) {
-        case 3 -> "high";
-        case 2 -> "mid";
-        case 1 -> "low";
-        default -> ""; // 없을 경우
+            case 3 -> "high";
+            case 2 -> "mid";
+            case 1 -> "low";
+            default -> ""; // 없을 경우
         };
     }
 
@@ -537,6 +537,9 @@ public class AnalyzerService {
             if (resultData != null && Constants.RESULT_SUCCESS.equalsIgnoreCase(resultData.path("status").asText(""))) {
                 String signedFileHash = resultData.path("signature_hex ").asText("");
                 String remoteFilePath = resultData.path("final_zip_path").asText("");
+                int fileCount = resultData.path("file_count").asInt(0);
+                long totalFileSize = resultData.path("total_size").asLong(0);
+
                 if (S2Util.isNotEmpty(remoteFilePath)) {
                     // 파일 다운로드 저장 후 signedFileId 업데이트 필요
                     String savePath = S2Util.joinPaths(fileRootPath, Constants.CD_FILE_SE_2010, new SimpleDateFormat("yyyy/MM/dd/HH/mm").format(new Date()));
@@ -568,6 +571,8 @@ public class AnalyzerService {
                             fileAnalysisParam.setAnalysisId(analysisId);
                             fileAnalysisParam.setSignedFileId(signedFileId);
                             fileAnalysisParam.setSignedFileHash(signedFileHash);
+                            fileAnalysisParam.setFileCount(fileCount);
+                            fileAnalysisParam.setTotalFileSize(totalFileSize);
 
                             analysisDetailService.updateFileAnalysis(fileAnalysisParam);
 

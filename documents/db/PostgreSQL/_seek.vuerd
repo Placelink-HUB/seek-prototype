@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1178.5742,
-    "scrollLeft": -811.7447,
+    "scrollTop": -1144.5742,
+    "scrollLeft": -1202.7447,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -693,6 +693,8 @@
           "BO65-kx1iHqilRMBZ0MNp",
           "3TWNwNi-MlTam0RYOjwGX",
           "ieuX02GCkdCOPHoWUAcy7",
+          "Jr9l1G0T94tG4FvBDIlDZ",
+          "Bly106WflKRIitQ74Qpu_",
           "d3meAVuY9b47wqizFcfco"
         ],
         "seqColumnIds": [
@@ -701,6 +703,8 @@
           "BO65-kx1iHqilRMBZ0MNp",
           "3TWNwNi-MlTam0RYOjwGX",
           "ieuX02GCkdCOPHoWUAcy7",
+          "Jr9l1G0T94tG4FvBDIlDZ",
+          "Bly106WflKRIitQ74Qpu_",
           "d3meAVuY9b47wqizFcfco"
         ],
         "ui": {
@@ -712,7 +716,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1749634603192,
+          "updateAt": 1750673500788,
           "createAt": 1748857169332
         }
       }
@@ -3817,6 +3821,46 @@
           "updateAt": 1749706012507,
           "createAt": 1749634593221
         }
+      },
+      "Jr9l1G0T94tG4FvBDIlDZ": {
+        "id": "Jr9l1G0T94tG4FvBDIlDZ",
+        "tableId": "TpbaLEAj2H9DyZBdp2b71",
+        "name": "FILE_COUNT",
+        "comment": "파일_개수",
+        "dataType": "NUMERIC(5)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 67,
+          "widthComment": 60,
+          "widthDataType": 68,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1750673679415,
+          "createAt": 1750673449812
+        }
+      },
+      "Bly106WflKRIitQ74Qpu_": {
+        "id": "Bly106WflKRIitQ74Qpu_",
+        "tableId": "TpbaLEAj2H9DyZBdp2b71",
+        "name": "TOTAL_FILE_SIZE",
+        "comment": "전체_파일_크기",
+        "dataType": "NUMERIC(12)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 88,
+          "widthComment": 84,
+          "widthDataType": 74,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1750673691416,
+          "createAt": 1750673476496
+        }
       }
     },
     "relationshipEntities": {
@@ -4120,7 +4164,7 @@
             "TiAWRZP4FhNSfHTEio-Bx"
           ],
           "x": 871.6399,
-          "y": 1138.7001,
+          "y": 1162.7001,
           "direction": 1
         },
         "meta": {

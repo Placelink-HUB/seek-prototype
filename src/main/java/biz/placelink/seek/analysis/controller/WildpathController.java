@@ -36,7 +36,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.WildpathAnalysisService;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,10 +55,12 @@ public class WildpathController {
 
     private final ServiceWorkerService serviceWorkerService;
     private final WildpathAnalysisService wildpathAnalysisService;
+    private final AnalysisDetailService analysisDetailService;
 
-    public WildpathController(ServiceWorkerService serviceWorkerService, WildpathAnalysisService wildpathAnalysisService) {
+    public WildpathController(ServiceWorkerService serviceWorkerService, WildpathAnalysisService wildpathAnalysisService, AnalysisDetailService analysisDetailService) {
         this.serviceWorkerService = serviceWorkerService;
         this.wildpathAnalysisService = wildpathAnalysisService;
+        this.analysisDetailService = analysisDetailService;
     }
 
     @Value("${analysis.excluded-paths}")
@@ -235,24 +239,24 @@ public class WildpathController {
         }
 
         switch (documentTypeFromContentType) {
-        case "text":
-            String body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-            wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, body, null, null, null);
-            break;
-        case "image":
-        case "pdf":
-        case "docx":
-        case "doc":
-        case "xlsx":
-        case "xls":
-        case "pptx":
-        case "ppt":
-        case "hwp":
-        case "zip":
-            try (InputStream fileData = request.getInputStream()) {
-                wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
-            }
-            break;
+            case "text":
+                String body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
+                wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, body, null, null, null);
+                break;
+            case "image":
+            case "pdf":
+            case "docx":
+            case "doc":
+            case "xlsx":
+            case "xls":
+            case "pptx":
+            case "ppt":
+            case "hwp":
+            case "zip":
+                try (InputStream fileData = request.getInputStream()) {
+                    wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
+                }
+                break;
         }
     }
 
@@ -322,15 +326,21 @@ public class WildpathController {
         }
 
         {
-            Map<String, Object> dataMap = new HashMap<>();
-            dataMap.put("sig_user_id", analysisId);
-            dataMap.put("user_id", email);
-            dataMap.put("dsign_check", dsignCheck);
-
-            // 테스트용 알림
+            // 첨부 파일 외부 전송 현황
             Map<String, Object> pushMap = new HashMap<>();
-            pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_NOTIFICATION);
-            pushMap.put("message", S2JsonUtil.toJsonString(dataMap));
+            pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_MAIL_OUTBOUND);
+            pushMap.put("dsign_check", dsignCheck);
+            pushMap.put("user_email", email);
+
+            if ("success".equals(dsignCheck)) {
+                AnalysisResultVO fileInfo = analysisDetailService.selectFileAnalysis(analysisId);
+                if (fileInfo != null) {
+                    pushMap.put("file_count", fileInfo.getFileCount());
+                    pushMap.put("total_file_size", fileInfo.getTotalFileSize());
+                }
+                pushMap.put("sig_user_id", analysisId);
+            }
+
             serviceWorkerService.sendNotificationAll(pushMap);
         }
     }

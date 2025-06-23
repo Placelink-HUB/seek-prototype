@@ -34,6 +34,10 @@ public class AnalysisDetailVO extends AnalysisVO {
     private String signedFileId;
     /* 서명된 파일 해시 */
     private String signedFileHash;
+    /* 파일 개수 */
+    private Integer fileCount;
+    /* 전체 파일 사이즈 */
+    private Long totalFileSize;
     /* 요청자 식별자 */
     private String requesterUid;
 
@@ -131,6 +135,22 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     public void setSignedFileHash(String signedFileHash) {
         this.signedFileHash = signedFileHash;
+    }
+
+    public Integer getFileCount() {
+        return fileCount;
+    }
+
+    public void setFileCount(Integer fileCount) {
+        this.fileCount = fileCount;
+    }
+
+    public Long getTotalFileSize() {
+        return totalFileSize;
+    }
+
+    public void setTotalFileSize(Long totalFileSize) {
+        this.totalFileSize = totalFileSize;
     }
 
     public String getRequesterUid() {

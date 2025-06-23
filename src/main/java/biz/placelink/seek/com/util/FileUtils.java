@@ -550,15 +550,15 @@ public class FileUtils {
             String contentType = file != null && file.getContentType() != null ? file.getContentType() : "";
 
             switch (contentType) {
-            // case "application/octet-stream": // 확장자가 없거나 판단하지 못할때
-            case "application/x-csh":
-            case "application/java-archive":
-            case "application/x-sh":
-            case "application/js":
-            case "application/x-javascript":
-            case "text/html":
-            case "text/javascript":
-                throw new S2RuntimeException("등록 가능한 파일이 아닙니다.");
+                // case "application/octet-stream": // 확장자가 없거나 판단하지 못할때
+                case "application/x-csh":
+                case "application/java-archive":
+                case "application/x-sh":
+                case "application/js":
+                case "application/x-javascript":
+                case "text/html":
+                case "text/javascript":
+                    throw new S2RuntimeException("등록 가능한 파일이 아닙니다.");
             }
 
             boolean chkBlack = false;

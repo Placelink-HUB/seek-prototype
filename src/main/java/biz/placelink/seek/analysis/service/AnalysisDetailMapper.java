@@ -83,4 +83,12 @@ public interface AnalysisDetailMapper {
      */
     int selectFileAnalysisListCount(SearchVO searchVO);
 
+    /**
+     * 파일 분석 정보를 조회한다.
+     *
+     * @param analysisId 분석 ID
+     * @return 파일 분석 정보
+     */
+    AnalysisResultVO selectFileAnalysis(String analysisId);
+
 }
