@@ -58,7 +58,7 @@
                 mailOutboundStatus: {
                     text: '전송 수',
                     totalCount: 0,
-                    successCount: 0,
+                    sentCount: 0,
                     fileCount: 0,
                     fileSize: 0,
                     blockedCount: 0,
@@ -180,11 +180,6 @@
                             semicircleChartInfo2.mailOutboundStatus.blockedCount++;
                         }
 
-                        fileKilobyte = semicircleChartInfo2.mailOutboundStatus.fileSize > 0 ? (semicircleChartInfo2.mailOutboundStatus.fileSize / 1024).toFixed(1) : 0;
-
-                        document.querySelector('.overseasDetectionStatus .file-count').textContent = semicircleChartInfo2.mailOutboundStatus.fileCount.toLocaleString('ko-KR');
-                        document.querySelector('.overseasDetectionStatus .file-size').textContent = fileKilobyte.toLocaleString('ko-KR');
-                        document.querySelector('.overseasDetectionStatus .blocked-count').textContent = semicircleChartInfo2.mailOutboundStatus.blockedCount.toLocaleString('ko-KR');
                         updateSemicircleChart2();
                         break;
                     case '[[${@Constants.CD_PUSH_TYPE_FILE_DETECTION}]]':
@@ -228,6 +223,8 @@
                             doughnutChartInfo['unmasking'].count = fileAnalysisInfo.analysisFileCount;
                             doughnutChartInfo['unmasking'].totalCount = fileAnalysisInfo.analysisFileCount;
 
+                            updateDoughnutChartAll();
+
                             // 첨부 파일 외부 전송 현황
                             const emailOutboundHistInfoList = response.emailOutboundHistInfoList;
                             if (emailOutboundHistInfoList) {
@@ -243,9 +240,9 @@
                                             break;
                                     }
                                 }
-                            }
 
-                            updateDoughnutChartAll();
+                                updateSemicircleChart2();
+                            }
                         }
 
                         {
@@ -646,6 +643,12 @@
             }
 
             function updateSemicircleChart2() {
+                const fileKilobyte = semicircleChartInfo2.mailOutboundStatus.fileSize > 0 ? (semicircleChartInfo2.mailOutboundStatus.fileSize / 1024).toFixed(1) : 0;
+
+                document.querySelector('.overseasDetectionStatus .file-count').textContent = semicircleChartInfo2.mailOutboundStatus.fileCount.toLocaleString('ko-KR');
+                document.querySelector('.overseasDetectionStatus .file-size').textContent = fileKilobyte.toLocaleString('ko-KR');
+                document.querySelector('.overseasDetectionStatus .blocked-count').textContent = semicircleChartInfo2.mailOutboundStatus.blockedCount.toLocaleString('ko-KR');
+
                 let totalCount = semicircleChartInfo2.mailOutboundStatus.totalCount;
                 let count = semicircleChartInfo2.mailOutboundStatus.sentCount;
 
