@@ -63,4 +63,18 @@ public interface DashboardMapper {
      */
     List<AnalysisStatisticsVO> selectTopSensitiveInformation(@Param("schDe") String schDe);
 
+    /**
+     * 파일 분석 정보를 조회한다.
+     *
+     * @return 파일 분석 정보
+     */
+    AnalysisStatisticsVO selectFileAnalysisInformation(@Param("schDe") String schDe);
+
+    /**
+     * 메일 외부전송 이력 정보를 조회한다.
+     *
+     * @return 메일 외부전송 이력 정보
+     */
+    List<AnalysisStatisticsVO> selectEmailOutboundHistInformation(@Param("schDe") String schDe);
+
 }

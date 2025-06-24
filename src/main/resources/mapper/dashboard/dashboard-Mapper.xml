@@ -151,4 +151,37 @@
         LIMIT 5
     </select>
 
+    <select id="selectFileAnalysisInformation" resultType="analysisStatisticsVO">
+        /** selectFileAnalysisInformation : 파일 분석 정보를 조회한다. */
+        SELECT
+            SUM(COALESCE(sfa.FILE_COUNT, 0)) AS ANALYSIS_FILE_COUNT,
+            SUM(COALESCE(sfa.TOTAL_FILE_SIZE, 0)) AS ANALYSIS_FILE_SIZE
+        FROM SEEK_ANALYSIS sa
+            JOIN SEEK_FILE_ANALYSIS sfa
+                ON sa.ANALYSIS_ID = sfa.ANALYSIS_ID
+                AND sa.ANALYSIS_MODE_CCD = 'DETECTION_FILE'
+        WHERE sa.ANALYSIS_STATUS_CCD = 'COMPLETE'
+            <if test='schDe != null and schDe != ""'>
+                AND (sa.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sa.CREATE_DT)
+            </if>
+    </select>
+
+    <select id="selectEmailOutboundHistInformation" resultType="analysisStatisticsVO">
+        /** selectEmailOutboundHistInformation : 메일 외부전송 이력 정보를 조회한다. */
+        SELECT
+            seoh.OUTBOUND_STATUS_CCD,
+            COUNT(1) AS OUTBOUND_HIST_COUNT,
+            SUM(COALESCE(sfa.FILE_COUNT, 0)) AS OUTBOUND_FILE_COUNT,
+            SUM(COALESCE(sfa.TOTAL_FILE_SIZE, 0)) AS OUTBOUND_FILE_SIZE
+        FROM SEEK_EMAIL_OUTBOUND_HIST seoh
+            LEFT JOIN SEEK_FILE_ANALYSIS sfa
+                ON seoh.ANALYSIS_ID = sfa.ANALYSIS_ID
+        <where>
+            <if test='schDe != null and schDe != ""'>
+                AND (seoh.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > seoh.CREATE_DT)
+            </if>
+        </where>
+        GROUP BY seoh.OUTBOUND_STATUS_CCD
+    </select>
+
 </mapper>

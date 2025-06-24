@@ -195,6 +195,10 @@ public class Constants {
      * 푸시_타입_공통코드 - 외부 메일
      */
     public static final String CD_PUSH_TYPE_MAIL_OUTBOUND = "mail_outbound";
+    /**
+     * 푸시_타입_공통코드 - 파일 탐지
+     */
+    public static final String CD_PUSH_TYPE_FILE_DETECTION = "file_detection";
 
     /**
      * 파일_구분_공통코드 - 분석 요청 파일
@@ -210,6 +214,15 @@ public class Constants {
      * 국가_공통코드 - 한국
      */
     public static final String CD_COUNTRY_KR = "KR";
+
+    /**
+     * 외부전송_상태_공통코드 - 전송
+     */
+    public static final String CD_OUTBOUND_STATUS_SENT = "SENT";
+    /**
+     * 외부전송_상태_공통코드 - 차단
+     */
+    public static final String CD_OUTBOUND_STATUS_BLOCKED = "BLOCKED";
 
     /**
      * 게시글_타입_공통코드

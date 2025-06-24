@@ -2,7 +2,6 @@ package biz.placelink.seek.dashboard.service;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,7 +72,7 @@ public class DashboardService {
      *
      * @return 최종 분석이 완료된 일시(문자열)
      */
-    public String selectLastAnalysisCompleteDateTimeStr(@Param("schDe") String schDe) {
+    public String selectLastAnalysisCompleteDateTimeStr(String schDe) {
         return dashboardMapper.selectLastAnalysisCompleteDateTimeStr(schDe);
     }
 
@@ -84,6 +83,24 @@ public class DashboardService {
      */
     public List<AnalysisStatisticsVO> selectTopSensitiveInformation(String schDe) {
         return dashboardMapper.selectTopSensitiveInformation(schDe);
+    }
+
+    /**
+     * 파일 분석 정보를 조회한다.
+     *
+     * @return 파일 분석 정보
+     */
+    public AnalysisStatisticsVO selectFileAnalysisInformation(String schDe) {
+        return dashboardMapper.selectFileAnalysisInformation(schDe);
+    }
+
+    /**
+     * 메일 외부전송 이력 정보를 조회한다.
+     *
+     * @return 메일 외부전송 이력 정보
+     */
+    public List<AnalysisStatisticsVO> selectEmailOutboundHistInformation(String schDe) {
+        return dashboardMapper.selectEmailOutboundHistInformation(schDe);
     }
 
 }

@@ -1121,7 +1121,7 @@ table caption {
   text-align: center;
 }
 .sidebar-wrap .sidebar-nav .sidebar-menu {
-  width: 100%;
+  width: 60px;
   height: 60px;
   border-bottom: 1px solid #3e3f42;
   background-size: 50%;
@@ -1148,6 +1148,13 @@ table caption {
 .sidebar-wrap .sidebar-nav .sidebar-menu.SITE_STATUS:hover,
 .sidebar-wrap .sidebar-nav .sidebar-menu.SITE_STATUS.active {
   background-image: url(../images/menu3_on.png);
+}
+.sidebar-wrap .sidebar-nav .sidebar-menu.MAIL_STATUS {
+  background-image: url(../images/menu_mail.png);
+}
+.sidebar-wrap .sidebar-nav .sidebar-menu.MAIL_STATUS:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.MAIL_STATUS.active {
+  background-image: url(../images/menu_mail_on.png);
 }
 .sidebar-wrap .sidebar-nav .sidebar-menu.DETECTION_FILE {
   background-image: url(../images/menu_file.png);

@@ -179,7 +179,7 @@ public class AnalyzerService {
 
                 if (Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd)) {
                     // 파일 탐지인 경우 파일 서명을 받는다. (!!s2!! 이미 분석된 데이터의 파일을 중복 서명할지 고민해보자.)
-                    requestRemoteFileSigning(analysisId, this.detectionTypePriority(existingAnalysisResult.getMaxDetectionTypeCcd()), analysisDetail.getDetectionFileId());
+                    requestRemoteFileSigning(analysisId, analysisDetail.getFileCount(), analysisDetail.getTotalFileSize(), this.detectionTypePriority(existingAnalysisResult.getMaxDetectionTypeCcd()), analysisDetail.getDetectionFileId());
                 }
 
                 if (analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, 0, analysisModeCcd, existingAnalysisResult) > 0 && existingAnalysisResult != null) {
@@ -461,7 +461,7 @@ public class AnalyzerService {
 
                     if (Constants.CD_ANALYSIS_MODE_DETECTION_FILE.equals(analysisModeCcd)) {
                         // 파일 탐지인 경우 파일 서명을 받는다.
-                        requestRemoteFileSigning(analysisId, maxDetectionTypePriority, analysisDetail.getDetectionFileId());
+                        requestRemoteFileSigning(analysisId, analysisDetail.getFileCount(), analysisDetail.getTotalFileSize(), maxDetectionTypePriority, analysisDetail.getDetectionFileId());
                     }
 
                     analysisService.updateAnalysisCompleted(analysisId, analysisDataHash, analysisTime, analysisModeCcd, totalDetectionCount, analysisDetail.getTargetInformation(), analyzedContent, analysisDetail.getContent());
@@ -504,7 +504,16 @@ public class AnalyzerService {
         };
     }
 
-    private void requestRemoteFileSigning(String analysisId, int maxDetectionTypePriority, String fileId) {
+    private void requestRemoteFileSigning(String analysisId, int fileCount, Long totalFileSize, int maxDetectionTypePriority, String fileId) {
+        // LLM 이 분석한 파일 정보를 실시간으로 푸시 푸시한다.
+        Map<String, Object> pushMap = new HashMap<>();
+
+        pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_FILE_DETECTION);
+        pushMap.put("fileCount", fileCount);
+        pushMap.put("totalFileSize", totalFileSize);
+
+        serviceWorkerService.sendNotificationAll(pushMap);
+
         if (maxDetectionTypePriority > 1) {
             // low 또는 민감정보가 없을때만 파일 서명을 받는다.
             return;
@@ -537,8 +546,6 @@ public class AnalyzerService {
             if (resultData != null && Constants.RESULT_SUCCESS.equalsIgnoreCase(resultData.path("status").asText(""))) {
                 String signedFileHash = resultData.path("signature_hex ").asText("");
                 String remoteFilePath = resultData.path("final_zip_path").asText("");
-                int fileCount = resultData.path("file_count").asInt(0);
-                long totalFileSize = resultData.path("total_size").asLong(0);
 
                 if (S2Util.isNotEmpty(remoteFilePath)) {
                     // 파일 다운로드 저장 후 signedFileId 업데이트 필요
@@ -571,8 +578,6 @@ public class AnalyzerService {
                             fileAnalysisParam.setAnalysisId(analysisId);
                             fileAnalysisParam.setSignedFileId(signedFileId);
                             fileAnalysisParam.setSignedFileHash(signedFileHash);
-                            fileAnalysisParam.setFileCount(fileCount);
-                            fileAnalysisParam.setTotalFileSize(totalFileSize);
 
                             analysisDetailService.updateFileAnalysis(fileAnalysisParam);
 

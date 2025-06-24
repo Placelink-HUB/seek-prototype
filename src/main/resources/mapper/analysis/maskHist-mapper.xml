@@ -18,6 +18,7 @@
             NOW()
         )
     </insert>
+
     <select id="selectMaskStatus" resultType="maskHistVO">
         /** selectMaskStatus : 마스크 현황을 조회한다. */
         SELECT

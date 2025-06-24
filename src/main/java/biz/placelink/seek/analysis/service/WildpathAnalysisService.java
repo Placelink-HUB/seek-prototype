@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
@@ -45,14 +46,16 @@ public class WildpathAnalysisService {
     private final AnalysisDetailService analysisDetailService;
     private final SensitiveInformationService sensitiveInformationService;
     private final MaskHistService maskHistService;
+    private final EmailOutboundHistService emailOutboundHistService;
     private final FileService fileService;
 
-    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, FileService fileService) {
+    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, EmailOutboundHistService emailOutboundHistService, FileService fileService) {
         this.serviceWorkerService = serviceWorkerService;
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
         this.sensitiveInformationService = sensitiveInformationService;
         this.maskHistService = maskHistService;
+        this.emailOutboundHistService = emailOutboundHistService;
         this.fileService = fileService;
     }
 
@@ -140,6 +143,29 @@ public class WildpathAnalysisService {
             serviceWorkerService.sendNotificationAll(pushMap);
         }
 
+        return result;
+    }
+
+    @Transactional(readOnly = false)
+    public int createEmailOutboundHist(String outboundStatusCcd, String senderEmail, String analysisId) {
+        int result = emailOutboundHistService.insertEmailOutboundHist(outboundStatusCcd, senderEmail, analysisId);
+        if (result > 0) {
+            // 첨부 파일 외부 전송 현황
+            Map<String, Object> pushMap = new HashMap<>();
+            pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_MAIL_OUTBOUND);
+            pushMap.put("outboundStatusCcd", outboundStatusCcd);
+            pushMap.put("senderEmail", senderEmail);
+
+            if (Constants.CD_OUTBOUND_STATUS_SENT.equals(outboundStatusCcd)) {
+                AnalysisResultVO fileInfo = analysisDetailService.selectFileAnalysis(analysisId);
+                if (fileInfo != null) {
+                    pushMap.put("fileCount", fileInfo.getFileCount());
+                    pushMap.put("totalFileSize", fileInfo.getTotalFileSize());
+                }
+            }
+
+            serviceWorkerService.sendNotificationAll(pushMap);
+        }
         return result;
     }
 

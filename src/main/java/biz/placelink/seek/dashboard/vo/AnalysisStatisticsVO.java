@@ -5,44 +5,44 @@ import biz.placelink.seek.com.vo.DefaultVO;
 public class AnalysisStatisticsVO extends DefaultVO {
 
     /* (분석) 요청 개수 */
-    private int requestCount;
+    private Integer requestCount;
     /* (분석) 완료 개수 */
-    private int completeCount;
+    private Integer completeCount;
     /* 탐지 개수 */
-    private int detectionCount;
+    private Integer detectionCount;
     /* 전체 탐지 개수 */
-    private int totalDetectionCount;
+    private Integer totalDetectionCount;
     /* 마스킹 개수 */
-    private int maskingCount;
+    private Integer maskingCount;
     /* 전체 마스킹 개수 */
-    private int totalMaskingCount;
+    private Integer totalMaskingCount;
     /* 언마스킹 개수 */
-    private int unmaskingCount;
+    private Integer unmaskingCount;
     /* 전체 언마스킹 개수 */
-    private int totalUnmaskingCount;
+    private Integer totalUnmaskingCount;
 
     /* 탐지 현황 - 전체 건수 */
-    private int totalCountryCount;
+    private Integer totalCountryCount;
     /* 탐지 현황 - 전체 국내 건수 */
-    private int totalKoreaCount;
+    private Integer totalKoreaCount;
     /* 탐지 현황 - 전체 해외 건수 */
-    private int totalOtherCountryCount;
+    private Integer totalOtherCountryCount;
     /* 탐지 현황 - 국내 건수 */
-    private int koreaCount;
+    private Integer koreaCount;
     /* 탐지 현황 - 해외 건수 */
-    private int otherCountryCount;
+    private Integer otherCountryCount;
     /* 탐지 현황 - 국내 위험 */
-    private int koreaHighCount;
+    private Integer koreaHighCount;
     /* 탐지 현황 - 국내 보통 */
-    private int koreaMidCount;
+    private Integer koreaMidCount;
     /* 탐지 현황 - 국내 낮음 */
-    private int koreaLowCount;
+    private Integer koreaLowCount;
     /* 탐지 현황 - 해외 위험 */
-    private int otherHighCount;
+    private Integer otherHighCount;
     /* 탐지 현황 - 해외 보통 */
-    private int otherMidCount;
+    private Integer otherMidCount;
     /* 탐지 현황 - 해외 낮음 */
-    private int otherLowCount;
+    private Integer otherLowCount;
 
     /* 실시간 분석 현황 - 분 (YYYYMMDDHH24MI) */
     private String minuteGroup;
@@ -50,157 +50,171 @@ public class AnalysisStatisticsVO extends DefaultVO {
     /* 민감 정보 검출 타입 공통코드 */
     private String detectionTypeCcd;
     /* 민감 정보 탐지 횟수 */
-    private int hitCount;
+    private Integer hitCount;
 
-    public int getRequestCount() {
+    /* 분석 파일 개수 */
+    private Integer analysisFileCount;
+    /* 분석 파일 크기 */
+    private Long analysisFileSize;
+
+    /* 외부전송 상태 공통코드 */
+    private String outboundStatusCcd;
+    /* 외부전송 이력 개수 */
+    private Integer outboundHistCount;
+    /* 외부전송 파일 개수 */
+    private Integer outboundFileCount;
+    /* 외부전송 파일 크기 */
+    private Long outboundFileSize;
+
+    public Integer getRequestCount() {
         return requestCount;
     }
 
-    public void setRequestCount(int requestCount) {
+    public void setRequestCount(Integer requestCount) {
         this.requestCount = requestCount;
     }
 
-    public int getCompleteCount() {
+    public Integer getCompleteCount() {
         return completeCount;
     }
 
-    public void setCompleteCount(int completeCount) {
+    public void setCompleteCount(Integer completeCount) {
         this.completeCount = completeCount;
     }
 
-    public int getDetectionCount() {
+    public Integer getDetectionCount() {
         return detectionCount;
     }
 
-    public void setDetectionCount(int detectionCount) {
+    public void setDetectionCount(Integer detectionCount) {
         this.detectionCount = detectionCount;
     }
 
-    public int getTotalDetectionCount() {
+    public Integer getTotalDetectionCount() {
         return totalDetectionCount;
     }
 
-    public void setTotalDetectionCount(int totalDetectionCount) {
+    public void setTotalDetectionCount(Integer totalDetectionCount) {
         this.totalDetectionCount = totalDetectionCount;
     }
 
-    public int getMaskingCount() {
+    public Integer getMaskingCount() {
         return maskingCount;
     }
 
-    public void setMaskingCount(int maskingCount) {
+    public void setMaskingCount(Integer maskingCount) {
         this.maskingCount = maskingCount;
     }
 
-    public int getTotalMaskingCount() {
+    public Integer getTotalMaskingCount() {
         return totalMaskingCount;
     }
 
-    public void setTotalMaskingCount(int totalMaskingCount) {
+    public void setTotalMaskingCount(Integer totalMaskingCount) {
         this.totalMaskingCount = totalMaskingCount;
     }
 
-    public int getUnmaskingCount() {
+    public Integer getUnmaskingCount() {
         return unmaskingCount;
     }
 
-    public void setUnmaskingCount(int unmaskingCount) {
+    public void setUnmaskingCount(Integer unmaskingCount) {
         this.unmaskingCount = unmaskingCount;
     }
 
-    public int getTotalUnmaskingCount() {
+    public Integer getTotalUnmaskingCount() {
         return totalUnmaskingCount;
     }
 
-    public void setTotalUnmaskingCount(int totalUnmaskingCount) {
+    public void setTotalUnmaskingCount(Integer totalUnmaskingCount) {
         this.totalUnmaskingCount = totalUnmaskingCount;
     }
 
-    public int getTotalCountryCount() {
+    public Integer getTotalCountryCount() {
         return totalCountryCount;
     }
 
-    public void setTotalCountryCount(int totalCountryCount) {
+    public void setTotalCountryCount(Integer totalCountryCount) {
         this.totalCountryCount = totalCountryCount;
     }
 
-    public int getTotalKoreaCount() {
+    public Integer getTotalKoreaCount() {
         return totalKoreaCount;
     }
 
-    public void setTotalKoreaCount(int totalKoreaCount) {
+    public void setTotalKoreaCount(Integer totalKoreaCount) {
         this.totalKoreaCount = totalKoreaCount;
     }
 
-    public int getTotalOtherCountryCount() {
+    public Integer getTotalOtherCountryCount() {
         return totalOtherCountryCount;
     }
 
-    public void setTotalOtherCountryCount(int totalOtherCountryCount) {
+    public void setTotalOtherCountryCount(Integer totalOtherCountryCount) {
         this.totalOtherCountryCount = totalOtherCountryCount;
     }
 
-    public int getKoreaCount() {
+    public Integer getKoreaCount() {
         return koreaCount;
     }
 
-    public void setKoreaCount(int koreaCount) {
+    public void setKoreaCount(Integer koreaCount) {
         this.koreaCount = koreaCount;
     }
 
-    public int getOtherCountryCount() {
+    public Integer getOtherCountryCount() {
         return otherCountryCount;
     }
 
-    public void setOtherCountryCount(int otherCountryCount) {
+    public void setOtherCountryCount(Integer otherCountryCount) {
         this.otherCountryCount = otherCountryCount;
     }
 
-    public int getKoreaHighCount() {
+    public Integer getKoreaHighCount() {
         return koreaHighCount;
     }
 
-    public void setKoreaHighCount(int koreaHighCount) {
+    public void setKoreaHighCount(Integer koreaHighCount) {
         this.koreaHighCount = koreaHighCount;
     }
 
-    public int getKoreaMidCount() {
+    public Integer getKoreaMidCount() {
         return koreaMidCount;
     }
 
-    public void setKoreaMidCount(int koreaMidCount) {
+    public void setKoreaMidCount(Integer koreaMidCount) {
         this.koreaMidCount = koreaMidCount;
     }
 
-    public int getKoreaLowCount() {
+    public Integer getKoreaLowCount() {
         return koreaLowCount;
     }
 
-    public void setKoreaLowCount(int koreaLowCount) {
+    public void setKoreaLowCount(Integer koreaLowCount) {
         this.koreaLowCount = koreaLowCount;
     }
 
-    public int getOtherHighCount() {
+    public Integer getOtherHighCount() {
         return otherHighCount;
     }
 
-    public void setOtherHighCount(int otherHighCount) {
+    public void setOtherHighCount(Integer otherHighCount) {
         this.otherHighCount = otherHighCount;
     }
 
-    public int getOtherMidCount() {
+    public Integer getOtherMidCount() {
         return otherMidCount;
     }
 
-    public void setOtherMidCount(int otherMidCount) {
+    public void setOtherMidCount(Integer otherMidCount) {
         this.otherMidCount = otherMidCount;
     }
 
-    public int getOtherLowCount() {
+    public Integer getOtherLowCount() {
         return otherLowCount;
     }
 
-    public void setOtherLowCount(int otherLowCount) {
+    public void setOtherLowCount(Integer otherLowCount) {
         this.otherLowCount = otherLowCount;
     }
 
@@ -220,12 +234,60 @@ public class AnalysisStatisticsVO extends DefaultVO {
         this.detectionTypeCcd = detectionTypeCcd;
     }
 
-    public int getHitCount() {
+    public Integer getHitCount() {
         return hitCount;
     }
 
-    public void setHitCount(int hitCount) {
+    public void setHitCount(Integer hitCount) {
         this.hitCount = hitCount;
+    }
+
+    public Integer getAnalysisFileCount() {
+        return analysisFileCount;
+    }
+
+    public void setAnalysisFileCount(Integer analysisFileCount) {
+        this.analysisFileCount = analysisFileCount;
+    }
+
+    public Long getAnalysisFileSize() {
+        return analysisFileSize;
+    }
+
+    public void setAnalysisFileSize(Long analysisFileSize) {
+        this.analysisFileSize = analysisFileSize;
+    }
+
+    public String getOutboundStatusCcd() {
+        return outboundStatusCcd;
+    }
+
+    public void setOutboundStatusCcd(String outboundStatusCcd) {
+        this.outboundStatusCcd = outboundStatusCcd;
+    }
+
+    public Integer getOutboundHistCount() {
+        return outboundHistCount;
+    }
+
+    public void setOutboundHistCount(Integer outboundHistCount) {
+        this.outboundHistCount = outboundHistCount;
+    }
+
+    public Integer getOutboundFileCount() {
+        return outboundFileCount;
+    }
+
+    public void setOutboundFileCount(Integer outboundFileCount) {
+        this.outboundFileCount = outboundFileCount;
+    }
+
+    public Long getOutboundFileSize() {
+        return outboundFileSize;
+    }
+
+    public void setOutboundFileSize(Long outboundFileSize) {
+        this.outboundFileSize = outboundFileSize;
     }
 
 }

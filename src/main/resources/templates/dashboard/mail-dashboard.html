@@ -171,13 +171,11 @@
                         break;
                     case '[[${@Constants.CD_PUSH_TYPE_MAIL_OUTBOUND}]]':
                         // 외부 메일 발송 탐지 현황
-                        console.debug('외부 메일 발송 탐지 현황', event.data.data);
-
                         semicircleChartInfo2.mailOutboundStatus.totalCount++;
-                        if (event.data.data['dsign_check'] === 'success') {
-                            semicircleChartInfo2.mailOutboundStatus.successCount++;
-                            semicircleChartInfo2.mailOutboundStatus.fileCount += Number(event.data.data['file_count'] || 0);
-                            semicircleChartInfo2.mailOutboundStatus.fileSize += Number(event.data.data['total_file_size'] || 0);
+                        if (event.data.data['outboundStatusCcd'] === '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]') {
+                            semicircleChartInfo2.mailOutboundStatus.sentCount++;
+                            semicircleChartInfo2.mailOutboundStatus.fileCount += Number(event.data.data['fileCount'] || 0);
+                            semicircleChartInfo2.mailOutboundStatus.fileSize += Number(event.data.data['totalFileSize'] || 0);
                         } else {
                             semicircleChartInfo2.mailOutboundStatus.blockedCount++;
                         }
@@ -189,12 +187,25 @@
                         document.querySelector('.overseasDetectionStatus .blocked-count').textContent = semicircleChartInfo2.mailOutboundStatus.blockedCount.toLocaleString('ko-KR');
                         updateSemicircleChart2();
                         break;
+                    case '[[${@Constants.CD_PUSH_TYPE_FILE_DETECTION}]]':
+                        // LLM이 분석한 파일 정보
+                        const fileSize = event.data.data.totalFileSize || 0;
+                        const fileCount = event.data.data.fileCount || 0;
+
+                        doughnutChartInfo['masking'].count += fileSize;
+                        doughnutChartInfo['masking'].totalCount += fileSize;
+                        doughnutChartInfo['unmasking'].count += fileCount;
+                        doughnutChartInfo['unmasking'].totalCount += fileCount;
+
+                        updateDoughnutChart('masking');
+                        updateDoughnutChart('unmasking');
+                        break;
                 }
             });
 
             function getAnalysisStatistics() {
                 S2Util.fetch(
-                    '[[@{/public/dashboard/analysis-statistics}]]',
+                    '[[@{/public/dashboard/analysis-statistics2}]]',
                     {
                         method: 'get',
                         dataType: 'json'
@@ -210,29 +221,28 @@
                             doughnutChartInfo['detection'].count = analysisData.detectionCount;
                             doughnutChartInfo['detection'].totalCount = analysisData.totalDetectionCount;
 
-                            // 마스킹(언마스킹)
-                            const maskingDataArray = response.maskingData;
-                            if (maskingDataArray) {
-                                let totalMaskingCount = 0;
-                                let maskingCount = 0;
-                                let unmaskingCount = 0;
+                            // LLM이 분석한 파일 정보
+                            const fileAnalysisInfo = response.fileAnalysisInfo;
+                            doughnutChartInfo['masking'].count = fileAnalysisInfo.analysisFileSize;
+                            doughnutChartInfo['masking'].totalCount = fileAnalysisInfo.analysisFileSize;
+                            doughnutChartInfo['unmasking'].count = fileAnalysisInfo.analysisFileCount;
+                            doughnutChartInfo['unmasking'].totalCount = fileAnalysisInfo.analysisFileCount;
 
-                                for (maskingData of maskingDataArray) {
-                                    totalMaskingCount += maskingData.maskCount;
-                                    switch (maskingData.maskModeCcd) {
-                                        case 'mask':
-                                            maskingCount = maskingData.maskCount;
+                            // 첨부 파일 외부 전송 현황
+                            const emailOutboundHistInfoList = response.emailOutboundHistInfoList;
+                            if (emailOutboundHistInfoList) {
+                                for (const emailOutboundHistInfo of emailOutboundHistInfoList) {
+                                    switch (emailOutboundHistInfo.outboundStatusCcd) {
+                                        case '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]':
+                                            semicircleChartInfo2.mailOutboundStatus.sentCount = emailOutboundHistInfo.outboundHistCount || 0;
+                                            semicircleChartInfo2.mailOutboundStatus.fileCount += emailOutboundHistInfo.outboundFileCount || 0;
+                                            semicircleChartInfo2.mailOutboundStatus.fileSize += emailOutboundHistInfo.outboundFileSize || 0;
                                             break;
-                                        case 'unmask':
-                                            unmaskingCount = maskingData.maskCount;
+                                        case '[[${@Constants.CD_OUTBOUND_STATUS_BLOCKED}]]':
+                                            semicircleChartInfo2.mailOutboundStatus.blockedCount = emailOutboundHistInfo.outboundHistCount || 0;
                                             break;
                                     }
                                 }
-
-                                doughnutChartInfo['masking'].count = maskingCount;
-                                doughnutChartInfo['masking'].totalCount = totalMaskingCount;
-                                doughnutChartInfo['unmasking'].count = unmaskingCount;
-                                doughnutChartInfo['unmasking'].totalCount = totalMaskingCount;
                             }
 
                             updateDoughnutChartAll();
@@ -637,7 +647,7 @@
 
             function updateSemicircleChart2() {
                 let totalCount = semicircleChartInfo2.mailOutboundStatus.totalCount;
-                let count = semicircleChartInfo2.mailOutboundStatus.successCount;
+                let count = semicircleChartInfo2.mailOutboundStatus.sentCount;
 
                 semicircleChart['mailOutboundStatus'].setOption(
                     {
@@ -1046,15 +1056,15 @@
                         </div>
                         <div class="card card3">
                             <div class="text">
-                                <span class="card-title">마스킹</span>
-                                <span class="card-desc">비식별 처리된 정보 수</span>
+                                <span class="card-title">LLM이 분석한 용량</span>
+                                <span class="card-desc">민감정보 분석한 총 파일 용량</span>
                             </div>
                             <div id="doughnutChart3" class="graph"></div>
                         </div>
                         <div class="card card4">
                             <div class="text">
-                                <span class="card-title">언마스킹</span>
-                                <span class="card-desc">복호화된 정보 횟수</span>
+                                <span class="card-title">LLM이 분석한 파일 수</span>
+                                <span class="card-desc">민감정보 분석한 총 파일 개수</span>
                             </div>
                             <div id="doughnutChart4" class="graph"></div>
                         </div>

@@ -46,12 +46,16 @@
 			DETECTION_FILE_ID,
 			SIGNED_FILE_ID,
 			SIGNED_FILE_HASH,
+			FILE_COUNT,
+			TOTAL_FILE_SIZE,
 			REQUESTER_UID
 		) VALUES (
 			#{analysisId},
 			#{detectionFileId},
 			#{signedFileId},
 			#{signedFileHash},
+			#{fileCount},
+			#{totalFileSize},
 			#{requesterUid}
 		)
     </insert>

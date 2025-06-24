@@ -201,6 +201,15 @@ public class AnalysisService {
     @Transactional
     public int createDetectionFile(List<MultipartFile> files) {
         int result = 0;
+        int fileCount = 0;
+        long fileSize = 0;
+
+        if (files != null) {
+            for (MultipartFile file : files) {
+                fileCount++;
+                fileSize += file.getSize();
+            }
+        }
 
         List<FileDetailVO> successFileList = fileService.writeFile(files, null, Constants.CD_ARTICLE_TYPE_FILE, Constants.CD_ARTICLE_TYPE_FILE, allowedFileExt.split(","), 5L);
         if (successFileList != null && !successFileList.isEmpty()) {
@@ -218,6 +227,8 @@ public class AnalysisService {
                 AnalysisDetailVO analysisDetail = new AnalysisDetailVO();
                 analysisDetail.setAnalysisId(analysisId);
                 analysisDetail.setDetectionFileId(successFileList.get(0).getFileId());
+                analysisDetail.setFileCount(fileCount);
+                analysisDetail.setTotalFileSize(fileSize);
                 analysisDetail.setRequesterUid(SessionUtil.getSessionUserUid());
 
                 analysisDetailService.insertFileAnalysis(analysisDetail);

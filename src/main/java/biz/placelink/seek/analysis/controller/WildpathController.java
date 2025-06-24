@@ -36,9 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.WildpathAnalysisService;
-import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,12 +53,10 @@ public class WildpathController {
 
     private final ServiceWorkerService serviceWorkerService;
     private final WildpathAnalysisService wildpathAnalysisService;
-    private final AnalysisDetailService analysisDetailService;
 
-    public WildpathController(ServiceWorkerService serviceWorkerService, WildpathAnalysisService wildpathAnalysisService, AnalysisDetailService analysisDetailService) {
+    public WildpathController(ServiceWorkerService serviceWorkerService, WildpathAnalysisService wildpathAnalysisService) {
         this.serviceWorkerService = serviceWorkerService;
         this.wildpathAnalysisService = wildpathAnalysisService;
-        this.analysisDetailService = analysisDetailService;
     }
 
     @Value("${analysis.excluded-paths}")
@@ -325,24 +321,7 @@ public class WildpathController {
             return;
         }
 
-        {
-            // 첨부 파일 외부 전송 현황
-            Map<String, Object> pushMap = new HashMap<>();
-            pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_MAIL_OUTBOUND);
-            pushMap.put("dsign_check", dsignCheck);
-            pushMap.put("user_email", email);
-
-            if ("success".equals(dsignCheck)) {
-                AnalysisResultVO fileInfo = analysisDetailService.selectFileAnalysis(analysisId);
-                if (fileInfo != null) {
-                    pushMap.put("file_count", fileInfo.getFileCount());
-                    pushMap.put("total_file_size", fileInfo.getTotalFileSize());
-                }
-                pushMap.put("sig_user_id", analysisId);
-            }
-
-            serviceWorkerService.sendNotificationAll(pushMap);
-        }
+        wildpathAnalysisService.createEmailOutboundHist("success".equals(dsignCheck) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, email, analysisId);
     }
 
     /**

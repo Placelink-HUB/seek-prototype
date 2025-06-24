@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import biz.placelink.seek.analysis.service.MaskHistService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.dashboard.service.DashboardService;
+import jakarta.servlet.http.HttpServletRequest;
 import kr.s2.ext.util.S2Util;
 
 @Controller
@@ -54,8 +55,8 @@ public class DashboardController {
      *
      * @return 분석 현황
      */
-    @GetMapping(value = "/public/dashboard/analysis-statistics")
-    public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", required = false) String schDe) {
+    @GetMapping(value = {"/public/dashboard/analysis-statistics", "/public/dashboard/analysis-statistics2"})
+    public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", required = false) String schDe, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
         if (S2Util.isEmpty(schDe)) {
@@ -64,10 +65,16 @@ public class DashboardController {
 
         response.put("analysisData", dashboardService.selectAnalysisStatistics(schDe));
         response.put("detectionData", dashboardService.selectDetectionStatistics(schDe));
-        response.put("maskingData", maskHistService.selectMaskStatus(schDe));
         response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(schDe));
         response.put("lastAnalysisCompleteDateTimeStr", dashboardService.selectLastAnalysisCompleteDateTimeStr(schDe));
         response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(schDe));
+
+        if ("/public/dashboard/analysis-statistics".equals(request.getServletPath())) {
+            response.put("maskingData", maskHistService.selectMaskStatus(schDe));
+        } else if ("/public/dashboard/analysis-statistics2".equals(request.getServletPath())) {
+            response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(schDe));
+            response.put("emailOutboundHistInfoList", dashboardService.selectEmailOutboundHistInformation(schDe));
+        }
 
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);

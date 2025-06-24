@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.analysis.service.EmailOutboundHistMapper">
+
+    <insert id="insertEmailOutboundHist">
+		/** insertEmailOutboundHist : 메일 외부전송 이력 정보를 등록한다. */
+        INSERT INTO SEEK_EMAIL_OUTBOUND_HIST (
+            OUTBOUND_STATUS_CCD,
+            SENDER_EMAIL,
+            ANALYSIS_ID,
+            CREATE_DT
+        ) VALUES (
+            #{outboundStatusCcd},
+            #{senderEmail},
+            #{analysisId},
+            NOW()
+        )
+    </insert>
+
+</mapper>
