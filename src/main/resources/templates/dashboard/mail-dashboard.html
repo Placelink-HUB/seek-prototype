@@ -22,21 +22,13 @@
                     count: 0,
                     totalCount: 0,
                     color: '#04f0fb'
-                },
-                // 마스킹 현황
-                masking: {
-                    text: '마스킹',
-                    count: 0,
-                    totalCount: 0,
-                    color: '#b4b4fc'
-                },
-                // 언마스킹 현황
-                unmasking: {
-                    text: '언마스킹',
-                    count: 0,
-                    totalCount: 0,
-                    color: '#5eefa6'
                 }
+            };
+
+            // LLM 이 분석한 파일 정보
+            const fileDetectionInfo = {
+                fileSize: 0,
+                fileCount: 0
             };
 
             const semicircleChartInfo = {
@@ -57,7 +49,6 @@
                 // 첨부 파일 외부 전송 현황
                 mailOutboundStatus: {
                     text: '전송 수',
-                    totalCount: 0,
                     sentCount: 0,
                     fileCount: 0,
                     fileSize: 0,
@@ -144,34 +135,8 @@
                         }
                         updateLineChart();
                         break;
-                    case '[[${@Constants.CD_PUSH_TYPE_MASKING}]]':
-                        // 마스킹
-                        const maskCount = event.data.data.count;
-                        if (maskCount > 0) {
-                            let maskChartDataChanged = false;
-
-                            switch (event.data.data.maskModeCcd) {
-                                case 'mask':
-                                    doughnutChartInfo.masking.count += maskCount;
-                                    maskChartDataChanged = true;
-                                    break;
-                                case 'unmask':
-                                    doughnutChartInfo.unmasking.count += maskCount;
-                                    maskChartDataChanged = true;
-                                    break;
-                            }
-
-                            if (maskChartDataChanged) {
-                                doughnutChartInfo.masking.totalCount += maskCount;
-                                doughnutChartInfo.unmasking.totalCount += maskCount;
-                                updateDoughnutChart('masking');
-                                updateDoughnutChart('unmasking');
-                            }
-                        }
-                        break;
                     case '[[${@Constants.CD_PUSH_TYPE_MAIL_OUTBOUND}]]':
                         // 외부 메일 발송 탐지 현황
-                        semicircleChartInfo2.mailOutboundStatus.totalCount++;
                         if (event.data.data['outboundStatusCcd'] === '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]') {
                             semicircleChartInfo2.mailOutboundStatus.sentCount++;
                             semicircleChartInfo2.mailOutboundStatus.fileCount += Number(event.data.data['fileCount'] || 0);
@@ -184,16 +149,9 @@
                         break;
                     case '[[${@Constants.CD_PUSH_TYPE_FILE_DETECTION}]]':
                         // LLM이 분석한 파일 정보
-                        const fileSize = event.data.data.totalFileSize || 0;
-                        const fileCount = event.data.data.fileCount || 0;
-
-                        doughnutChartInfo['masking'].count += fileSize;
-                        doughnutChartInfo['masking'].totalCount += fileSize;
-                        doughnutChartInfo['unmasking'].count += fileCount;
-                        doughnutChartInfo['unmasking'].totalCount += fileCount;
-
-                        updateDoughnutChart('masking');
-                        updateDoughnutChart('unmasking');
+                        fileDetectionInfo.fileSize += event.data.data.totalFileSize || 0;
+                        fileDetectionInfo.fileCount += event.data.data.fileCount || 0;
+                        updateFileDetectionInfo();
                         break;
                 }
             });
@@ -216,14 +174,13 @@
                             doughnutChartInfo['detection'].count = analysisData.detectionCount;
                             doughnutChartInfo['detection'].totalCount = analysisData.totalDetectionCount;
 
+                            updateDoughnutChartAll();
+
                             // LLM이 분석한 파일 정보
                             const fileAnalysisInfo = response.fileAnalysisInfo;
-                            doughnutChartInfo['masking'].count = fileAnalysisInfo.analysisFileSize;
-                            doughnutChartInfo['masking'].totalCount = fileAnalysisInfo.analysisFileSize;
-                            doughnutChartInfo['unmasking'].count = fileAnalysisInfo.analysisFileCount;
-                            doughnutChartInfo['unmasking'].totalCount = fileAnalysisInfo.analysisFileCount;
-
-                            updateDoughnutChartAll();
+                            fileDetectionInfo.fileSize = fileAnalysisInfo.analysisFileSize;
+                            fileDetectionInfo.fileCount = fileAnalysisInfo.analysisFileCount;
+                            updateFileDetectionInfo();
 
                             // 첨부 파일 외부 전송 현황
                             const emailOutboundHistInfoList = response.emailOutboundHistInfoList;
@@ -303,8 +260,6 @@
             function initDoughnutChart() {
                 doughnutChart['analysis'] = echarts.init(document.getElementById('doughnutChart1'));
                 doughnutChart['detection'] = echarts.init(document.getElementById('doughnutChart2'));
-                doughnutChart['masking'] = echarts.init(document.getElementById('doughnutChart3'));
-                doughnutChart['unmasking'] = echarts.init(document.getElementById('doughnutChart4'));
 
                 for (const targetChartName in doughnutChartInfo) {
                     const chartInfo = doughnutChartInfo[targetChartName];
@@ -384,6 +339,11 @@
                     },
                     false // false로 설정하여 기존 값은 유지);
                 );
+            }
+
+            function updateFileDetectionInfo() {
+                document.querySelector('.detection-file-size').textContent = (fileDetectionInfo.fileSize / 1024).toFixed(1).toLocaleString('ko-KR');
+                document.querySelector('.detection-file-count').textContent = fileDetectionInfo.fileCount.toLocaleString('ko-KR');
             }
 
             function initSemicircleChart() {
@@ -649,7 +609,7 @@
                 document.querySelector('.overseasDetectionStatus .file-size').textContent = fileKilobyte.toLocaleString('ko-KR');
                 document.querySelector('.overseasDetectionStatus .blocked-count').textContent = semicircleChartInfo2.mailOutboundStatus.blockedCount.toLocaleString('ko-KR');
 
-                let totalCount = semicircleChartInfo2.mailOutboundStatus.totalCount;
+                let totalCount = semicircleChartInfo2.mailOutboundStatus.sentCount + semicircleChartInfo2.mailOutboundStatus.blockedCount;
                 let count = semicircleChartInfo2.mailOutboundStatus.sentCount;
 
                 semicircleChart['mailOutboundStatus'].setOption(
@@ -1062,14 +1022,18 @@
                                 <span class="card-title">LLM이 분석한 용량</span>
                                 <span class="card-desc">민감정보 분석한 총 파일 용량</span>
                             </div>
-                            <div id="doughnutChart3" class="graph"></div>
+                            <div style="display: flex; flex-direction: column; justify-content: center">
+                                <div style="white-space: nowrap; font-size: 18px; color: #ffffff"><span class="detection-file-size" style="font-weight: bold">0</span> <span style="font-size: 14px">KB</span></div>
+                            </div>
                         </div>
                         <div class="card card4">
                             <div class="text">
                                 <span class="card-title">LLM이 분석한 파일 수</span>
                                 <span class="card-desc">민감정보 분석한 총 파일 개수</span>
                             </div>
-                            <div id="doughnutChart4" class="graph"></div>
+                            <div style="display: flex; flex-direction: column; justify-content: center">
+                                <div style="white-space: nowrap; font-size: 18px; color: #ffffff"><span class="detection-file-count" style="font-weight: bold">0</span> <span style="font-size: 14px">건</span></div>
+                            </div>
                         </div>
                     </div>
                     <div class="status-box">
