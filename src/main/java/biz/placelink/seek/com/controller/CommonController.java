@@ -22,9 +22,9 @@ public class CommonController {
      *
      * @return 기본 페이지 경로
      */
-    @GetMapping(value = {"/", "/public/index"})
+    @GetMapping(value = {"/", "/index"})
     public String index() {
-        return "redirect:/public/dashboard/test";
+        return "redirect:/dashboard/file";
     }
 
 }

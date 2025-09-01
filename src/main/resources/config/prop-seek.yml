@@ -8,7 +8,7 @@ analysis:
     enabled: true
     request:
       maxcnt: 3
-  excluded-paths: /public/dashboard/,/public/js/,/public/css/,/public/images/,/public/ico/
+  excluded-paths: /dashboard/,/public/js/,/public/css/,/public/images/,/public/ico/
 encryption:
   password: PL408@fnw96
 

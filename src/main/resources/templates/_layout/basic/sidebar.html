@@ -5,13 +5,13 @@
         <div class="sidebar-wrap">
             <nav class="sidebar-nav">
                 <ul>
-                    <li class="sidebar-menu MENU1"><a href="#"></a></li>
-                    <li class="sidebar-menu ALL_STATUS"><a href="#"></a></li>
-                    <li class="sidebar-menu SITE_STATUS" th:classappend="${SERVLET_PATH.startsWith('/public/dashboard/sample')} ? 'active'"><a href="/public/dashboard/sample"></a></li>
-                    <li class="sidebar-menu MAIL_STATUS" th:classappend="${SERVLET_PATH.startsWith('/public/dashboard/mail')} ? 'active'"><a href="/public/dashboard/mail"></a></li>
+                    <!--<li class="sidebar-menu MENU1"><a href="#"></a></li>-->
+                    <li class="sidebar-menu ALL_STATUS" th:classappend="${SERVLET_PATH.startsWith('/dashboard/file')} ? 'active'"><a href="/dashboard/file"></a></li>
+                    <li class="sidebar-menu SITE_STATUS" th:classappend="${SERVLET_PATH.startsWith('/dashboard/mask')} ? 'active'"><a href="/dashboard/mask"></a></li>
+                    <!--<li class="sidebar-menu MAIL_STATUS"><a href="#"></a></li>-->
                     <li class="sidebar-menu MENU4" th:classappend="${SERVLET_PATH == '/sample/test'} ? 'active'"><a href="/sample/test"></a></li>
                     <li class="sidebar-menu DETECTION_FILE" th:classappend="${SERVLET_PATH == '/analysis/detection-file-list'} ? 'active'"><a href="/analysis/detection-file-list"></a></li>
-                    <li class="sidebar-menu MENU5"><a href="#"></a></li>
+                    <!--<li class="sidebar-menu MENU5"><a href="#"></a></li>-->
                 </ul>
             </nav>
         </div>

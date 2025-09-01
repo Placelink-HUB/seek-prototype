@@ -33,18 +33,18 @@ public class DashboardController {
         this.maskHistService = maskHistService;
     }
 
-    @GetMapping(value = "/public/dashboard/integrated")
+    @GetMapping(value = "/dashboard/integrated")
     protected String integratedDashboard(@PathVariable String siteId, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
         return "dashboard/integrated-dashboard";
     }
 
-    @GetMapping(value = "/public/dashboard/{siteId}")
+    @GetMapping(value = "/dashboard/{siteId}")
     protected String detailDashboard(@PathVariable String siteId, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
 
         String viewName = switch (siteId) {
-            case "mail" -> "dashboard/mail-dashboard";
+            case "file" -> "dashboard/file-dashboard";
             default -> "dashboard/detail-dashboard";
         };
         return viewName;
@@ -55,7 +55,7 @@ public class DashboardController {
      *
      * @return 분석 현황
      */
-    @GetMapping(value = {"/public/dashboard/analysis-statistics", "/public/dashboard/analysis-statistics2"})
+    @GetMapping(value = {"/dashboard/analysis-statistics", "/dashboard/analysis-statistics2"})
     public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", required = false) String schDe, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
@@ -69,9 +69,9 @@ public class DashboardController {
         response.put("lastAnalysisCompleteDateTimeStr", dashboardService.selectLastAnalysisCompleteDateTimeStr(schDe));
         response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(schDe));
 
-        if ("/public/dashboard/analysis-statistics".equals(request.getServletPath())) {
+        if ("/dashboard/analysis-statistics".equals(request.getServletPath())) {
             response.put("maskingData", maskHistService.selectMaskStatus(schDe));
-        } else if ("/public/dashboard/analysis-statistics2".equals(request.getServletPath())) {
+        } else if ("/dashboard/analysis-statistics2".equals(request.getServletPath())) {
             response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(schDe));
             response.put("emailOutboundHistInfoList", dashboardService.selectEmailOutboundHistInformation(schDe));
         }

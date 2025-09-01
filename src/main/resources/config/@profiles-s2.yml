@@ -2,10 +2,8 @@
 # -Dspring.profiles.active=#DEVELOP,e01000
 #
 
-myhome: /Users/eseun
-
 # 파일 관리자 구현체 이름
 file.manager.impl.name: sftpFileManagerImpl
 
 sftp:
-  private-key-path: ${myhome}/.ssh/placelink_key
+  private-key-path: ${user.home}/OneDrive/.ssh/SEEK/placelink_key
