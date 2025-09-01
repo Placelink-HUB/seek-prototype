@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -33,17 +34,15 @@ public class DashboardController {
         this.maskHistService = maskHistService;
     }
 
-    @GetMapping(value = "/dashboard/integrated")
-    protected String integratedDashboard(@PathVariable String siteId, Model model) {
-        model.addAttribute("pl_webpush_s2_key_public", publicKey);
-        return "dashboard/integrated-dashboard";
-    }
-
     @GetMapping(value = "/dashboard/{siteId}")
-    protected String detailDashboard(@PathVariable String siteId, Model model) {
+    protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
+        if (Set.of("on", "off").contains(console)) {
+            model.addAttribute("console", console);
+        }
 
         String viewName = switch (siteId) {
+            case "integrated" -> "dashboard/integrated-dashboard";
             case "file" -> "dashboard/file-dashboard";
             default -> "dashboard/detail-dashboard";
         };
