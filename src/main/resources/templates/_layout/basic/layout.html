@@ -42,7 +42,12 @@
 
         <th:block layout:fragment="bodyScript"></th:block>
         <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', () => {});
+            document.addEventListener('DOMContentLoaded', () => {
+                const console = '[[${console}]]';
+                if (console) {
+                    sessionStorage.setItem('console', console);
+                }
+            });
         </script>
     </head>
     <body class="hold-transition layout-fixed sidebar-collapse">

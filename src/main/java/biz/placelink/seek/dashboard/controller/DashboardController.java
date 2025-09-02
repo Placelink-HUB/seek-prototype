@@ -35,14 +35,14 @@ public class DashboardController {
     }
 
     /**
-     * 지정된 사이트의 세부 사항 대시 보드보기를 검색하도록 요청을 처리합니다.
-     * 입력 매개 변수를 기반으로 콘솔의 디스플레이 환경 설정을 관리합니다.
+     * 대시보드 상세 정보를 렌더링하는 메서드.
+     * 주어진 사이트 ID에 따라 적합한 대시보드 뷰를 반환하며, 콘솔 설정 값을 이용해 모델 속성을 업데이트한다.
      *
-     * @param siteId  사이트의 식별자 인 렌더링 할 특정 대시 보드보기를 결정합니다.
+     * @param siteId 사이트 ID로, 렌더링할 대시보드 종류를 결정한다. 예: "integrated", "file".
      * @param console "on": 푸시 메시지 보기, "off": 푸시 메시지 숨기기, "all": 푸시 메시지와 함께 전체 매개변수까지 보이기
-     * @param session 현재 사용자의 상태를 관리하는 데 사용되는 HTTP 세션
-     * @param model   뷰에 속성을 전달하는 데 사용되는 모델 객체
-     * @return View Name
+     * @param session 현재 사용자 세션 객체.
+     * @param model 뷰 렌더링 시 사용되는 모델 객체.
+     * @return 사용한 사이트 ID에 따라 지정된 대시보드 뷰 이름.
      */
     @GetMapping(value = "/dashboard/{siteId}")
     protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, HttpSession session, Model model) {
