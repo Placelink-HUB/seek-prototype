@@ -1,23 +1,6 @@
 package biz.placelink.seek.analysis.service;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
-import biz.placelink.seek.analysis.vo.AnalysisResultVO;
-import biz.placelink.seek.analysis.vo.AnalysisVO;
-import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
-import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import biz.placelink.seek.analysis.vo.*;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import biz.placelink.seek.system.file.service.FileService;
@@ -25,6 +8,14 @@ import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2FileUtil;
 import kr.s2.ext.util.S2Util;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.InputStream;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <pre>
@@ -46,16 +37,16 @@ public class WildpathAnalysisService {
     private final AnalysisDetailService analysisDetailService;
     private final SensitiveInformationService sensitiveInformationService;
     private final MaskHistService maskHistService;
-    private final EmailOutboundHistService emailOutboundHistService;
+    private final FileOutboundHistService fileOutboundHistService;
     private final FileService fileService;
 
-    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, EmailOutboundHistService emailOutboundHistService, FileService fileService) {
+    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, FileOutboundHistService fileOutboundHistService, FileService fileService) {
         this.serviceWorkerService = serviceWorkerService;
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
         this.sensitiveInformationService = sensitiveInformationService;
         this.maskHistService = maskHistService;
-        this.emailOutboundHistService = emailOutboundHistService;
+        this.fileOutboundHistService = fileOutboundHistService;
         this.fileService = fileService;
     }
 
@@ -147,14 +138,14 @@ public class WildpathAnalysisService {
     }
 
     @Transactional(readOnly = false)
-    public int createEmailOutboundHist(String outboundStatusCcd, String senderEmail, String analysisId) {
-        int result = emailOutboundHistService.insertEmailOutboundHist(outboundStatusCcd, senderEmail, analysisId);
+    public int createFileOutboundHist(String outboundStatusCcd, String sender, String analysisId) {
+        int result = fileOutboundHistService.insertFileOutboundHist(outboundStatusCcd, sender, analysisId);
         if (result > 0) {
-            // 첨부 파일 외부 전송 현황
+            // 파일 외부 전송 현황
             Map<String, Object> pushMap = new HashMap<>();
-            pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_MAIL_OUTBOUND);
+            pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_FILE_OUTBOUND);
             pushMap.put("outboundStatusCcd", outboundStatusCcd);
-            pushMap.put("senderEmail", senderEmail);
+            pushMap.put("sender", sender);
 
             if (Constants.CD_OUTBOUND_STATUS_SENT.equals(outboundStatusCcd)) {
                 AnalysisResultVO fileInfo = analysisDetailService.selectFileAnalysis(analysisId);
@@ -236,7 +227,7 @@ public class WildpathAnalysisService {
      *
      * @param contentType HTTP 요청 또는 응답의 Content-Type 헤더 값. null이 허용됩니다.
      * @return 추론된 문서 타입 (예: "text", "image", "pdf", "docx", "unknown" 등).
-     *         contentType 이 null 인 경우 "unknown"을 반환합니다.
+     * contentType 이 null 인 경우 "unknown"을 반환합니다.
      */
     public static String getDocumentTypeFromContentType(String contentType, String fileName) {
         String documentType = "unknown";

@@ -15,16 +15,16 @@ import org.apache.ibatis.annotations.Param;
  * </pre>
  */
 @Mapper
-public interface EmailOutboundHistMapper {
+public interface FileOutboundHistMapper {
 
     /**
-     * 메일 외부전송 이력 정보를 등록한다.
+     * 파일 외부전송 이력 정보를 등록한다.
      *
      * @param outboundStatusCcd 외부전송 상태 공통코드
-     * @param senderEmail       발신자 이메일
+     * @param sender            발신자
      * @param analysisId        분석 ID
      * @return 등록 개수
      */
-    int insertEmailOutboundHist(@Param("outboundStatusCcd") String outboundStatusCcd, @Param("senderEmail") String senderEmail, @Param("analysisId") String analysisId);
+    int insertFileOutboundHist(@Param("outboundStatusCcd") String outboundStatusCcd, @Param("sender") String sender, @Param("analysisId") String analysisId);
 
 }

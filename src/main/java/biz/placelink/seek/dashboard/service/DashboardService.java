@@ -95,12 +95,12 @@ public class DashboardService {
     }
 
     /**
-     * 메일 외부전송 이력 정보를 조회한다.
+     * 파일 외부전송 이력 정보를 조회한다.
      *
-     * @return 메일 외부전송 이력 정보
+     * @return 파일 외부전송 이력 정보
      */
-    public List<AnalysisStatisticsVO> selectEmailOutboundHistInformation(String schDe) {
-        return dashboardMapper.selectEmailOutboundHistInformation(schDe);
+    public List<AnalysisStatisticsVO> selectFileOutboundHistInformation(String schDe) {
+        return dashboardMapper.selectFileOutboundHistInformation(schDe);
     }
 
 }

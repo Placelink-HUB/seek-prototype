@@ -194,7 +194,7 @@ public class Constants {
     /**
      * 푸시_타입_공통코드 - 외부 메일
      */
-    public static final String CD_PUSH_TYPE_MAIL_OUTBOUND = "mail_outbound";
+    public static final String CD_PUSH_TYPE_FILE_OUTBOUND = "file_outbound";
     /**
      * 푸시_타입_공통코드 - 파일 탐지
      */

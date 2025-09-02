@@ -16,24 +16,24 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(readOnly = true)
-public class EmailOutboundHistService {
+public class FileOutboundHistService {
 
-    private final EmailOutboundHistMapper emailOutboundHistMapper;
+    private final FileOutboundHistMapper fileOutboundHistMapper;
 
-    public EmailOutboundHistService(EmailOutboundHistMapper emailOutboundHistMapper) {
-        this.emailOutboundHistMapper = emailOutboundHistMapper;
+    public FileOutboundHistService(FileOutboundHistMapper fileOutboundHistMapper) {
+        this.fileOutboundHistMapper = fileOutboundHistMapper;
     }
 
     /**
-     * 메일 외부전송 이력 정보를 등록한다.
+     * 파일 외부전송 이력 정보를 등록한다.
      *
      * @param outboundStatusCcd 외부전송 상태 공통코드
-     * @param senderEmail       발신자 이메일
+     * @param sender            발신자
      * @param analysisId        분석 ID
      * @return 등록 개수
      */
-    public int insertEmailOutboundHist(String outboundStatusCcd, String senderEmail, String analysisId) {
-        return emailOutboundHistMapper.insertEmailOutboundHist(outboundStatusCcd, senderEmail, analysisId);
+    public int insertFileOutboundHist(String outboundStatusCcd, String sender, String analysisId) {
+        return fileOutboundHistMapper.insertFileOutboundHist(outboundStatusCcd, sender, analysisId);
     }
 
 }

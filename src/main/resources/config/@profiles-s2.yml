@@ -1,5 +1,5 @@
 #
-# -Dspring.profiles.active=#DEVELOP,e01000
+# -Dspring.profiles.active=0_DEVELOP,e01000
 #
 
 # 파일 관리자 구현체 이름

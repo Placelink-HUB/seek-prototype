@@ -72,7 +72,7 @@ public class DashboardController {
             response.put("maskingData", maskHistService.selectMaskStatus(schDe));
         } else if ("/dashboard/analysis-statistics2".equals(request.getServletPath())) {
             response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(schDe));
-            response.put("emailOutboundHistInfoList", dashboardService.selectEmailOutboundHistInformation(schDe));
+            response.put("fileOutboundHistInfoList", dashboardService.selectFileOutboundHistInformation(schDe));
         }
 
         response.put(Constants.RESULT_CODE, 1);

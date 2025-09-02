@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1031.5742,
-    "scrollLeft": -772,
+    "scrollTop": -1581.5742,
+    "scrollLeft": -1685,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -723,8 +723,8 @@
       },
       "oeP34Oe_AxBEwOalanag0": {
         "id": "oeP34Oe_AxBEwOalanag0",
-        "name": "SEEK_EMAIL_OUTBOUND_HIST",
-        "comment": "메일_외부전송_이력",
+        "name": "SEEK_FILE_OUTBOUND_HIST",
+        "comment": "파일_외부전송_이력",
         "columnIds": [
           "VLy-BhaDFZvytTS7PK-ZC",
           "xF98BE9-QLVS-XC6V640r",
@@ -743,12 +743,12 @@
           "x": 1597.561,
           "y": 1370.2124,
           "zIndex": 3146,
-          "widthName": 165,
+          "widthName": 153,
           "widthComment": 108,
           "color": ""
         },
         "meta": {
-          "updateAt": 1750765914606,
+          "updateAt": 1756776940784,
           "createAt": 1750764462488
         }
       }
@@ -3937,20 +3937,20 @@
       "ffVr7XGRcKtvswqN_xzTR": {
         "id": "ffVr7XGRcKtvswqN_xzTR",
         "tableId": "oeP34Oe_AxBEwOalanag0",
-        "name": "SENDER_EMAIL",
-        "comment": "발신자_이메일",
+        "name": "SENDER",
+        "comment": "발신자",
         "dataType": "VARCHAR(255)",
         "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
-          "widthName": 83,
-          "widthComment": 79,
+          "widthName": 60,
+          "widthComment": 60,
           "widthDataType": 81,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1750765500607,
+          "updateAt": 1756776949242,
           "createAt": 1750765470398
         }
       },

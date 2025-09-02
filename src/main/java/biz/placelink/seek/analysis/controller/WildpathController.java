@@ -321,7 +321,7 @@ public class WildpathController {
             return;
         }
 
-        wildpathAnalysisService.createEmailOutboundHist("success".equals(dsignCheck) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, email, analysisId);
+        wildpathAnalysisService.createFileOutboundHist("success".equals(dsignCheck) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, email, analysisId);
     }
 
     /**

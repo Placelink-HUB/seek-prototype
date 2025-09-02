@@ -71,10 +71,10 @@ public interface DashboardMapper {
     AnalysisStatisticsVO selectFileAnalysisInformation(@Param("schDe") String schDe);
 
     /**
-     * 메일 외부전송 이력 정보를 조회한다.
+     * 파일 외부전송 이력 정보를 조회한다.
      *
-     * @return 메일 외부전송 이력 정보
+     * @return 파일 외부전송 이력 정보
      */
-    List<AnalysisStatisticsVO> selectEmailOutboundHistInformation(@Param("schDe") String schDe);
+    List<AnalysisStatisticsVO> selectFileOutboundHistInformation(@Param("schDe") String schDe);
 
 }

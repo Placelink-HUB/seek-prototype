@@ -137,7 +137,7 @@
                     }
                     updateLineChart();
                     break;
-                case '[[${@Constants.CD_PUSH_TYPE_MAIL_OUTBOUND}]]':
+                case '[[${@Constants.CD_PUSH_TYPE_FILE_OUTBOUND}]]':
                     // 외부 메일 발송 탐지 현황
                     if (event.data.data['outboundStatusCcd'] === '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]') {
                         semicircleChartInfo2.mailOutboundStatus.sentCount++;
@@ -185,17 +185,17 @@
                         updateFileDetectionInfo();
 
                         // 첨부 파일 외부 전송 현황
-                        const emailOutboundHistInfoList = response.emailOutboundHistInfoList;
-                        if (emailOutboundHistInfoList) {
-                            for (const emailOutboundHistInfo of emailOutboundHistInfoList) {
-                                switch (emailOutboundHistInfo.outboundStatusCcd) {
+                        const fileOutboundHistInfoList = response.fileOutboundHistInfoList;
+                        if (fileOutboundHistInfoList) {
+                            for (const fileOutboundHistInfo of fileOutboundHistInfoList) {
+                                switch (fileOutboundHistInfo.outboundStatusCcd) {
                                     case '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]':
-                                        semicircleChartInfo2.mailOutboundStatus.sentCount = emailOutboundHistInfo.outboundHistCount || 0;
-                                        semicircleChartInfo2.mailOutboundStatus.fileCount += emailOutboundHistInfo.outboundFileCount || 0;
-                                        semicircleChartInfo2.mailOutboundStatus.fileSize += emailOutboundHistInfo.outboundFileSize || 0;
+                                        semicircleChartInfo2.mailOutboundStatus.sentCount = fileOutboundHistInfo.outboundHistCount || 0;
+                                        semicircleChartInfo2.mailOutboundStatus.fileCount += fileOutboundHistInfo.outboundFileCount || 0;
+                                        semicircleChartInfo2.mailOutboundStatus.fileSize += fileOutboundHistInfo.outboundFileSize || 0;
                                         break;
                                     case '[[${@Constants.CD_OUTBOUND_STATUS_BLOCKED}]]':
-                                        semicircleChartInfo2.mailOutboundStatus.blockedCount = emailOutboundHistInfo.outboundHistCount || 0;
+                                        semicircleChartInfo2.mailOutboundStatus.blockedCount = fileOutboundHistInfo.outboundHistCount || 0;
                                         break;
                                 }
                             }
