@@ -113,14 +113,14 @@ public class ServiceWorkerService {
      * @param messageMap 전송할 알림 메시지 Map
      */
     public void sendNotificationAll(Map<String, Object> messageMap) {
-        this.sendNotification(messageMap, new Long[] {});
+        this.sendNotification(messageMap, new Long[]{});
     }
 
     /**
      * 지정된 사용자들에게 푸시 알림을 전송합니다.
      *
-     * @param jsonMessage 전송할 알림 메시지 (JSON 문자열)
-     * @param userIdArr   알림을 받을 사용자 관리 번호 배열
+     * @param messageMap 전송할 알림 메시지 Map
+     * @param userIdArr  알림을 받을 사용자 관리 번호 배열
      */
     private void sendNotification(Map<String, Object> messageMap, Long... userIdArr) {
         if (messageMap != null) {

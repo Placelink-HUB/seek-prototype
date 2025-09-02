@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -35,10 +36,19 @@ public class DashboardController {
     }
 
     @GetMapping(value = "/dashboard/{siteId}")
-    protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, Model model) {
+    protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, HttpSession session, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
-        if (Set.of("on", "off").contains(console)) {
-            model.addAttribute("console", console);
+
+        String vConsole = console;
+        if ("all".equals(console)) {
+            vConsole = "on";
+            session.setAttribute("pushConsoleType", "all");
+        } else if ("off".equals(console)) {
+            session.removeAttribute("pushConsoleType");
+        }
+
+        if (Set.of("on", "off").contains(vConsole)) {
+            model.addAttribute("console", vConsole);
         }
 
         String viewName = switch (siteId) {

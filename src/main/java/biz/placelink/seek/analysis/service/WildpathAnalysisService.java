@@ -8,6 +8,7 @@ import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2FileUtil;
 import kr.s2.ext.util.S2Util;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -138,7 +139,7 @@ public class WildpathAnalysisService {
     }
 
     @Transactional(readOnly = false)
-    public int createFileOutboundHist(String outboundStatusCcd, String sender, String analysisId) {
+    public int createFileOutboundHist(String outboundStatusCcd, String sender, String analysisId, String allParamsStr) {
         int result = fileOutboundHistService.insertFileOutboundHist(outboundStatusCcd, sender, analysisId);
         if (result > 0) {
             // 파일 외부 전송 현황
@@ -153,6 +154,10 @@ public class WildpathAnalysisService {
                     pushMap.put("fileCount", fileInfo.getFileCount());
                     pushMap.put("totalFileSize", fileInfo.getTotalFileSize());
                 }
+            }
+
+            if (StringUtils.isNotEmpty(allParamsStr)) {
+                pushMap.put("allParamsStr", allParamsStr);
             }
 
             serviceWorkerService.sendNotificationAll(pushMap);

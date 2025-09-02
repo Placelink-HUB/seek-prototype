@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -312,16 +313,23 @@ public class WildpathController {
      * 순방향 프록시 후처리 비동기 처리
      *
      * @param request  HttpServletRequest
-     * @param response HttpServletResponse
-     * @throws IOException 예외 발생 시
      */
     @PostMapping(path = "/forward/response/async/**")
-    public void forwardOnAfterPostprocess(@RequestParam(value = "sig_user_id", required = false) String analysisId, @RequestParam(value = "user_id", required = false) String email, @RequestParam(value = "dsign_check", required = false) String dsignCheck, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void forwardOnAfterPostprocess(@RequestParam MultiValueMap<String, String> params, HttpServletRequest request) {
         if (this.isExcludedPath(request, "/forward/response/async/", true)) {
             return;
         }
 
-        wildpathAnalysisService.createFileOutboundHist("success".equals(dsignCheck) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, email, analysisId);
+        String analysisId = params.getFirst("sig_user_id");
+        String email = params.getFirst("user_id");
+        String dsignCheck = params.getFirst("dsign_check");
+
+        String allParamsStr = null;
+        if ("all".equals(request.getSession().getAttribute("pushConsoleType"))) {
+            allParamsStr = S2JsonUtil.toJsonString(params);
+        }
+
+        wildpathAnalysisService.createFileOutboundHist("success".equals(dsignCheck) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, email, analysisId, allParamsStr);
     }
 
     /**
