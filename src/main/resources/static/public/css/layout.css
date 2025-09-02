@@ -29,7 +29,6 @@ a:active {
   background: #000;
 }
 .wrapper {
-  max-width: 1920px;
   margin: 0 auto;
 }
 
@@ -60,7 +59,6 @@ a:active {
 #main {
   position: relative;
   /* eslint-disable-next-line css/no-important */
-  max-width: 1920px !important;
   margin: 0 auto;
   transition: 0.5s;
   background: #000;
@@ -85,7 +83,6 @@ a:active {
   bottom: 0;
   width: 100%;
   height: 45px;
-  max-width: 1920px;
   padding: 15px 50px;
   margin: 0 auto;
   color: #a6a7aa;
