@@ -324,10 +324,7 @@ public class WildpathController {
         String email = params.getFirst("user_id");
         String dsignCheck = params.getFirst("dsign_check");
 
-        String allParamsStr = null;
-        if ("all".equals(request.getSession().getAttribute("pushConsoleType"))) {
-            allParamsStr = S2JsonUtil.toJsonString(params);
-        }
+        String allParamsStr = S2JsonUtil.toJsonString(params);
 
         wildpathAnalysisService.createFileOutboundHist("success".equals(dsignCheck) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, email, analysisId, allParamsStr);
     }

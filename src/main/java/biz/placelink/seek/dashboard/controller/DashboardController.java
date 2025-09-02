@@ -39,7 +39,7 @@ public class DashboardController {
      * 주어진 사이트 ID에 따라 적합한 대시보드 뷰를 반환하며, 콘솔 설정 값을 이용해 모델 속성을 업데이트한다.
      *
      * @param siteId 사이트 ID로, 렌더링할 대시보드 종류를 결정한다. 예: "integrated", "file".
-     * @param console "on": 푸시 메시지 보기, "off": 푸시 메시지 숨기기, "all": 푸시 메시지와 함께 전체 매개변수까지 보이기
+     * @param console "on": console 에서 푸시 메시지 보기, "off": console 에서 푸시 메시지 숨기기
      * @param session 현재 사용자 세션 객체.
      * @param model 뷰 렌더링 시 사용되는 모델 객체.
      * @return 사용한 사이트 ID에 따라 지정된 대시보드 뷰 이름.
@@ -48,16 +48,8 @@ public class DashboardController {
     protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, HttpSession session, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
 
-        String vConsole = console;
-        if ("all".equals(console)) {
-            vConsole = "on";
-            session.setAttribute("pushConsoleType", "all");
-        } else if ("off".equals(console)) {
-            session.removeAttribute("pushConsoleType");
-        }
-
-        if (Set.of("on", "off").contains(vConsole)) {
-            model.addAttribute("console", vConsole);
+        if (Set.of("on", "off").contains(console)) {
+            model.addAttribute("console", console);
         }
 
         String viewName = switch (siteId) {
