@@ -2,6 +2,7 @@ package biz.placelink.seek.dashboard.controller;
 
 import biz.placelink.seek.analysis.service.MaskHistService;
 import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.com.util.GlobalSharedStore;
 import biz.placelink.seek.dashboard.service.DashboardService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -28,28 +29,42 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
     private final MaskHistService maskHistService;
+    private final GlobalSharedStore store;
 
-    public DashboardController(DashboardService dashboardService, MaskHistService maskHistService) {
+    public DashboardController(DashboardService dashboardService, MaskHistService maskHistService, GlobalSharedStore store) {
         this.dashboardService = dashboardService;
         this.maskHistService = maskHistService;
+        this.store = store;
     }
 
     /**
      * 대시보드 상세 정보를 렌더링하는 메서드.
      * 주어진 사이트 ID에 따라 적합한 대시보드 뷰를 반환하며, 콘솔 설정 값을 이용해 모델 속성을 업데이트한다.
      *
-     * @param siteId 사이트 ID로, 렌더링할 대시보드 종류를 결정한다. 예: "integrated", "file".
+     * @param siteId  사이트 ID로, 렌더링할 대시보드 종류를 결정한다. 예: "integrated", "file".
      * @param console "on": console 에서 푸시 메시지 보기, "off": console 에서 푸시 메시지 숨기기
      * @param session 현재 사용자 세션 객체.
-     * @param model 뷰 렌더링 시 사용되는 모델 객체.
+     * @param model   뷰 렌더링 시 사용되는 모델 객체.
      * @return 사용한 사이트 ID에 따라 지정된 대시보드 뷰 이름.
      */
     @GetMapping(value = "/dashboard/{siteId}")
     protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, HttpSession session, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
 
-        if (Set.of("on", "off").contains(console)) {
+        /*
+         * Push 메시지 console.log 작성 방법
+         * on: Push 메시지 로그를 남긴다.
+         * all: 모든 파라미터를 포함한 Push 메시지 로그를 남긴다.
+         * off: Push 메시지 로그를 남기지 않는다.
+         */
+        if (Set.of("on", "all", "off").contains(console)) {
             model.addAttribute("console", console);
+
+            if ("all".equals(console)) {
+                store.put("pushConsoleType", console, 600_1000);
+            } else if ("off".equals(console)) {
+                store.remove("pushConsoleType");
+            }
         }
 
         String viewName = switch (siteId) {

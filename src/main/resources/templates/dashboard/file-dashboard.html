@@ -87,7 +87,8 @@
 
         navigator.serviceWorker.addEventListener('message', (event) => {
             // eslint-disable-next-line no-console
-            if (sessionStorage.getItem('console') === 'on') {
+            const vConsole = sessionStorage.getItem('console');
+            if (vConsole === 'on' || vConsole === 'all') {
                 console.log('ReceiveServiceWorker Data', event.data);
             }
 

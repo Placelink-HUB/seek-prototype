@@ -139,14 +139,23 @@ public class WildpathAnalysisService {
     }
 
     @Transactional(readOnly = false)
-    public int createFileOutboundHist(String outboundStatusCcd, String sender, String analysisId, String allParamsStr) {
-        int result = fileOutboundHistService.insertFileOutboundHist(outboundStatusCcd, sender, analysisId);
+    public int createFileOutboundHist(String outboundStatusCcd, String analysisId, String orgCode, String channel, String reason, String eventTime, String macAddr, String destHost, String fileName, String fileSize, String fileCount, String allParamsStr) {
+        int result = fileOutboundHistService.insertFileOutboundHist(outboundStatusCcd, macAddr, analysisId);
         if (result > 0) {
             // 파일 외부 전송 현황
             Map<String, Object> pushMap = new HashMap<>();
             pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_FILE_OUTBOUND);
             pushMap.put("outboundStatusCcd", outboundStatusCcd);
-            pushMap.put("sender", sender);
+
+            pushMap.put("orgCode", orgCode);
+            pushMap.put("channel", channel);
+            pushMap.put("reason", reason);
+            pushMap.put("eventTime", eventTime);
+            pushMap.put("macAddr", macAddr);
+            pushMap.put("destHost", destHost);
+            pushMap.put("fileName", fileName);
+            pushMap.put("fileSize", fileSize);
+            pushMap.put("fileCount", fileCount);
 
             if (Constants.CD_OUTBOUND_STATUS_SENT.equals(outboundStatusCcd)) {
                 AnalysisResultVO fileInfo = analysisDetailService.selectFileAnalysis(analysisId);

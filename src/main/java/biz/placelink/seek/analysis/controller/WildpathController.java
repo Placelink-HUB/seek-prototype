@@ -1,26 +1,15 @@
 package biz.placelink.seek.analysis.controller;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import biz.placelink.seek.analysis.service.WildpathAnalysisService;
+import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
+import biz.placelink.seek.com.util.GlobalSharedStore;
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import kr.s2.ext.util.S2JsonUtil;
+import kr.s2.ext.util.S2ServletUtil;
+import kr.s2.ext.util.S2Util;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,16 +24,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import biz.placelink.seek.analysis.service.WildpathAnalysisService;
-import biz.placelink.seek.com.constants.Constants;
-import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import kr.s2.ext.util.S2JsonUtil;
-import kr.s2.ext.util.S2ServletUtil;
-import kr.s2.ext.util.S2Util;
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/console")
@@ -54,10 +47,12 @@ public class WildpathController {
 
     private final ServiceWorkerService serviceWorkerService;
     private final WildpathAnalysisService wildpathAnalysisService;
+    private final GlobalSharedStore store;
 
-    public WildpathController(ServiceWorkerService serviceWorkerService, WildpathAnalysisService wildpathAnalysisService) {
+    public WildpathController(ServiceWorkerService serviceWorkerService, WildpathAnalysisService wildpathAnalysisService, GlobalSharedStore store) {
         this.serviceWorkerService = serviceWorkerService;
         this.wildpathAnalysisService = wildpathAnalysisService;
+        this.store = store;
     }
 
     @Value("${analysis.excluded-paths}")
@@ -312,7 +307,7 @@ public class WildpathController {
     /**
      * 순방향 프록시 후처리 비동기 처리
      *
-     * @param request  HttpServletRequest
+     * @param request HttpServletRequest
      */
     @PostMapping(path = "/forward/response/async/**")
     public void forwardOnAfterPostprocess(@RequestParam MultiValueMap<String, String> params, HttpServletRequest request) {
@@ -321,12 +316,94 @@ public class WildpathController {
         }
 
         String analysisId = params.getFirst("sig_user_id");
-        String email = params.getFirst("user_id");
-        String dsignCheck = params.getFirst("dsign_check");
 
-        String allParamsStr = S2JsonUtil.toJsonString(params);
+        /*
+         * 기관 분류 코드
+         * @value 조직/부서/사이트 식별용 내부 코드 뙤는 조직 없으면 "000000"
+         */
+        String orgCode = params.getFirst("org_code");
 
-        wildpathAnalysisService.createFileOutboundHist("success".equals(dsignCheck) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, email, analysisId, allParamsStr);
+        /*
+         * 이벤트 채널(이벤트가 발생한 경로)
+         * @value https | smtp | messenger | usb | print
+         */
+        String channel = params.getFirst("channel");
+
+        /*
+         * 허용/차단(최종 정책 결과)
+         * @value ALLOW: 전송/행위 허용, BLOCK: 정책에 의해 차단
+         */
+        String action = params.getFirst("action");
+
+        /*
+         * 세부 사유 코드(왜 ALLOW/BLOCK 되었는지 상세 코드)
+         * @value
+         *     OK_browser3: 브라우저 1차 검사 통과
+         *     BLOCK_browser1: 동일 프로세스 2회 이상 읽기 → 차단
+         *     BLOCK_browser2: 검증 결과 파일 불허
+         *     BLOCK_browser_pdf: 브라우저 PDF 전송 차단
+         *     BLOCK_messenger_pdf: 메신저 PDF 차단
+         *     BLOCK_browser_image / BLOCK_kakao_image: 이미지 첨부 차단
+         *     OK_usb / BLOCK_usb / BLOCK_usb_nonzip: USB 정책 결과
+         *     BLOCK_usb_pdf_create / BLOCK_usb_pdf_rename: USB에 PDF 생성/이동 차단
+         *     allowed_sig: 서명 유효 → 허용
+         *     sig_missing: 동일이름 .sig 없음
+         *     sig_invalid: 서명 불일치/검증실패
+         *     sig_error: 검증 에러
+         *     path_unknown: 문서 경로 미확인
+         *     cancel_fail: 인쇄 취소 실패
+         */
+        String reason = params.getFirst("reason");
+
+        /*
+         * 타임스탬프(이벤트 발생 시각)
+         * @value 2025-08-29 09:12:33 (YYYY-MM-DD hh:mm:ss)
+         */
+        String eventTime = params.getFirst("event_time");
+
+        /*
+         * MAC 주소(주 네트워크 어댑터 MAC, 식별용)
+         * @value AA:BB:CC:DD:EE:FF 포맷 권장
+         */
+        String macAddr = params.getFirst("mac_addr");
+
+        /*
+         * 목적지 호스트/플랫폼(향하는 서비스 호스트/플랫폼명)
+         * @value
+         *     mail.google.com, outlook.office.com, smtp.office365.com ...
+         *     USB/프린트처럼 호스트 개념 없을 때:  usb -> "usb", print -> "print"
+         *     없으면 빈 문자열("")
+         */
+        String destHost = params.getFirst("dest_host");
+
+        /*
+         * 파일/문서명
+         * 대상 파일명(가능하면 원본 파일명). 파일 여러개 일경우 "," 구분해서 여러개 넣기
+         * 경로 전체가 아닌 파일명을 기본으로. 경로는 별도 필드가 없다면 로그에 포함하지 않는 게 안전
+         * @value report.pdf(바이트수), design_assets.zip(바이트수), handoff_v2.7z(바이트수)
+         */
+        String fileName = params.getFirst("file_name");
+
+        /*
+         * 파일 바이트 수
+         * 전송/대상 파일을 모두 합한 전체 크기 (바이트)
+         */
+        String fileSize = params.getFirst("file_size");
+
+        /*
+         * 파일 개수
+         * 전송/대상 파일을 모두 더한 파일 개수 (프린트는 항상 1)
+         */
+        String fileCount = params.getFirst("file_count");
+
+        String allParamsStr = null;
+        if ("all".equals(store.get("pushConsoleType"))) {
+            allParamsStr = S2JsonUtil.toJsonString(params);
+        }
+
+
+
+        wildpathAnalysisService.createFileOutboundHist("ALLOW".equals(action) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, analysisId, orgCode, channel, reason, eventTime, macAddr, destHost, fileName, fileSize, fileCount, allParamsStr);
     }
 
     /**
