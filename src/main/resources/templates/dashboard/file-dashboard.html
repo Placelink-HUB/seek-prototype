@@ -189,6 +189,7 @@
                         const fileOutboundHistInfoList = response.fileOutboundHistInfoList;
                         if (fileOutboundHistInfoList) {
                             for (const fileOutboundHistInfo of fileOutboundHistInfoList) {
+                                console.log('fileOutboundHistInfo', fileOutboundHistInfo);
                                 switch (fileOutboundHistInfo.outboundStatusCcd) {
                                     case '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]':
                                         semicircleChartInfo2.mailOutboundStatus.sentCount = fileOutboundHistInfo.outboundHistCount || 0;
