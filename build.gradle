@@ -177,8 +177,8 @@ tasks.register("deployBootWar") {
         def artifactName = "engine" // project.name
         def artifactVersion = project.version.toString()
         def timestamp = System.currentTimeMillis()
-        def targetDir = rootProject.projectDir.toPath().resolve("../_/gw.placelink.biz/opt/seek/apps/engine/artifacts")
-        def explodedDir = rootProject.projectDir.toPath().resolve("../_/gw.placelink.biz/opt/seek/apps/engine/exploded")
+        def targetDir = rootProject.projectDir.toPath().resolve("../_deploy/gw.placelink.biz/opt/seek/apps/engine/artifacts")
+        def explodedDir = rootProject.projectDir.toPath().resolve("../_deploy/gw.placelink.biz/opt/seek/apps/engine/exploded")
 
         // exploded 디렉토리 비우기
         delete(explodedDir)

@@ -1,5 +1,5 @@
 #
-# -Dspring.profiles.active=0_DEVELOP,e01000
+# -Dspring.profiles.active=0_DEVELOP,s2
 #
 
 # 파일 관리자 구현체 이름
@@ -7,3 +7,9 @@ file.manager.impl.name: sftpFileManagerImpl
 
 sftp:
   private-key-path: ${user.home}/OneDrive/.ssh/SEEK/placelink_key
+
+logging.file.path: ${user.home}/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/logs
+
+# 시스템 속성의 "pid.file.path", "state.file.path" 경로를 배포용 모듈(경로) 하위로 설정하려면 VM 옵션에 아래의 내용을 추가한다.
+# -Dpid.file.path=C:/Users/eseun/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/run
+# -Dstate.file.path=C:/Users/eseun/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/state
