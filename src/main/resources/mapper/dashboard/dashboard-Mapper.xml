@@ -154,8 +154,8 @@
     <select id="selectFileAnalysisInformation" resultType="analysisStatisticsVO">
         /** selectFileAnalysisInformation : 파일 분석 정보를 조회한다. */
         SELECT
-            SUM(COALESCE(sfa.FILE_COUNT, 0)) AS ANALYSIS_FILE_COUNT,
-            SUM(COALESCE(sfa.TOTAL_FILE_SIZE, 0)) AS ANALYSIS_FILE_SIZE
+            COALESCE(SUM(COALESCE(sfa.FILE_COUNT, 0)), 0) AS ANALYSIS_FILE_COUNT,
+            COALESCE(SUM(COALESCE(sfa.TOTAL_FILE_SIZE, 0)), 0) AS ANALYSIS_FILE_SIZE
         FROM SEEK_ANALYSIS sa
             JOIN SEEK_FILE_ANALYSIS sfa
                 ON sa.ANALYSIS_ID = sfa.ANALYSIS_ID
