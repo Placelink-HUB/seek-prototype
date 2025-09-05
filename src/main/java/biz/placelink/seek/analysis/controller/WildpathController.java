@@ -316,6 +316,12 @@ public class WildpathController {
         }
 
         String analysisId = params.getFirst("sig_user_id");
+        if (S2Util.isEmpty(analysisId)) {
+            analysisId = params.getFirst("sig_id");
+        }
+        if (S2Util.isEmpty(analysisId)) {
+            analysisId = params.getFirst("user_id");
+        }
 
         /*
          * 기관 분류 코드
@@ -397,7 +403,7 @@ public class WildpathController {
         String fileCount = params.getFirst("file_count");
 
         String allParamsStr = null;
-        if ("all".equals(store.get("pushConsoleType"))) {
+        if ("all".equals(store.get("pushConsole"))) {
             allParamsStr = S2JsonUtil.toJsonString(params);
         }
 

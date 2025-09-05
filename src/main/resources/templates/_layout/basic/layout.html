@@ -49,6 +49,10 @@
             if (vConsole) {
                 sessionStorage.setItem('console', vConsole);
             }
+            const vConsoleType = '[[${consoleType}]]';
+            if (vConsoleType) {
+                sessionStorage.setItem('consoleType', vConsoleType);
+            }
         });
     </script>
 </head>

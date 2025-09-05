@@ -23,8 +23,9 @@ public interface FileOutboundHistMapper {
      * @param outboundStatusCcd 외부전송 상태 공통코드
      * @param sender            발신자
      * @param analysisId        분석 ID
+     * @param fileDesc        파일 설명
      * @return 등록 개수
      */
-    int insertFileOutboundHist(@Param("outboundStatusCcd") String outboundStatusCcd, @Param("sender") String sender, @Param("analysisId") String analysisId);
+    int insertFileOutboundHist(@Param("outboundStatusCcd") String outboundStatusCcd, @Param("sender") String sender, @Param("analysisId") String analysisId, @Param("fileDesc") String fileDesc);
 
 }

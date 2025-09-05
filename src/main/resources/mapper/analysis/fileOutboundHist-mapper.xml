@@ -8,11 +8,13 @@
             OUTBOUND_STATUS_CCD,
             SENDER,
             ANALYSIS_ID,
+            FILE_DESC,
             CREATE_DT
         ) VALUES (
             #{outboundStatusCcd},
             #{sender},
             #{analysisId},
+            #{fileDesc},
             NOW()
         )
     </insert>

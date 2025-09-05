@@ -30,10 +30,11 @@ public class FileOutboundHistService {
      * @param outboundStatusCcd 외부전송 상태 공통코드
      * @param sender            발신자
      * @param analysisId        분석 ID
+     * @param fileDesc          파일 설명
      * @return 등록 개수
      */
-    public int insertFileOutboundHist(String outboundStatusCcd, String sender, String analysisId) {
-        return fileOutboundHistMapper.insertFileOutboundHist(outboundStatusCcd, sender, analysisId);
+    public int insertFileOutboundHist(String outboundStatusCcd, String sender, String analysisId, String fileDesc) {
+        return fileOutboundHistMapper.insertFileOutboundHist(outboundStatusCcd, sender, analysisId, fileDesc);
     }
 
 }

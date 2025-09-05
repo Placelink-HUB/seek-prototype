@@ -89,7 +89,10 @@
             // eslint-disable-next-line no-console
             const vConsole = sessionStorage.getItem('console');
             if (vConsole === 'on' || vConsole === 'all') {
-                console.log('ReceiveServiceWorker Data', event.data);
+                const vConsoleType = sessionStorage.getItem('consoleType');
+                if (!vConsoleType || vConsoleType === 'all' || vConsoleType === event.data.type) {
+                    console.log('ReceiveServiceWorker Data', event.data);
+                }
             }
 
             const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
@@ -189,7 +192,6 @@
                         const fileOutboundHistInfoList = response.fileOutboundHistInfoList;
                         if (fileOutboundHistInfoList) {
                             for (const fileOutboundHistInfo of fileOutboundHistInfoList) {
-                                console.log('fileOutboundHistInfo', fileOutboundHistInfo);
                                 switch (fileOutboundHistInfo.outboundStatusCcd) {
                                     case '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]':
                                         semicircleChartInfo2.mailOutboundStatus.sentCount = fileOutboundHistInfo.outboundHistCount || 0;
@@ -200,6 +202,7 @@
                                         semicircleChartInfo2.mailOutboundStatus.blockedCount = fileOutboundHistInfo.outboundHistCount || 0;
                                         break;
                                 }
+                                console.log('fileOutboundHistInfo', fileOutboundHistInfo, semicircleChartInfo2.mailOutboundStatus);
                             }
 
                             updateSemicircleChart2();

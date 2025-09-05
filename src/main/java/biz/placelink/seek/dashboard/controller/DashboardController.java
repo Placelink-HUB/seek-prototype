@@ -7,6 +7,7 @@ import biz.placelink.seek.dashboard.service.DashboardService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import kr.s2.ext.util.S2Util;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -48,7 +49,7 @@ public class DashboardController {
      * @return 사용한 사이트 ID에 따라 지정된 대시보드 뷰 이름.
      */
     @GetMapping(value = "/dashboard/{siteId}")
-    protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, HttpSession session, Model model) {
+    protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, @RequestParam(name = "consoleType", defaultValue = "") String consoleType, HttpSession session, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
 
         /*
@@ -61,10 +62,14 @@ public class DashboardController {
             model.addAttribute("console", console);
 
             if ("all".equals(console)) {
-                store.put("pushConsoleType", console, 600_1000);
+                store.put("pushConsole", console, 600_1000);
             } else if ("off".equals(console)) {
-                store.remove("pushConsoleType");
+                store.remove("pushConsole");
             }
+        }
+
+        if (StringUtils.isNotEmpty(consoleType)) {
+            model.addAttribute("consoleType", consoleType);
         }
 
         String viewName = switch (siteId) {

@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1581.5742,
-    "scrollLeft": -1685,
+    "scrollTop": -1580.5742,
+    "scrollLeft": -1686,
     "zoomLevel": 0.82,
     "show": 511,
     "database": 16,
@@ -730,6 +730,7 @@
           "xF98BE9-QLVS-XC6V640r",
           "ffVr7XGRcKtvswqN_xzTR",
           "gQPrmzgSldUOG_1jlJPqk",
+          "jI4NQ1MU2Zk-xA0HsyPCF",
           "9FuKmCkiR5XYDpIE5NpoB"
         ],
         "seqColumnIds": [
@@ -737,6 +738,7 @@
           "xF98BE9-QLVS-XC6V640r",
           "ffVr7XGRcKtvswqN_xzTR",
           "gQPrmzgSldUOG_1jlJPqk",
+          "jI4NQ1MU2Zk-xA0HsyPCF",
           "9FuKmCkiR5XYDpIE5NpoB"
         ],
         "ui": {
@@ -748,7 +750,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1756776940784,
+          "updateAt": 1757057958040,
           "createAt": 1750764462488
         }
       }
@@ -3992,6 +3994,26 @@
         "meta": {
           "updateAt": 1750765925263,
           "createAt": 1750765914606
+        }
+      },
+      "jI4NQ1MU2Zk-xA0HsyPCF": {
+        "id": "jI4NQ1MU2Zk-xA0HsyPCF",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "FILE_DESC",
+        "comment": "파일_설명",
+        "dataType": "VARCHAR(500)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 81,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1757058186404,
+          "createAt": 1757057938869
         }
       }
     },

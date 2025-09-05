@@ -93,7 +93,10 @@
             // eslint-disable-next-line no-console
             const vConsole = sessionStorage.getItem('console');
             if (vConsole === 'on' || vConsole === 'all') {
-                console.log('ReceiveServiceWorker Data', event.data);
+                const vConsoleType = sessionStorage.getItem('consoleType');
+                if (!vConsoleType || vConsoleType === 'all' || vConsoleType === event.data.type) {
+                    console.log('ReceiveServiceWorker Data', event.data);
+                }
             }
 
             const realtimeAnalysisStatus = lineChartInfo.realtimeAnalysisStatus;
