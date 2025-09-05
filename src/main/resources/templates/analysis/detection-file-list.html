@@ -54,7 +54,10 @@
                                     <div id="tab-file" class="tab-contents active">
                                         <div class="contents file-upload">
                                             <div class="file-upload-box">
+                                                <!-- // 파일 검증 시 hwpx 오류나서 막음
                                                 <input type="file" class="file-upload d-none" multiple accept=".pdf, .hwpx, .docx, .xlsx, .pptx"/>
+                                                -->
+                                                <input type="file" class="file-upload d-none" multiple accept=".pdf, .hwp, .docx, .xlsx, .pptx"/>
                                                 <div class="file-upload-icon">
                                                     <img src="/public/images/file_upload_icon.png" alt="파일아이콘"/>
                                                 </div>
@@ -131,7 +134,10 @@
 
             function checkFileExtension(fileList) {
                 let result = true;
+                /* // 파일 검증 시 hwpx 오류나서 막음
                 const allowedExtensions = ['pdf', 'hwpx', 'docx', 'xlsx', 'pptx'];
+                */
+                const allowedExtensions = ['pdf', 'hwp', 'docx', 'xlsx', 'pptx'];
                 for (let file of fileList) {
                     const ext = file.name.split('.').pop().toLowerCase();
                     if (!allowedExtensions.includes(ext)) {
