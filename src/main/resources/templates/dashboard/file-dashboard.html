@@ -6,7 +6,6 @@
         const doughnutChart = {};
         const semicircleChart = {};
         const lineChart = {};
-        const barChart = {};
 
         const doughnutChartInfo = {
             // 분석 현황
@@ -22,13 +21,21 @@
                 count: 0,
                 totalCount: 0,
                 color: '#04f0fb'
+            },
+            // 마스킹 현황
+            masking: {
+                text: '마스킹',
+                count: 0,
+                totalCount: 0,
+                color: '#b4b4fc'
+            },
+            // 언마스킹 현황
+            unmasking: {
+                text: '언마스킹',
+                count: 0,
+                totalCount: 0,
+                color: '#5eefa6'
             }
-        };
-
-        // LLM 이 분석한 파일 정보
-        const fileDetectionInfo = {
-            fileSize: 0,
-            fileCount: 0
         };
 
         const semicircleChartInfo = {
@@ -70,13 +77,17 @@
             }
         };
 
+        // LLM 이 분석한 파일 정보
+        const fileDetectionInfo = {
+            fileSize: 0,
+            fileCount: 0
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             initDoughnutChart();
             initSemicircleChart();
             initSemicircleChart2();
             initLineChart();
-            initBarChart();
-            initBarChart2();
 
             document.querySelector('.targetDate').textContent = dayjs().format('YYYY년 MM월 DD일');
 
@@ -141,6 +152,31 @@
                     }
                     updateLineChart();
                     break;
+                case '[[${@Constants.CD_PUSH_TYPE_MASKING}]]':
+                    // 마스킹
+                    const maskCount = event.data.data.count;
+                    if (maskCount > 0) {
+                        let maskChartDataChanged = false;
+
+                        switch (event.data.data.maskModeCcd) {
+                            case 'mask':
+                                doughnutChartInfo.masking.count += maskCount;
+                                maskChartDataChanged = true;
+                                break;
+                            case 'unmask':
+                                doughnutChartInfo.unmasking.count += maskCount;
+                                maskChartDataChanged = true;
+                                break;
+                        }
+
+                        if (maskChartDataChanged) {
+                            doughnutChartInfo.masking.totalCount += maskCount;
+                            doughnutChartInfo.unmasking.totalCount += maskCount;
+                            updateDoughnutChart('masking');
+                            updateDoughnutChart('unmasking');
+                        }
+                    }
+                    break;
                 case '[[${@Constants.CD_PUSH_TYPE_FILE_OUTBOUND}]]':
                     // 외부 메일 발송 탐지 현황
                     if (event.data.data['outboundStatusCcd'] === '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]') {
@@ -164,6 +200,7 @@
 
         function getAnalysisStatistics() {
             S2Util.fetch(
+                // '[[@{/dashboard/analysis-statistics}]]',
                 '[[@{/dashboard/analysis-statistics2}]]',
                 {
                     method: 'get',
@@ -180,14 +217,47 @@
                         doughnutChartInfo['detection'].count = analysisData.detectionCount;
                         doughnutChartInfo['detection'].totalCount = analysisData.totalDetectionCount;
 
+                        // 마스킹(언마스킹)
+                        const maskingDataArray = response.maskingData;
+                        if (maskingDataArray) {
+                            let totalMaskingCount = 0;
+                            let maskingCount = 0;
+                            let unmaskingCount = 0;
+
+                            for (maskingData of maskingDataArray) {
+                                totalMaskingCount += maskingData.maskCount;
+                                switch (maskingData.maskModeCcd) {
+                                    case 'mask':
+                                        maskingCount = maskingData.maskCount;
+                                        break;
+                                    case 'unmask':
+                                        unmaskingCount = maskingData.maskCount;
+                                        break;
+                                }
+                            }
+
+                            doughnutChartInfo['masking'].count = maskingCount;
+                            doughnutChartInfo['masking'].totalCount = totalMaskingCount;
+                            doughnutChartInfo['unmasking'].count = unmaskingCount;
+                            doughnutChartInfo['unmasking'].totalCount = totalMaskingCount;
+                        }
+
                         updateDoughnutChartAll();
+                    }
 
-                        // LLM이 분석한 파일 정보
-                        const fileAnalysisInfo = response.fileAnalysisInfo;
-                        fileDetectionInfo.fileSize = fileAnalysisInfo.analysisFileSize;
-                        fileDetectionInfo.fileCount = fileAnalysisInfo.analysisFileCount;
-                        updateFileDetectionInfo();
+                    {
+                        const detectionData = response.detectionData;
 
+                        // 국내 접속자 탐지 현황 => 내부로 임시 변경(!!s2!!)
+                        semicircleChartInfo['koreaDetectionStatus'].low = detectionData.koreaLowCount;
+                        semicircleChartInfo['koreaDetectionStatus'].mid = detectionData.koreaMidCount;
+                        semicircleChartInfo['koreaDetectionStatus'].high = detectionData.koreaHighCount;
+
+                        updateSemicircleChartAll();
+                    }
+
+                    {
+                        console.log('response.fileOutboundHistInfoList', response.fileOutboundHistInfoList);
                         // 첨부 파일 외부 전송 현황
                         const fileOutboundHistInfoList = response.fileOutboundHistInfoList;
                         if (fileOutboundHistInfoList) {
@@ -207,17 +277,6 @@
 
                             updateSemicircleChart2();
                         }
-                    }
-
-                    {
-                        const detectionData = response.detectionData;
-
-                        // 국내 접속자 탐지 현황 => 내부로 임시 변경(!!s2!!)
-                        semicircleChartInfo['koreaDetectionStatus'].low = detectionData.koreaLowCount;
-                        semicircleChartInfo['koreaDetectionStatus'].mid = detectionData.koreaMidCount;
-                        semicircleChartInfo['koreaDetectionStatus'].high = detectionData.koreaHighCount;
-
-                        updateSemicircleChartAll();
                     }
 
                     {
@@ -258,8 +317,13 @@
                         }, 1000);
                     }
 
-                    // 상위 5개 항목
-                    updateBarChart(response.hitRankDataList);
+                    {
+                        // LLM이 분석한 파일 정보
+                        const fileAnalysisInfo = response.fileAnalysisInfo;
+                        fileDetectionInfo.fileSize = fileAnalysisInfo.analysisFileSize;
+                        fileDetectionInfo.fileCount = fileAnalysisInfo.analysisFileCount;
+                        updateFileDetectionInfo();
+                    }
                 }
             );
         }
@@ -267,6 +331,8 @@
         function initDoughnutChart() {
             doughnutChart['analysis'] = echarts.init(document.getElementById('doughnutChart1'));
             doughnutChart['detection'] = echarts.init(document.getElementById('doughnutChart2'));
+            doughnutChart['masking'] = echarts.init(document.getElementById('doughnutChart3'));
+            doughnutChart['unmasking'] = echarts.init(document.getElementById('doughnutChart4'));
 
             for (const targetChartName in doughnutChartInfo) {
                 const chartInfo = doughnutChartInfo[targetChartName];
@@ -346,11 +412,6 @@
                 },
                 false // false로 설정하여 기존 값은 유지);
             );
-        }
-
-        function updateFileDetectionInfo() {
-            document.querySelector('.detection-file-size').textContent = (fileDetectionInfo.fileSize / 1024).toFixed(1).toLocaleString('ko-KR');
-            document.querySelector('.detection-file-count').textContent = fileDetectionInfo.fileCount.toLocaleString('ko-KR');
         }
 
         function initSemicircleChart() {
@@ -854,123 +915,9 @@
             lineChart['realtimeAnalysis'].setOption(updateSeries, false); // false로 설정하여 기존 값은 유지
         }
 
-        function initBarChart() {
-            barChart['sensitiveInfoType'] = echarts.init(document.getElementById('barChart1'));
-
-            option = {
-                grid: {left: 0, right: 0, top: 20, bottom: 50},
-                tooltip: {
-                    trigger: 'axis'
-                },
-                xAxis: {
-                    type: 'category',
-                    // data: xAxisData,
-                    axisLine: {show: false},
-                    axisTick: {show: false},
-                    axisLabel: {
-                        color: '#fff',
-                        fontSize: 12,
-                        fontWeight: 200,
-                        formatter: function (value) {
-                            // return value.length > 8 ? value.slice(0, 8) + '...' : value; // 말줄임
-                            return value.length > 8 ? value.slice(0, 6) + '\n' + value.slice(6) : value; // 줄바꿈
-                        }
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    axisLine: {show: false},
-                    axisTick: {show: false},
-                    splitLine: {show: false},
-                    axisLabel: {show: false}
-                },
-                series: [
-                    {
-                        type: 'bar',
-                        // data: seriesData,
-                        barWidth: 28,
-                        itemStyle: {
-                            borderRadius: [10, 10, 10, 10],
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                {offset: 0, color: '#097bdd'},
-                                {offset: 1, color: '#04e6f8'}
-                            ])
-                        }
-                    }
-                ]
-            };
-            barChart['sensitiveInfoType'].setOption(option);
-        }
-
-        function updateBarChart(hitRankDataList) {
-            barChart['sensitiveInfoType'] = echarts.init(document.getElementById('barChart1'));
-
-            const xAxisData = hitRankDataList.map((item) => item.detectionTypeCcd);
-            const seriesData = hitRankDataList.map((item) => item.hitCount);
-
-            barChart['sensitiveInfoType'].setOption(
-                {
-                    xAxis: {
-                        data: xAxisData
-                    },
-                    series: [
-                        {
-                            data: seriesData
-                        }
-                    ]
-                },
-                false
-            );
-        }
-
-        function initBarChart2() {
-            barChart['documentType'] = echarts.init(document.getElementById('barChart2'));
-            option = {
-                grid: {left: 0, right: 0, top: 20, bottom: 50},
-                tooltip: {
-                    trigger: 'axis'
-                },
-                xAxis: {
-                    type: 'category',
-                    data: ['PDF', 'HWP', 'WORD', 'EXCEL'],
-                    axisLine: {show: false},
-                    axisTick: {show: false},
-                    axisLabel: {
-                        color: '#fff',
-                        fontSize: 13,
-                        fontWeight: 200,
-                        margin: 16
-                    }
-                },
-                yAxis: {
-                    type: 'value',
-                    axisLine: {show: false},
-                    axisTick: {show: false},
-                    splitLine: {show: false},
-                    axisLabel: {show: false}
-                },
-                series: [
-                    {
-                        type: 'bar',
-                        data: [100, 60, 80, 90],
-                        barWidth: 34,
-                        itemStyle: {
-                            borderRadius: [10, 10, 10, 10],
-                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                                {offset: 0, color: '#6cf9ff'},
-                                {offset: 0.5, color: '#21d1e6'},
-                                {offset: 1, color: '#1b7fa6'}
-                            ])
-                        },
-                        emphasis: {
-                            itemStyle: {
-                                opacity: 1
-                            }
-                        }
-                    }
-                ]
-            };
-            barChart['documentType'].setOption(option);
+        function updateFileDetectionInfo() {
+            document.querySelector('.detection-file-size').textContent = (fileDetectionInfo.fileSize / 1024).toFixed(1).toLocaleString('ko-KR');
+            document.querySelector('.detection-file-count').textContent = fileDetectionInfo.fileCount.toLocaleString('ko-KR');
         }
 
         // eslint-disable-next-line no-unused-vars
@@ -1026,21 +973,17 @@
                     </div>
                     <div class="card card3">
                         <div class="text">
-                            <span class="card-title">LLM이 분석한 용량</span>
-                            <span class="card-desc">민감정보 분석한 총 파일 용량</span>
+                            <span class="card-title">마스킹</span>
+                            <span class="card-desc">비식별 처리된 정보 수</span>
                         </div>
-                        <div style="display: flex; flex-direction: column; justify-content: center">
-                            <div style="white-space: nowrap; font-size: 18px; color: #ffffff"><span class="detection-file-size" style="font-weight: bold">0</span> <span style="font-size: 14px">KB</span></div>
-                        </div>
+                        <div id="doughnutChart3" class="graph"></div>
                     </div>
                     <div class="card card4">
                         <div class="text">
-                            <span class="card-title">LLM이 분석한 파일 수</span>
-                            <span class="card-desc">민감정보 분석한 총 파일 개수</span>
+                            <span class="card-title">언마스킹</span>
+                            <span class="card-desc">복호화된 정보 횟수</span>
                         </div>
-                        <div style="display: flex; flex-direction: column; justify-content: center">
-                            <div style="white-space: nowrap; font-size: 18px; color: #ffffff"><span class="detection-file-count" style="font-weight: bold">0</span> <span style="font-size: 14px">건</span></div>
-                        </div>
+                        <div id="doughnutChart4" class="graph"></div>
                     </div>
                 </div>
                 <div class="status-box">
@@ -1109,16 +1052,22 @@
                         </div>
                     </div>
                     <div class="box box2">
-                        <div class="box-box box-box1">
-                            <div class="box-top">상위 5개 항목</div>
-                            <div class="box-contents">
-                                <div id="barChart1" class="graph"></div>
+                        <div class="box-box box-box1 detection-file detection-file-size-box">
+                            <div class="text">
+                                <div class="card-title">LLM이 분석한 용량</div>
+                                <div class="card-desc">민감정보 분석한 총 파일 용량</div>
+                            </div>
+                            <div class="text-content">
+                                <div><span class="file-count detection-file-size">0</span> <span class="num-item">KB</span></div>
                             </div>
                         </div>
-                        <div class="box-box box-box2">
-                            <div class="box-top">문서별 탐지 수</div>
-                            <div class="box-contents">
-                                <div id="barChart2" class="graph"></div>
+                        <div class="box-box box-box2 detection-file detection-file-count-box">
+                            <div class="text">
+                                <span class="card-title">LLM이 분석한 파일 수</span>
+                                <span class="card-desc">민감정보 분석한 총 파일 개수</span>
+                            </div>
+                            <div class="text-content">
+                                <div><span class="file-count detection-file-count">0</span> <span class="num-item">건</span></div>
                             </div>
                         </div>
                     </div>
