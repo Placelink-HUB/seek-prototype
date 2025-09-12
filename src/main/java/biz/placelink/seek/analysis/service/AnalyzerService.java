@@ -241,7 +241,7 @@ public class AnalyzerService {
 
             if (analysisJsonData == null || !analysisJsonData.path("request_id").asText("").equals(analysisId)) {
                 // API 요청 응답의 request_id 와 분석 요청 ID 가 일치하지 않으면 하면 분석 요청이 실패한 것으로 판단한다.
-                throw new S2RuntimeException("[API 요청 호출 실패]: API 요청 호출 결과 값이 틀립니다.");
+                throw new S2RuntimeException("[API 요청 호출 실패]: API 요청 호출 결과 값이 틀립니다.(request_id 불일치)");
             }
 
             // 분석 모델을 포함한 데이터 해시 값을 등록한다.

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import biz.placelink.seek.analysis.service.AnalysisService;
 import biz.placelink.seek.analysis.service.AnalyzerService;
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import kr.s2.ext.util.S2Util;
 
 /**
  * <pre>
@@ -74,7 +75,7 @@ public class AnalysisScheduler {
         int processableCount = Math.min(availableSlots, analysisScheduleRequestMaxcnt);
         List<AnalysisDetailVO> waitAnalysisList = analysisService.selectAnalysisHistListToExecuted(processableCount);
 
-        if (waitAnalysisList != null) {
+        if (S2Util.isNotEmpty(waitAnalysisList)) {
             for (AnalysisDetailVO analysis : waitAnalysisList) {
                 AnalyzerService.asyncAnalysisRequest(analysis);
             }
