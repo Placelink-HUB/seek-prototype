@@ -101,6 +101,7 @@
                 if (vConsole === 'on' || vConsole === 'all') {
                     const vConsoleType = sessionStorage.getItem('consoleType');
                     if (!vConsoleType || vConsoleType === 'all' || vConsoleType === event.data.type) {
+                        // eslint-disable-next-line no-console
                         console.log('ReceiveServiceWorker Data', event.data);
                     }
                 }
