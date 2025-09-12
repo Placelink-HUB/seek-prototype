@@ -1,6 +1,24 @@
 package biz.placelink.seek.analysis.service;
 
-import biz.placelink.seek.analysis.vo.*;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
+import biz.placelink.seek.analysis.vo.AnalysisVO;
+import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
+import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import biz.placelink.seek.system.file.service.FileService;
@@ -8,15 +26,6 @@ import biz.placelink.seek.system.file.vo.FileDetailVO;
 import kr.s2.ext.util.S2EncryptionUtil;
 import kr.s2.ext.util.S2FileUtil;
 import kr.s2.ext.util.S2Util;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.io.InputStream;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * <pre>
@@ -176,6 +185,27 @@ public class WildpathAnalysisService {
     }
 
     /**
+     * SEEK 에이전트 하트비트
+     *
+     * @param orgCode    조직코드
+     * @param eventTime  이벤트 시간
+     * @param macAddr    MAC 주소
+     * @param host       호스트 이름
+     * @param components 컴포넌트(에이전트) 정보
+     */
+    public void pushAgentHeartbeat(String orgCode, String eventTime, String macAddr, String host, String components) {
+        Map<String, Object> pushMap = new HashMap<>();
+        pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_AGENT_HEARTBEAT);
+        pushMap.put("orgCode", orgCode);
+        pushMap.put("eventTime", eventTime);
+        pushMap.put("macAddr", macAddr);
+        pushMap.put("host", host);
+        pushMap.put("components", components);
+
+        serviceWorkerService.sendNotificationAll(pushMap);
+    }
+
+    /**
      * 주어진 문자열 데이터에서 민감 정보를 마스킹한다.
      *
      * @param requestId       요청 ID
@@ -242,7 +272,7 @@ public class WildpathAnalysisService {
      *
      * @param contentType HTTP 요청 또는 응답의 Content-Type 헤더 값. null이 허용됩니다.
      * @return 추론된 문서 타입 (예: "text", "image", "pdf", "docx", "unknown" 등).
-     * contentType 이 null 인 경우 "unknown"을 반환합니다.
+     *         contentType 이 null 인 경우 "unknown"을 반환합니다.
      */
     public static String getDocumentTypeFromContentType(String contentType, String fileName) {
         String documentType = "unknown";

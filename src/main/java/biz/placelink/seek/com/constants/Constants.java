@@ -192,13 +192,17 @@ public class Constants {
      */
     public static final String CD_PUSH_TYPE_MASKING = "masking";
     /**
-     * 푸시_타입_공통코드 - 외부 메일
+     * 푸시_타입_공통코드 - 파일 외부전송
      */
     public static final String CD_PUSH_TYPE_FILE_OUTBOUND = "file_outbound";
     /**
      * 푸시_타입_공통코드 - 파일 탐지
      */
     public static final String CD_PUSH_TYPE_FILE_DETECTION = "file_detection";
+    /**
+     * 푸시_타입_공통코드 - SEEK 에이전트 하트비트
+     */
+    public static final String CD_PUSH_TYPE_AGENT_HEARTBEAT = "agent_heartbeat";
 
     /**
      * 파일_구분_공통코드 - 분석 요청 파일

@@ -1,12 +1,11 @@
 package biz.placelink.seek.dashboard.controller;
 
-import biz.placelink.seek.analysis.service.MaskHistService;
-import biz.placelink.seek.com.constants.Constants;
-import biz.placelink.seek.com.util.GlobalSharedStore;
-import biz.placelink.seek.dashboard.service.DashboardService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-import kr.s2.ext.util.S2Util;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +15,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import biz.placelink.seek.analysis.service.MaskHistService;
+import biz.placelink.seek.com.constants.Constants;
+import biz.placelink.seek.com.util.GlobalSharedStore;
+import biz.placelink.seek.dashboard.service.DashboardService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+import kr.s2.ext.util.S2Util;
 
 @Controller
 public class DashboardController {
@@ -41,11 +42,13 @@ public class DashboardController {
     /**
      * 대시보드 상세 정보를 렌더링하는 메서드.
      * 주어진 사이트 ID에 따라 적합한 대시보드 뷰를 반환하며, 콘솔 설정 값을 이용해 모델 속성을 업데이트한다.
+     * ?console=all&consoleType=file_outbound => console=all: 모든 파라미터를 포함한 Push 메시지 로그를 남긴다. consoleType=file_outbound: 파일 외부전송 로그만 출력
      *
-     * @param siteId  사이트 ID로, 렌더링할 대시보드 종류를 결정한다. 예: "integrated", "file".
-     * @param console "on": console 에서 푸시 메시지 보기, "off": console 에서 푸시 메시지 숨기기
-     * @param session 현재 사용자 세션 객체.
-     * @param model   뷰 렌더링 시 사용되는 모델 객체.
+     * @param siteId      사이트 ID로, 렌더링할 대시보드 종류를 결정한다. 예: "integrated", "file".
+     * @param console     "on": console 에서 푸시 메시지 보기, "off": console 에서 푸시 메시지 숨기기
+     * @param consoleType "file_outbound": 파일 외부전송 로그만 출력, "agent_heartbeat": SEEK 에이전트 하트비트 로그만 출력
+     * @param session     현재 사용자 세션 객체.
+     * @param model       뷰 렌더링 시 사용되는 모델 객체.
      * @return 사용한 사이트 ID에 따라 지정된 대시보드 뷰 이름.
      */
     @GetMapping(value = "/dashboard/{siteId}")
