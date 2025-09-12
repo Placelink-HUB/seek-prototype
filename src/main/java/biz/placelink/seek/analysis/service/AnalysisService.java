@@ -211,7 +211,7 @@ public class AnalysisService {
             }
         }
 
-        List<FileDetailVO> successFileList = fileService.writeFile(files, null, Constants.CD_ARTICLE_TYPE_FILE, Constants.CD_ARTICLE_TYPE_FILE, allowedFileExt.split(","), 5L);
+        List<FileDetailVO> successFileList = fileService.writeFile(files, null, Constants.CD_ARTICLE_TYPE_FILE, Constants.CD_ARTICLE_TYPE_FILE, allowedFileExt.split(","), 50L);
         if (successFileList != null && !successFileList.isEmpty()) {
             String analysisId = UUID.randomUUID().toString();
 

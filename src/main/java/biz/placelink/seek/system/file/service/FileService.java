@@ -165,7 +165,7 @@ public class FileService {
      * @param fileSeCcd      파일 구분 공통코드
      * @param saveNameSuffix 저장명 접미사
      * @param chkFileExt     등록 가능한 파일 확장자
-     * @param maxSize        등록 가능한 파일 최대 크기
+     * @param maxSize        등록 가능한 파일 최대 크기(MB)
      * @return 등록한 파일 상세 정보 목록
      */
     @Transactional
