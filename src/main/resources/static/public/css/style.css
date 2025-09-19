@@ -787,7 +787,7 @@ table caption {
 }
 
 .header-wrapper .header-box1 .top-logo img {
-  width: 125px;
+  width: 7.8125rem;
 }
 
 .header-wrapper .header-box2 {
@@ -807,13 +807,13 @@ table caption {
 
 .header-wrapper .header-box2 .notice-box .bar {
   width: 0.625rem;
-  height: 39px;
+  height: 2.4375rem;
   background: linear-gradient(to bottom, #687cfb, #ab82fe);
 }
 
 .header-wrapper .header-box2 .notice-box .back1 {
   width: 2.625rem;
-  height: 21px;
+  height: 1.3125rem;
   background-image: url(../images/alarm.png);
   background-size: contain;
   background-position: 0.9375rem;
@@ -851,9 +851,9 @@ table caption {
     Main 영역
 =================================================================================================== */
 #main .main-contents {
-  width: calc(100% - 61px);
+  width: calc(100% - 3.8125rem);
   padding: 0.625rem 0 6.25rem 0;
-  margin-left: 61px;
+  margin-left: 3.8125rem;
 }
 
 #main .main-contents .main-contents-contents {
@@ -863,7 +863,7 @@ table caption {
 }
 
 #main .main-contents .main-contents-contents .wrap-top .site-logo {
-  width: 110px;
+  width: 6.875rem;
 }
 
 #main .main-contents .main-contents-contents .wrap-top .main-title {
@@ -921,7 +921,7 @@ table caption {
 
 .main-contents-contents .wrap-contents .data-date {
   display: flex;
-  margin: 0 3.125rem 0 70px;
+  margin: 0 3.125rem 0 4.375rem;
   align-items: center;
 }
 
@@ -953,7 +953,7 @@ table caption {
   position: relative;
   display: flex;
   width: 24%;
-  height: 140px;
+  height: 8.75rem;
   padding: 1.25rem 1.5rem 1.25rem 6.25rem;
   border: 0;
   border-radius: 0.3125rem;
@@ -962,7 +962,7 @@ table caption {
   word-wrap: break-word;
   background-repeat: no-repeat, no-repeat;
   background-position: left 1.25rem top 2.8125rem, center;
-  background-size: 60px, cover;
+  background-size: 3.75rem, cover;
   justify-content: space-between;
 }
 
@@ -975,7 +975,7 @@ table caption {
 .main-contents-contents .wrap-contents .contents .status-card .card.card1 {
   color: #6eb7ff;
   background-image: url(../images/main_icon1.png), linear-gradient(100deg, #080808, #212121);
-  background-position: left 1.25rem top 47px, center;
+  background-position: left 1.25rem top 2.9375rem, center;
   background-size: 63px, cover;
 }
 
@@ -1183,7 +1183,7 @@ table caption {
 .main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.detection-file {
   padding: 1.25rem 1.5rem 1.25rem 6.25rem;
   background-repeat: no-repeat;
-  background-size: 60px, cover;
+  background-size: 3.75rem, cover;
   background-position: left 1.25rem top 3.4375rem, center;
 }
 
