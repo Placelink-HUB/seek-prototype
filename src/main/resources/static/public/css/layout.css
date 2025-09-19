@@ -58,7 +58,7 @@ a:active {
 =================================================================================================== */
 #main {
   position: relative;
-  /* eslint-disable-next-line css/no-important */
+
   margin: 0 auto;
   transition: 0.5s;
   background: #000;
@@ -71,7 +71,7 @@ a:active {
   width: 60px;
   height: 100%;
   background-color: #212429;
-  border-right: 1px solid #7e7e7e;
+  border-right: 0.0625rem solid #7e7e7e;
 }
 
 /* ===================================================================================================
@@ -83,7 +83,7 @@ a:active {
   bottom: 0;
   width: 100%;
   height: 45px;
-  padding: 15px 50px;
+  padding: 0.9375rem 3.125rem;
   margin: 0 auto;
   color: #a6a7aa;
   background: #191919;

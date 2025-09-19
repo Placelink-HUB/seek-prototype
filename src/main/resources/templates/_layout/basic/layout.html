@@ -1,83 +1,83 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<head>
-    <meta charset="utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>SEEK - Sensitive Entity & Enterprise Keeper</title>
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>SEEK - Sensitive Entity & Enterprise Keeper</title>
 
-    <link rel="shortcut icon" th:href="@{/public/ico/favicon.ico}"/>
-    <link rel="stylesheet" th:href="@{/public/css/layout.css}"/>
-    <link rel="stylesheet" th:href="@{/public/css/style.css}"/>
-    <link rel="stylesheet" th:href="@{/public/css/loading.css}"/>
-    <link rel="stylesheet" th:href="@{/public/css/s2.util.css}"/>
-    <link rel="stylesheet" th:href="@{/public/js/lib/flatpickr/flatpickr.min.css}"/>
+        <link rel="shortcut icon" th:href="@{/public/ico/favicon.ico}" />
+        <link rel="stylesheet" th:href="@{/public/css/layout.css}" />
+        <link rel="stylesheet" th:href="@{/public/css/style.css}" />
+        <link rel="stylesheet" th:href="@{/public/css/loading.css}" />
+        <link rel="stylesheet" th:href="@{/public/css/s2.util.css}" />
+        <link rel="stylesheet" th:href="@{/public/js/lib/flatpickr/flatpickr.min.css}" />
 
-    <th:block layout:fragment="bodyStyle"></th:block>
-    <style>
-        .flatpickr-wrapper {
-            /* flatpickr 전체를 감싸는 요소 */
-            font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
-        }
-
-        .flatpickr-calendar {
-            /* 달력 부분 */
-            font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
-        }
-
-        .flatpickr-day {
-            /* 날짜 부분 */
-            font-family: 'Pretendard', sans-serif;
-            font-size: 14px;
-        }
-    </style>
-
-    <script th:src="@{/public/js/jquery-3.4.1.min.js}"></script>
-    <script th:src="@{/public/js/s2.util.js}"></script>
-    <script th:src="@{/public/js/s2.dropzone.js}"></script>
-    <script th:src="@{/public/js/loading.js}"></script>
-    <script th:src="@{/public/js/lib/dayjs.min.js}"></script>
-    <script th:src="@{/public/js/lib/flatpickr/flatpickr.min.js}"></script>
-    <script th:src="@{/public/js/lib/flatpickr/ko.js}"></script>
-
-    <th:block layout:fragment="bodyScript"></th:block>
-    <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            const vConsole = '[[${console}]]';
-            if (vConsole) {
-                sessionStorage.setItem('console', vConsole);
+        <th:block layout:fragment="bodyStyle"></th:block>
+        <style>
+            .flatpickr-wrapper {
+                /* flatpickr 전체를 감싸는 요소 */
+                font-family: 'Pretendard', sans-serif;
+                font-size: 0.875rem;
             }
-            const vConsoleType = '[[${consoleType}]]';
-            if (vConsoleType) {
-                sessionStorage.setItem('consoleType', vConsoleType);
-            }
-        });
-    </script>
-</head>
-<body class="hold-transition layout-fixed sidebar-collapse">
-<div class="wrapper">
-    <div class="content_wrap">
-        <header class="header-wrapper">
-            <th:block th:replace="~{_layout/basic/header :: headerFragment}"></th:block>
-        </header>
 
-        <section class="content-wrapper">
-            <div id="main">
-                <div class="sidebar-wrapper">
-                    <th:block th:replace="~{_layout/basic/sidebar :: sidebarFragment}"></th:block>
-                </div>
-                <div class="main-contents">
-                    <th:block layout:fragment="bodyFragment"></th:block>
-                </div>
+            .flatpickr-calendar {
+                /* 달력 부분 */
+                font-family: 'Pretendard', sans-serif;
+                font-size: 0.875rem;
+            }
+
+            .flatpickr-day {
+                /* 날짜 부분 */
+                font-family: 'Pretendard', sans-serif;
+                font-size: 0.875rem;
+            }
+        </style>
+
+        <script th:src="@{/public/js/jquery-3.4.1.min.js}"></script>
+        <script th:src="@{/public/js/s2.util.js}"></script>
+        <script th:src="@{/public/js/s2.dropzone.js}"></script>
+        <script th:src="@{/public/js/loading.js}"></script>
+        <script th:src="@{/public/js/lib/dayjs.min.js}"></script>
+        <script th:src="@{/public/js/lib/flatpickr/flatpickr.min.js}"></script>
+        <script th:src="@{/public/js/lib/flatpickr/ko.js}"></script>
+
+        <th:block layout:fragment="bodyScript"></th:block>
+        <script type="text/javascript">
+            document.addEventListener('DOMContentLoaded', () => {
+                const vConsole = '[[${console}]]';
+                if (vConsole) {
+                    sessionStorage.setItem('console', vConsole);
+                }
+                const vConsoleType = '[[${consoleType}]]';
+                if (vConsoleType) {
+                    sessionStorage.setItem('consoleType', vConsoleType);
+                }
+            });
+        </script>
+    </head>
+    <body class="hold-transition layout-fixed sidebar-collapse">
+        <div class="wrapper">
+            <div class="content_wrap">
+                <header class="header-wrapper">
+                    <th:block th:replace="~{_layout/basic/header :: headerFragment}"></th:block>
+                </header>
+
+                <section class="content-wrapper">
+                    <div id="main">
+                        <div class="sidebar-wrapper">
+                            <th:block th:replace="~{_layout/basic/sidebar :: sidebarFragment}"></th:block>
+                        </div>
+                        <div class="main-contents">
+                            <th:block layout:fragment="bodyFragment"></th:block>
+                        </div>
+                    </div>
+                </section>
+
+                <footer class="footer-wrapper">
+                    <th:block th:replace="~{_layout/basic/footer :: footerFragment}"></th:block>
+                </footer>
             </div>
-        </section>
-
-        <footer class="footer-wrapper">
-            <th:block th:replace="~{_layout/basic/footer :: footerFragment}"></th:block>
-        </footer>
-    </div>
-</div>
-</body>
+        </div>
+    </body>
 </html>

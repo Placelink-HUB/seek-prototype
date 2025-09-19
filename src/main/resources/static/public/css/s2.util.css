@@ -20,39 +20,39 @@
   flex-direction: column; /* 수직 방향으로 요소 배치 */
   max-height: 90vh; /* 브라우저 창 높이의 90%로 최대 높이 설정 */
   background-color: #fff;
-  border-radius: 10px;
-  box-shadow: 4px 4px 8px 2px #0000000f;
+  border-radius: 0.625rem;
+  box-shadow: 0.25rem 0.25rem 0.5rem 0.125rem #0000000f;
   font-family: 'Pretendard', sans-serif;
 }
 
 .s2-modal > .modal-content > .modal-header {
   display: flex;
   position: relative;
-  padding: 10px;
+  padding: 0.625rem;
   background-color: #1a5df4;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-top-left-radius: 0.625rem;
+  border-top-right-radius: 0.625rem;
   color: #fff;
   align-items: center;
   background-image: url(../images/SEEK_logo.png);
   background-repeat: no-repeat;
-  background-position: top 17px left 20px;
-  background-size: 80px;
+  background-position: top 1.0625rem left 1.25rem;
+  background-size: 5rem;
 }
 
 .s2-modal > .modal-content > .modal-header > .modal-title {
-  margin: 10px 0 10px 10px;
+  margin: 0.625rem 0 0.625rem 0.625rem;
   padding-left: 90px;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 400;
-  letter-spacing: -1px;
+  letter-spacing: -0.0625rem;
 }
 
 .s2-modal > .modal-content > .modal-header > .close-button {
   position: absolute;
   width: 30px;
   height: 30px;
-  right: 15px;
+  right: 0.9375rem;
   font-size: 25px;
   color: #fff;
   cursor: pointer;
@@ -61,8 +61,8 @@
 }
 
 .s2-modal > .modal-content > .modal-body {
-  min-height: 250px;
-  padding: 20px; /* body padding 추가 */
+  min-height: 15.625rem;
+  padding: 1.25rem; /* body padding 추가 */
   overflow-y: auto; /* body 부분만 스크롤 가능하도록 설정 */
   flex-grow: 1; /* body가 남은 공간을 모두 차지하도록 설정 */
 }
@@ -72,12 +72,12 @@
 =================================================================================================== */
 .s2-toast {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  width: 300px;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 18.75rem;
   background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   overflow: hidden;
   animation: toast-slide-in 0.5s ease-out;
@@ -88,20 +88,20 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
+  padding: 0.625rem 0.9375rem;
   background-color: #f0f0f0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 0.0625rem solid #e0e0e0;
 }
 
 .s2-toast .flex-sty04 strong {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: #333;
 }
 
 .s2-toast .fa-close {
   color: #888;
   text-decoration: none;
-  font-size: 18px;
+  font-size: 1.125rem;
   cursor: pointer;
   transition: color 0.2s;
 }
@@ -111,20 +111,20 @@
 }
 
 .s2-toast .ma-t15 {
-  padding: 15px;
-  font-size: 14px;
+  padding: 0.9375rem;
+  font-size: 0.875rem;
   color: #555;
 }
 
 .s2-toast.fade-out {
   opacity: 0;
-  transform: translateX(20px);
+  transform: translateX(1.25rem);
 }
 
 .s2-toast .close-btn {
   position: relative;
-  width: 16px;
-  height: 16px;
+  width: 1rem;
+  height: 1rem;
   cursor: pointer;
 }
 
@@ -135,7 +135,7 @@
   top: 50%;
   left: 50%;
   width: 12px;
-  height: 2px;
+  height: 0.125rem;
   background: #333;
   transform: translate(-50%, -50%) rotate(45deg);
 }
@@ -147,7 +147,7 @@
 @keyframes toast-slide-in {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(1.25rem);
   }
   to {
     opacity: 1;
