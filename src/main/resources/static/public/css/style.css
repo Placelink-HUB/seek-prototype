@@ -1,6 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
+html {
+  /**
+   * rem의 기준을 절대단위(px)로 명시적으로 설정
+   * ex) 최상위 <html> 요소의 font-size 가 16px 이라면 1rem == 16px 이다.
+   *     <html> 하위 요소에서 15px 의 크기는 15 / 16 = 0.9375rem 이다.
+   */
+  font-size: 16px;
+}
+
 html,
 body {
   height: 100%;
@@ -1260,75 +1269,93 @@ table caption {
 }
 
 .sidebar-wrap .sidebar-nav .sidebar-menu {
-  width: 60px;
-  height: 60px;
+  width: 3.75rem;
+  height: 3.75rem;
   border-bottom: 1px solid #3e3f42;
-  background-size: 50%;
-  background-position: 15px;
+  background-size: 1.75rem auto;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU1 {
-  background-image: url(../images/menu1.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu1 {
+  background-image: url(../images/main-off.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU1:hover,
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU1.active {
-  background-image: url(../images/menu1_on.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu1:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu1.active {
+  background-image: url(../images/main-on.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.ALL_STATUS {
-  background-image: url(../images/menu2.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu2 {
+  background-image: url(../images/2-off.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.ALL_STATUS:hover,
-.sidebar-wrap .sidebar-nav .sidebar-menu.ALL_STATUS.active {
-  background-image: url(../images/menu2_on.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu2:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu2.active {
+  background-image: url(../images/2-on.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.SITE_STATUS {
-  background-image: url(../images/menu3.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu3 {
+  background-image: url(../images/3-off.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.SITE_STATUS:hover,
-.sidebar-wrap .sidebar-nav .sidebar-menu.SITE_STATUS.active {
-  background-image: url(../images/menu3_on.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu3:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu3.active {
+  background-image: url(../images/3-on.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.MAIL_STATUS {
-  background-image: url(../images/menu_mail.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu4 {
+  background-image: url(../images/4-off.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.MAIL_STATUS:hover,
-.sidebar-wrap .sidebar-nav .sidebar-menu.MAIL_STATUS.active {
-  background-image: url(../images/menu_mail_on.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu4:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu4.active {
+  background-image: url(../images/4-on.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.DETECTION_FILE {
-  background-image: url(../images/menu_file.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu5 {
+  background-image: url(../images/5-off.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.DETECTION_FILE:hover,
-.sidebar-wrap .sidebar-nav .sidebar-menu.DETECTION_FILE.active {
-  background-image: url(../images/menu_file_on.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu5:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu5.active {
+  background-image: url(../images/5-on.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU4 {
-  background-image: url(../images/menu4.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu6 {
+  background-image: url(../images/6-off.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU4:hover,
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU4.active {
-  background-image: url(../images/menu4_on.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu6:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu6.active {
+  background-image: url(../images/6-on.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU5 {
-  background-image: url(../images/menu5.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu7 {
+  background-image: url(../images/7-off.png);
 }
 
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU5:hover,
-.sidebar-wrap .sidebar-nav .sidebar-menu.MENU5.active {
-  background-image: url(../images/menu5_on.png);
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu7:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu7.active {
+  background-image: url(../images/7-on.png);
+}
+
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu8 {
+  background-image: url(../images/8-off.png);
+}
+
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu8:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu8.active {
+  background-image: url(../images/8-on.png);
+}
+
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu9 {
+  background-image: url(../images/9-off.png);
+}
+
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu9:hover,
+.sidebar-wrap .sidebar-nav .sidebar-menu.menu9.active {
+  background-image: url(../images/9-on.png);
 }
 
 .sidebar-wrap .sidebar-nav .sidebar-menu a {
