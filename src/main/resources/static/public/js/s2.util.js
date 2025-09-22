@@ -1525,7 +1525,7 @@ const S2Util = (function () {
                 <div id="s2-modal-${modelNo}" class="s2-modal" role="dialog" aria-modal="true" aria-labelledby="s2-modal-title-${modelNo}" aria-describedby="s2-modal-description-${modelNo}">
                     <div class="modal-content" style="width: ${option.width ? option.width : '80%'}">
                         <div class="modal-header">
-                            <h2 class="modal-title" id="s2-modal-title-${modelNo}" style="text-align: ${option.titleAlign ? option.titleAlign : 'center'}; font-size: ${option.titleSize ? option.titleSize : '18px'}">${option.title || ''}&nbsp;</h2>
+                            <h2 class="modal-title" id="s2-modal-title-${modelNo}" style="text-align: ${option.titleAlign ? option.titleAlign : 'center'}; font-size: ${option.titleSize ? option.titleSize : '1.125rem'}">${option.title || ''}&nbsp;</h2>
                             ${option.headerHtml ? option.headerHtml : ''}
                             <button class="close-button" aria-label="닫기">&times;</button>
                         </div>

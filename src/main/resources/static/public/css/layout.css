@@ -25,7 +25,7 @@ a:active {
 =================================================================================================== */
 .content-wrapper {
   /* eslint-disable-next-line css/no-important */
-  min-height: calc(100% - 115px) !important;
+  min-height: calc(100% - 7.1875rem) !important;
   background: #000;
 }
 .wrapper {

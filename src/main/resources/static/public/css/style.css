@@ -867,6 +867,20 @@ table caption {
 }
 
 #main .main-contents .main-contents-contents .wrap-top .main-title {
+  color: #fff;
+  font-weight: bolder;
+  font-size: 1.875rem;
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 1.8125rem;
+  padding-left: 2.5rem;
+}
+
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu1 {
+  background-image: url(../images/main-on.png);
+}
+
+#main .main-contents .main-contents-contents .wrap-top .sub-title {
   margin-left: 0.625rem;
   color: #fff;
   font-weight: 300;
@@ -887,6 +901,27 @@ table caption {
   justify-content: space-around;
   align-items: center;
   color: #fff;
+}
+
+.main-contents-contents .wrap-contents .top .summary {
+  position: absolute;
+  left: 1.25rem;
+  display: flex;
+}
+
+.main-contents-contents .wrap-contents .top .summary .info {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.875rem;
+  border-radius: 0.75rem;
+}
+
+.main-contents-contents .wrap-contents .top .summary .inspection {
+  background-color: #bd8200;
+}
+
+.main-contents-contents .wrap-contents .top .summary .warning {
+  margin-left: 0.625rem;
+  background-color: #ba0000;
 }
 
 .main-contents-contents .wrap-contents .arrow-left,
@@ -976,13 +1011,13 @@ table caption {
   color: #6eb7ff;
   background-image: url(../images/main_icon1.png), linear-gradient(100deg, #080808, #212121);
   background-position: left 1.25rem top 2.9375rem, center;
-  background-size: 63px, cover;
+  background-size: 3.9375rem, cover;
 }
 
 .main-contents-contents .wrap-contents .contents .status-card .card.card2 {
   color: #04f0fb;
   background-image: url(../images/main_icon2.png), linear-gradient(100deg, #080808, #212121);
-  background-position: left 1.25rem top 41px, center;
+  background-position: left 1.25rem top 2.5625rem, center;
 }
 
 .main-contents-contents .wrap-contents .contents .status-card .card.card3 {
@@ -1020,7 +1055,7 @@ table caption {
 .main-contents-contents .wrap-contents .contents .status-box .box {
   display: flex;
   width: 49.4%;
-  height: 260px;
+  height: 16.25rem;
   border: 0;
   border-radius: 0.3125rem;
   font-size: 0.8125rem;
@@ -1041,6 +1076,7 @@ table caption {
   text-align: center;
   padding-top: 0.6875rem;
   font-size: 1rem;
+  font-weight: bold;
 }
 
 .main-contents-contents .wrap-contents .contents .status-box .box .box-contents {
@@ -1053,14 +1089,14 @@ table caption {
 }
 
 .main-contents-contents .wrap-contents .contents .status-box .box .box-contents .graph {
-  width: 190px;
-  height: 150px;
+  width: 11.875rem;
+  height: 9.375rem;
   margin-top: 0.4375rem;
 }
 
 .main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap {
   display: flex;
-  width: calc(100% - 210px);
+  width: calc(100% - 13.125rem);
   margin-left: 0.9375rem;
   justify-content: space-between;
   flex-direction: row;
@@ -1081,9 +1117,19 @@ table caption {
   color: #a9fcb1;
 }
 
+.main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap .data.data1.type2 {
+  border: 0.0625rem solid #8ca6eb;
+  color: #8ca6eb;
+}
+
 .main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap .data.data2 {
   border: 0.0625rem solid #8bdbf7;
   color: #8bdbf7;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap .data.data2.type2 {
+  border: 0.0625rem solid #5ad0ff;
+  color: #5ad0ff;
 }
 
 .main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap .data.data3 {
@@ -1102,8 +1148,16 @@ table caption {
   border-bottom: 0.0625rem solid #a9fcb1;
 }
 
+.main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap .data.data1.type2 .data-title {
+  border-bottom: 0.0625rem solid #8ca6eb;
+}
+
 .main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap .data.data2 .data-title {
   border-bottom: 0.0625rem solid #8bdbf7;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap .data.data2.type2 .data-title {
+  border-bottom: 0.0625rem solid #5ad0ff;
 }
 
 .main-contents-contents .wrap-contents .contents .status-box .box .box-contents .data-wrap .data.data3 .data-title {
@@ -1232,6 +1286,7 @@ table caption {
   padding: 1.25rem;
   color: #fff;
   font-size: 1rem;
+  font-weight: bold;
 }
 
 .main-contents-contents .wrap-contents .contents .status-box2 .box .box-contents {

@@ -46,8 +46,8 @@
                     low: 0,
                     mid: 0,
                     high: 0,
-                    color1: '#c900e4',
-                    color2: '#fa0050',
+                    color1: '#04e6f9',
+                    color2: '#096fdb',
                     backColor: '#61082b'
                 }
             };
@@ -60,8 +60,8 @@
                     fileCount: 0,
                     fileSize: 0,
                     blockedCount: 0,
-                    color1: '#c900e4',
-                    color2: '#fa0050',
+                    color1: '#04e6f9',
+                    color2: '#096fdb',
                     backColor: '#61082b'
                 }
             };
@@ -936,11 +936,15 @@
     <th:block layout:fragment="bodyFragment">
         <div class="main-contents-contents">
             <div class="wrap-top">
-                <img id="site-logo" src="/public/images/aicas_logo.png" alt="site-logo" class="site-logo" />
-                <span class="main-title">사이트별 현황</span>
+                <span class="main-title menu1">종합 대시보드</span>
+                <span class="sub-title">기관 전체 보안 현황</span>
             </div>
             <div class="wrap-contents">
                 <div class="top">
+                    <div class="summary">
+                        <div class="info inspection"><b>점검</b> (3/12)</div>
+                        <div class="info warning"><b>경고</b> (1/5)</div>
+                    </div>
                     <div class="flex-sty01">
                         <div class="arrow-left"></div>
                         <div class="data-date">
@@ -1020,13 +1024,13 @@
                             <div class="box-contents overseas-users overseasDetectionStatus">
                                 <div id="semicircleChart2" class="graph"></div>
                                 <div class="data-wrap">
-                                    <div class="data data1">
+                                    <div class="data data1 type2">
                                         <div class="data-title">전송된 파일 수</div>
                                         <div class="data-contents">
                                             <div><span class="low-count file-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
-                                    <div class="data data2">
+                                    <div class="data data2 type2">
                                         <div class="data-title">전송된 파일 용량</div>
                                         <div class="data-contents">
                                             <div><span class="mid-count file-size"></span><span> KB</span></div>
