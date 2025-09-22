@@ -1241,6 +1241,60 @@ table caption {
   background-position: left 1.25rem top 3.4375rem, center;
 }
 
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box {
+  width: 61.4%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: none;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box .column-box-inner {
+  width: 100%;
+  height: 47.4%;
+  background: linear-gradient(100deg, #080808, #212121);
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box .column-box-inner .row-box {
+  height: calc(100% - 2.5rem);
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box .column-box-inner .row-box .row-box-inner {
+  width: 48.4%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box .column-box-inner .row-box .row-box-inner .row-box-inner-wrap {
+  width: 100%;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box .column-box-inner .row-box .row-box-inner .text-content {
+  color: #ffffff;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box .column-box-inner .row-box .llm-analysis-count {
+  color: #b4b4fc;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box .column-box-inner .row-box .llm-analysis-size {
+  color: #5eefa6;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.column-box .column-box-inner .row-box .row-border {
+  width: 0.0625rem;
+  height: 100%;
+  background-color: #ffffff;
+}
+
+.main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.transmission-status {
+  width: 36.4%;
+}
+
 .main-contents-contents .wrap-contents .contents .status-box2 .box.box2 .box-box.detection-file.detection-file-size-box {
   color: #b4b4fc;
   background-image: url(../images/main_icon3.png), linear-gradient(100deg, #080808, #212121);
