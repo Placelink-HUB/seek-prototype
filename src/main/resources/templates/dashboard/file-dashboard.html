@@ -927,52 +927,56 @@
                 pieChart['transmissionChannel'] = echarts.init(pieChartDom);
 
                 // 차트가 컨테이너에 꽉 차게, 라벨이 잘 보이도록 옵션 조정
+                // 최초에는 라벨 위치를 inside로 초기화, 실제 데이터 반영은 updatePieChart에서 처리
+                // radius 값을 변수로 분리하여 관리
+                window.transmissionPieRadius = ['25%', '94%'];
                 pieChart['transmissionChannel'].setOption({
-                    series: [{
-                        type: 'pie',
-                        radius: ['50%', '80%'], // 컨테이너에 맞게 조정
-                        center: ['50%', '50%'],
-                        avoidLabelOverlap: false,
-                        itemStyle: {
-                            borderColor: '#fff',
-                            borderWidth: 2
-                        },
-                        label: {
-                            show: true,
-                            position: 'outside',
-                            formatter: '{b}\n{c}%',
-                            fontSize: 12,
-                            color: '#fff',
-                            overflow: 'truncate',
-                            alignTo: 'none',
-                            lineHeight: 16
-                        },
-                        labelLine: {
-                            show: true,
-                            length: 18,
-                            length2: 10,
-                            smooth: true
-                        },
-                        emphasis: {
+                    series: [
+                        {
+                            type: 'pie',
+                            radius: window.transmissionPieRadius,
+                            avoidLabelOverlap: false,
+                            itemStyle: {
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            },
                             label: {
                                 show: true,
-                                fontSize: 14,
-                                fontWeight: 'bold',
-                                color: '#ffd10a'
-                            }
-                        },
-                        data: [
-                            {name: 'FTP/SSH', value: 5.6},
-                            {name: '메일/클라우드', value: 1},
-                            {name: '메신저', value: 0.8},
-                            {name: '프린트', value: 0.5},
-                            {name: 'USB', value: 3.8}
-                        ]
-                    }]
+                                position: 'inside',
+                                formatter: '{b}\n{c}%',
+                                fontSize: 10,
+                                color: '#fff',
+                                overflow: 'truncate',
+                                alignTo: 'none',
+                                lineHeight: 16
+                            },
+                            labelLine: {
+                                show: true,
+                                length: 18,
+                                length2: 10,
+                                smooth: true
+                            },
+                            emphasis: {
+                                label: {
+                                    show: true,
+                                    fontSize: 14,
+                                    fontWeight: 'bold',
+                                    color: '#ffd10a'
+                                }
+                            },
+                            data: [
+                                {name: 'FTP/SSH', value: 5.6},
+                                {name: '메일/클라우드', value: 1},
+                                {name: '메신저', value: 0.8},
+                                {name: '프린트', value: 0.5},
+                                {name: 'USB', value: 3.8}
+                            ]
+                        }
+                    ]
                 });
 
                 // 반응형 리사이즈
-                window.addEventListener('resize', function() {
+                window.addEventListener('resize', function () {
                     pieChart['transmissionChannel'].resize();
                 });
 
@@ -987,11 +991,29 @@
             }
 
             function updatePieChart(datas) {
+                // radius(반지름) 크기에 따라 라벨 위치 동적 결정
+                // window.transmissionPieRadius의 두 번째 값(예: '60%')을 기준으로 판단
+                let outerRadius = 60; // 기본값
+                if (window.transmissionPieRadius && window.transmissionPieRadius[1]) {
+                    const rStr = window.transmissionPieRadius[1];
+                    if (typeof rStr === 'string' && rStr.endsWith('%')) {
+                        outerRadius = parseInt(rStr.replace('%', ''), 10);
+                    } else if (typeof rStr === 'number') {
+                        outerRadius = rStr;
+                    }
+                }
+                const labelPosition = outerRadius <= 45 ? 'outside' : 'inside';
                 pieChart['transmissionChannel'].setOption(
                     {
-                        series: {
-                            data: datas
-                        }
+                        series: [
+                            {
+                                radius: window.transmissionPieRadius,
+                                data: datas,
+                                label: {
+                                    position: labelPosition
+                                }
+                            }
+                        ]
                     },
                     false
                 ); // false로 설정하여 기존 값은 유지
