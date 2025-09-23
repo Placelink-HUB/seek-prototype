@@ -191,6 +191,8 @@ public class FileService {
             List<FileDetailVO> fileDtlList = new ArrayList<>();
 
             boolean validSize = true;
+            String firstFileName = "";
+            int fileCount = 0;
 
             for (MultipartFile file : fileList) {
                 if (file.getSize() > maxSizeLimit) {
@@ -201,9 +203,17 @@ public class FileService {
                 try (InputStream fileData = file.getInputStream()) {
                     FileDetailVO fileDtlVO = this.writeFile(fileData, fileSeCcd, saveNameSuffix);
                     if (fileDtlVO != null) {
+                        String fileName = FileUtils.getFileNm(file);
+                        String fileExt = FileUtils.getFileExt(file);
+
+                        if (S2Util.isEmpty(firstFileName)) {
+                            firstFileName = fileName + (S2Util.isNotEmpty(fileExt) ? "." + fileExt : "");
+                        }
+                        fileCount++;
+
                         fileDtlVO.setFileId(fileId);
-                        fileDtlVO.setFileName(FileUtils.getFileNm(file));
-                        fileDtlVO.setFileExt(FileUtils.getFileExt(file));
+                        fileDtlVO.setFileName(fileName);
+                        fileDtlVO.setFileExt(fileExt);
                         fileDtlVO.setFileSize(file.getSize());
                         fileDtlVO.setContentType(file.getContentType());
                         fileDtlVO.setCreateUid(sessionUserUid);
@@ -226,6 +236,7 @@ public class FileService {
                         FileVO fileInfo = new FileVO();
                         fileInfo.setFileId(fileId);
                         fileInfo.setFileSeCcd(fileSeCcd);
+                        fileInfo.setFileName(firstFileName + (fileCount > 1 ? " 외 " + (fileCount - 1) + "개" : ""));
                         fileInfo.setCreateUid(sessionUserUid);
 
                         this.insertFile(fileInfo);

@@ -37,10 +37,12 @@
 		INSERT INTO SEEK_FILE (
 			FILE_ID,
 			FILE_SE_CCD,
+			FILE_NAME,
 			CREATE_DT
 		) VALUES (
 			#{fileId},
 			#{fileSeCcd},
+			#{fileName},
 			NOW()
 		)
     </insert>

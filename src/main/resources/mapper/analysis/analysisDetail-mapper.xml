@@ -81,6 +81,7 @@
             cc1.COM_CD_NM AS ANALYSIS_STATUS_CCD_NM,
             sa.ANALYSIS_RESULT_ID,
             sfa.DETECTION_FILE_ID,
+            dsf.FILE_NAME AS DETECTION_FILE_NAME,
             sfa.SIGNED_FILE_ID,
             sfa.SIGNED_FILE_HASH,
             sfa.FILE_COUNT,
@@ -97,6 +98,8 @@
                 AND sa.ANALYSIS_MODE_CCD = 'DETECTION_FILE'
             LEFT JOIN SEEK_ANALYSIS_RESULT sar
                 ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
+            LEFT JOIN SEEK_FILE dsf
+                ON sfa.DETECTION_FILE_ID = dsf.FILE_ID
             LEFT JOIN SEEK_COM_CD cc1
                 ON sa.ANALYSIS_STATUS_CCD = cc1.COM_CD
                 AND cc1.GROUP_CD = 'ANALYSIS_STATUS_CCD'
