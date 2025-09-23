@@ -6,6 +6,7 @@
             const doughnutChart = {};
             const semicircleChart = {};
             const lineChart = {};
+            const pieChart = {};
 
             const doughnutChartInfo = {
                 // 분석 현황
@@ -77,6 +78,13 @@
                 }
             };
 
+            // const pieChartInfo = {
+            //     // 전송 채널 현황
+            //     transmissionChannelStatus: {
+            //         color: ['#5070dd', '#b6d634', '#505372', '#ff994d', '#0ca8df', '#ffd10a', '#fb628b', '#785db0', '#3fbe95']
+            //     }
+            // };
+
             // LLM 이 분석한 파일 정보
             const fileDetectionInfo = {
                 fileSize: 0,
@@ -88,6 +96,7 @@
                 initSemicircleChart();
                 initSemicircleChart2();
                 initLineChart();
+                initPieChart();
 
                 document.querySelector('.targetDate').textContent = dayjs().format('YYYY년 MM월 DD일');
 
@@ -913,6 +922,81 @@
                 lineChart['realtimeAnalysis'].setOption(updateSeries, false); // false로 설정하여 기존 값은 유지
             }
 
+            function initPieChart() {
+                const pieChartDom = document.getElementById('transmission-channel-pieChart');
+                pieChart['transmissionChannel'] = echarts.init(pieChartDom);
+
+                // 차트가 컨테이너에 꽉 차게, 라벨이 잘 보이도록 옵션 조정
+                pieChart['transmissionChannel'].setOption({
+                    series: [{
+                        type: 'pie',
+                        radius: ['50%', '80%'], // 컨테이너에 맞게 조정
+                        center: ['50%', '50%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: true,
+                            position: 'outside',
+                            formatter: '{b}\n{c}%',
+                            fontSize: 12,
+                            color: '#fff',
+                            overflow: 'truncate',
+                            alignTo: 'none',
+                            lineHeight: 16
+                        },
+                        labelLine: {
+                            show: true,
+                            length: 18,
+                            length2: 10,
+                            smooth: true
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                color: '#ffd10a'
+                            }
+                        },
+                        data: [
+                            {name: 'FTP/SSH', value: 5.6},
+                            {name: '메일/클라우드', value: 1},
+                            {name: '메신저', value: 0.8},
+                            {name: '프린트', value: 0.5},
+                            {name: 'USB', value: 3.8}
+                        ]
+                    }]
+                });
+
+                // 반응형 리사이즈
+                window.addEventListener('resize', function() {
+                    pieChart['transmissionChannel'].resize();
+                });
+
+                // updatePieChart 함수도 data만 갱신하도록 유지
+                updatePieChart([
+                    {name: 'FTP/SSH', value: 5.6},
+                    {name: '메일/클라우드', value: 1},
+                    {name: '메신저', value: 0.8},
+                    {name: '프린트', value: 0.5},
+                    {name: 'USB', value: 3.8}
+                ]);
+            }
+
+            function updatePieChart(datas) {
+                pieChart['transmissionChannel'].setOption(
+                    {
+                        series: {
+                            data: datas
+                        }
+                    },
+                    false
+                ); // false로 설정하여 기존 값은 유지
+            }
+
             function updateFileDetectionInfo() {
                 document.querySelector('.detection-file-size').textContent = (fileDetectionInfo.fileSize / 1024).toFixed(1).toLocaleString('ko-KR');
                 document.querySelector('.detection-file-count').textContent = fileDetectionInfo.fileCount.toLocaleString('ko-KR');
@@ -1103,6 +1187,7 @@
                             </div>
                             <div class="box-box box-box2 transmission-status">
                                 <div class="box-top">전송 채널 현황</div>
+                                <div id="transmission-channel-pieChart" class="graph"></div>
                             </div>
                         </div>
                     </div>
