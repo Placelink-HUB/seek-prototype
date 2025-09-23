@@ -474,7 +474,7 @@ table caption {
     Table
 =================================================================================================== */
 .table-wrap {
-  margin: 1.875rem;
+  font-size: 1rem;
 }
 
 .table-wrap .table-sty01 {
@@ -519,11 +519,12 @@ table caption {
 }
 
 .table-wrap .table-btn-sty01 {
-  padding: 0.3125rem 0.625rem;
-  background: #dfeafc;
+  padding: 0.3125rem 0.9375rem;
+  background-color: #1679ef;
   border: 0;
-  color: #416de7;
-  font-weight: 500;
+  border-radius: 0.3125rem;
+  color: #ffffff;
+  font-size: 0.8125rem;
 }
 
 .table-wrap .pagination-wrapper {
@@ -566,6 +567,54 @@ table caption {
 
 .table-wrap .pagination-wrapper .pagination .paginate_button.active a {
   cursor: auto;
+}
+
+.table-wrap.type1 .table-sty01 {
+  border-top-color: #0d7176;
+}
+
+.table-wrap.type2 .table-sty01 {
+  border-top-color: #3e4a97;
+}
+
+.table-wrap.type1 .table-sty01 th,
+.table-wrap.type2 .table-sty01 th {
+  height: 2.875rem;
+  color: #ffffff;
+  background-color: #0d7176;
+}
+
+.table-wrap.type2 .table-sty01 th {
+  background-color: #3e4a97;
+}
+
+.table-wrap.type1 .table-sty01 td,
+.table-wrap.type2 .table-sty01 td {
+  height: 2.875rem;
+  color: #ffffff;
+}
+
+.table-wrap.type1 .table-sty01 tr:last-child td {
+  border-bottom: 0.125rem solid #0d7176;
+}
+
+.table-wrap.type2 .table-sty01 tr:last-child td {
+  border-bottom: 0.125rem solid #3e4a97;
+}
+
+.table-wrap.type1 .pagination-wrapper,
+.table-wrap.type2 .pagination-wrapper {
+  margin-top: 1rem;
+}
+
+.table-wrap.type1 .pagination-wrapper .pagination .paginate_button a,
+.table-wrap.type2 .pagination-wrapper .pagination .paginate_button a {
+  color: #ffffff;
+}
+
+.table-wrap.type1 .pagination-wrapper .pagination .paginate_button.active a,
+.table-wrap.type2 .pagination-wrapper .pagination .paginate_button.active a {
+  color: #000000;
 }
 
 /* ===================================================================================================
@@ -852,7 +901,7 @@ table caption {
 =================================================================================================== */
 #main .main-contents {
   width: calc(100% - 3.8125rem);
-  padding: 0.625rem 0 6.25rem 0;
+  padding: 0.625rem 0 2.8125rem 0;
   margin-left: 3.8125rem;
 }
 
@@ -862,13 +911,18 @@ table caption {
   margin-top: 1.25rem;
 }
 
+#main .main-contents .main-contents-contents .wrap-top h1 {
+  margin: 0;
+  display: inline-block;
+}
+
 #main .main-contents .main-contents-contents .wrap-top .site-logo {
   width: 6.875rem;
 }
 
 #main .main-contents .main-contents-contents .wrap-top .main-title {
   color: #fff;
-  font-weight: bolder;
+  font-weight: bold;
   font-size: 1.875rem;
   background-repeat: no-repeat;
   background-position: left center;
@@ -880,11 +934,52 @@ table caption {
   background-image: url(../images/main-on.png);
 }
 
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu2 {
+  background-image: url(../images/2-on.png);
+}
+
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu3 {
+  background-image: url(../images/3-on.png);
+}
+
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu4 {
+  background-image: url(../images/4-on.png);
+}
+
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu5 {
+  background-image: url(../images/5-on.png);
+}
+
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu6 {
+  background-image: url(../images/6-on.png);
+}
+
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu7 {
+  background-image: url(../images/7-on.png);
+}
+
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu8 {
+  background-image: url(../images/8-on.png);
+}
+
+#main .main-contents .main-contents-contents .wrap-top .main-title.menu9 {
+  background-image: url(../images/9-on.png);
+}
+
 #main .main-contents .main-contents-contents .wrap-top .sub-title {
   margin-left: 0.625rem;
   color: #fff;
   font-weight: 300;
   font-size: 0.9375rem;
+}
+
+#main .main-contents .main-contents-contents .wrap-top .btn-group {
+  float: right;
+  margin-top: 0.3125rem;
+}
+
+#main .main-contents .main-contents-contents .wrap-top .btn-group button {
+  margin-left: 0.3125rem;
 }
 
 .main-contents-contents .wrap-contents {
@@ -977,6 +1072,13 @@ table caption {
   margin-top: 1.25rem;
 }
 
+.main-contents-contents .wrap-contents .contents h2.type1 {
+  margin: 1.875rem 0 1.25rem 0;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.375rem;
+}
+
 .main-contents-contents .wrap-contents .contents .status-card {
   display: flex;
   width: 100%;
@@ -999,6 +1101,81 @@ table caption {
   background-position: left 1.25rem top 2.8125rem, center;
   background-size: 3.75rem, cover;
   justify-content: space-between;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 {
+  display: block;
+  color: #ffffff;
+  padding: 0;
+  background: linear-gradient(100deg, #080808, #212121);
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box {
+  background-repeat: no-repeat;
+  background-position: left center;
+  padding-left: 3.125rem;
+  margin: 1.375rem 0 0 1.875rem;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu2-1 {
+  background-image: url(../images/2-1.png);
+  background-size: 1.875rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu2-2 {
+  background-image: url(../images/2-2.png);
+  background-size: 1.875rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu2-3 {
+  background-image: url(../images/2-3.png);
+  background-size: 2.125rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu2-4 {
+  background-image: url(../images/2-4.png);
+  background-size: 2.125rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu3-1 {
+  background-image: url(../images/3-1.png);
+  background-size: 1.875rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu3-2 {
+  background-image: url(../images/3-2.png);
+  background-size: 1.875rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu3-3 {
+  background-image: url(../images/3-3.png);
+  background-size: 2.125rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu3-4 {
+  background-image: url(../images/3-4.png);
+  background-size: 2.5rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box .card-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.1875rem;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box .card-desc {
+  font-size: 0.8125rem;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .card-content {
+  float: right;
+  margin: 1.25rem 1.875rem 0 0;
+  font-size: 1rem;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .card-content > span {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-right: 0.3125rem;
 }
 
 .main-contents-contents .wrap-contents .contents .status-card .card .text {
@@ -1555,3 +1732,12 @@ table caption {
 /* ===================================================================================================
     Footer 영역
 =================================================================================================== */
+
+.btn-type1 {
+  background-color: #2d2d2d;
+  border: 0.0625rem solid #ffffff;
+  border-radius: 0.1875rem;
+  color: #ffffff;
+  padding: 0.25rem 0.9375rem;
+  font-size: 0.75rem;
+}

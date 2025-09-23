@@ -98,8 +98,6 @@
                 initLineChart();
                 initPieChart();
 
-                document.querySelector('.targetDate').textContent = dayjs().format('YYYY년 MM월 DD일');
-
                 getAnalysisStatistics();
 
                 S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
@@ -1042,8 +1040,10 @@
     <th:block layout:fragment="bodyFragment">
         <div class="main-contents-contents">
             <div class="wrap-top">
-                <span class="main-title menu1">종합 대시보드</span>
-                <span class="sub-title">기관 전체 보안 현황</span>
+                <h1>
+                    <span class="main-title menu1">종합 대시보드</span>
+                    <span class="sub-title">기관 전체 보안 현황</span>
+                </h1>
             </div>
             <div class="wrap-contents">
                 <div class="top">

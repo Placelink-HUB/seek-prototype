@@ -337,66 +337,116 @@
         </script>
     </th:block>
     <th:block layout:fragment="bodyFragment">
-        <div class="main-btn">
-            <button class="btn-sty-02" onclick="openCreateArticle();">새글 등록</button>
-        </div>
         <div class="main-contents-contents">
-            <div class="contents-box">
-                <div class="table-wrap">
-                    <table class="table-sty01">
-                        <caption>
-                            위험성 탐지 목록
-                        </caption>
-                        <thead>
-                            <tr>
-                                <th>등록 일시</th>
-                                <th>게시글 타입</th>
-                                <th>raw 보기</th>
-                                <th>내용 보기</th>
-                                <th>원본 보기</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:if="${articleListPagination.isEmpty}">
-                                <td colspan="5">데이터가 없습니다.</td>
-                            </tr>
-                            <tr th:each="article : ${articleListPagination.dataList}">
-                                <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
-                                <td th:text="${article.articleTypeCcdNm}"></td>
-                                <td>
-                                    <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>
-                                </td>
-                                <td>
-                                    <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
-                                </td>
-                                <td>
-                                    <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
-                                    <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="pagination-wrapper">
-                        <ul th:if="${articleListPagination.isNotEmpty}" class="pagination">
-                            <li th:if="${articleListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
-                                <a href="#" th:onclick="goPage([[${articleListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
-                            </li>
-                            <th:block th:each="pageNo : ${#numbers.sequence(articleListPagination.firstPageNoOnPageList, articleListPagination.lastPageNoOnPageList)}">
-                                <li th:if="${pageNo eq articleListPagination.pageNo}" class="paginate_button active">
-                                    <a href="#" th:text="${pageNo}"></a>
+            <div class="wrap-top">
+                <h1>
+                    <span class="main-title menu3">데이터 암호화 현황</span>
+                    <span class="sub-title">PC별 데이터 복호화 처리 현황</span>
+                </h1>
+                <span class="btn-group">
+                    <button class="btn-type1" onclick="openCreateArticle();">데이터 등록</button>
+                    <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">기간 검색</button>
+                    <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">전체 현황 다운로드</button>
+                </span>
+            </div>
+            <div class="wrap-contents">
+                <div class="top">
+                    <div class="flex-sty01">
+                        <div class="arrow-left"></div>
+                        <div class="data-date">
+                            <div class="date targetDate">0000년 00월 00일</div>
+                            <div class="icon-today">TODAY</div>
+                        </div>
+                        <div class="arrow-right"></div>
+                    </div>
+                </div>
+                <div class="contents">
+                    <div class="status-card">
+                        <div class="card type1">
+                            <div class="title-box menu3-1">
+                                <div class="card-title">총 암호화 처리 건수</div>
+                                <div class="card-desc">데이터 암호화 총 처리 건수</div>
+                            </div>
+                            <div class="card-content"><span>531</span>건</div>
+                        </div>
+                        <div class="card type1">
+                            <div class="title-box menu3-2">
+                                <div class="card-title">민감정보 암호화 건수</div>
+                                <div class="card-desc">암호화 처리된 민감 정보 건수</div>
+                            </div>
+                            <div class="card-content"><span>1,277</span>건</div>
+                        </div>
+                        <div class="card type1">
+                            <div class="title-box menu3-3">
+                                <div class="card-title">데이터 암호화 건수</div>
+                                <div class="card-desc">데이터 암호화 건수</div>
+                            </div>
+                            <div class="card-content"><span>457</span>건</div>
+                        </div>
+                        <div class="card type1">
+                            <div class="title-box menu3-4">
+                                <div class="card-title">파일 내 민감정보 건수</div>
+                                <div class="card-desc">파일 내 민감정보 건수</div>
+                            </div>
+                            <div class="card-content"><span>177</span>건</div>
+                        </div>
+                    </div>
+                    <h2 class="type1">데이터 내 민감정보 암호화 현황</h2>
+                    <div class="table-wrap type2">
+                        <table class="table-sty01">
+                            <caption>
+                                위험성 탐지 목록
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th>등록 일시</th>
+                                    <th>게시글 타입</th>
+                                    <th>raw 보기</th>
+                                    <th>내용 보기</th>
+                                    <th>원본 보기</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${articleListPagination.isEmpty}">
+                                    <td colspan="5">데이터가 없습니다.</td>
+                                </tr>
+                                <tr th:each="article : ${articleListPagination.dataList}">
+                                    <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
+                                    <td th:text="${article.articleTypeCcdNm}"></td>
+                                    <td>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>
+                                    </td>
+                                    <td>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
+                                    </td>
+                                    <td>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="pagination-wrapper">
+                            <ul th:if="${articleListPagination.isNotEmpty}" class="pagination">
+                                <li th:if="${articleListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
+                                    <a href="#" th:onclick="goPage([[${articleListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
                                 </li>
-                                <li th:if="${pageNo ne articleListPagination.pageNo}" class="paginate_button">
-                                    <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
+                                <th:block th:each="pageNo : ${#numbers.sequence(articleListPagination.firstPageNoOnPageList, articleListPagination.lastPageNoOnPageList)}">
+                                    <li th:if="${pageNo eq articleListPagination.pageNo}" class="paginate_button active">
+                                        <a href="#" th:text="${pageNo}"></a>
+                                    </li>
+                                    <li th:if="${pageNo ne articleListPagination.pageNo}" class="paginate_button">
+                                        <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
+                                    </li>
+                                </th:block>
+                                <li th:if="${articleListPagination.lastPageNoOnPageList lt articleListPagination.lastPageNo}" class="paginate_button next">
+                                    <a href="#" th:onclick="goPage([[${articleListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
                                 </li>
-                            </th:block>
-                            <li th:if="${articleListPagination.lastPageNoOnPageList lt articleListPagination.lastPageNo}" class="paginate_button next">
-                                <a href="#" th:onclick="goPage([[${articleListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
-                            </li>
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
-
             <script id="template_contents_file" type="text/template">
                 <img th:src="@{{{=serverUrl}}/file/image/view/{{=fileId}}}" alt="파일이미지"/>
             </script>

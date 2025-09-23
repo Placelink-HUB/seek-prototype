@@ -53,6 +53,11 @@
                 if (vConsoleType) {
                     sessionStorage.setItem('consoleType', vConsoleType);
                 }
+
+                const targetDate = document.querySelector('.targetDate');
+                if (targetDate) {
+                    targetDate.textContent = dayjs().format('YYYY년 MM월 DD일');
+                }
             });
         </script>
     </head>
