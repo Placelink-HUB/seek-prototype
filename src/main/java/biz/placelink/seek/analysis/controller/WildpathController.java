@@ -12,12 +12,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -278,38 +274,39 @@ public class WildpathController {
         logger.info("📎 첨부파일 개수: " + (attachments != null ? attachments.size() : "null"));
 
         // 저장 경로 설정
-
-        String uploadDir = "C:/test";
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        // attachments 저장
-        if (attachments != null) {
-            for (MultipartFile file : attachments) {
-                String fileName = file.getOriginalFilename();
-                if (fileName == null) {
-                    fileName = "";
-                }
-                Long fileSize = file.getSize();
-
-                Map<String, Object> pushMap = new HashMap<>();
-                pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_NOTIFICATION);
-                pushMap.put("message", "[" + fileName + "]" + (file.getName() != null ? "[" + file.getName() + "]" : "") + " 수신 사이즈: " + fileSize);
-                serviceWorkerService.sendNotificationAll(pushMap);
-
-                if (fileName != null && !fileName.isEmpty()) {
-                    try {
-                        Path filePath = uploadPath.resolve(fileName);
-                        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                        logger.info("📁 저장 완료: " + fileName + ", size: " + fileSize + " bytes");
-                    } catch (Exception e) {
-                        logger.error("파일 저장 오류: ", e);
-                    }
-                }
-            }
-        }
+        /*
+         * String uploadDir = "C:/test";
+         * Path uploadPath = Paths.get(uploadDir);
+         * if (!Files.exists(uploadPath)) {
+         * Files.createDirectories(uploadPath);
+         * }
+         *
+         * // attachments 저장
+         * if (attachments != null) {
+         * for (MultipartFile file : attachments) {
+         * String fileName = file.getOriginalFilename();
+         * if (fileName == null) {
+         * fileName = "";
+         * }
+         * Long fileSize = file.getSize();
+         *
+         * Map<String, Object> pushMap = new HashMap<>();
+         * pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_NOTIFICATION);
+         * pushMap.put("message", "[" + fileName + "]" + (file.getName() != null ? "[" + file.getName() + "]" : "") + " 수신 사이즈: " + fileSize);
+         * serviceWorkerService.sendNotificationAll(pushMap);
+         *
+         * if (fileName != null && !fileName.isEmpty()) {
+         * try {
+         * Path filePath = uploadPath.resolve(fileName);
+         * Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+         * logger.info("📁 저장 완료: " + fileName + ", size: " + fileSize + " bytes");
+         * } catch (Exception e) {
+         * logger.error("파일 저장 오류: ", e);
+         * }
+         * }
+         * }
+         * }
+         */
     }
 
     /**

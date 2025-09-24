@@ -19,15 +19,6 @@
                 margin-top: 0;
             }
 
-            .table-wrap .table-sty01 th,
-            .table-wrap .table-sty01 td {
-                height: 49px;
-            }
-
-            .table-wrap .pagination-wrapper {
-                margin-top: 1rem;
-            }
-
             .content-wrapper.contents-type2 {
                 overflow-y: hidden;
             }
@@ -41,31 +32,17 @@
 
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
-                location.href = `/sample/test?pageNo=${pageNo}`;
+                location.href = `/analysis/detection-file-list?pageNo=${pageNo}`;
             }
 
             // eslint-disable-next-line no-unused-vars
-            function openCreateArticle() {
+            function openValidateFile() {
                 S2Util.showModal(
                     `
                         <div class="risk-inspection-wrap modal">
                             <div class="tab-container">
-                                <div class="tab-buttons">
-                                    <div class="tab-btn active" data-tab="tab-text">글 등록</div>
-                                    <div class="tab-btn" data-tab="tab-file">파일 등록</div>
-                                </div>
                                 <div>
-                                    <div id="tab-text" class="tab-contents active">
-                                        <div class="box1">
-                                            <div class="contents">
-                                                <textarea id="desc" name="desc" rows="3" class="form-textarea" placeholder="내용을 입력해주세요."></textarea>
-                                            </div>
-                                        </div>
-                                        <div class="button-wrap ma-t30">
-                                            <button class="btn-sty-01 create-article-btn">등록</button>
-                                        </div>
-                                    </div>
-                                    <div id="tab-file" class="tab-contents">
+                                    <div id="tab-file" class="tab-contents active">
                                         <div class="contents file-upload">
                                             <div class="file-upload-box">
                                                 <input type="file" class="file-upload d-none" multiple accept=".pdf, .hwpx, .docx, .xlsx, .pptx"/>
@@ -90,78 +67,37 @@
                     `,
                     {
                         width: '800px',
-                        title: '새글 등록'
+                        title: '파일 검증'
                     },
-                    function (modalSelector) {
-                        // 탭
-                        const tabButtons = document.querySelectorAll('.tab-container .tab-buttons .tab-btn');
-                        const tabContents = document.querySelectorAll('.tab-container .tab-contents');
+                    function () {
+                        initDropZone();
 
-                        tabButtons.forEach((selectedTabButton) => {
-                            selectedTabButton.addEventListener('click', () => {
-                                tabButtons.forEach((tabButton) => {
-                                    tabButton.classList.remove('active');
-                                });
-                                tabContents.forEach((tabContent) => {
-                                    tabContent.classList.remove('active');
-                                });
-
-                                selectedTabButton.classList.add('active');
-                                const targetContent = document.getElementById(selectedTabButton.dataset.tab);
-                                targetContent.classList.add('active');
-
-                                const activeTabButton = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
-                                if (activeTabButton === 'tab-file') {
-                                    initDropZone();
-                                }
-                            });
-                        });
-
-                        // 등록 버튼 클릭 이벤트 처리
+                        // 파일 검증 등록 버튼 클릭 이벤트 처리
                         document.body.addEventListener('click', (event) => {
                             if (event.target.classList.contains('create-article-btn') && !isRegistering) {
                                 isRegistering = true;
-                                const activeTab = document.querySelector('.tab-buttons .tab-btn.active').dataset.tab;
-                                if (activeTab === 'tab-text') {
-                                    // 글 등록
-                                    const desc = document.querySelector(`${modalSelector} [name=desc]`);
 
-                                    S2Util.fetch(
-                                        `/public/sample/create-article`,
-                                        {
-                                            method: 'post',
-                                            content: desc.value
-                                        },
-                                        function () {
-                                            S2Util.showToast('등록되었습니다.');
-                                            setTimeout(function () {
-                                                location.reload();
-                                            }, 500);
-                                        }
-                                    );
-                                } else if (activeTab === 'tab-file') {
-                                    if (g_uploadFiles.length === 0) {
-                                        S2Util.alert('파일이 없습니다.');
-                                        isRegistering = false;
-                                        return;
-                                    }
-
-                                    // 파일 등록
-                                    S2Util.fetch(
-                                        `/sample/create-article-file`,
-                                        {
-                                            method: 'post',
-                                            dataType: 'multipart/form-data',
-                                            files: g_uploadFiles
-                                        },
-                                        function () {
-                                            S2Util.showToast('등록되었습니다.');
-                                            setTimeout(function () {
-                                                location.reload();
-                                            }, 500);
-                                        }
-                                    );
+                                if (g_uploadFiles.length === 0) {
+                                    S2Util.alert('파일이 없습니다.');
+                                    isRegistering = false;
+                                    return;
                                 }
+
+                                // 파일 등록
+                                S2Util.fetch(
+                                    '/analysis/create-detection-file',
+                                    {
+                                        method: 'post',
+                                        dataType: 'multipart/form-data',
+                                        files: g_uploadFiles
+                                    },
+                                    function () {
+                                        S2Util.showToast('등록되었습니다.');
+                                        setTimeout(function () {
+                                            location.reload();
+                                        }, 500);
+                                    }
+                                );
                             }
                         });
                     }
@@ -169,52 +105,12 @@
             }
 
             // eslint-disable-next-line no-unused-vars
-            function openModalArticleContents(articleId, seekMode) {
+            function downloadFile(fileId) {
                 S2Util.fetch(
-                    `/public/sample/article-info` + (seekMode ? `?seek_mode=${seekMode}` : ''),
+                    `/file/image/view/${fileId}`,
                     {
-                        method: 'get',
-                        dataType: 'json',
-                        articleId: articleId
-                    },
-                    function (response) {
-                        const data = response.articleData;
-                        let innerHtml = '';
-
-                        if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_TEXT}]]') {
-                            innerHtml = `<pre class="detail_contents">${data.content}</pre>`;
-                        } else if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_FILE}]]') {
-                            data.serverUrl = '';
-                            innerHtml = S2Util.s2Template('template_contents_file', data);
-                        }
-
-                        S2Util.showModal(
-                            `
-                            <div class="risk-inspection-wrap modal">
-                                <div class="box1">
-                                    <div class="contents">
-                                        ${innerHtml}
-                                    </div>
-                                </div>
-                            </div>
-                        `,
-                            {
-                                width: '800px',
-                                title: '상세'
-                            }
-                        );
-                    }
-                );
-            }
-
-            // eslint-disable-next-line no-unused-vars
-            function downloadFile(articleId) {
-                S2Util.fetch(
-                    '/sample/downloadFile',
-                    {
-                        method: 'POST',
-                        responseType: 'blob',
-                        articleId: articleId
+                        method: 'GET',
+                        responseType: 'blob'
                     },
                     function () {
                         S2Util.showToast('다운로드 성공하였습니다.');
@@ -340,11 +236,10 @@
         <div class="main-contents-contents">
             <div class="wrap-top">
                 <h1>
-                    <span class="main-title menu3">데이터 암호화 현황</span>
-                    <span class="sub-title">PC별 데이터 복호화 처리 현황</span>
+                    <span class="main-title menu7">서명파일 전송 현황</span>
+                    <span class="sub-title">서명 파일의 외부 전송 처리 현황</span>
                 </h1>
                 <span class="btn-group">
-                    <button class="btn-type1" onclick="openCreateArticle();">데이터 등록</button>
                     <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">기간 검색</button>
                     <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">전체 현황 다운로드</button>
                 </span>
@@ -363,84 +258,81 @@
                 <div class="contents">
                     <div class="status-card">
                         <div class="card type1">
-                            <div class="title-box menu3-1">
-                                <div class="card-title">총 암호화 처리 건수</div>
-                                <div class="card-desc">데이터 암호화 총 처리 건수</div>
+                            <div class="title-box menu2-1">
+                                <div class="card-title">총 서명 완료 수</div>
+                                <div class="card-desc">디지털 서명 처리 수</div>
                             </div>
-                            <div class="card-content"><span>531</span>건</div>
+                            <div class="card-content"><span>3,531</span>건</div>
                         </div>
                         <div class="card type1">
-                            <div class="title-box menu3-2">
-                                <div class="card-title">민감정보 암호화 건수</div>
-                                <div class="card-desc">암호화 처리된 민감 정보 건수</div>
+                            <div class="title-box menu2-2">
+                                <div class="card-title">탐지 수</div>
+                                <div class="card-desc">LLM이 탐지한 민감정보 수</div>
                             </div>
                             <div class="card-content"><span>1,277</span>건</div>
                         </div>
                         <div class="card type1">
-                            <div class="title-box menu3-3">
-                                <div class="card-title">데이터 암호화 건수</div>
-                                <div class="card-desc">데이터 암호화 건수</div>
+                            <div class="title-box menu2-3">
+                                <div class="card-title">분석 용량</div>
+                                <div class="card-desc">LLM이 분석한 전체 용량</div>
                             </div>
-                            <div class="card-content"><span>457</span>건</div>
+                            <div class="card-content"><span>749</span>MB</div>
                         </div>
                         <div class="card type1">
-                            <div class="title-box menu3-4">
-                                <div class="card-title">파일 내 민감정보 건수</div>
-                                <div class="card-desc">파일 내 민감정보 건수</div>
+                            <div class="title-box menu2-4">
+                                <div class="card-title">다운로드 수</div>
+                                <div class="card-desc">서명파일 다운로드 수</div>
                             </div>
-                            <div class="card-content"><span>177</span>건</div>
+                            <div class="card-content"><span>3,531</span>건</div>
                         </div>
                     </div>
-                    <h2 class="type1">데이터 내 민감정보 암호화 현황</h2>
-                    <div class="table-wrap type1 deep-indigo">
+                    <h2 class="type1">디지털 서명 처리 현황</h2>
+                    <div class="table-wrap type1">
                         <table class="table-sty01">
                             <caption>
                                 위험성 탐지 목록
                             </caption>
                             <thead>
                                 <tr>
+                                    <th>파일명</th>
                                     <th>등록 일시</th>
-                                    <th>게시글 타입</th>
-                                    <th>raw 보기</th>
-                                    <th>내용 보기</th>
-                                    <th>원본 보기</th>
+                                    <th>상태</th>
+                                    <th>민감정보개수</th>
+                                    <th>민감정보등급</th>
+                                    <th>다운로드</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:if="${articleListPagination.isEmpty}">
+                                <tr th:if="${fileAnalysisListPagination.isEmpty}">
                                     <td colspan="5">데이터가 없습니다.</td>
                                 </tr>
-                                <tr th:each="article : ${articleListPagination.dataList}">
-                                    <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
-                                    <td th:text="${article.articleTypeCcdNm}"></td>
+                                <tr th:each="fileAnalysis : ${fileAnalysisListPagination.dataList}">
+                                    <td th:text="${fileAnalysis.detectionFileName}"></td>
+                                    <td th:text="${#temporals.format(fileAnalysis.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
+                                    <td th:text="${fileAnalysis.analysisStatusCcdNm}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileAnalysis.totalDetectionCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${fileAnalysis.maxDetectionTypeCcdNm}"></td>
                                     <td>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>
-                                    </td>
-                                    <td>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
-                                    </td>
-                                    <td>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
+                                        <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
                         <div class="pagination-wrapper">
-                            <ul th:if="${articleListPagination.isNotEmpty}" class="pagination">
-                                <li th:if="${articleListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
-                                    <a href="#" th:onclick="goPage([[${articleListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
+                            <ul th:if="${fileAnalysisListPagination.isNotEmpty}" class="pagination">
+                                <li th:if="${fileAnalysisListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
+                                    <a href="#" th:onclick="goPage([[${fileAnalysisListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
                                 </li>
-                                <th:block th:each="pageNo : ${#numbers.sequence(articleListPagination.firstPageNoOnPageList, articleListPagination.lastPageNoOnPageList)}">
-                                    <li th:if="${pageNo eq articleListPagination.pageNo}" class="paginate_button active">
+                                <th:block th:each="pageNo : ${#numbers.sequence(fileAnalysisListPagination.firstPageNoOnPageList, fileAnalysisListPagination.lastPageNoOnPageList)}">
+                                    <li th:if="${pageNo eq fileAnalysisListPagination.pageNo}" class="paginate_button active">
                                         <a href="#" th:text="${pageNo}"></a>
                                     </li>
-                                    <li th:if="${pageNo ne articleListPagination.pageNo}" class="paginate_button">
+                                    <li th:if="${pageNo ne fileAnalysisListPagination.pageNo}" class="paginate_button">
                                         <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
                                     </li>
                                 </th:block>
-                                <li th:if="${articleListPagination.lastPageNoOnPageList lt articleListPagination.lastPageNo}" class="paginate_button next">
-                                    <a href="#" th:onclick="goPage([[${articleListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
+                                <li th:if="${fileAnalysisListPagination.lastPageNoOnPageList lt fileAnalysisListPagination.lastPageNo}" class="paginate_button next">
+                                    <a href="#" th:onclick="goPage([[${fileAnalysisListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
                                 </li>
                             </ul>
                         </div>

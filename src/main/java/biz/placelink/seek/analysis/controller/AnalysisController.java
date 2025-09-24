@@ -172,4 +172,106 @@ public class AnalysisController {
         return "downloadView";
     }
 
+    /**
+     * 데이터 복호화 현황(민감정보 처리 이력)
+     *
+     * @param model ModelMap
+     * @return 민감정보 처리 이력 목록
+     */
+    @GetMapping(value = "/analysis/sensitive-access-hist")
+    public String sensitiveAccessHist(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setOrderBy("CREATE_DT DESC");
+        // 민감정보 처리 이력 목록 조회
+        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        response.setHeader("X-Seek-Mode", seekMode);
+        return "analysis/sensitive-access-hist";
+    }
+
+    /**
+     * PC 에이전트 상태
+     *
+     * @param model ModelMap
+     * @return PC 에이전트 상태 목록
+     */
+    @GetMapping(value = "/analysis/agent-status-list")
+    public String agentStatusList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setOrderBy("CREATE_DT DESC");
+        // PC 에이전트 상태 목록 조회
+        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        response.setHeader("X-Seek-Mode", seekMode);
+        return "/analysis/agent-status-list";
+    }
+
+    /**
+     * 파일전송 차단 현황
+     *
+     * @param model ModelMap
+     * @return 파일전송 차단 현황 목록
+     */
+    @GetMapping(value = "/analysis/file-blocking-list")
+    public String fileBlockingList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setOrderBy("CREATE_DT DESC");
+        // 파일전송 차단 현황 목록 조회
+        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        response.setHeader("X-Seek-Mode", seekMode);
+        return "/analysis/file-blocking-list";
+    }
+
+    /**
+     * 서명파일 전송 현황
+     *
+     * @param model ModelMap
+     * @return 서명파일 전송 현황 목록
+     */
+    @GetMapping(value = "/analysis/file-transfer-list")
+    public String fileTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setOrderBy("CREATE_DT DESC");
+        // 서명파일 전송 현황 목록 조회
+        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        response.setHeader("X-Seek-Mode", seekMode);
+        return "/analysis/file-transfer-list";
+    }
+
+    /**
+     * 시스템 파일 전송 현황
+     *
+     * @param model ModelMap
+     * @return 시스템 파일 전송 현황 목록
+     */
+    @GetMapping(value = "/analysis/system-transfer-list")
+    public String systemTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setOrderBy("CREATE_DT DESC");
+        // 시스템 파일 전송 현황 목록 조회
+        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        response.setHeader("X-Seek-Mode", seekMode);
+        return "/analysis/system-transfer-list";
+    }
+
+    /**
+     * 이상 패턴 탐지 현황
+     *
+     * @param model ModelMap
+     * @return 이상 패턴 탐지 현황 목록
+     */
+    @GetMapping(value = "/analysis/anomaly_detection-list")
+    public String anomalyDetectionList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setOrderBy("CREATE_DT DESC");
+        // 이상 패턴 탐지 현황 목록 조회
+        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        response.setHeader("X-Seek-Mode", seekMode);
+        return "/analysis/anomaly_detection-list";
+    }
+
 }

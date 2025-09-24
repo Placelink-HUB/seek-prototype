@@ -573,23 +573,29 @@ table caption {
   border-top-color: #0d7176;
 }
 
-.table-wrap.type2 .table-sty01 {
+.table-wrap.type1.deep-indigo .table-sty01 {
   border-top-color: #3e4a97;
 }
 
-.table-wrap.type1 .table-sty01 th,
-.table-wrap.type2 .table-sty01 th {
+.table-wrap.type1.teal-blue .table-sty01 {
+  border-top-color: #07498f;
+}
+
+.table-wrap.type1 .table-sty01 th {
   height: 2.875rem;
   color: #ffffff;
   background-color: #0d7176;
 }
 
-.table-wrap.type2 .table-sty01 th {
+.table-wrap.type1.deep-indigo .table-sty01 th {
   background-color: #3e4a97;
 }
 
-.table-wrap.type1 .table-sty01 td,
-.table-wrap.type2 .table-sty01 td {
+.table-wrap.type1.teal-blue .table-sty01 th {
+  background-color: #07498f;
+}
+
+.table-wrap.type1 .table-sty01 td {
   height: 2.875rem;
   color: #ffffff;
 }
@@ -598,22 +604,23 @@ table caption {
   border-bottom: 0.125rem solid #0d7176;
 }
 
-.table-wrap.type2 .table-sty01 tr:last-child td {
+.table-wrap.type1.deep-indigo .table-sty01 tr:last-child td {
   border-bottom: 0.125rem solid #3e4a97;
 }
 
-.table-wrap.type1 .pagination-wrapper,
-.table-wrap.type2 .pagination-wrapper {
+.table-wrap.type1.teal-blue .table-sty01 tr:last-child td {
+  border-bottom: 0.125rem solid #07498f;
+}
+
+.table-wrap.type1 .pagination-wrapper {
   margin-top: 1rem;
 }
 
-.table-wrap.type1 .pagination-wrapper .pagination .paginate_button a,
-.table-wrap.type2 .pagination-wrapper .pagination .paginate_button a {
+.table-wrap.type1 .pagination-wrapper .pagination .paginate_button a {
   color: #ffffff;
 }
 
-.table-wrap.type1 .pagination-wrapper .pagination .paginate_button.active a,
-.table-wrap.type2 .pagination-wrapper .pagination .paginate_button.active a {
+.table-wrap.type1 .pagination-wrapper .pagination .paginate_button.active a {
   color: #000000;
 }
 
@@ -1157,6 +1164,28 @@ table caption {
   background-size: 2.5rem auto;
 }
 
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu4-1 {
+  padding-left: 0;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu4-2,
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu5-2 {
+  background-image: url(../images/normal.png);
+  background-size: 1.875rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu4-3,
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu5-3 {
+  background-image: url(../images/caution.png);
+  background-size: 2.5rem auto;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu4-4,
+.main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box.menu5-4 {
+  background-image: url(../images/danger.png);
+  background-size: 2.125rem auto;
+}
+
 .main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box .card-title {
   font-size: 1.25rem;
   margin-bottom: 0.1875rem;
@@ -1176,6 +1205,48 @@ table caption {
   font-size: 2rem;
   font-weight: bold;
   margin-right: 0.3125rem;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.white {
+  border: 1px solid #ffffff;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.white .title-box {
+  color: #ffffff;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.mint {
+  border: 1px solid #5ef0a7;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.mint .title-box {
+  color: #5ef0a7;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.tangerine {
+  border: 1px solid #fe8e10;
+}
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.tangerine .title-box {
+  color: #fe8e10;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.red {
+  border: 1px solid #fe0000;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.red .title-box {
+  color: #fe0000;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.three_wide {
+  height: 5.625rem;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.three_wide .title-box {
+  float: left;
+}
+
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.three_wide .title-box {
 }
 
 .main-contents-contents .wrap-contents .contents .status-card .card .text {
