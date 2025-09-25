@@ -1,6 +1,9 @@
 package biz.placelink.seek.dashboard.controller;
 
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,8 +55,9 @@ public class DashboardController {
      * @return 사용한 사이트 ID에 따라 지정된 대시보드 뷰 이름.
      */
     @GetMapping(value = "/dashboard/{siteId}")
-    protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "console", defaultValue = "") String console, @RequestParam(name = "consoleType", defaultValue = "") String consoleType, HttpSession session, Model model) {
+    protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "console", defaultValue = "") String console, @RequestParam(name = "consoleType", defaultValue = "") String consoleType, HttpSession session, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
+        model.addAttribute("schDe", this.getSchDe(schDe));
 
         /*
          * Push 메시지 console.log 작성 방법
@@ -89,28 +93,57 @@ public class DashboardController {
      * @return 분석 현황
      */
     @GetMapping(value = {"/dashboard/analysis-statistics", "/dashboard/analysis-statistics2"})
-    public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", required = false) String schDe, HttpServletRequest request) {
+    public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", defaultValue = "") String schDe, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
-        if (S2Util.isEmpty(schDe)) {
-            schDe = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        }
+        String vSchDe = this.getSchDe(schDe);
 
-        response.put("analysisData", dashboardService.selectAnalysisStatistics(schDe));
-        response.put("detectionData", dashboardService.selectDetectionStatistics(schDe));
-        response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(schDe));
-        response.put("lastAnalysisCompleteDateTimeStr", dashboardService.selectLastAnalysisCompleteDateTimeStr(schDe));
-        response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(schDe));
+        response.put("analysisData", dashboardService.selectAnalysisStatistics(vSchDe));
+        response.put("detectionData", dashboardService.selectDetectionStatistics(vSchDe));
+        response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(vSchDe));
+        response.put("lastAnalysisCompleteDateTimeStr", dashboardService.selectLastAnalysisCompleteDateTimeStr(vSchDe));
+        response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(vSchDe));
 
         if ("/dashboard/analysis-statistics".equals(request.getServletPath())) {
-            response.put("maskingData", maskHistService.selectMaskStatus(schDe));
+            response.put("maskingData", maskHistService.selectMaskStatus(vSchDe));
         } else if ("/dashboard/analysis-statistics2".equals(request.getServletPath())) {
-            response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(schDe));
-            response.put("fileOutboundHistInfoList", dashboardService.selectFileOutboundHistInformation(schDe));
+            response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(vSchDe));
+            response.put("fileOutboundHistInfoList", dashboardService.selectFileOutboundHistInformation(vSchDe));
         }
 
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 날짜를 확인하여 정상일때만 그대로 리턴하고 미래의 날짜거나 형식이 잘못되었다면 오늘을 리턴한다.
+     *
+     * @param pSchDe
+     * @return
+     */
+    private String getSchDe(String pSchDe) {
+        String vSchDe = "";
+
+        if (S2Util.isNotEmpty(pSchDe)) {
+            vSchDe = pSchDe.replaceAll("-", "");
+
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                LocalDate schDate = LocalDate.parse(vSchDe, formatter);
+                if (schDate.isAfter(LocalDate.now())) {
+                    // 조회일이 미래(오늘 이후)라면 초기화 하여 오늘로 설정되도록 한다.
+                    vSchDe = "";
+                }
+            } catch (DateTimeException e) {
+                vSchDe = "";
+            }
+        }
+
+        if (S2Util.isEmpty(vSchDe)) {
+            vSchDe = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        }
+
+        return vSchDe;
     }
 
 }

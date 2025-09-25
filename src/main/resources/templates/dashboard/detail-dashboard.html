@@ -3,6 +3,19 @@
     <th:block layout:fragment="bodyScript">
         <script th:src="@{/public/js/echarts.min.js}"></script>
         <script type="text/javascript">
+            // eslint-disable-next-line no-unused-vars
+            function initPage() {
+                initDoughnutChart();
+                initSemicircleChart();
+                initLineChart();
+                initBarChart();
+                initBarChart2();
+
+                getAnalysisStatistics();
+
+                S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
+            }
+
             const doughnutChart = {};
             const semicircleChart = {};
             const lineChart = {};
@@ -75,22 +88,13 @@
                 }
             };
 
-            document.addEventListener('DOMContentLoaded', () => {
-                initDoughnutChart();
-                initSemicircleChart();
-                initLineChart();
-                initBarChart();
-                initBarChart2();
-
-                document.querySelector('.targetDate').textContent = dayjs().format('YYYY년 MM월 DD일');
-
-                getAnalysisStatistics();
-
-                S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
-            });
-
             navigator.serviceWorker.addEventListener('message', (event) => {
-                // eslint-disable-next-line no-console
+                const todayWrap = document.querySelector('.targetDate-wrap.today');
+                if (!todayWrap) {
+                    // 오늘 일때만 푸시 정보를 수신한다.
+                    return;
+                }
+
                 const vConsole = sessionStorage.getItem('console');
                 if (vConsole === 'on' || vConsole === 'all') {
                     const vConsoleType = sessionStorage.getItem('consoleType');
@@ -182,7 +186,8 @@
                     '[[@{/dashboard/analysis-statistics}]]',
                     {
                         method: 'get',
-                        dataType: 'json'
+                        dataType: 'json',
+                        schDe: document.querySelector('.targetDate-wrap .targetDate').dataset.schDe
                     },
                     function (response) {
                         {
@@ -863,7 +868,7 @@
             </div>
             <div class="wrap-contents">
                 <div class="top">
-                    <div class="flex-sty01">
+                    <div class="flex-sty01 targetDate-wrap">
                         <div class="arrow-left"></div>
                         <div class="data-date">
                             <div class="date targetDate">0000년 00월 00일</div>

@@ -26,9 +26,10 @@
     </th:block>
     <th:block layout:fragment="bodyScript">
         <script type="text/javascript">
-            let isRegistering = false;
+            // eslint-disable-next-line no-unused-vars
+            function initPage() {}
 
-            document.addEventListener('DOMContentLoaded', () => {});
+            let isRegistering = false;
 
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
@@ -247,7 +248,7 @@
             </div>
             <div class="wrap-contents">
                 <div class="top">
-                    <div class="flex-sty01">
+                    <div class="flex-sty01 targetDate-wrap">
                         <div class="arrow-left"></div>
                         <div class="data-date">
                             <div class="date targetDate">0000년 00월 00일</div>

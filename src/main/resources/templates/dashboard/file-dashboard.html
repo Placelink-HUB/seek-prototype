@@ -3,6 +3,19 @@
     <th:block layout:fragment="bodyScript">
         <script th:src="@{/public/js/echarts.min.js}"></script>
         <script type="text/javascript">
+            // eslint-disable-next-line no-unused-vars
+            function initPage() {
+                initDoughnutChart();
+                initSemicircleChart();
+                initSemicircleChart2();
+                initLineChart();
+                initPieChart();
+
+                getAnalysisStatistics();
+
+                S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
+            }
+
             const doughnutChart = {};
             const semicircleChart = {};
             const lineChart = {};
@@ -91,19 +104,13 @@
                 fileCount: 0
             };
 
-            document.addEventListener('DOMContentLoaded', () => {
-                initDoughnutChart();
-                initSemicircleChart();
-                initSemicircleChart2();
-                initLineChart();
-                initPieChart();
-
-                getAnalysisStatistics();
-
-                S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
-            });
-
             navigator.serviceWorker.addEventListener('message', (event) => {
+                const todayWrap = document.querySelector('.targetDate-wrap.today');
+                if (!todayWrap) {
+                    // 오늘 일때만 푸시 정보를 수신한다.
+                    return;
+                }
+
                 const vConsole = sessionStorage.getItem('console');
                 if (vConsole === 'on' || vConsole === 'all') {
                     const vConsoleType = sessionStorage.getItem('consoleType');
@@ -211,7 +218,8 @@
                     '[[@{/dashboard/analysis-statistics2}]]',
                     {
                         method: 'get',
-                        dataType: 'json'
+                        dataType: 'json',
+                        schDe: document.querySelector('.targetDate-wrap .targetDate').dataset.schDe
                     },
                     function (response) {
                         {
@@ -1051,7 +1059,7 @@
                         <div class="info inspection"><b>점검</b> (3/12)</div>
                         <div class="info warning"><b>경고</b> (1/5)</div>
                     </div>
-                    <div class="flex-sty01">
+                    <div class="flex-sty01 targetDate-wrap">
                         <div class="arrow-left"></div>
                         <div class="data-date">
                             <div class="date targetDate">0000년 00월 00일</div>

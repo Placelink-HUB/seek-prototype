@@ -1094,13 +1094,13 @@ table caption {
   background-color: #ba0000;
 }
 
-.main-contents-contents .wrap-contents .arrow-left,
-.main-contents-contents .wrap-contents .arrow-right {
+.main-contents-contents .wrap-contents .targetDate-wrap .arrow-left,
+.main-contents-contents .wrap-contents .targetDate-wrap .arrow-right {
   position: relative;
   cursor: pointer;
 }
 
-.main-contents-contents .wrap-contents .arrow-left::before {
+.main-contents-contents .wrap-contents .targetDate-wrap .arrow-left::before {
   position: absolute;
   left: 0;
   top: -0.4375rem;
@@ -1112,7 +1112,7 @@ table caption {
   transform: rotate(225deg);
 }
 
-.main-contents-contents .wrap-contents .arrow-right::before {
+.main-contents-contents .wrap-contents .targetDate-wrap .arrow-right::before {
   position: absolute;
   left: 0;
   top: -0.4375rem;
@@ -1124,23 +1124,33 @@ table caption {
   transform: rotate(225deg);
 }
 
-.main-contents-contents .wrap-contents .data-date {
+.main-contents-contents .wrap-contents .targetDate-wrap.today .arrow-right::before {
+  border-color: #212429;
+  cursor: default;
+}
+
+.main-contents-contents .wrap-contents .targetDate-wrap .data-date {
   display: flex;
   margin: 0 3.125rem 0 4.375rem;
   align-items: center;
 }
 
-.main-contents-contents .wrap-contents .data-date .date {
+.main-contents-contents .wrap-contents .targetDate-wrap .data-date .date {
   margin-right: 0.9375rem;
   font-weight: 300;
 }
 
-.main-contents-contents .wrap-contents .data-date .icon-today {
+.main-contents-contents .wrap-contents .targetDate-wrap .data-date .icon-today {
   padding: 0.3125rem 0.9375rem;
   background-color: #393939;
   border-radius: 1.25rem;
   font-size: 0.8125rem;
   font-weight: 200;
+  display: none;
+}
+
+.main-contents-contents .wrap-contents .targetDate-wrap.today .data-date .icon-today {
+  display: block;
 }
 
 .main-contents-contents .wrap-contents .contents {

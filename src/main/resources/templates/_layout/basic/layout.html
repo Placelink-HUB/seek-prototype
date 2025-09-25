@@ -54,9 +54,58 @@
                     sessionStorage.setItem('consoleType', vConsoleType);
                 }
 
-                const targetDate = document.querySelector('.targetDate');
+                const targetDate = document.querySelector('.targetDate-wrap .targetDate');
                 if (targetDate) {
-                    targetDate.textContent = dayjs().format('YYYY년 MM월 DD일');
+                    let schDe = '[[${schDe}]]';
+                    if (schDe) {
+                        try {
+                            const chkDay = dayjs(schDe, 'YYYYMMDD');
+                            if (chkDay.isAfter(dayjs(), 'day')) {
+                                schDe = '';
+                            }
+                        } catch {
+                            schDe = '';
+                        }
+                    }
+
+                    if (!schDe) {
+                        schDe = dayjs().format('YYYYMMDD');
+                    }
+
+                    const schDay = dayjs(schDe, 'YYYYMMDD');
+                    const isToday = schDay.isSame(dayjs(), 'day');
+
+                    targetDate.textContent = schDay.format('YYYY년 MM월 DD일');
+                    targetDate.dataset.schDe = schDe;
+                    if (isToday) {
+                        targetDate.closest('.targetDate-wrap').classList.add('today');
+                    } else {
+                        targetDate.closest('.targetDate-wrap').classList.remove('today');
+
+                        const arrowRight = document.querySelector('.targetDate-wrap .arrow-right');
+                        if (arrowRight) {
+                            arrowRight.addEventListener('click', function () {
+                                // 다음날로 이동(오늘일때는 다음날로 이동할 수 없다.)
+                                const url = new URL(window.location.href);
+                                url.searchParams.set('schDe', schDay.add(1, 'day').format('YYYYMMDD'));
+                                window.location.href = url.href;
+                            });
+                        }
+                    }
+
+                    const arrowLeft = document.querySelector('.targetDate-wrap .arrow-left');
+                    if (arrowLeft) {
+                        arrowLeft.addEventListener('click', function () {
+                            // 이전날로 이동
+                            const url = new URL(window.location.href);
+                            url.searchParams.set('schDe', schDay.subtract(1, 'day').format('YYYYMMDD'));
+                            window.location.href = url.href;
+                        });
+                    }
+                }
+
+                if (typeof initPage === 'function') {
+                    initPage();
                 }
             });
         </script>
