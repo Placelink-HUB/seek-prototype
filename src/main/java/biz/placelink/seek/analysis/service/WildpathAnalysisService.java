@@ -189,15 +189,17 @@ public class WildpathAnalysisService {
      *
      * @param orgCode    조직코드
      * @param eventTime  이벤트 시간
+     * @param userId     사용자ID
      * @param macAddr    MAC 주소
      * @param host       호스트 이름
      * @param components 컴포넌트(에이전트) 정보
      */
-    public void pushAgentHeartbeat(String orgCode, String eventTime, String macAddr, String host, String components) {
+    public void pushAgentHeartbeat(String orgCode, String eventTime, String userId, String macAddr, String host, String components) {
         Map<String, Object> pushMap = new HashMap<>();
         pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_AGENT_HEARTBEAT);
         pushMap.put("orgCode", orgCode);
         pushMap.put("eventTime", eventTime);
+        pushMap.put("userId", userId);
         pushMap.put("macAddr", macAddr);
         pushMap.put("host", host);
         pushMap.put("components", components);

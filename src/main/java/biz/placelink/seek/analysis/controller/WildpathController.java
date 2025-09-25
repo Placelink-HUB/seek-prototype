@@ -273,7 +273,7 @@ public class WildpathController {
         logger.info("📩 Body: " + decryptedBody);
         logger.info("📎 첨부파일 개수: " + (attachments != null ? attachments.size() : "null"));
 
-        // 저장 경로 설정
+        // 저장 경로 설정 (파일을 계속 보내는 이유를 확인하자)
         /*
          * String uploadDir = "C:/test";
          * Path uploadPath = Paths.get(uploadDir);
@@ -487,11 +487,12 @@ public class WildpathController {
     protected void heartbeat(@RequestParam MultiValueMap<String, String> params) throws IOException {
         String orgCode = params.getFirst("org_code");
         String eventTime = params.getFirst("event_time");
+        String userId = params.getFirst("user_id");
         String macAddr = params.getFirst("mac_addr");
         String host = params.getFirst("host");
         String components = params.getFirst("components");
 
-        wildpathAnalysisService.pushAgentHeartbeat(orgCode, eventTime, macAddr, host, components);
+        wildpathAnalysisService.pushAgentHeartbeat(orgCode, eventTime, userId, macAddr, host, components);
     }
 
     /**

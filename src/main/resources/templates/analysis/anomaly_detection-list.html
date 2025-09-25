@@ -253,49 +253,67 @@
                 </div>
                 <div class="contents">
                     <div class="status-card">
-                        <div class="card type1">
-                            <div class="title-box menu2-1">
-                                <div class="card-title">총 서명 완료 수</div>
-                                <div class="card-desc">디지털 서명 처리 수</div>
+                        <div class="card type1 many-on-many white">
+                            <div class="title-box menu6-1 padding-left-0">
+                                <div class="card-title">전체 이상패턴 탐지 건수</div>
+                                <div class="card-desc">PC별 이상패턴 탐지 합계</div>
                             </div>
                             <div class="card-content"><span>3,531</span>건</div>
                         </div>
-                        <div class="card type1">
-                            <div class="title-box menu2-2">
-                                <div class="card-title">탐지 수</div>
-                                <div class="card-desc">LLM이 탐지한 민감정보 수</div>
+                        <div class="card type1 many-on-many white">
+                            <div class="title-box menu6-2 padding-left-0">
+                                <div class="card-title">위험 점수</div>
+                                <div class="card-desc">이상 탐지 분석 등을 종합한 위험 지수</div>
                             </div>
-                            <div class="card-content"><span>1,277</span>건</div>
+                            <div class="card-content"><span>65</span>점</div>
                         </div>
-                        <div class="card type1">
-                            <div class="title-box menu2-3">
-                                <div class="card-title">분석 용량</div>
-                                <div class="card-desc">LLM이 분석한 전체 용량</div>
+                        <div class="card border"></div>
+                        <div class="card type1 many-on-many mint">
+                            <div class="title-box menu6-3">
+                                <div class="card-title">정상</div>
+                                <div class="card-desc">이상 탐지 정상 건수</div>
                             </div>
-                            <div class="card-content"><span>749</span>MB</div>
+                            <div class="card-content"><span>31</span>건</div>
                         </div>
-                        <div class="card type1">
-                            <div class="title-box menu2-4">
-                                <div class="card-title">다운로드 수</div>
-                                <div class="card-desc">서명파일 다운로드 수</div>
+                        <div class="card type1 many-on-many tangerine">
+                            <div class="title-box menu6-4">
+                                <div class="card-title">점검</div>
+                                <div class="card-desc">이상 패턴 점검 건수</div>
                             </div>
-                            <div class="card-content"><span>3,531</span>건</div>
+                            <div class="card-content"><span>7</span>건</div>
+                        </div>
+                        <div class="card type1 many-on-many red">
+                            <div class="title-box menu6-5">
+                                <div class="card-title">경고</div>
+                                <div class="card-desc">이상 패턴 경고 건수</div>
+                            </div>
+                            <div class="card-content"><span>1</span>건</div>
                         </div>
                     </div>
-                    <h2 class="type1">디지털 서명 처리 현황</h2>
-                    <div class="table-wrap type1">
+                    <h2 class="type1">PC별 이상 패턴 탐지 현황</h2>
+                    <div class="table-wrap type1 dark-gray multi-head">
                         <table class="table-sty01">
                             <caption>
-                                위험성 탐지 목록
+                                PC별 이상 패턴 탐지 현황
                             </caption>
                             <thead>
                                 <tr>
-                                    <th>파일명</th>
-                                    <th>등록 일시</th>
-                                    <th>상태</th>
-                                    <th>민감정보개수</th>
-                                    <th>민감정보등급</th>
-                                    <th>다운로드</th>
+                                    <th rowspan="2">Mac 주소</th>
+                                    <th colspan="3">에이전트 중지 패턴</th>
+                                    <th colspan="2">복호화 시도 패턴</th>
+                                    <th colspan="3">외부 유출 시도 패턴</th>
+                                    <th rowspan="2">탐지 결과</th>
+                                    <th rowspan="2">알림 전송</th>
+                                </tr>
+                                <tr>
+                                    <th>반복 중지</th>
+                                    <th>비 업무시간대 중지</th>
+                                    <th>일부 프로세스 중지</th>
+                                    <th>비 업무시간대 복호화</th>
+                                    <th>대량 복호화</th>
+                                    <th>비 업무시간대 전송</th>
+                                    <th>중복 전송</th>
+                                    <th>대량 전송</th>
                                 </tr>
                             </thead>
                             <tbody>
