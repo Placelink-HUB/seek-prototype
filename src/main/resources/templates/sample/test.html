@@ -400,6 +400,7 @@
                             <thead>
                                 <tr>
                                     <th>등록 일시</th>
+                                    <th>ID</th>
                                     <th>게시글 타입</th>
                                     <th>raw 보기</th>
                                     <th>내용 보기</th>
@@ -412,6 +413,7 @@
                                 </tr>
                                 <tr th:each="article : ${articleListPagination.dataList}">
                                     <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
+                                    <td></td>
                                     <td th:text="${article.articleTypeCcdNm}"></td>
                                     <td>
                                         <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>

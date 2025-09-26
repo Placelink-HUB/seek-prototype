@@ -203,7 +203,7 @@ public class AnalysisController {
         // PC 에이전트 상태 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
-        return "/analysis/agent-status-list";
+        return "analysis/agent-status-list";
     }
 
     /**
@@ -220,7 +220,7 @@ public class AnalysisController {
         // 파일전송 차단 현황 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
-        return "/analysis/file-blocking-list";
+        return "analysis/file-blocking-list";
     }
 
     /**
@@ -237,7 +237,7 @@ public class AnalysisController {
         // 서명파일 전송 현황 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
-        return "/analysis/file-transfer-list";
+        return "analysis/file-transfer-list";
     }
 
     /**
@@ -254,7 +254,7 @@ public class AnalysisController {
         // 시스템 파일 전송 현황 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
-        return "/analysis/system-transfer-list";
+        return "analysis/system-transfer-list";
     }
 
     /**
@@ -271,7 +271,7 @@ public class AnalysisController {
         // 이상 패턴 탐지 현황 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
-        return "/analysis/anomaly_detection-list";
+        return "analysis/anomaly_detection-list";
     }
 
 }

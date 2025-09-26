@@ -266,35 +266,37 @@
                             <div class="card-content"><span>1</span>건</div>
                         </div>
                     </div>
-                    <h2 class="type1">디지털 서명 처리 현황</h2>
+                    <h2 class="type1">PC별 데이터 보호 프로세스 작동 현황</h2>
                     <div class="table-wrap type1 dark-cyan">
                         <table class="table-sty01">
                             <caption>
-                                디지털 서명 처리 현황
+                                PC별 데이터 보호 프로세스 작동 현황
                             </caption>
                             <thead>
                                 <tr>
-                                    <th>파일명</th>
-                                    <th>등록 일시</th>
-                                    <th>상태</th>
-                                    <th>민감정보개수</th>
-                                    <th>민감정보등급</th>
-                                    <th>다운로드</th>
+                                    <th>Mac 주소</th>
+                                    <th>파일 차단 상태</th>
+                                    <th>SSH/FTP 차단 상태</th>
+                                    <th>화이트리스트 상태</th>
+                                    <th>서명 검증 상태</th>
+                                    <th>최근 Heartbeat 시각</th>
+                                    <th>탐지 결과</th>
+                                    <th>알림 전송</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:if="${fileAnalysisListPagination.isEmpty}">
-                                    <td colspan="5">데이터가 없습니다.</td>
+                                    <td colspan="8">데이터가 없습니다.</td>
                                 </tr>
                                 <tr th:each="fileAnalysis : ${fileAnalysisListPagination.dataList}">
-                                    <td th:text="${fileAnalysis.detectionFileName}"></td>
-                                    <td th:text="${#temporals.format(fileAnalysis.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
-                                    <td th:text="${fileAnalysis.analysisStatusCcdNm}"></td>
-                                    <td th:text="${#numbers.formatInteger(fileAnalysis.totalDetectionCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${fileAnalysis.maxDetectionTypeCcdNm}"></td>
-                                    <td>
-                                        <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
-                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>

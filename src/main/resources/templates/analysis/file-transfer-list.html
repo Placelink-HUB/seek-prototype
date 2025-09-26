@@ -310,27 +310,25 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    <th>파일명</th>
-                                    <th>등록 일시</th>
-                                    <th>상태</th>
-                                    <th>민감정보개수</th>
-                                    <th>민감정보등급</th>
-                                    <th>다운로드</th>
+                                    <th>MAC 주소</th>
+                                    <th>차단 건수</th>
+                                    <th>차단 용량(MB)</th>
+                                    <th>발생 채널</th>
+                                    <th>업무시간 차단 수</th>
+                                    <th>비업무시간 차단 수</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:if="${fileAnalysisListPagination.isEmpty}">
-                                    <td colspan="5">데이터가 없습니다.</td>
+                                    <td colspan="6">데이터가 없습니다.</td>
                                 </tr>
                                 <tr th:each="fileAnalysis : ${fileAnalysisListPagination.dataList}">
-                                    <td th:text="${fileAnalysis.detectionFileName}"></td>
-                                    <td th:text="${#temporals.format(fileAnalysis.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
-                                    <td th:text="${fileAnalysis.analysisStatusCcdNm}"></td>
-                                    <td th:text="${#numbers.formatInteger(fileAnalysis.totalDetectionCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${fileAnalysis.maxDetectionTypeCcdNm}"></td>
-                                    <td>
-                                        <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
-                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
