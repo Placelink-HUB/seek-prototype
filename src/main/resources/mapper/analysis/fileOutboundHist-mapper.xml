@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.analysis.service.FileOutboundHistMapper">
 
-    <insert id="insertFileOutboundHist" parameterType="fileOutboundHistVO"  resultType="integer">
+    <insert id="insertFileOutboundHist" parameterType="fileOutboundHistVO">
 		/** insertFileOutboundHist : 파일 외부전송 이력 정보를 등록한다. */
         INSERT INTO SEEK_FILE_OUTBOUND_HIST (
             OUTBOUND_STATUS_CCD,
