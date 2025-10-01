@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
+import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
@@ -147,28 +148,36 @@ public class WildpathAnalysisService {
         return result;
     }
 
+    /**
+     * 파일 외부전송 이력을 등록한다.
+     *
+     * @param paramVO      파일 외부전송 정보
+     * @param allParamsStr 모든 매개변수 정보(원본)
+     * @return
+     */
     @Transactional(readOnly = false)
-    public int createFileOutboundHist(String outboundStatusCcd, String analysisId, String orgCode, String channel, String reason, String eventTime, String macAddr, String destHost, String fileName, String fileSize, String fileCount, String allParamsStr) {
-        int result = fileOutboundHistService.insertFileOutboundHist(outboundStatusCcd, macAddr, analysisId, fileName);
+    public int createFileOutboundHist(FileOutboundHistVO paramVO, String allParamsStr) {
+        int result = fileOutboundHistService.insertFileOutboundHist(paramVO);
         if (result > 0) {
             // 파일 외부 전송 현황
             Map<String, Object> pushMap = new HashMap<>();
             pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_FILE_OUTBOUND);
-            pushMap.put("outboundStatusCcd", outboundStatusCcd);
+            pushMap.put("outboundStatusCcd", paramVO.getOutboundStatusCcd());
 
-            pushMap.put("sigId", analysisId);
-            pushMap.put("orgCode", orgCode);
-            pushMap.put("channel", channel);
-            pushMap.put("reason", reason);
-            pushMap.put("eventTime", eventTime);
-            pushMap.put("macAddr", macAddr);
-            pushMap.put("destHost", destHost);
-            pushMap.put("fileName", fileName);
-            pushMap.put("fileSize", fileSize);
-            pushMap.put("fileCount", fileCount);
+            pushMap.put("sigId", paramVO.getAnalysisId());
+            pushMap.put("orgCode", paramVO.getOrgCd());
+            pushMap.put("channel", paramVO.getOutboundChannelCcd());
+            pushMap.put("reason", paramVO.getOutboundReasonCcd());
+            pushMap.put("eventTime", paramVO.getEventDtStr());
+            pushMap.put("macAddr", paramVO.getMacAddr());
+            pushMap.put("destHost", paramVO.getDestHost());
+            pushMap.put("fileName", paramVO.getFileNm());
+            pushMap.put("fileSize", paramVO.getTotalFileSize());
+            pushMap.put("fileCount", paramVO.getTotalFileCount());
 
-            if (Constants.CD_OUTBOUND_STATUS_SENT.equals(outboundStatusCcd)) {
-                AnalysisResultVO fileInfo = analysisDetailService.selectFileAnalysis(analysisId);
+            if (Constants.CD_OUTBOUND_STATUS_SENT.equals(paramVO.getOutboundStatusCcd())) {
+                // 전송 되었다면 최초 분석한 파일 정보의 파일 개수와 크기를 가져온다. (totalFileSize 와 totalFileCount 가 정확하다면 중복되어 불필요함)
+                AnalysisResultVO fileInfo = analysisDetailService.selectFileAnalysis(paramVO.getAnalysisId());
                 if (fileInfo != null) {
                     pushMap.put("fileCount", fileInfo.getFileCount());
                     pushMap.put("totalFileSize", fileInfo.getTotalFileSize());

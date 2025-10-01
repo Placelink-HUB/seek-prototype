@@ -4,9 +4,9 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -741,
-    "scrollLeft": -813.6871,
-    "zoomLevel": 0.82,
+    "scrollTop": -1096.495,
+    "scrollLeft": -942.5315,
+    "zoomLevel": 0.79,
     "show": 511,
     "database": 16,
     "databaseName": "",
@@ -730,29 +730,45 @@
         "columnIds": [
           "VLy-BhaDFZvytTS7PK-ZC",
           "xF98BE9-QLVS-XC6V640r",
+          "4F7XMEqcbRR0-r1aQT6YQ",
+          "XX80CSztWmrybCcYkWyaU",
           "ffVr7XGRcKtvswqN_xzTR",
           "gQPrmzgSldUOG_1jlJPqk",
           "jI4NQ1MU2Zk-xA0HsyPCF",
+          "WnDhBXwuw_05bdkY9v_mn",
+          "2xegNW9gsr7-x6Yb4WSuj",
+          "h5i_7Jm0XJGIFgNKQTmwI",
+          "KfKi-JS7L19a6oxIv3RUO",
+          "idjGaA1qIgs1KqlU0Eq9D",
+          "XrTebTNnwBu57PID2lcZW",
           "9FuKmCkiR5XYDpIE5NpoB"
         ],
         "seqColumnIds": [
           "VLy-BhaDFZvytTS7PK-ZC",
           "xF98BE9-QLVS-XC6V640r",
+          "4F7XMEqcbRR0-r1aQT6YQ",
+          "XX80CSztWmrybCcYkWyaU",
           "ffVr7XGRcKtvswqN_xzTR",
           "gQPrmzgSldUOG_1jlJPqk",
           "jI4NQ1MU2Zk-xA0HsyPCF",
+          "WnDhBXwuw_05bdkY9v_mn",
+          "2xegNW9gsr7-x6Yb4WSuj",
+          "h5i_7Jm0XJGIFgNKQTmwI",
+          "KfKi-JS7L19a6oxIv3RUO",
+          "idjGaA1qIgs1KqlU0Eq9D",
+          "XrTebTNnwBu57PID2lcZW",
           "9FuKmCkiR5XYDpIE5NpoB"
         ],
         "ui": {
           "x": 1597.561,
-          "y": 1370.2124,
+          "y": 1242.3643,
           "zIndex": 3146,
           "widthName": 153,
           "widthComment": 108,
           "color": ""
         },
         "meta": {
-          "updateAt": 1757057958040,
+          "updateAt": 1759295516184,
           "createAt": 1750764462488
         }
       }
@@ -4001,8 +4017,8 @@
       "jI4NQ1MU2Zk-xA0HsyPCF": {
         "id": "jI4NQ1MU2Zk-xA0HsyPCF",
         "tableId": "oeP34Oe_AxBEwOalanag0",
-        "name": "FILE_DESC",
-        "comment": "파일_설명",
+        "name": "FILE_NM",
+        "comment": "파일_이름",
         "dataType": "VARCHAR(500)",
         "default": "",
         "options": 0,
@@ -4014,7 +4030,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1757058186404,
+          "updateAt": 1759281707036,
           "createAt": 1757057938869
         }
       },
@@ -4036,6 +4052,166 @@
         "meta": {
           "updateAt": 1758663693795,
           "createAt": 1758662784374
+        }
+      },
+      "WnDhBXwuw_05bdkY9v_mn": {
+        "id": "WnDhBXwuw_05bdkY9v_mn",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "ORG_CD",
+        "comment": "기관_코드",
+        "dataType": "VARCHAR(30)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759280937810,
+          "createAt": 1759280799861
+        }
+      },
+      "XX80CSztWmrybCcYkWyaU": {
+        "id": "XX80CSztWmrybCcYkWyaU",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "OUTBOUND_REASON_CCD",
+        "comment": "외부전송_사유_공통코드",
+        "dataType": "VARCHAR(30)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 145,
+          "widthComment": 132,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759281013607,
+          "createAt": 1759280858187
+        }
+      },
+      "XrTebTNnwBu57PID2lcZW": {
+        "id": "XrTebTNnwBu57PID2lcZW",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "EVENT_DT",
+        "comment": "이벤트(발생)_일시",
+        "dataType": "TIMESTAMP",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 98,
+          "widthDataType": 65,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759281191856,
+          "createAt": 1759281105107
+        }
+      },
+      "2xegNW9gsr7-x6Yb4WSuj": {
+        "id": "2xegNW9gsr7-x6Yb4WSuj",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "MAC_ADDR",
+        "comment": "MAC_주소",
+        "dataType": "VARCHAR(23)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 64,
+          "widthComment": 60,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759281589592,
+          "createAt": 1759281548866
+        }
+      },
+      "h5i_7Jm0XJGIFgNKQTmwI": {
+        "id": "h5i_7Jm0XJGIFgNKQTmwI",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "DEST_HOST",
+        "comment": "목적지_호스트",
+        "dataType": "VARCHAR(500)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 64,
+          "widthComment": 79,
+          "widthDataType": 81,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759281637599,
+          "createAt": 1759281618458
+        }
+      },
+      "KfKi-JS7L19a6oxIv3RUO": {
+        "id": "KfKi-JS7L19a6oxIv3RUO",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "TOTAL_FILE_COUNT",
+        "comment": "전체_파일_개수",
+        "dataType": "NUMERIC(5)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 105,
+          "widthComment": 84,
+          "widthDataType": 68,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759281883226,
+          "createAt": 1759281843915
+        }
+      },
+      "idjGaA1qIgs1KqlU0Eq9D": {
+        "id": "idjGaA1qIgs1KqlU0Eq9D",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "TOTAL_FILE_SIZE",
+        "comment": "전체_파일_크기(바이트)",
+        "dataType": "NUMERIC(12)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 88,
+          "widthComment": 127,
+          "widthDataType": 74,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759281911853,
+          "createAt": 1759281888682
+        }
+      },
+      "4F7XMEqcbRR0-r1aQT6YQ": {
+        "id": "4F7XMEqcbRR0-r1aQT6YQ",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "OUTBOUND_CHANNEL_CCD",
+        "comment": "외부전송_채널_공통코드",
+        "dataType": "VARCHAR(30)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 153,
+          "widthComment": 132,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759283170457,
+          "createAt": 1759283093173
         }
       }
     },

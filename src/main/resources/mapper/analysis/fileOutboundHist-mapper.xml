@@ -2,19 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="biz.placelink.seek.analysis.service.FileOutboundHistMapper">
 
-    <insert id="insertFileOutboundHist">
+    <insert id="insertFileOutboundHist" parameterType="fileOutboundHistVO"  resultType="integer">
 		/** insertFileOutboundHist : 파일 외부전송 이력 정보를 등록한다. */
         INSERT INTO SEEK_FILE_OUTBOUND_HIST (
             OUTBOUND_STATUS_CCD,
+            OUTBOUND_CHANNEL_CCD,
+            OUTBOUND_REASON_CCD,
             SENDER,
             ANALYSIS_ID,
-            FILE_DESC,
+            FILE_NM,
+            ORG_CD,
+            MAC_ADDR,
+            DEST_HOST,
+            TOTAL_FILE_COUNT,
+            TOTAL_FILE_SIZE,
+            EVENT_DT,
             CREATE_DT
         ) VALUES (
             #{outboundStatusCcd},
+            #{outboundChannelCcd},
+            #{outboundReasonCcd},
             #{sender},
             #{analysisId},
-            #{fileDesc},
+            #{fileNm},
+            #{orgCd},
+            #{macAddr},
+            #{destHost},
+            #{totalFileCount},
+            #{totalFileSize},
+            #{eventDt},
             NOW()
         )
     </insert>

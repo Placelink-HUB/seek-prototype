@@ -1,7 +1,8 @@
 package biz.placelink.seek.analysis.service;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
+
+import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
 
 /**
  * <pre>
@@ -20,12 +21,9 @@ public interface FileOutboundHistMapper {
     /**
      * 파일 외부전송 이력 정보를 등록한다.
      *
-     * @param outboundStatusCcd 외부전송 상태 공통코드
-     * @param sender            발신자
-     * @param analysisId        분석 ID
-     * @param fileDesc        파일 설명
+     * @param paramVO 파일 외부전송 정보
      * @return 등록 개수
      */
-    int insertFileOutboundHist(@Param("outboundStatusCcd") String outboundStatusCcd, @Param("sender") String sender, @Param("analysisId") String analysisId, @Param("fileDesc") String fileDesc);
+    int insertFileOutboundHist(FileOutboundHistVO paramVO);
 
 }

@@ -3,6 +3,8 @@ package biz.placelink.seek.analysis.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
+
 /**
  * <pre>
  * << 개정이력(Modification Information) >>
@@ -27,14 +29,11 @@ public class FileOutboundHistService {
     /**
      * 파일 외부전송 이력 정보를 등록한다.
      *
-     * @param outboundStatusCcd 외부전송 상태 공통코드
-     * @param sender            발신자
-     * @param analysisId        분석 ID
-     * @param fileDesc          파일 설명
+     * @param paramVO 파일 외부전송 정보
      * @return 등록 개수
      */
-    public int insertFileOutboundHist(String outboundStatusCcd, String sender, String analysisId, String fileDesc) {
-        return fileOutboundHistMapper.insertFileOutboundHist(outboundStatusCcd, sender, analysisId, fileDesc);
+    public int insertFileOutboundHist(FileOutboundHistVO paramVO) {
+        return fileOutboundHistMapper.insertFileOutboundHist(paramVO);
     }
 
 }

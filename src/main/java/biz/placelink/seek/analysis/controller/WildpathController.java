@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import biz.placelink.seek.analysis.service.WildpathAnalysisService;
+import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
 import biz.placelink.seek.com.util.GlobalSharedStore;
@@ -336,21 +337,21 @@ public class WildpathController {
         String orgCode = params.getFirst("org_code");
 
         /*
-         * 이벤트 채널(이벤트가 발생한 경로)
+         * 이벤트 채널(이벤트가 발생한 경로, OUTBOUND_CHANNEL_CCD)
          *
          * @value https | smtp | messenger | usb | print
          */
-        String channel = params.getFirst("channel");
+        String channelCd = params.getFirst("channel");
 
         /*
-         * 허용/차단(최종 정책 결과)
+         * 허용/차단(최종 정책 결과, OUTBOUND_STATUS_CCD => SENT: 전송, BLOCKED: 차단)
          *
          * @value ALLOW: 전송/행위 허용, BLOCK: 정책에 의해 차단
          */
         String action = params.getFirst("action");
 
         /*
-         * 세부 사유 코드(왜 ALLOW/BLOCK 되었는지 상세 코드)
+         * 세부 사유 코드(왜 ALLOW/BLOCK 되었는지 상세 코드, OUTBOUND_REASON_CCD)
          *
          * @value
          * OK_browser3: 브라우저 1차 검사 통과
@@ -368,14 +369,14 @@ public class WildpathController {
          * path_unknown: 문서 경로 미확인
          * cancel_fail: 인쇄 취소 실패
          */
-        String reason = params.getFirst("reason");
+        String reasonCd = params.getFirst("reason");
 
         /*
          * 타임스탬프(이벤트 발생 시각)
          *
          * @value 2025-08-29 09:12:33 (YYYY-MM-DD hh:mm:ss)
          */
-        String eventTime = params.getFirst("event_time");
+        String eventTimeStr = params.getFirst("event_time");
 
         /*
          * MAC 주소(주 네트워크 어댑터 MAC, 식별용)
@@ -420,7 +421,21 @@ public class WildpathController {
             allParamsStr = S2JsonUtil.toJsonString(params);
         }
 
-        wildpathAnalysisService.createFileOutboundHist("ALLOW".equals(action) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED, analysisId, orgCode, channel, reason, eventTime, macAddr, destHost, fileName, fileSize, fileCount, allParamsStr);
+        FileOutboundHistVO paramVO = new FileOutboundHistVO();
+        paramVO.setOutboundStatusCcd("ALLOW".equals(action) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED);
+        paramVO.setOutboundChannelCcd(channelCd);
+        paramVO.setOutboundReasonCcd(reasonCd);
+        paramVO.setSender(null); // !!s2!! 발신자를 어떻게 할지 생각해보자.
+        paramVO.setAnalysisId(analysisId);
+        paramVO.setFileNm(fileName);
+        paramVO.setOrgCd(orgCode);
+        paramVO.setMacAddr(macAddr);
+        paramVO.setDestHost(destHost);
+        paramVO.setTotalFileCount(Integer.parseInt(fileCount));
+        paramVO.setTotalFileSize(Long.parseLong(fileSize));
+        paramVO.setEventDtStr(eventTimeStr);
+
+        wildpathAnalysisService.createFileOutboundHist(paramVO, allParamsStr);
     }
 
     /**
