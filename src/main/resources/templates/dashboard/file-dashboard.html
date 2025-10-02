@@ -91,12 +91,10 @@
                 }
             };
 
-            // const pieChartInfo = {
-            //     // 전송 채널 현황
-            //     transmissionChannelStatus: {
-            //         color: ['#5070dd', '#b6d634', '#505372', '#ff994d', '#0ca8df', '#ffd10a', '#fb628b', '#785db0', '#3fbe95']
-            //     }
-            // };
+            const pieChartInfo = {
+                // 전송 채널 현황
+                fileOutboundChannelInfo: []
+            };
 
             // LLM 이 분석한 파일 정보
             const fileDetectionInfo = {
@@ -197,6 +195,19 @@
                             semicircleChartInfo2.mailOutboundStatus.sentCount++;
                             semicircleChartInfo2.mailOutboundStatus.fileCount += Number(event.data.data['fileCount'] || 0);
                             semicircleChartInfo2.mailOutboundStatus.fileSize += Number(event.data.data['totalFileSize'] || 0);
+
+                            // 전송 채널 현황
+                            const fileOutboundChannelInfo = pieChartInfo['fileOutboundChannelInfo'];
+                            const foundChannel = fileOutboundChannelInfo.find((item) => item.name === event.data.data['outboundChannelCcd']);
+                            if (foundChannel) {
+                                foundChannel.value++;
+                            } else {
+                                fileOutboundChannelInfo.push({
+                                    name: fileOutboundHistChannelInfo.outboundChannelCcd,
+                                    value: fileOutboundHistChannelInfo.outboundHistCount || 0
+                                });
+                            }
+                            updatePieChart();
                         } else {
                             semicircleChartInfo2.mailOutboundStatus.blockedCount++;
                         }
@@ -214,8 +225,7 @@
 
             function getAnalysisStatistics() {
                 S2Util.fetch(
-                    // '[[@{/dashboard/analysis-statistics}]]',
-                    '[[@{/dashboard/analysis-statistics2}]]',
+                    '[[@{/dashboard/analysis-statistics}]]',
                     {
                         method: 'get',
                         dataType: 'json',
@@ -273,9 +283,9 @@
 
                         {
                             // 첨부 파일 외부 전송 현황
-                            const fileOutboundHistInfoList = response.fileOutboundHistInfoList;
-                            if (fileOutboundHistInfoList) {
-                                for (const fileOutboundHistInfo of fileOutboundHistInfoList) {
+                            const fileOutboundHistStatusInfoList = response.fileOutboundHistStatusInfoList;
+                            if (fileOutboundHistStatusInfoList) {
+                                for (const fileOutboundHistInfo of fileOutboundHistStatusInfoList) {
                                     switch (fileOutboundHistInfo.outboundStatusCcd) {
                                         case '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]':
                                             semicircleChartInfo2.mailOutboundStatus.sentCount = fileOutboundHistInfo.outboundHistCount || 0;
@@ -336,6 +346,27 @@
                             fileDetectionInfo.fileSize = fileAnalysisInfo.analysisFileSize;
                             fileDetectionInfo.fileCount = fileAnalysisInfo.analysisFileCount;
                             updateFileDetectionInfo();
+                        }
+
+                        {
+                            // 전송 채널 현황
+                            const fileOutboundHistChannelInfoList = response.fileOutboundHistChannelInfoList;
+                            if (fileOutboundHistChannelInfoList) {
+                                for (const fileOutboundHistChannelInfo of fileOutboundHistChannelInfoList) {
+                                    const fileOutboundChannelInfo = pieChartInfo['fileOutboundChannelInfo'];
+                                    const foundChannel = fileOutboundChannelInfo.find((item) => item.name === fileOutboundHistChannelInfo.outboundChannelCcd);
+                                    if (foundChannel) {
+                                        foundChannel.value += fileOutboundHistChannelInfo.outboundHistCount || 0;
+                                    } else {
+                                        fileOutboundChannelInfo.push({
+                                            name: fileOutboundHistChannelInfo.outboundChannelCcd,
+                                            value: fileOutboundHistChannelInfo.outboundHistCount || 0
+                                        });
+                                    }
+                                }
+
+                                updatePieChart();
+                            }
                         }
                     }
                 );
@@ -985,18 +1016,9 @@
                 window.addEventListener('resize', function () {
                     pieChart['transmissionChannel'].resize();
                 });
-
-                // updatePieChart 함수도 data만 갱신하도록 유지
-                updatePieChart([
-                    {name: 'FTP/SSH', value: 5.6},
-                    {name: '메일/클라우드', value: 1},
-                    {name: '메신저', value: 0.8},
-                    {name: '프린트', value: 0.5},
-                    {name: 'USB', value: 3.8}
-                ]);
             }
 
-            function updatePieChart(datas) {
+            function updatePieChart() {
                 // radius(반지름) 크기에 따라 라벨 위치 동적 결정
                 // window.transmissionPieRadius의 두 번째 값(예: '60%')을 기준으로 판단
                 let outerRadius = 60; // 기본값
@@ -1014,7 +1036,7 @@
                         series: [
                             {
                                 radius: window.transmissionPieRadius,
-                                data: datas,
+                                data: pieChartInfo['fileOutboundChannelInfo'],
                                 label: {
                                     position: labelPosition
                                 }

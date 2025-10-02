@@ -59,6 +59,8 @@ public class AnalysisStatisticsVO extends DefaultVO {
 
     /* 외부전송 상태 공통코드 */
     private String outboundStatusCcd;
+    /* 외부전송 채널 공통코드 */
+    private String outboundChannelCcd;
     /* 외부전송 이력 개수 */
     private Integer outboundHistCount;
     /* 외부전송 파일 개수 */
@@ -264,6 +266,14 @@ public class AnalysisStatisticsVO extends DefaultVO {
 
     public void setOutboundStatusCcd(String outboundStatusCcd) {
         this.outboundStatusCcd = outboundStatusCcd;
+    }
+
+    public String getOutboundChannelCcd() {
+        return outboundChannelCcd;
+    }
+
+    public void setOutboundChannelCcd(String outboundChannelCcd) {
+        this.outboundChannelCcd = outboundChannelCcd;
     }
 
     public Integer getOutboundHistCount() {

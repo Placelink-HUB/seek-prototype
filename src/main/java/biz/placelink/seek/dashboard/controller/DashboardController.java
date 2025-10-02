@@ -92,7 +92,7 @@ public class DashboardController {
      *
      * @return 분석 현황
      */
-    @GetMapping(value = {"/dashboard/analysis-statistics", "/dashboard/analysis-statistics2"})
+    @GetMapping(value = "/dashboard/analysis-statistics")
     public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", defaultValue = "") String schDe, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
@@ -103,13 +103,10 @@ public class DashboardController {
         response.put("realtimeData", dashboardService.selectRealtimeAnalysisCount(vSchDe));
         response.put("lastAnalysisCompleteDateTimeStr", dashboardService.selectLastAnalysisCompleteDateTimeStr(vSchDe));
         response.put("hitRankDataList", dashboardService.selectTopSensitiveInformation(vSchDe));
-
-        if ("/dashboard/analysis-statistics".equals(request.getServletPath())) {
-            response.put("maskingData", maskHistService.selectMaskStatus(vSchDe));
-        } else if ("/dashboard/analysis-statistics2".equals(request.getServletPath())) {
-            response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(vSchDe));
-            response.put("fileOutboundHistInfoList", dashboardService.selectFileOutboundHistInformation(vSchDe));
-        }
+        response.put("maskingData", maskHistService.selectMaskStatus(vSchDe));
+        response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(vSchDe));
+        response.put("fileOutboundHistStatusInfoList", dashboardService.selectFileOutboundHistStatusInformation(vSchDe));
+        response.put("fileOutboundHistChannelInfoList", dashboardService.selectFileOutboundHistChannelInformation(vSchDe));
 
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);

@@ -164,16 +164,16 @@ public class WildpathAnalysisService {
             pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_FILE_OUTBOUND);
             pushMap.put("outboundStatusCcd", paramVO.getOutboundStatusCcd());
 
-            pushMap.put("sigId", paramVO.getAnalysisId());
+            pushMap.put("analysisId", paramVO.getAnalysisId());
             pushMap.put("orgCode", paramVO.getOrgCd());
-            pushMap.put("channel", paramVO.getOutboundChannelCcd());
-            pushMap.put("reason", paramVO.getOutboundReasonCcd());
-            pushMap.put("eventTime", paramVO.getEventDtStr());
+            pushMap.put("outboundChannelCcd", paramVO.getOutboundChannelCcd());
+            pushMap.put("outboundReasonCcd", paramVO.getOutboundReasonCcd());
+            pushMap.put("eventDtStr", paramVO.getEventDtStr());
             pushMap.put("macAddr", paramVO.getMacAddr());
             pushMap.put("destHost", paramVO.getDestHost());
-            pushMap.put("fileName", paramVO.getFileNm());
-            pushMap.put("fileSize", paramVO.getTotalFileSize());
-            pushMap.put("fileCount", paramVO.getTotalFileCount());
+            pushMap.put("fileNm", paramVO.getFileNm());
+            pushMap.put("totalFileSize", paramVO.getTotalFileSize());
+            pushMap.put("totalFileCount", paramVO.getTotalFileCount());
 
             if (Constants.CD_OUTBOUND_STATUS_SENT.equals(paramVO.getOutboundStatusCcd())) {
                 // 전송 되었다면 최초 분석한 파일 정보의 파일 개수와 크기를 가져온다. (totalFileSize 와 totalFileCount 가 정확하다면 중복되어 불필요함)

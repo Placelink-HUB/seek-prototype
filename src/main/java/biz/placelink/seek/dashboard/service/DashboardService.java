@@ -95,12 +95,21 @@ public class DashboardService {
     }
 
     /**
-     * 파일 외부전송 이력 정보를 조회한다.
+     * 파일 외부전송 이력 상태 정보를 조회한다.
      *
-     * @return 파일 외부전송 이력 정보
+     * @return 파일 외부전송 이력 상태 정보
      */
-    public List<AnalysisStatisticsVO> selectFileOutboundHistInformation(String schDe) {
-        return dashboardMapper.selectFileOutboundHistInformation(schDe);
+    public List<AnalysisStatisticsVO> selectFileOutboundHistStatusInformation(String schDe) {
+        return dashboardMapper.selectFileOutboundHistStatusInformation(schDe);
+    }
+
+    /**
+     * 파일 외부전송 이력 채널 정보를 조회한다.
+     *
+     * @return 파일 외부전송 이력 채널 정보
+     */
+    public List<AnalysisStatisticsVO> selectFileOutboundHistChannelInformation(String schDe) {
+        return dashboardMapper.selectFileOutboundHistChannelInformation(schDe);
     }
 
 }

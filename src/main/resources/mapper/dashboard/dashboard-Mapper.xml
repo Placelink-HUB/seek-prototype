@@ -166,8 +166,8 @@
             </if>
     </select>
 
-    <select id="selectFileOutboundHistInformation" resultType="analysisStatisticsVO">
-        /** selectFileOutboundHistInformation : 파일 외부전송 이력 정보를 조회한다. */
+    <select id="selectFileOutboundHistStatusInformation" resultType="analysisStatisticsVO">
+        /** selectFileOutboundHistStatusInformation : 파일 외부전송 이력 상태 정보를 조회한다. */
         SELECT
             sfoh.OUTBOUND_STATUS_CCD,
             COUNT(1) AS OUTBOUND_HIST_COUNT,
@@ -182,6 +182,26 @@
             </if>
         </where>
         GROUP BY sfoh.OUTBOUND_STATUS_CCD
+    </select>
+
+    <select id="selectFileOutboundHistChannelInformation" resultType="analysisStatisticsVO">
+        /** selectFileOutboundHistChannelInformation : 파일 외부전송 이력 채널 정보를 조회한다. */
+        SELECT
+            sfoh.OUTBOUND_CHANNEL_CCD,
+            cc1.COM_CD_NM AS OUTBOUND_CHANNEL_CCD_NM,
+            COUNT(1) AS OUTBOUND_HIST_COUNT
+        FROM SEEK_FILE_OUTBOUND_HIST sfoh
+            LEFT JOIN SEEK_COM_CD cc1
+                ON sfoh.OUTBOUND_CHANNEL_CCD = cc1.COM_CD
+                AND cc1.GROUP_CD = 'OUTBOUND_CHANNEL_CCD'
+        <where>
+            <if test='schDe != null and schDe != ""'>
+                AND (sfoh.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sfoh.CREATE_DT)
+            </if>
+        </where>
+        GROUP BY
+            sfoh.OUTBOUND_CHANNEL_CCD,
+            cc1.COM_CD_NM
     </select>
 
 </mapper>
