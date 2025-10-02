@@ -30,6 +30,7 @@ import biz.placelink.seek.sample.vo.SchArticleVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.file.FileManager;
+import kr.s2.ext.util.S2DateUtil;
 import kr.s2.ext.util.S2JsonUtil;
 
 /**
@@ -118,8 +119,21 @@ public class AnalysisController {
      * @return 파일 검증 목록
      */
     @GetMapping(value = "/analysis/detection-file-list")
-    public String file(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+    public String file(
+            HttpServletResponse response, ModelMap model,
+            @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo,
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+
+        String vSearchStartDe = "";
+        String vSearchEndDe = "";
+
+        if (!S2DateUtil.isValidDate(searchStartDe, "yyyyMMdd") && !S2DateUtil.isValidDate(searchStartDe, "yyyyMMdd")) {
+            // 조회 기간이 없다면 최근 1달을 기본으로 한다.
+        }
+
         SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDe(vSearchStartDe);
+        searchVO.setSearchEndDe(vSearchEndDe);
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
         model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));

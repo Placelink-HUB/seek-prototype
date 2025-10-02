@@ -228,7 +228,7 @@ public class WildpathController {
         String countryCcd = request.getHeader("X-Country_Code");
         String url = request.getRequestURL().toString();
         String header = S2JsonUtil.toJsonString(S2ServletUtil.convertHeadersToMap(request));
-        String queryString = S2ServletUtil.parameterToQueryString(request, true);
+        String queryString = S2ServletUtil.parameterToQueryString(request);
 
         if (S2Util.isEmpty(countryCcd)) {
             // 아직 국가 코드를 보내주지 않아 임시로 한국으로 설정

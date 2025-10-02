@@ -5,14 +5,14 @@ import biz.placelink.seek.com.vo.DefaultVO;
 public class SchAnalysisStatisticsVO extends DefaultVO {
 
     /* 조회 일자 */
-    private String schBeginDe;
+    private String searchStartDe;
 
-    public String getSchBeginDe() {
-        return schBeginDe;
+    public String getSearchStartDe() {
+        return searchStartDe;
     }
 
-    public void setSchBeginDe(String schBeginDe) {
-        this.schBeginDe = schBeginDe;
+    public void setSearchStartDe(String searchStartDe) {
+        this.searchStartDe = searchStartDe;
     }
 
 }
