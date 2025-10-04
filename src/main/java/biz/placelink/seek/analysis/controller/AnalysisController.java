@@ -3,6 +3,8 @@ package biz.placelink.seek.analysis.controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +29,13 @@ import biz.placelink.seek.analysis.service.AnalysisService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
 import biz.placelink.seek.sample.vo.SchArticleVO;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2DateUtil;
 import kr.s2.ext.util.S2JsonUtil;
+import kr.s2.ext.util.S2Util;
 
 /**
  * <pre>
@@ -124,20 +128,19 @@ public class AnalysisController {
             @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
-        String vSearchStartDe = "";
-        String vSearchEndDe = "";
-
-        if (!S2DateUtil.isValidDate(searchStartDe, "yyyyMMdd") && !S2DateUtil.isValidDate(searchStartDe, "yyyyMMdd")) {
-            // 조회 기간이 없다면 최근 1달을 기본으로 한다.
-        }
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
         SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDe(vSearchStartDe);
-        searchVO.setSearchEndDe(vSearchEndDe);
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
-        model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
+
+        model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/detection-file-list";
     }
 
@@ -193,13 +196,23 @@ public class AnalysisController {
      * @return 민감정보 처리 이력 목록
      */
     @GetMapping(value = "/analysis/sensitive-access-hist")
-    public String sensitiveAccessHist(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+    public String sensitiveAccessHist(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
         SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
+        response.setHeader("X-Seek-Mode", seekMode);
+
         // 민감정보 처리 이력 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
-        response.setHeader("X-Seek-Mode", seekMode);
+        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/sensitive-access-hist";
     }
 
@@ -227,13 +240,23 @@ public class AnalysisController {
      * @return 파일전송 차단 현황 목록
      */
     @GetMapping(value = "/analysis/file-blocking-list")
-    public String fileBlockingList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+    public String fileBlockingList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
         SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
+        response.setHeader("X-Seek-Mode", seekMode);
+
         // 파일전송 차단 현황 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
-        response.setHeader("X-Seek-Mode", seekMode);
+        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/file-blocking-list";
     }
 
@@ -244,13 +267,23 @@ public class AnalysisController {
      * @return 서명파일 전송 현황 목록
      */
     @GetMapping(value = "/analysis/file-transfer-list")
-    public String fileTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+    public String fileTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
         SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
+        response.setHeader("X-Seek-Mode", seekMode);
+
         // 서명파일 전송 현황 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
-        response.setHeader("X-Seek-Mode", seekMode);
+        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/file-transfer-list";
     }
 
@@ -261,13 +294,23 @@ public class AnalysisController {
      * @return 시스템 파일 전송 현황 목록
      */
     @GetMapping(value = "/analysis/system-transfer-list")
-    public String systemTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+    public String systemTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
         SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
+        response.setHeader("X-Seek-Mode", seekMode);
+
         // 시스템 파일 전송 현황 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
-        response.setHeader("X-Seek-Mode", seekMode);
+        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/system-transfer-list";
     }
 
@@ -278,14 +321,62 @@ public class AnalysisController {
      * @return 이상 패턴 탐지 현황 목록
      */
     @GetMapping(value = "/analysis/anomaly_detection-list")
-    public String anomalyDetectionList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+    public String anomalyDetectionList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
         SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
+        response.setHeader("X-Seek-Mode", seekMode);
+
         // 이상 패턴 탐지 현황 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
-        response.setHeader("X-Seek-Mode", seekMode);
+        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/anomaly_detection-list";
+    }
+
+    public record SearchPeriod(LocalDate searchStartDate, LocalDate searchEndDate) {
+        public SearchPeriod {
+        }
+
+        public String searchStartDe(String pattern) {
+            return this.searchStartDate() != null ? this.searchStartDate().format(DateTimeFormatter.ofPattern(S2Util.isNotEmpty(pattern) ? pattern : "yyyyMMdd")) : null;
+        }
+
+        public String searchEndDe(String pattern) {
+            return this.searchEndDate() != null ? this.searchEndDate().format(DateTimeFormatter.ofPattern(S2Util.isNotEmpty(pattern) ? pattern : "yyyyMMdd")) : null;
+        }
+    }
+
+    /**
+     * 검색 기간을 설정한다.
+     * 조회 시작일과 종료일이 유효하지 않으면 최근 1개월을 기본값으로 설정한다.
+     *
+     * @param searchStartDe 조회 시작일 (yyyyMMdd 형식)
+     * @param searchEndDe   조회 종료일 (yyyyMMdd 형식)
+     * @param pattern       날짜 형식 패턴 (예: "yyyyMMdd")
+     * @return 설정된 조회 시작일과 종료일을 담은 Map
+     */
+    public static @Nonnull SearchPeriod setSearchPeriod(String searchStartDe, String searchEndDe, String pattern) {
+        LocalDate searchStartDate = null;
+        LocalDate searchEndDate = null;
+
+        if (!S2DateUtil.isValidDate(searchStartDe, pattern, false) && !S2DateUtil.isValidDate(searchStartDe, pattern, false)) {
+            // 조회 기간이 없다면 최근 1달을 기본으로 한다.
+            searchEndDate = LocalDate.now();
+            searchStartDate = searchEndDate.minusMonths(1).plusDays(1);
+        } else {
+            searchStartDate = S2DateUtil.parseToLocalDate(searchStartDe, pattern, false);
+            searchEndDate = S2DateUtil.parseToLocalDate(searchEndDe, pattern, false);
+        }
+
+        return new SearchPeriod(searchStartDate, searchEndDate);
     }
 
 }

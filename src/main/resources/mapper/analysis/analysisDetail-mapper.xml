@@ -106,6 +106,14 @@
             LEFT JOIN SEEK_COM_CD cc2
                 ON sar.MAX_DETECTION_TYPE_CCD = cc2.COM_CD
                 AND cc2.GROUP_CD = 'DETECTION_TYPE_CCD'
+            <where>
+                <if test='searchStartDate neq null'>
+                    AND sa.CREATE_DT >= #{searchStartDate}
+                </if>
+                <if test='searchEndDate neq null'>
+                    AND #{searchEndDateNextDay} > sa.CREATE_DT
+                </if>
+            </where>
     </sql>
 
     <select id="selectFileAnalysisList" parameterType="searchVO" resultType="analysisResultVO">

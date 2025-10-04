@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import biz.placelink.seek.analysis.controller.AnalysisController;
+import biz.placelink.seek.analysis.controller.AnalysisController.SearchPeriod;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
 import biz.placelink.seek.sample.service.ArticleService;
@@ -65,12 +67,22 @@ public class ArticleController {
      * @return Sample 페이지 경로
      */
     @GetMapping(value = "/sample/test")
-    public String tissue(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, Model model) {
+    public String tissue(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, Model model,
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
         SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("MODIFY_DT DESC");
-        model.addAttribute("articleListPagination", articleService.selectArticleListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
+
+        model.addAttribute("articleListPagination", articleService.selectArticleListWithPagination(searchVO));
+        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "sample/test";
     }
 

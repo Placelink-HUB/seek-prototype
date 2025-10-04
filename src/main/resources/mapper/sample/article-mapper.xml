@@ -19,6 +19,12 @@
             <if test='schArticleId neq null and schArticleId neq ""'>
                 AND a.ARTICLE_ID = #{schArticleId}
             </if>
+            <if test='searchStartDate neq null'>
+                AND a.CREATE_DT >= #{searchStartDate}
+            </if>
+            <if test='searchEndDate neq null'>
+                AND #{searchEndDateNextDay} > a.CREATE_DT
+            </if>
         </where>
     </sql>
 
