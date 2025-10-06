@@ -298,6 +298,7 @@
                                     <th>상태</th>
                                     <th>민감정보개수</th>
                                     <th>민감정보등급</th>
+                                    <th>다운로드 수</th>
                                     <th>다운로드</th>
                                 </tr>
                             </thead>
@@ -311,6 +312,7 @@
                                     <td th:text="${fileAnalysis.analysisStatusCcdNm}"></td>
                                     <td th:text="${#numbers.formatInteger(fileAnalysis.totalDetectionCount, 0, 'COMMA')}"></td>
                                     <td th:text="${fileAnalysis.maxDetectionTypeCcdNm}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileAnalysis.downloadCount, 0, 'COMMA')}"></td>
                                     <td>
                                         <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
                                     </td>

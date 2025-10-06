@@ -82,12 +82,12 @@
             sa.ANALYSIS_RESULT_ID,
             sfa.DETECTION_FILE_ID,
             dsf.FILE_NAME AS DETECTION_FILE_NAME,
-            dsf.DOWNLOAD_COUNT,
             sfa.SIGNED_FILE_ID,
             sfa.SIGNED_FILE_HASH,
             sfa.FILE_COUNT,
             sfa.TOTAL_FILE_SIZE,
             sfa.REQUESTER_UID,
+            COALESCE(ssf.DOWNLOAD_COUNT, 0) AS DOWNLOAD_COUNT,
             sar.MAX_DETECTION_TYPE_CCD,
             cc2.COM_CD_NM AS MAX_DETECTION_TYPE_CCD_NM,
             COALESCE(sar.TOTAL_DETECTION_COUNT, 0) AS TOTAL_DETECTION_COUNT,
@@ -101,6 +101,8 @@
                 ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
             LEFT JOIN SEEK_FILE dsf
                 ON sfa.DETECTION_FILE_ID = dsf.FILE_ID
+            LEFT JOIN SEEK_FILE ssf
+                ON sfa.SIGNED_FILE_ID = ssf.FILE_ID
             LEFT JOIN SEEK_COM_CD cc1
                 ON sa.ANALYSIS_STATUS_CCD = cc1.COM_CD
                 AND cc1.GROUP_CD = 'ANALYSIS_STATUS_CCD'
