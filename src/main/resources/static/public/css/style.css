@@ -1195,6 +1195,10 @@ table caption {
   background: linear-gradient(100deg, #080808, #212121);
 }
 
+.main-contents-contents .wrap-contents .contents .status-card .card.type1.half {
+  width: calc(50% - 0.625rem);
+}
+
 .main-contents-contents .wrap-contents .contents .status-card .card.type1 .title-box {
   background-repeat: no-repeat;
   background-position: left center;
