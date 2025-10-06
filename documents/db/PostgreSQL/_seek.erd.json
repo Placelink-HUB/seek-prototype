@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -512.495,
-    "scrollLeft": -595.5315,
+    "scrollTop": -500.495,
+    "scrollLeft": -663,
     "zoomLevel": 0.79,
     "show": 511,
     "database": 16,
@@ -443,6 +443,7 @@
           "qqP9lK1MeYo78KodBn-VQ",
           "FmuX2JXeStRDLkd-TWb-5",
           "HYAF_RDVP4BdTTy3pzXUs",
+          "kd5JkA5WCNZK62KQ7qDDq",
           "YpO_RdE3cXKGAaemzPZQ9",
           "ojnOcW9kWx2UYiZECtCC1"
         ],
@@ -450,6 +451,7 @@
           "qqP9lK1MeYo78KodBn-VQ",
           "FmuX2JXeStRDLkd-TWb-5",
           "HYAF_RDVP4BdTTy3pzXUs",
+          "kd5JkA5WCNZK62KQ7qDDq",
           "YpO_RdE3cXKGAaemzPZQ9",
           "ojnOcW9kWx2UYiZECtCC1"
         ],
@@ -462,7 +464,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1758662809691,
+          "updateAt": 1759751576652,
           "createAt": 1744781035737
         }
       },
@@ -480,6 +482,7 @@
           "IKKttp7GZIQqRqbFSfkav",
           "d9JbLHiwVAeM0eypSBO6C",
           "4ISOLJ_a2m0Tx7LqfSWL4",
+          "Wqja7LT_3x7D4ccXPDzQM",
           "qI13dZEEEYGmTm1rsbzGc",
           "etScfrfLZfAEZE1QupAe0",
           "qon-WgMB9cEfejGkFGAIZ"
@@ -495,6 +498,7 @@
           "IKKttp7GZIQqRqbFSfkav",
           "d9JbLHiwVAeM0eypSBO6C",
           "4ISOLJ_a2m0Tx7LqfSWL4",
+          "Wqja7LT_3x7D4ccXPDzQM",
           "qI13dZEEEYGmTm1rsbzGc",
           "etScfrfLZfAEZE1QupAe0",
           "qon-WgMB9cEfejGkFGAIZ"
@@ -508,7 +512,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1745210630890,
+          "updateAt": 1759751032243,
           "createAt": 1744781054179
         }
       },
@@ -4213,6 +4217,46 @@
           "updateAt": 1759283170457,
           "createAt": 1759283093173
         }
+      },
+      "Wqja7LT_3x7D4ccXPDzQM": {
+        "id": "Wqja7LT_3x7D4ccXPDzQM",
+        "tableId": "GszrHp96dozH39hXraUUI",
+        "name": "DOWNLOAD_COUNT",
+        "comment": "다운로드_수",
+        "dataType": "NUMERIC(12)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 114,
+          "widthComment": 67,
+          "widthDataType": 74,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759751028771,
+          "createAt": 1759750996467
+        }
+      },
+      "kd5JkA5WCNZK62KQ7qDDq": {
+        "id": "kd5JkA5WCNZK62KQ7qDDq",
+        "tableId": "LjJkw6PIkeqL5uDXtbEM4",
+        "name": "DOWNLOAD_COUNT",
+        "comment": "다운로드_수",
+        "dataType": "NUMERIC(12)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 114,
+          "widthComment": 67,
+          "widthDataType": 74,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759751575000,
+          "createAt": 1759751562920
+        }
       }
     },
     "relationshipEntities": {
@@ -4310,8 +4354,8 @@
           "columnIds": [
             "qqP9lK1MeYo78KodBn-VQ"
           ],
-          "x": 2018.1705,
-          "y": 207.5121,
+          "x": 2064.1705,
+          "y": 219.5121,
           "direction": 2
         },
         "end": {
@@ -4320,7 +4364,7 @@
             "10GpbHQTO6MA10w-uwU7p"
           ],
           "x": 2190.2439,
-          "y": 285.4147,
+          "y": 297.4147,
           "direction": 1
         },
         "meta": {

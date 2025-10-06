@@ -66,4 +66,21 @@ public interface FileMapper {
      */
     int insertFileDetailList(@Param("fileDetailList") List<FileDetailVO> fileDetailList, @Param("createUid") String createUid);
 
+    /**
+     * 파일 다운로드 수를 증가시킨다.
+     *
+     * @param fileId 파일ID
+     * @return 증가시킨 파일 수
+     */
+    int updateFileDownloadCountIncrement(@Param("fileId") String fileId, @Param("sortSn") Integer sortSn);
+
+    /**
+     * 파일 상세 다운로드 수를 증가시킨다.
+     *
+     * @param fileId 파일ID
+     * @param sortSn 파일 정렬 순번
+     * @return 증가시킨 파일 상세 수
+     */
+    int updateFileDetailDownloadCountIncrement(@Param("fileId") String fileId, @Param("sortSn") Integer sortSn);
+
 }

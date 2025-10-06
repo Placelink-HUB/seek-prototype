@@ -280,4 +280,20 @@ public class FileService {
         return result;
     }
 
+    /**
+     * 파일 다운로드 수를 증가시킨다.
+     *
+     * @param fileId 파일ID
+     * @param sortSn 파일 정렬 순번
+     * @return 증가시킨 파일 수
+     */
+    @Transactional
+    public int updateDownloadCountIncrement(String fileId, Integer sortSn) {
+        int result = fileMapper.updateFileDetailDownloadCountIncrement(fileId, sortSn);
+        if (result > 0) {
+            fileMapper.updateFileDownloadCountIncrement(fileId, sortSn);
+        }
+        return result;
+    }
+
 }

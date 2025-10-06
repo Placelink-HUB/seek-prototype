@@ -40,6 +40,8 @@ public class AnalysisDetailVO extends AnalysisVO {
     private Integer fileCount;
     /* 전체 파일 사이즈 */
     private Long totalFileSize;
+    /* 파일 다운로드 수 */
+    private Long downloadCount;
     /* 요청자 식별자 */
     private String requesterUid;
 
@@ -161,6 +163,14 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     public void setTotalFileSize(Long totalFileSize) {
         this.totalFileSize = totalFileSize;
+    }
+
+    public Long getDownloadCount() {
+        return downloadCount;
+    }
+
+    public void setDownloadCount(Long downloadCount) {
+        this.downloadCount = downloadCount;
     }
 
     public String getRequesterUid() {

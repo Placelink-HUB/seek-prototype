@@ -13,3 +13,4 @@ file.manager.impl.name: sftpFileManagerImpl
 
 sftp:
   private-key-path: ${user.home}/OneDrive/.ssh/SEEK/placelink_key
+  private-key-passphrase: PL408@redwit

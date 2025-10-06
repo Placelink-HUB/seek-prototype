@@ -46,6 +46,8 @@ public class FileController {
         if (fileDetailList != null && fileDetailList.size() == 1) {
             FileDetailVO fileDetail = fileDetailList.getFirst();
             if (fileDetail != null) {
+                fileService.updateDownloadCountIncrement(fileId, sortSn);
+
                 model.put("fileName", fileDetail.getFileFullName());
                 model.put("fileData", fileManager.readFile(fileDetail.getSavePath(), fileDetail.getSaveName()));
             }

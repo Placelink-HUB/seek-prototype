@@ -143,4 +143,21 @@
         </choose>
     </insert>
 
+    <update id="updateFileDownloadCountIncrement">
+		/** updateFileDownloadCountIncrement : 파일 다운로드 수를 증가시킨다. */
+		UPDATE SEEK_FILE
+		SET DOWNLOAD_COUNT = COALESCE(DOWNLOAD_COUNT, 0) + 1
+		WHERE FILE_ID = #{fileId}
+    </update>
+
+    <update id="updateFileDetailDownloadCountIncrement">
+		/** updateFileDetailDownloadCountIncrement : 파일 상세 다운로드 수를 증가시킨다. */
+		UPDATE SEEK_FILE_DETAIL
+		SET DOWNLOAD_COUNT = COALESCE(DOWNLOAD_COUNT, 0) + 1
+		WHERE FILE_ID = #{fileId}
+            <if test='sortSn neq null'>
+                AND SORT_SN = #{sortSn}
+            </if>
+    </update>
+
 </mapper>

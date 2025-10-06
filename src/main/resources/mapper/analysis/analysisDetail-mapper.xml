@@ -82,6 +82,7 @@
             sa.ANALYSIS_RESULT_ID,
             sfa.DETECTION_FILE_ID,
             dsf.FILE_NAME AS DETECTION_FILE_NAME,
+            dsf.DOWNLOAD_COUNT,
             sfa.SIGNED_FILE_ID,
             sfa.SIGNED_FILE_HASH,
             sfa.FILE_COUNT,
