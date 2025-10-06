@@ -84,6 +84,14 @@ public interface AnalysisDetailMapper {
     int selectFileAnalysisListCount(SearchVO searchVO);
 
     /**
+     * 파일 분석 목록 현황을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 파일 분석 목록 현황
+     */
+    AnalysisResultVO selectFileAnalysisListStatus(SearchVO searchVO);
+
+    /**
      * 파일 분석 정보를 조회한다.
      *
      * @param analysisId 분석 ID

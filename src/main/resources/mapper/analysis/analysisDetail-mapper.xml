@@ -134,6 +134,18 @@
         )
     </select>
 
+    <select id="selectFileAnalysisListStatus" parameterType="searchVO" resultType="analysisResultVO">
+        /** selectFileAnalysisListStatus : 파일 분석 목록 현황을 조회한다. */
+        SELECT
+            SUM(case when SIGNED_FILE_ID is not null then 1 else 0 END) as FILE_COUNT,
+		    SUM(coalesce(TOTAL_FILE_SIZE, 0)) as TOTAL_FILE_SIZE,
+		    SUM(coalesce(DOWNLOAD_COUNT, 0)) as DOWNLOAD_COUNT,
+		    SUM(coalesce(TOTAL_DETECTION_COUNT, 0)) as TOTAL_DETECTION_COUNT
+        FROM (
+            <include refid="sqlFileAnalysis"/>
+        )
+    </select>
+
     <select id="selectFileAnalysis" resultType="analysisResultVO">
         /** selectFileAnalysis : 파일 분석 정보를 조회한다. */
         <include refid="sqlFileAnalysis"/>

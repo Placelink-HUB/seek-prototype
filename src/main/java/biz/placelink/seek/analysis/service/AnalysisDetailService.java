@@ -106,6 +106,16 @@ public class AnalysisDetailService {
     }
 
     /**
+     * 파일 분석 목록 현황을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 파일 분석 목록 현황
+     */
+    public AnalysisResultVO selectFileAnalysisListStatus(SearchVO searchVO) {
+        return analysisDetailMapper.selectFileAnalysisListStatus(searchVO);
+    }
+
+    /**
      * 파일 분석 목록을 조회한다.
      *
      * @param analysisId 분석 ID
