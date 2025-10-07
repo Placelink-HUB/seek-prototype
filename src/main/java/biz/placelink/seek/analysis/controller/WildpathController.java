@@ -34,6 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import biz.placelink.seek.analysis.service.WildpathAnalysisService;
+import biz.placelink.seek.analysis.vo.AgentVO;
 import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
@@ -500,14 +501,30 @@ public class WildpathController {
      */
     @PostMapping(path = "/forward/response/heartbeat")
     protected void heartbeat(@RequestParam MultiValueMap<String, String> params) throws IOException {
-        String orgCode = params.getFirst("org_code");
-        String eventTime = params.getFirst("event_time");
+        /*
+         * {
+         * "host": "<hostname>",
+         * "user_id": "<string>",
+         * "mac_addr": "<AA:BB:CC:DD:EE:FF>",
+         * "org_code": "<string>",
+         * "event_time": "<YYYY-MM-DD HH:MM:SS>",
+         * "components": {
+         * "minispy.sys": true|false,
+         * "mspyUser.exe": true|false,
+         * "WfpBlocker.exe": true|false,
+         * "ClickDomainAgent.exe": true|false
+         * }
+         */
+        String host = params.getFirst("host");
         String userId = params.getFirst("user_id");
         String macAddr = params.getFirst("mac_addr");
-        String host = params.getFirst("host");
+        String orgCode = params.getFirst("org_code");
+        String eventTime = params.getFirst("event_time");
         String components = params.getFirst("components");
 
-        wildpathAnalysisService.pushAgentHeartbeat(orgCode, eventTime, userId, macAddr, host, components);
+        AgentVO agentVO = new AgentVO(host, userId, macAddr, orgCode, eventTime, components);
+
+        wildpathAnalysisService.receiveAgentHeartbeat(agentVO);
     }
 
     /**

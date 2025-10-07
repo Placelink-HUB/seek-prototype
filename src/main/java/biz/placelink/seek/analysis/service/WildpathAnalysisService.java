@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import biz.placelink.seek.analysis.vo.AgentVO;
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
@@ -50,8 +51,9 @@ public class WildpathAnalysisService {
     private final MaskHistService maskHistService;
     private final FileOutboundHistService fileOutboundHistService;
     private final FileService fileService;
+    private final AgentService agentService;
 
-    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, FileOutboundHistService fileOutboundHistService, FileService fileService) {
+    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, FileOutboundHistService fileOutboundHistService, FileService fileService, AgentService agentService) {
         this.serviceWorkerService = serviceWorkerService;
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
@@ -59,6 +61,7 @@ public class WildpathAnalysisService {
         this.maskHistService = maskHistService;
         this.fileOutboundHistService = fileOutboundHistService;
         this.fileService = fileService;
+        this.agentService = agentService;
     }
 
     @Value("${encryption.password}")
@@ -194,26 +197,27 @@ public class WildpathAnalysisService {
     }
 
     /**
-     * SEEK 에이전트 하트비트
+     * SEEK 에이전트 하트비트 수신
      *
-     * @param orgCode    조직코드
-     * @param eventTime  이벤트 시간
-     * @param userId     사용자ID
-     * @param macAddr    MAC 주소
-     * @param host       호스트 이름
-     * @param components 컴포넌트(에이전트) 정보
+     * @param agentVO SEEK 에이전트 정보
      */
-    public void pushAgentHeartbeat(String orgCode, String eventTime, String userId, String macAddr, String host, String components) {
+    public void receiveAgentHeartbeat(AgentVO agentVO) {
         Map<String, Object> pushMap = new HashMap<>();
         pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_AGENT_HEARTBEAT);
-        pushMap.put("orgCode", orgCode);
-        pushMap.put("eventTime", eventTime);
-        pushMap.put("userId", userId);
-        pushMap.put("macAddr", macAddr);
-        pushMap.put("host", host);
-        pushMap.put("components", components);
+        pushMap.put("host", agentVO.getHost());
+        pushMap.put("userId", agentVO.getUserId());
+        pushMap.put("macAddr", agentVO.getMacAddr());
+        pushMap.put("orgCode", agentVO.getOrgCode());
+        pushMap.put("eventTime", agentVO.getEventTime());
+        pushMap.put("components", agentVO.getComponents());
+        pushMap.put("minispySysYn", agentVO.getMinispySysYn());
+        pushMap.put("mspyUserExeYn", agentVO.getMspyUserExeYn());
+        pushMap.put("wfpBlockerExeYn", agentVO.getWfpBlockerExeYn());
+        pushMap.put("clickDomainAgentExeYn", agentVO.getClickDomainAgentExeYn());
 
         serviceWorkerService.sendNotificationAll(pushMap);
+
+        agentService.insertAgentHeartBeatHist(agentVO);
     }
 
     /**

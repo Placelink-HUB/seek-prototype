@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.analysis.service.AgentMapper">
+
+    <insert id="insertAgent" parameterType="agentVO">
+		/** insertAgent : 에이전트 정보를 등록한다. */
+		INSERT INTO SEEK_AGENT (
+			"HOST",
+			USER_ID,
+			MAC_ADDR,
+			ORG_CODE,
+			EVENT_DT,
+			MINISPY_SYS_YN,
+			MSPY_USER_EXE_YN,
+			WFP_BLOCKER_EXE_YN,
+			CLICK_DOMAIN_AGENT_EXE_YN,
+			CREATE_DT,
+			CREATE_UID,
+			MODIFY_DT,
+			MODIFY_UID
+		) VALUES (
+            #{host},
+            #{userId},
+            #{macAddr},
+            #{orgCode},
+            #{eventDt},
+            #{minispySysYn},
+            #{mspyUserExeYn},
+            #{wfpBlockerExeYn},
+            #{clickDomainAgentExeYn},
+            NOW(),
+            #{createUid},
+            NOW(),
+            #{createUid}
+        )
+		ON CONFLICT ("HOST")
+		DO UPDATE SET
+			USER_ID = EXCLUDED.USER_ID,
+			MAC_ADDR = EXCLUDED.MAC_ADDR,
+			ORG_CODE = EXCLUDED.ORG_CODE,
+			EVENT_DT = EXCLUDED.EVENT_DT,
+			MINISPY_SYS_YN = EXCLUDED.MINISPY_SYS_YN,
+			MSPY_USER_EXE_YN = EXCLUDED.MSPY_USER_EXE_YN,
+			WFP_BLOCKER_EXE_YN = EXCLUDED.WFP_BLOCKER_EXE_YN,
+            CLICK_DOMAIN_AGENT_EXE_YN = EXCLUDED.CLICK_DOMAIN_AGENT_EXE_YN,
+			MODIFY_DT = NOW(),
+            MODIFY_UIDc = EXCLUDED.MODIFY_UID
+    </insert>
+
+    <insert id="insertAgentHeartBeatHist" parameterType="agentVO">
+		/** insertAgentHeartBeatHist : 에이전트 상태확인 이력을 등록한다. */
+		INSERT INTO SEEK_AGENT_HEARTBEAT_HIST (
+			"HOST",
+			USER_ID,
+			MAC_ADDR,
+			ORG_CODE,
+			EVENT_TIME,
+			COMPONENTS,
+			EVENT_DT,
+			MINISPY_SYS_YN,
+			MSPY_USER_EXE_YN,
+			WFP_BLOCKER_EXE_YN,
+			CLICK_DOMAIN_AGENT_EXE_YN,
+			CREATE_DT
+		) VALUES (
+            #{host},
+            #{userId},
+            #{macAddr},
+            #{orgCode},
+            #{eventTime},
+            #{components},
+            #{eventDt},
+            #{minispySysYn},
+            #{mspyUserExeYn},
+            #{wfpBlockerExeYn},
+            #{clickDomainAgentExeYn},
+            NOW()
+        )
+    </insert>
+
+</mapper>
