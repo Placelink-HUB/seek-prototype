@@ -43,6 +43,25 @@
         )
     </select>
 
+    <select id="selectArticleListStatus" parameterType="searchVO" resultType="analysisResultVO">
+        /** selectArticleListStatus : 게시글 목록 현황을 조회한다. */
+        SELECT COALESCE(SUM(COALESCE(TOTAL_DETECTION_COUNT, 0)), 0) AS TOTAL_DETECTION_COUNT
+        FROM (
+            <include refid="sqlArticle"/>
+        ) xa
+            LEFT JOIN SEEK_DATABASE_ANALYSIS sda
+                ON xa.ARTICLE_TYPE_CCD = 'TEXT'
+                /* 함수 기반 인덱스 생성을 고려하자
+                CREATE INDEX IDX_TB_ARTICLE_TARGET_ID
+                ON SEEK_DATABASE_ANALYSIS (REGEXP_REPLACE(TARGET_INFORMATION, '^tb_article.content.', ''));
+                */
+                AND REGEXP_REPLACE(sda.TARGET_INFORMATION, '^tb_article.content.', '') = xa.ARTICLE_ID
+            JOIN SEEK_ANALYSIS sa
+                ON sda.ANALYSIS_ID = sa.ANALYSIS_ID
+            JOIN SEEK_ANALYSIS_RESULT sar
+                ON sa.ANALYSIS_RESULT_ID = sar.ANALYSIS_RESULT_ID
+    </select>
+
     <select id="selectArticle" resultType="articleVO">
         /** selectArticle : 게시글을 조회한다. */
         <include refid="sqlArticle"/>

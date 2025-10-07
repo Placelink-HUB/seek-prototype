@@ -81,6 +81,7 @@ public class ArticleController {
         response.setHeader("X-Seek-Mode", seekMode);
 
         model.addAttribute("articleListPagination", articleService.selectArticleListWithPagination(searchVO));
+        model.addAttribute("articleListStatus", articleService.selectArticleListStatus(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "sample/test";

@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.sample.vo.ArticleVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
 
@@ -37,6 +38,14 @@ public interface ArticleMapper {
      * @return 게시글 목록 개수
      */
     int selectArticleListCount(SchArticleVO searchVO);
+
+    /**
+     * 게시글 목록 현황을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 게시글 목록 현황
+     */
+    AnalysisResultVO selectArticleListStatus(SchArticleVO searchVO);
 
     /**
      * 게시글 상세정보를 조회한다.

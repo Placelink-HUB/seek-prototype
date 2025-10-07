@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.PaginationInfo;
 import biz.placelink.seek.sample.vo.ArticleVO;
@@ -51,6 +52,16 @@ public class ArticleService {
         List<ArticleVO> list = articleMapper.selectArticleList(searchVO);
         int count = articleMapper.selectArticleListCount(searchVO);
         return new PaginationInfo(searchVO, list, count);
+    }
+
+    /**
+     * 게시글 목록 현황을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 게시글 현황
+     */
+    public AnalysisResultVO selectArticleListStatus(SchArticleVO searchVO) {
+        return articleMapper.selectArticleListStatus(searchVO);
     }
 
     /**
