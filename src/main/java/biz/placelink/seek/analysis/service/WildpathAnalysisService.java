@@ -20,6 +20,7 @@ import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
+import biz.placelink.seek.analysis.vo.SensitiveInformationUnmaskHistVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.serviceworker.service.ServiceWorkerService;
@@ -52,8 +53,9 @@ public class WildpathAnalysisService {
     private final FileOutboundHistService fileOutboundHistService;
     private final FileService fileService;
     private final AgentService agentService;
+    private final SensitiveInformationUnmaskHistService sensitiveInformationUnmaskHistService;
 
-    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, FileOutboundHistService fileOutboundHistService, FileService fileService, AgentService agentService) {
+    public WildpathAnalysisService(ServiceWorkerService serviceWorkerService, AnalysisService analysisService, AnalysisDetailService analysisDetailService, SensitiveInformationService sensitiveInformationService, MaskHistService maskHistService, FileOutboundHistService fileOutboundHistService, FileService fileService, AgentService agentService, SensitiveInformationUnmaskHistService sensitiveInformationUnmaskHistService) {
         this.serviceWorkerService = serviceWorkerService;
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
@@ -62,6 +64,7 @@ public class WildpathAnalysisService {
         this.fileOutboundHistService = fileOutboundHistService;
         this.fileService = fileService;
         this.agentService = agentService;
+        this.sensitiveInformationUnmaskHistService = sensitiveInformationUnmaskHistService;
     }
 
     @Value("${encryption.password}")
@@ -90,6 +93,7 @@ public class WildpathAnalysisService {
         analysis.setAnalysisId(analysisId);
         analysis.setAnalysisModeCcd(analysisModeCcd);
         analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
+        analysis.setRequestId(requestId);
         analysis.setClientIp(clientIp);
 
         result = analysisService.insertAnalysis(analysis);
@@ -229,10 +233,11 @@ public class WildpathAnalysisService {
      * @param analysisModeCcd 분석 모드 공통코드
      * @param textData        문자열 데이터
      * @param seekMode        마스킹 모드 (mask: 마스킹된 데이터, origin: 원본 데이터, raw: 저장된 실제 데이터)
+     * @param clientIp        클라이언트 IP
      * @return 마스킹한 문자열
      */
     @Transactional(readOnly = false)
-    public String maskSensitiveInformation(String requestId, String analysisModeCcd, String textData, String seekMode) {
+    public String maskSensitiveInformation(String requestId, String analysisModeCcd, String textData, String seekMode, String clientIp) {
         String maskModeCcd = S2Util.isEmpty(seekMode) ? Constants.CD_MASK_MODE_MASK : seekMode;
         String resultText = textData;
         List<String> patterns = new ArrayList<>();
@@ -257,11 +262,21 @@ public class WildpathAnalysisService {
             searchVO.setSchSensitiveInformationIdList(patterns);
             List<SensitiveInformationVO> sensitiveInformationList = sensitiveInformationService.selectSensitiveInformationList(searchVO);
 
-            if (sensitiveInformationList != null) {
+            if (sensitiveInformationList != null && !sensitiveInformationList.isEmpty()) {
                 for (SensitiveInformationVO sensitiveInformation : sensitiveInformationList) {
                     resultText = resultText.replace(sensitiveInformation.getSensitiveInformationId(), Constants.CD_MASK_MODE_UNMASK.equals(maskModeCcd)
                             ? S2EncryptionUtil.decrypt(sensitiveInformation.getTargetText(), encryptionPassword)
                             : sensitiveInformation.getEscapeText());
+                }
+
+                if (Constants.CD_MASK_MODE_UNMASK.equals(maskModeCcd)) {
+                    SensitiveInformationUnmaskHistVO paramVO = new SensitiveInformationUnmaskHistVO();
+                    paramVO.setRequestId(requestId);
+                    paramVO.setClientIp(clientIp);
+                    paramVO.setSensitiveInformationCount(sensitiveInformationList.size());
+
+                    sensitiveInformationUnmaskHistService.insertSensitiveInformationUnmaskHist(paramVO);
+                    sensitiveInformationUnmaskHistService.insertSensitiveInformationUnmaskInfo(requestId, sensitiveInformationList);
                 }
             }
         }

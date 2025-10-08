@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistMapper">
+
+    <insert id="insertSensitiveInformationUnmaskHist" parameterType="sensitiveInformationUnmaskHistVO">
+		/** insertSensitiveInformationUnmaskHist : 민감 정보 언마스크 이력을 등록한다. */
+		INSERT INTO SEEK_SENSITIVE_INFORMATION_UNMASK_HIST (
+			REQUEST_ID,
+			CLIENT_IP,
+			USER_ID,
+			SENSITIVE_INFORMATION_COUNT,
+			CREATE_DT
+		) VALUES (
+            #{requestId},
+            #{clientIp},
+            <choose>
+                <when test='userId != null and userId != ""'>
+                    #{userId}
+                </when>
+                <when test='clientIp != null and clientIp != ""'>
+                    (SELECT USER_ID FROM SEEK_AGENT WHERE CLIENT_IP = #{clientIp} LIMIT 1)
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
+            #{sensitiveInformationCount},
+            NOW()
+        )
+    </insert>
+
+    <insert id="insertSensitiveInformationUnmaskInfo">
+		/** insertSensitiveInformationUnmaskInfo : 민감 정보 언마스크 정보를 등록한다. */
+		INSERT INTO SEEK_SENSITIVE_INFORMATION_UNMASK_INFO (
+			REQUEST_ID,
+			SENSITIVE_INFORMATION_ID
+		) VALUES
+        <foreach collection="sensitiveInformationList" item="item" separator=",">
+			(
+				#{requestId},
+				#{item.sensitiveInformationId}
+			)
+        </foreach>
+		ON CONFLICT (REQUEST_ID, SENSITIVE_INFORMATION_ID)
+		DO NOTHING
+    </insert>
+
+</mapper>

@@ -78,6 +78,7 @@
 			ANALYSIS_MODE_CCD,
 			ANALYSIS_STATUS_CCD,
 			ANALYSIS_MODEL,
+			REQUEST_ID,
 			CLIENT_IP,
 			USER_ID,
 			CREATE_DT,
@@ -87,6 +88,7 @@
 			#{analysisModeCcd},
 			#{analysisStatusCcd},
 			#{analysisModel},
+			#{requestId},
 			#{clientIp},
             <choose>
                 <when test='userId != null and userId != ""'>

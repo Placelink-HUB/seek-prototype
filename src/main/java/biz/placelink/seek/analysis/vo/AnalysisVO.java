@@ -28,6 +28,8 @@ public class AnalysisVO extends DefaultVO {
     private Long analysisTime;
     /* 생성 일시 문자열 */
     private String createDtStr;
+    /* 요청 ID */
+    private String requestId;
     /* 클라이언트 IP */
     private String clientIp;
     /* 유저 ID */
@@ -130,6 +132,14 @@ public class AnalysisVO extends DefaultVO {
 
     public void setCreateDtStr(String createDtStr) {
         this.createDtStr = createDtStr;
+    }
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
     public String getClientIp() {
