@@ -1,5 +1,7 @@
 package biz.placelink.seek.analysis.service;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import biz.placelink.seek.analysis.vo.AgentVO;
@@ -33,5 +35,12 @@ public interface AgentMapper {
      * @return 등록 개수
      */
     int insertAgentHeartBeatHist(AgentVO paramVO);
+
+    /**
+     * 에이전트 상태 목록을 조회한다.
+     *
+     * @return 에이전트 상태 목록
+     */
+    List<AgentVO> selectAgentStatusList();
 
 }

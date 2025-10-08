@@ -5,8 +5,9 @@
     <insert id="insertAgent" parameterType="agentVO">
 		/** insertAgent : 에이전트 정보를 등록한다. */
 		INSERT INTO SEEK_AGENT (
-			"HOST",
+			CLIENT_IP,
 			USER_ID,
+			HOST,
 			MAC_ADDR,
 			ORG_CODE,
 			EVENT_DT,
@@ -19,8 +20,9 @@
 			MODIFY_DT,
 			MODIFY_UID
 		) VALUES (
-            #{host},
+            #{clientIp},
             #{userId},
+            #{host},
             #{macAddr},
             #{orgCode},
             #{eventDt},
@@ -33,9 +35,10 @@
             NOW(),
             #{createUid}
         )
-		ON CONFLICT ("HOST")
+		ON CONFLICT (CLIENT_IP)
 		DO UPDATE SET
 			USER_ID = EXCLUDED.USER_ID,
+			HOST = EXCLUDED.HOST,
 			MAC_ADDR = EXCLUDED.MAC_ADDR,
 			ORG_CODE = EXCLUDED.ORG_CODE,
 			EVENT_DT = EXCLUDED.EVENT_DT,
@@ -50,8 +53,9 @@
     <insert id="insertAgentHeartBeatHist" parameterType="agentVO">
 		/** insertAgentHeartBeatHist : 에이전트 상태확인 이력을 등록한다. */
 		INSERT INTO SEEK_AGENT_HEARTBEAT_HIST (
-			"HOST",
+			CLIENT_IP,
 			USER_ID,
+			HOST,
 			MAC_ADDR,
 			ORG_CODE,
 			EVENT_TIME,
@@ -63,8 +67,9 @@
 			CLICK_DOMAIN_AGENT_EXE_YN,
 			CREATE_DT
 		) VALUES (
-            #{host},
+            #{clientIp},
             #{userId},
+            #{host},
             #{macAddr},
             #{orgCode},
             #{eventTime},
@@ -77,5 +82,59 @@
             NOW()
         )
     </insert>
+
+    <select id="selectAgentStatusList" resultType="agentVO">
+        /** insertAgentHeartBeatHist : 에이전트 상태 목록을 조회한다. */
+        WITH AGENT_STATUS AS (
+            SELECT
+                sa.CLIENT_IP,
+                sa.USER_ID,
+                sa.HOST,
+                sa.MAC_ADDR,
+                sa.ORG_CODE,
+                sa.EVENT_DT,
+                sa.MINISPY_SYS_YN,
+                sa.MSPY_USER_EXE_YN,
+                sa.WFP_BLOCKER_EXE_YN,
+                sa.CLICK_DOMAIN_AGENT_EXE_YN,
+                sa.CREATE_DT,
+                sa.CREATE_UID,
+                sa.MODIFY_DT,
+                sa.MODIFY_UID,
+                (sa.EVENT_DT >= NOW() - INTERVAL '1 minute') AS IS_ACTIVE_RECENTLY
+            FROM SEEK_AGENT sa
+            WHERE sa.MODIFY_DT >= NOW() - INTERVAL '1 month'
+        )
+        SELECT
+            s.CLIENT_IP,
+            s.USER_ID,
+            s.HOST,
+            s.MAC_ADDR,
+            s.ORG_CODE,
+            s.EVENT_DT,
+            /* '최근 1분 이내 활동 여부'에 따라 해당 활동이 있는 값들만 유효하게 처리한다. */
+            CASE
+                WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.MINISPY_SYS_YN, 'N')
+                ELSE 'X'
+            END AS MINISPY_SYS_YN,
+            CASE
+                WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.MSPY_USER_EXE_YN, 'N')
+                ELSE 'X'
+            END AS MSPY_USER_EXE_YN,
+            CASE
+                WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.WFP_BLOCKER_EXE_YN, 'N')
+                ELSE 'X'
+            END AS WFP_BLOCKER_EXE_YN,
+            CASE
+                WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.CLICK_DOMAIN_AGENT_EXE_YN, 'N')
+                ELSE 'X'
+            END AS CLICK_DOMAIN_AGENT_EXE_YN,
+            s.CREATE_DT,
+            s.CREATE_UID,
+            s.MODIFY_DT,
+            s.MODIFY_UID
+        FROM AGENT_STATUS s
+        ORDER BY s.CREATE_DT DESC
+    </select>
 
 </mapper>

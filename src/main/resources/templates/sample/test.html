@@ -1,38 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
-    <th:block layout:fragment="bodyStyle">
-        <style>
-            .header-wrapper .header-wrap {
-                border-right: 0;
-            }
-
-            .content-wrapper.contents-type2 #main .main-contents {
-                margin-top: 0;
-                padding-top: 0;
-            }
-
-            #main .main-contents .btn-sty-02 {
-                margin: 0.625rem 0 0.625rem calc(100% - 11.25rem);
-            }
-
-            #main .main-contents .main-contents-contents .contents-box {
-                margin-top: 0;
-            }
-
-            .table-wrap .table-sty01 th,
-            .table-wrap .table-sty01 td {
-                height: 49px;
-            }
-
-            .table-wrap .pagination-wrapper {
-                margin-top: 1rem;
-            }
-
-            .content-wrapper.contents-type2 {
-                overflow-y: hidden;
-            }
-        </style>
-    </th:block>
+    <th:block layout:fragment="bodyStyle"></th:block>
     <th:block layout:fragment="bodyScript">
         <script type="text/javascript">
             let isRegistering = false;
@@ -61,7 +29,7 @@
                                                 <textarea id="desc" name="desc" rows="3" class="form-textarea" placeholder="내용을 입력해주세요."></textarea>
                                             </div>
                                         </div>
-                                        <div class="button-wrap ma-t30">
+                                        <div class="button-wrap c-ma-t30">
                                             <button class="btn-sty-01 create-article-btn">등록</button>
                                         </div>
                                     </div>
@@ -80,7 +48,7 @@
                                                 <button class="file-upload-button">파일선택</button>
                                             </div>
                                         </div>
-                                        <div class="button-wrap ma-t30">
+                                        <div class="button-wrap c-ma-t30">
                                             <button class="btn-sty-01 create-article-btn">등록</button>
                                         </div>
                                     </div>
@@ -254,7 +222,7 @@
                             <li class="file-upload-ok">
                                 <img class="checked-file" src="/public/images/icon_file_chk.png" alt="파일선택완료"/>
                                 <div class="file-info">
-                                    <div class="flex-sty02">
+                                    <div class="c-flex-sty02">
                                         <div class="file-border"></div>
                                         <div class="file-title file-name">${file.name}</div>
                                     </div>
@@ -351,7 +319,7 @@
             </div>
             <div class="wrap-contents">
                 <div class="top">
-                    <div class="flex-sty01 targetDate-wrap">
+                    <div class="c-flex-sty01 targetDate-wrap">
                         <span th:text="${searchStartDeStr}"></span>
                         <span>&nbsp;~&nbsp;</span>
                         <span th:text="${searchEndDeStr}"></span>

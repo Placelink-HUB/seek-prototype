@@ -104,20 +104,20 @@ table caption {
 /* ===================================================================================================
     Position
 =================================================================================================== */
-.po-a {
+.c-po-a {
   position: absolute;
 }
 
 /* ===================================================================================================
     Flex
 =================================================================================================== */
-.flex-sty01 {
+.c-flex-sty01 {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.flex-sty02 {
+.c-flex-sty02 {
   display: flex;
   align-items: center;
 }
@@ -125,51 +125,72 @@ table caption {
 /* ===================================================================================================
     Width
 =================================================================================================== */
+.c-width-100 {
+  width: 6.25rem;
+}
+.c-width-150 {
+  width: 9.375rem;
+}
+.c-width-200 {
+  width: 12.5rem;
+}
+.c-width-10p {
+  width: 10%;
+}
+.c-width-12p {
+  width: 12%;
+}
+.c-width-15p {
+  width: 15%;
+}
+.c-width-20p {
+  width: 20%;
+}
 
 /* ===================================================================================================
     Margin, Padding
 =================================================================================================== */
-.ma-t5 {
+.c-ma-t5 {
   /* eslint-disable-next-line css/no-important */
   margin-top: 0.3125rem !important;
 }
 
-.ma-t10 {
+.c-ma-t10 {
   /* eslint-disable-next-line css/no-important */
   margin-top: 0.625rem !important;
 }
 
-.ma-t20 {
+.c-ma-t20 {
   /* eslint-disable-next-line css/no-important */
   margin-top: 1.25rem !important;
 }
 
-.ma-t30 {
+.c-ma-t30 {
   /* eslint-disable-next-line css/no-important */
   margin-top: 1.875rem !important;
 }
 
-.ma-l20 {
+.c-ma-l20 {
   /* eslint-disable-next-line css/no-important */
   margin-left: 1.25rem !important;
 }
 
-.ma-l50 {
+.c-ma-l50 {
   /* eslint-disable-next-line css/no-important */
   margin-left: 3.125rem !important;
 }
 
-.pa-0 {
+.c-pa-0 {
   /* eslint-disable-next-line css/no-important */
   padding: 0 !important;
 }
 
-.pa-10 {
+.c-pa-10 {
   /* eslint-disable-next-line css/no-important */
   padding: 0.625rem !important;
 }
 
-.pa-20 {
+.c-pa-20 {
   /* eslint-disable-next-line css/no-important */
   padding: 1.25rem !important;
 }
@@ -1809,6 +1830,17 @@ table caption {
   border: 0.0625rem solid #bfcdf0;
   border-radius: 0.625rem;
   background: #fff;
+}
+
+td.agent-status-indicator {
+  background-image: url(../images/5-off-button.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 2rem auto;
+}
+
+td.agent-status-indicator.Y {
+  background-image: url(../images/5-on-button.png);
 }
 
 @media (max-width: 112.5rem) {

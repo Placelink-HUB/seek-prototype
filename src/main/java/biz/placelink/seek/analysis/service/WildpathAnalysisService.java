@@ -204,8 +204,9 @@ public class WildpathAnalysisService {
     public void receiveAgentHeartbeat(AgentVO agentVO) {
         Map<String, Object> pushMap = new HashMap<>();
         pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_AGENT_HEARTBEAT);
-        pushMap.put("host", agentVO.getHost());
+        pushMap.put("clientIp", agentVO.getClientIp());
         pushMap.put("userId", agentVO.getUserId());
+        pushMap.put("host", agentVO.getHost());
         pushMap.put("macAddr", agentVO.getMacAddr());
         pushMap.put("orgCode", agentVO.getOrgCode());
         pushMap.put("eventTime", agentVO.getEventTime());

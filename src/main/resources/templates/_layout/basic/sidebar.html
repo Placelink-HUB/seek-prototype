@@ -6,14 +6,14 @@
             <nav class="sidebar-nav">
                 <ul>
                     <li class="sidebar-menu menu1" th:classappend="${SERVLET_PATH.startsWith('/dashboard/file')} ? 'active'"><a href="/dashboard/file"></a></li>
-                    <li class="sidebar-menu menu2" th:classappend="${SERVLET_PATH == '/analysis/detection-file-list'} ? 'active'"><a href="/analysis/detection-file-list"></a></li>
+                    <li class="sidebar-menu menu2" th:classappend="${SERVLET_PATH == '/analysis/detection-file'} ? 'active'"><a href="/analysis/detection-file"></a></li>
                     <li class="sidebar-menu menu3" th:classappend="${SERVLET_PATH == '/sample/test'} ? 'active'"><a href="/sample/test"></a></li>
                     <li class="sidebar-menu menu4" th:classappend="${SERVLET_PATH == '/analysis/sensitive-access-hist'} ? 'active'"><a href="/analysis/sensitive-access-hist"></a></li>
-                    <li class="sidebar-menu menu5" th:classappend="${SERVLET_PATH == '/analysis/agent-status-list'} ? 'active'"><a href="/analysis/agent-status-list"></a></li>
-                    <li class="sidebar-menu menu6" th:classappend="${SERVLET_PATH == '/analysis/file-blocking-list'} ? 'active'"><a href="/analysis/file-blocking-list"></a></li>
-                    <li class="sidebar-menu menu7" th:classappend="${SERVLET_PATH == '/analysis/file-transfer-list'} ? 'active'"><a href="/analysis/file-transfer-list"></a></li>
-                    <li class="sidebar-menu menu8" th:classappend="${SERVLET_PATH == '/analysis/system-transfer-list'} ? 'active'"><a href="/analysis/system-transfer-list"></a></li>
-                    <li class="sidebar-menu menu9" th:classappend="${SERVLET_PATH == '/analysis/anomaly_detection-list'} ? 'active'"><a href="/analysis/anomaly_detection-list"></a></li>
+                    <li class="sidebar-menu menu5" th:classappend="${SERVLET_PATH == '/analysis/agent-status'} ? 'active'"><a href="/analysis/agent-status"></a></li>
+                    <li class="sidebar-menu menu6" th:classappend="${SERVLET_PATH == '/analysis/file-blocking'} ? 'active'"><a href="/analysis/file-blocking"></a></li>
+                    <li class="sidebar-menu menu7" th:classappend="${SERVLET_PATH == '/analysis/file-transfer'} ? 'active'"><a href="/analysis/file-transfer"></a></li>
+                    <li class="sidebar-menu menu8" th:classappend="${SERVLET_PATH == '/analysis/system-transfer'} ? 'active'"><a href="/analysis/system-transfer"></a></li>
+                    <li class="sidebar-menu menu9" th:classappend="${SERVLET_PATH == '/analysis/anomaly_detection'} ? 'active'"><a href="/analysis/anomaly_detection"></a></li>
                 </ul>
             </nav>
         </div>

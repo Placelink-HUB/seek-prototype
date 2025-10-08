@@ -1,29 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
-    <th:block layout:fragment="bodyStyle">
-        <style>
-            .header-wrapper .header-wrap {
-                border-right: 0;
-            }
-
-            .content-wrapper.contents-type2 #main .main-contents {
-                margin-top: 0;
-                padding-top: 0;
-            }
-
-            #main .main-contents .btn-sty-02 {
-                margin: 0.625rem 0 0.625rem calc(100% - 11.25rem);
-            }
-
-            #main .main-contents .main-contents-contents .contents-box {
-                margin-top: 0;
-            }
-
-            .content-wrapper.contents-type2 {
-                overflow-y: hidden;
-            }
-        </style>
-    </th:block>
+    <th:block layout:fragment="bodyStyle"></th:block>
     <th:block layout:fragment="bodyScript">
         <script type="text/javascript">
             // eslint-disable-next-line no-unused-vars
@@ -33,7 +10,7 @@
 
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
-                location.href = `/analysis/detection-file-list?pageNo=${pageNo}`;
+                location.href = `/analysis/detection-file?pageNo=${pageNo}`;
             }
 
             // eslint-disable-next-line no-unused-vars
@@ -58,7 +35,7 @@
                                                 <button class="file-upload-button">파일선택</button>
                                             </div>
                                         </div>
-                                        <div class="button-wrap ma-t30">
+                                        <div class="button-wrap c-ma-t30">
                                             <button class="btn-sty-01 create-article-btn">등록</button>
                                         </div>
                                     </div>
@@ -151,7 +128,7 @@
                             <li class="file-upload-ok">
                                 <img class="checked-file" src="/public/images/icon_file_chk.png" alt="파일선택완료"/>
                                 <div class="file-info">
-                                    <div class="flex-sty02">
+                                    <div class="c-flex-sty02">
                                         <div class="file-border"></div>
                                         <div class="file-title file-name">${file.name}</div>
                                     </div>
@@ -237,51 +214,70 @@
         <div class="main-contents-contents">
             <div class="wrap-top">
                 <h1>
-                    <span class="main-title menu5">PC 에이전트 상태</span>
-                    <span class="sub-title">동작 중인 에이전트 상태 점검</span>
+                    <span class="main-title menu2">디지털 서명 현황</span>
+                    <span class="sub-title">민감정보 탐지 현황 및 서명 파일 다운로드</span>
                 </h1>
+                <span class="btn-group">
+                    <button class="btn-type1" onclick="openValidateFile();">파일 검증</button>
+                    <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">기간 검색</button>
+                    <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">전체 현황 다운로드</button>
+                </span>
             </div>
             <div class="wrap-contents">
+                <div class="top">
+                    <div class="c-flex-sty01 targetDate-wrap">
+                        <span th:text="${searchStartDeStr}"></span>
+                        <span>&nbsp;~&nbsp;</span>
+                        <span th:text="${searchEndDeStr}"></span>
+                    </div>
+                </div>
                 <div class="contents">
                     <div class="status-card">
-                        <div class="card type1 three-wide mint">
-                            <div class="title-box menu5-2">
-                                <div class="card-title">정상</div>
-                                <div class="card-desc">데이터 보호 프로세스 모두 작동</div>
+                        <div class="card type1">
+                            <div class="title-box menu2-1">
+                                <div class="card-title">총 서명 완료 수</div>
+                                <div class="card-desc">디지털 서명 처리 수</div>
                             </div>
-                            <div class="card-content"><span>31</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileAnalysisListStatus.fileCount, 0, 'COMMA')}">3,531</span>건</div>
                         </div>
-                        <div class="card type1 three-wide tangerine">
-                            <div class="title-box menu5-3">
-                                <div class="card-title">점검</div>
-                                <div class="card-desc">일부/전체 프로세스 작동 중지</div>
+                        <div class="card type1">
+                            <div class="title-box menu2-2">
+                                <div class="card-title">탐지 수</div>
+                                <div class="card-desc">LLM이 탐지한 민감정보 수</div>
                             </div>
-                            <div class="card-content"><span>7</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileAnalysisListStatus.totalDetectionCount, 0, 'COMMA')}">1,277</span>건</div>
                         </div>
-                        <div class="card type1 three-wide red">
-                            <div class="title-box menu5-4">
-                                <div class="card-title">경고</div>
-                                <div class="card-desc">시간/패턴 이상 탐지</div>
+                        <div class="card type1">
+                            <div class="title-box menu2-3">
+                                <div class="card-title">분석 용량</div>
+                                <div class="card-desc">LLM이 분석한 전체 용량</div>
                             </div>
-                            <div class="card-content"><span>1</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(fileAnalysisListStatus.totalFileSize / 1024.0, 1, 'COMMA', 2, 'POINT')}">749</span>MB</div>
+                        </div>
+                        <div class="card type1">
+                            <div class="title-box menu2-4">
+                                <div class="card-title">다운로드 수</div>
+                                <div class="card-desc">서명파일 다운로드 수</div>
+                            </div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileAnalysisListStatus.downloadCount, 0, 'COMMA')}">3,531</span>건</div>
                         </div>
                     </div>
-                    <h2 class="type1">PC별 데이터 보호 프로세스 작동 현황</h2>
-                    <div class="table-wrap type1 dark-cyan">
+                    <h2 class="type1">디지털 서명 처리 현황</h2>
+                    <div class="table-wrap type1">
                         <table class="table-sty01">
                             <caption>
-                                PC별 데이터 보호 프로세스 작동 현황
+                                디지털 서명 처리 현황
                             </caption>
                             <thead>
                                 <tr>
-                                    <th>Mac 주소</th>
-                                    <th>파일 차단 상태</th>
-                                    <th>SSH/FTP 차단 상태</th>
-                                    <th>화이트리스트 상태</th>
-                                    <th>서명 검증 상태</th>
-                                    <th>최근 Heartbeat 시각</th>
-                                    <th>탐지 결과</th>
-                                    <th>알림 전송</th>
+                                    <th>파일명</th>
+                                    <th>등록 일시</th>
+                                    <th>상태</th>
+                                    <th>파일용량(MB)</th>
+                                    <th>민감정보개수</th>
+                                    <th>민감정보등급</th>
+                                    <th>다운로드 수</th>
+                                    <th>다운로드</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -289,14 +285,16 @@
                                     <td colspan="8">데이터가 없습니다.</td>
                                 </tr>
                                 <tr th:each="fileAnalysis : ${fileAnalysisListPagination.dataList}">
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td th:text="${fileAnalysis.detectionFileName}"></td>
+                                    <td th:text="${#temporals.format(fileAnalysis.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
+                                    <td th:text="${fileAnalysis.analysisStatusCcdNm}"></td>
+                                    <td th:text="${#numbers.formatDecimal(fileAnalysis.totalFileSize / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileAnalysis.totalDetectionCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${fileAnalysis.maxDetectionTypeCcdNm}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileAnalysis.downloadCount, 0, 'COMMA')}"></td>
+                                    <td>
+                                        <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -321,9 +319,6 @@
                     </div>
                 </div>
             </div>
-            <script id="template_contents_file" type="text/template">
-                <img th:src="@{{{=serverUrl}}/file/image/view/{{=fileId}}}" alt="파일이미지"/>
-            </script>
         </div>
     </th:block>
 </html>

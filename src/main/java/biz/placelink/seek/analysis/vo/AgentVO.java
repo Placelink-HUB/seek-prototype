@@ -12,10 +12,12 @@ import kr.s2.ext.util.S2JsonUtil;
 
 public class AgentVO extends DefaultVO {
 
-    /** 호스트 */
-    private String host;
+    /** 클라이언트 IP */
+    private String clientIp;
     /** 사용자 ID */
     private String userId;
+    /** 호스트 */
+    private String host;
     /** MAC 주소 */
     private String macAddr;
     /** 조직 코드 */
@@ -34,21 +36,22 @@ public class AgentVO extends DefaultVO {
     /** ClickDomainAgent.exe 활성화 여부 */
     private String clickDomainAgentExeYn;
 
-    public AgentVO(String host, String userId, String macAddr, String orgCode, String eventTime, String components) {
-        this.setHost(host);
+    public AgentVO(String clientIp, String userId, String host, String macAddr, String orgCode, String eventTime, String components) {
+        this.setClientIp(Optional.ofNullable(clientIp).filter(ip -> !ip.trim().isEmpty()).orElse(host));
         this.setUserId(userId);
+        this.setHost(host);
         this.setMacAddr(macAddr);
         this.setOrgCode(orgCode);
         this.setEventTime(eventTime);
         this.setComponents(components);
     }
 
-    public String getHost() {
-        return host;
+    public String getClientIp() {
+        return clientIp;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public void setClientIp(String clientIp) {
+        this.clientIp = clientIp;
     }
 
     public String getUserId() {
@@ -57,6 +60,14 @@ public class AgentVO extends DefaultVO {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public String getMacAddr() {

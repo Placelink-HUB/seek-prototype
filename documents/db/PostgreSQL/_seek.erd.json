@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -1536.8786,
-    "scrollLeft": -75.5224,
+    "scrollTop": -2413.8786,
+    "scrollLeft": -11,
     "zoomLevel": 0.94,
     "show": 511,
     "database": 16,
@@ -259,7 +259,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1749010355409,
+          "updateAt": 1759906283436,
           "createAt": 1743753799542
         }
       },
@@ -785,6 +785,7 @@
         "columnIds": [
           "RBC1nkgXE1pXR9hUU9KNU",
           "fKI1uV9ct5OOOKLD2X6la",
+          "-eHj6TDTciyA-C-seSweu",
           "oVwiDqHRD2s84eSSsrnya",
           "GBMeCjmAhEiJIZ11s5uSh",
           "R88dzyRP5twhJ-alExSKv",
@@ -800,6 +801,7 @@
         "seqColumnIds": [
           "RBC1nkgXE1pXR9hUU9KNU",
           "fKI1uV9ct5OOOKLD2X6la",
+          "-eHj6TDTciyA-C-seSweu",
           "oVwiDqHRD2s84eSSsrnya",
           "GBMeCjmAhEiJIZ11s5uSh",
           "R88dzyRP5twhJ-alExSKv",
@@ -813,15 +815,15 @@
           "cbJDQoH4sHqmPsvg5mXIn"
         ],
         "ui": {
-          "x": 175.9494,
-          "y": 2548.1219,
+          "x": 198.2896,
+          "y": 2524.7177,
           "zIndex": 3147,
           "widthName": 70,
           "widthComment": 80,
           "color": ""
         },
         "meta": {
-          "updateAt": 1759865884140,
+          "updateAt": 1759906309379,
           "createAt": 1759865377556
         }
       },
@@ -830,8 +832,9 @@
         "name": "SEEK_AGENT_HEARTBEAT_HIST",
         "comment": "SEE_에이전트_상태확인_이력",
         "columnIds": [
-          "SqeEJQ1qlRZMYRsmd0XBN",
+          "LIPxGcVZw46nCscTmCJbC",
           "9u-3yLCJUCpIZrbz7-rTU",
+          "SqeEJQ1qlRZMYRsmd0XBN",
           "Ni_p37YOpnMW86WI82UQ5",
           "XknwM87BDtmvGIhZYjcgj",
           "CsZtEgrjqAGqmI0fVRFRc",
@@ -844,8 +847,9 @@
           "O8kTn1zCnls7jTajwystd"
         ],
         "seqColumnIds": [
-          "SqeEJQ1qlRZMYRsmd0XBN",
+          "LIPxGcVZw46nCscTmCJbC",
           "9u-3yLCJUCpIZrbz7-rTU",
+          "SqeEJQ1qlRZMYRsmd0XBN",
           "Ni_p37YOpnMW86WI82UQ5",
           "XknwM87BDtmvGIhZYjcgj",
           "CsZtEgrjqAGqmI0fVRFRc",
@@ -867,7 +871,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1759867201660,
+          "updateAt": 1759906415548,
           "createAt": 1759865918096
         }
       }
@@ -4356,20 +4360,20 @@
       "RBC1nkgXE1pXR9hUU9KNU": {
         "id": "RBC1nkgXE1pXR9hUU9KNU",
         "tableId": "zAG2q7iXupfX8i0s1DKWT",
-        "name": "HOST",
-        "comment": "호스트",
-        "dataType": "VARCHAR(256)",
+        "name": "CLIENT_IP",
+        "comment": "클라이언트_IP",
+        "dataType": "VARCHAR(32)",
         "default": "",
         "options": 10,
         "ui": {
           "keys": 1,
           "widthName": 60,
-          "widthComment": 60,
-          "widthDataType": 81,
+          "widthComment": 77,
+          "widthDataType": 75,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1759865424779,
+          "updateAt": 1759906440247,
           "createAt": 1759865403601
         }
       },
@@ -4871,6 +4875,46 @@
         "meta": {
           "updateAt": 1759866117208,
           "createAt": 1759866117208
+        }
+      },
+      "-eHj6TDTciyA-C-seSweu": {
+        "id": "-eHj6TDTciyA-C-seSweu",
+        "tableId": "zAG2q7iXupfX8i0s1DKWT",
+        "name": "HOST",
+        "comment": "호스트",
+        "dataType": "VARCHAR(256)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 81,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759906303239,
+          "createAt": 1759906291088
+        }
+      },
+      "LIPxGcVZw46nCscTmCJbC": {
+        "id": "LIPxGcVZw46nCscTmCJbC",
+        "tableId": "t9kEG8BHPteBO7FKIUJUV",
+        "name": "CLIENT_IP",
+        "comment": "클라이언트_IP",
+        "dataType": "VARCHAR(32)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 77,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759906434475,
+          "createAt": 1759906387284
         }
       }
     },

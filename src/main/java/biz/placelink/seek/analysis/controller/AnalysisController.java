@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import biz.placelink.seek.analysis.service.AgentService;
 import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.AnalysisService;
 import biz.placelink.seek.com.constants.Constants;
@@ -53,11 +54,13 @@ public class AnalysisController {
 
     private final AnalysisService analysisService;
     private final AnalysisDetailService analysisDetailService;
+    private final AgentService agentService;
     private final FileManager fileManager;
 
-    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService, FileManager fileManager) {
+    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService, AgentService agentService, FileManager fileManager) {
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
+        this.agentService = agentService;
         this.fileManager = fileManager;
     }
 
@@ -117,12 +120,12 @@ public class AnalysisController {
     }
 
     /**
-     * 파일 검증 목록
+     * 파일 검증
      *
      * @param model ModelMap
-     * @return 파일 검증 목록
+     * @return 파일 검증 화면
      */
-    @GetMapping(value = "/analysis/detection-file-list")
+    @GetMapping(value = "/analysis/detection-file")
     public String file(
             HttpServletResponse response, ModelMap model,
             @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo,
@@ -142,7 +145,7 @@ public class AnalysisController {
         model.addAttribute("fileAnalysisListStatus", analysisDetailService.selectFileAnalysisListStatus(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
-        return "analysis/detection-file-list";
+        return "analysis/detection-file";
     }
 
     /**
@@ -221,26 +224,41 @@ public class AnalysisController {
      * PC 에이전트 상태
      *
      * @param model ModelMap
-     * @return PC 에이전트 상태 목록
+     * @return PC 에이전트 상태 화면
      */
-    @GetMapping(value = "/analysis/agent-status-list")
-    public String agentStatusList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
+    @GetMapping(value = "/analysis/agent-status")
+    public String agentStatus(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
         SchArticleVO searchVO = new SchArticleVO();
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
         // PC 에이전트 상태 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         response.setHeader("X-Seek-Mode", seekMode);
-        return "analysis/agent-status-list";
+        return "analysis/agent-status";
+    }
+
+    /**
+     * PC 에이전트 상태 목록을 조회한다.
+     *
+     * @return PC 에이전트 상태 목록
+     */
+    @GetMapping(value = "/analysis/agent-status-list")
+    public ResponseEntity<Map<String, Object>> agentStatusList() {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("agentStatusList", agentService.selectAgentStatusList());
+
+        response.put(Constants.RESULT_CODE, 1);
+        return ResponseEntity.ok(response);
     }
 
     /**
      * 파일전송 차단 현황
      *
      * @param model ModelMap
-     * @return 파일전송 차단 현황 목록
+     * @return 파일전송 차단 현황 화면
      */
-    @GetMapping(value = "/analysis/file-blocking-list")
+    @GetMapping(value = "/analysis/file-blocking")
     public String fileBlockingList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
@@ -258,16 +276,16 @@ public class AnalysisController {
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
-        return "analysis/file-blocking-list";
+        return "analysis/file-blocking";
     }
 
     /**
      * 서명파일 전송 현황
      *
      * @param model ModelMap
-     * @return 서명파일 전송 현황 목록
+     * @return 서명파일 전송 현황
      */
-    @GetMapping(value = "/analysis/file-transfer-list")
+    @GetMapping(value = "/analysis/file-transfer")
     public String fileTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
@@ -285,16 +303,16 @@ public class AnalysisController {
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
-        return "analysis/file-transfer-list";
+        return "analysis/file-transfer";
     }
 
     /**
      * 시스템 파일 전송 현황
      *
      * @param model ModelMap
-     * @return 시스템 파일 전송 현황 목록
+     * @return 시스템 파일 전송 현황 화면
      */
-    @GetMapping(value = "/analysis/system-transfer-list")
+    @GetMapping(value = "/analysis/system-transfer")
     public String systemTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
@@ -312,7 +330,7 @@ public class AnalysisController {
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
-        return "analysis/system-transfer-list";
+        return "analysis/system-transfer";
     }
 
     /**
@@ -321,7 +339,7 @@ public class AnalysisController {
      * @param model ModelMap
      * @return 이상 패턴 탐지 현황 목록
      */
-    @GetMapping(value = "/analysis/anomaly_detection-list")
+    @GetMapping(value = "/analysis/anomaly_detection")
     public String anomalyDetectionList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
@@ -339,7 +357,7 @@ public class AnalysisController {
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
-        return "analysis/anomaly_detection-list";
+        return "analysis/anomaly_detection";
     }
 
     public record SearchPeriod(LocalDate searchStartDate, LocalDate searchEndDate) {

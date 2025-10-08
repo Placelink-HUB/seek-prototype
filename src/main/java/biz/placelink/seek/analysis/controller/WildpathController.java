@@ -503,8 +503,9 @@ public class WildpathController {
     protected void heartbeat(@RequestParam MultiValueMap<String, String> params) throws IOException {
         /*
          * {
-         * "host": "<hostname>",
+         * "client_ip": "<string>",
          * "user_id": "<string>",
+         * "host": "<hostname>",
          * "mac_addr": "<AA:BB:CC:DD:EE:FF>",
          * "org_code": "<string>",
          * "event_time": "<YYYY-MM-DD HH:MM:SS>",
@@ -515,14 +516,15 @@ public class WildpathController {
          * "ClickDomainAgent.exe": true|false
          * }
          */
-        String host = params.getFirst("host");
+        String clientIp = params.getFirst("client_ip");
         String userId = params.getFirst("user_id");
+        String host = params.getFirst("host");
         String macAddr = params.getFirst("mac_addr");
         String orgCode = params.getFirst("org_code");
         String eventTime = params.getFirst("event_time");
         String components = params.getFirst("components");
 
-        AgentVO agentVO = new AgentVO(host, userId, macAddr, orgCode, eventTime, components);
+        AgentVO agentVO = new AgentVO(clientIp, userId, host, macAddr, orgCode, eventTime, components);
 
         wildpathAnalysisService.receiveAgentHeartbeat(agentVO);
     }

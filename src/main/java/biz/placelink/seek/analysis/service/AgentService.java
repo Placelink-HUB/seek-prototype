@@ -1,5 +1,7 @@
 package biz.placelink.seek.analysis.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,15 @@ public class AgentService {
             agentMapper.insertAgent(paramVO);
         }
         return result;
+    }
+
+    /**
+     * 에이전트 상태 목록을 조회한다.
+     *
+     * @return 에이전트 상태 목록
+     */
+    public List<AgentVO> selectAgentStatusList() {
+        return agentMapper.selectAgentStatusList();
     }
 
 }

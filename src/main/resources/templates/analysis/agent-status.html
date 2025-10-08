@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
+    <th:block layout:fragment="bodyStyle"></th:block>
+    <th:block layout:fragment="bodyScript">
+        <script type="text/javascript">
+            // eslint-disable-next-line no-unused-vars
+            function initPage() {
+                {
+                    // 에이전트 상태를 주기적으로 조회한다.
+                    getAgentStatus();
+                    setInterval(function () {
+                        getAgentStatus();
+                    }, 10_000);
+                }
+            }
+
+            function getAgentStatus() {
+                S2Util.fetch(
+                    '[[@{/analysis/agent-status-list}]]',
+                    {
+                        method: 'get',
+                        dataType: 'json'
+                    },
+                    function (response) {
+                        console.log('response', response);
+
+                        {
+                            response.agentStatusList.push({
+                                clientIp: '1.1.1.1',
+                                macAddr: '11:11:11:11:11:11',
+                                userId: 'admin',
+                                minispySysYn: 'Y',
+                                mspyUserExeYn: 'Y',
+                                wfpBlockerExeYn: 'Y'
+                            });
+
+                            // PC별 데이터 보호 프로세스 작동 현황
+                            const agentStatusList = document.querySelector('#agentStatusList');
+                            if (!response.agentStatusList || response.agentStatusList.length === 0) {
+                                agentStatusList.innerHTML = '<tr><td colspan="10">데이터가 없습니다.</td></tr>';
+                            } else {
+                                agentStatusList.innerHTML = '';
+                                for (const agentStatus of response.agentStatusList) {
+                                    agentStatusList.innerHTML += `
+                                        <tr>
+                                            <td>${agentStatus.clientIp}</td>
+                                            <td>${agentStatus.macAddr}</td>
+                                            <td>${agentStatus.userId ? agentStatus.userId : '-'}</td>
+                                            <td class="agent-status-indicator ${agentStatus.minispySysYn}"></td>
+                                            <td class="agent-status-indicator ${agentStatus.mspyUserExeYn}"></td>
+                                            <td class="agent-status-indicator ${agentStatus.wfpBlockerExeYn}"></td>
+                                            <td class="agent-status-indicator ${agentStatus.clickDomainAgentExeYn}"></td>
+                                            <td>${agentStatus.eventDateTime ? dayjs(agentStatus.eventDateTime, 'YYYY-MM-DDTHH:mm:ss').format('YYYY년 MM월 DD일 HH시 mm분') : '-'}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                    `;
+                                }
+                            }
+                        }
+                    }
+                );
+            }
+        </script>
+    </th:block>
+    <th:block layout:fragment="bodyFragment">
+        <div class="main-contents-contents">
+            <div class="wrap-top">
+                <h1>
+                    <span class="main-title menu5">PC 에이전트 상태</span>
+                    <span class="sub-title">동작 중인 에이전트 상태 점검</span>
+                </h1>
+            </div>
+            <div class="wrap-contents">
+                <div class="contents">
+                    <div class="status-card">
+                        <div class="card type1 three-wide mint">
+                            <div class="title-box menu5-2">
+                                <div class="card-title">정상</div>
+                                <div class="card-desc">데이터 보호 프로세스 모두 작동</div>
+                            </div>
+                            <div class="card-content"><span>31</span>건</div>
+                        </div>
+                        <div class="card type1 three-wide tangerine">
+                            <div class="title-box menu5-3">
+                                <div class="card-title">점검</div>
+                                <div class="card-desc">일부/전체 프로세스 작동 중지</div>
+                            </div>
+                            <div class="card-content"><span>7</span>건</div>
+                        </div>
+                        <div class="card type1 three-wide red">
+                            <div class="title-box menu5-4">
+                                <div class="card-title">경고</div>
+                                <div class="card-desc">시간/패턴 이상 탐지</div>
+                            </div>
+                            <div class="card-content"><span>1</span>건</div>
+                        </div>
+                    </div>
+                    <h2 class="type1">PC별 데이터 보호 프로세스 작동 현황</h2>
+                    <div class="table-wrap type1 dark-cyan">
+                        <table class="table-sty01">
+                            <caption>
+                                PC별 데이터 보호 프로세스 작동 현황
+                            </caption>
+                            <thead>
+                                <tr>
+                                    <th>IP</th>
+                                    <th>Mac 주소</th>
+                                    <th>사용자 ID</th>
+                                    <th class="c-width-10p">파일 차단 상태</th>
+                                    <th class="c-width-10p">SSH/FTP 차단 상태</th>
+                                    <th class="c-width-10p">화이트리스트 상태</th>
+                                    <th class="c-width-10p">서명 검증 상태</th>
+                                    <th>최근 Heartbeat 시각</th>
+                                    <th>탐지 결과</th>
+                                    <th>알림 전송</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agentStatusList"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</html>

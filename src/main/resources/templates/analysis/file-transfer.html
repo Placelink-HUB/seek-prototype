@@ -1,138 +1,14 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
-    <th:block layout:fragment="bodyStyle">
-        <style>
-            .header-wrapper .header-wrap {
-                border-right: 0;
-            }
-
-            .content-wrapper.contents-type2 #main .main-contents {
-                margin-top: 0;
-                padding-top: 0;
-            }
-
-            #main .main-contents .btn-sty-02 {
-                margin: 0.625rem 0 0.625rem calc(100% - 11.25rem);
-            }
-
-            #main .main-contents .main-contents-contents .contents-box {
-                margin-top: 0;
-            }
-
-            .content-wrapper.contents-type2 {
-                overflow-y: hidden;
-            }
-        </style>
-    </th:block>
+    <th:block layout:fragment="bodyStyle"></th:block>
     <th:block layout:fragment="bodyScript">
         <script type="text/javascript">
             // eslint-disable-next-line no-unused-vars
             function initPage() {}
 
-            let isRegistering = false;
-
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
-                location.href = `/analysis/detection-file-list?pageNo=${pageNo}`;
-            }
-
-            // eslint-disable-next-line no-unused-vars
-            function openValidateFile() {
-                S2Util.showModal(
-                    `
-                        <div class="risk-inspection-wrap modal">
-                            <div class="tab-container">
-                                <div>
-                                    <div id="tab-file" class="tab-contents active">
-                                        <div class="contents file-upload">
-                                            <div class="file-upload-box">
-                                                <input type="file" class="file-upload d-none" multiple accept=".pdf, .hwpx, .docx, .xlsx, .pptx"/>
-                                                <div class="file-upload-icon">
-                                                    <img src="/public/images/file_upload_icon.png" alt="파일아이콘"/>
-                                                </div>
-                                                <ul class="upload-file-list">
-                                                </ul>
-                                                <div class="file-upload-text">
-                                                    <p>첨부할 파일을 여기에 끌어다 놓거나, 파일 선택 버튼을 직접 선택해주세요.</p>
-                                                </div>
-                                                <button class="file-upload-button">파일선택</button>
-                                            </div>
-                                        </div>
-                                        <div class="button-wrap ma-t30">
-                                            <button class="btn-sty-01 create-article-btn">등록</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `,
-                    {
-                        width: '800px',
-                        title: '파일 검증'
-                    },
-                    function () {
-                        initDropZone();
-
-                        // 파일 검증 등록 버튼 클릭 이벤트 처리
-                        document.body.addEventListener('click', (event) => {
-                            if (event.target.classList.contains('create-article-btn') && !isRegistering) {
-                                isRegistering = true;
-
-                                if (g_uploadFiles.length === 0) {
-                                    S2Util.alert('파일이 없습니다.');
-                                    isRegistering = false;
-                                    return;
-                                }
-
-                                // 파일 등록
-                                S2Util.fetch(
-                                    '/analysis/create-detection-file',
-                                    {
-                                        method: 'post',
-                                        dataType: 'multipart/form-data',
-                                        files: g_uploadFiles
-                                    },
-                                    function () {
-                                        S2Util.showToast('등록되었습니다.');
-                                        setTimeout(function () {
-                                            location.reload();
-                                        }, 500);
-                                    }
-                                );
-                            }
-                        });
-                    }
-                );
-            }
-
-            // eslint-disable-next-line no-unused-vars
-            function downloadFile(fileId) {
-                S2Util.fetch(
-                    `/file/image/view/${fileId}`,
-                    {
-                        method: 'GET',
-                        responseType: 'blob'
-                    },
-                    function () {
-                        S2Util.showToast('다운로드 성공하였습니다.');
-                    }
-                );
-            }
-
-            let g_uploadFiles = [];
-
-            function checkFileExtension(fileList) {
-                let result = true;
-                const allowedExtensions = ['pdf', 'hwpx', 'docx', 'xlsx', 'pptx'];
-                for (let file of fileList) {
-                    const ext = file.name.split('.').pop().toLowerCase();
-                    if (!allowedExtensions.includes(ext)) {
-                        S2Util.alert('허용되지 않은 파일 형식입니다: ' + file.name);
-                        result = false;
-                        break;
-                    }
-                }
-                return result;
+                location.href = `/analysis/detection-file?pageNo=${pageNo}`;
             }
 
             /**
@@ -151,7 +27,7 @@
                             <li class="file-upload-ok">
                                 <img class="checked-file" src="/public/images/icon_file_chk.png" alt="파일선택완료"/>
                                 <div class="file-info">
-                                    <div class="flex-sty02">
+                                    <div class="c-flex-sty02">
                                         <div class="file-border"></div>
                                         <div class="file-title file-name">${file.name}</div>
                                     </div>
@@ -237,8 +113,8 @@
         <div class="main-contents-contents">
             <div class="wrap-top">
                 <h1>
-                    <span class="main-title menu8">시스템 파일 전송 현황</span>
-                    <span class="sub-title">정책상 허용된 5MB 이하 시스템 파일의 전송 현황</span>
+                    <span class="main-title menu7">서명파일 전송 현황</span>
+                    <span class="sub-title">서명 파일의 외부 전송 처리 현황</span>
                 </h1>
                 <span class="btn-group">
                     <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">기간 검색</button>
@@ -247,7 +123,7 @@
             </div>
             <div class="wrap-contents">
                 <div class="top">
-                    <div class="flex-sty01 targetDate-wrap">
+                    <div class="c-flex-sty01 targetDate-wrap">
                         <span th:text="${searchStartDeStr}"></span>
                         <span>&nbsp;~&nbsp;</span>
                         <span th:text="${searchEndDeStr}"></span>
@@ -255,48 +131,55 @@
                 </div>
                 <div class="contents">
                     <div class="status-card">
-                        <div class="card type1 many-on-many white">
-                            <div class="title-box menu6-1 padding-left-0">
+                        <div class="card type1 many-on-many white small">
+                            <div class="title-box menu7-1 padding-left-0">
                                 <div class="card-title">전송한 총 파일 수</div>
                                 <div class="card-desc">외부로 전송한 총 파일 수</div>
                             </div>
                             <div class="card-content"><span>3,531</span>건</div>
                         </div>
-                        <div class="card type1 many-on-many white">
-                            <div class="title-box menu6-2 padding-left-0">
+                        <div class="card type1 many-on-many white small">
+                            <div class="title-box menu7-2 padding-left-0">
                                 <div class="card-title">전송한 총 파일 용량</div>
                                 <div class="card-desc">외부로 전송한 총 파일 용량</div>
                             </div>
                             <div class="card-content"><span>1,277</span>MB</div>
                         </div>
                         <div class="card border"></div>
-                        <div class="card type1 many-on-many mint">
-                            <div class="title-box menu6-3">
-                                <div class="card-title">정상</div>
-                                <div class="card-desc">파일 전송 이상 없음</div>
+                        <div class="card type1 many-on-many white small">
+                            <div class="title-box menu7-3">
+                                <div class="card-title">HTTPS 전송</div>
+                                <div class="card-desc">메일/클라우드로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span>31</span>건</div>
+                            <div class="card-content"><span>749</span>건</div>
                         </div>
-                        <div class="card type1 many-on-many tangerine">
-                            <div class="title-box menu6-4">
-                                <div class="card-title">점검</div>
-                                <div class="card-desc">대량 전송 및 비 업무시간 전송</div>
+                        <div class="card type1 many-on-many white small">
+                            <div class="title-box menu7-4">
+                                <div class="card-title">USB 전송</div>
+                                <div class="card-desc">USB로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span>7</span>건</div>
+                            <div class="card-content"><span>5,749</span>건</div>
                         </div>
-                        <div class="card type1 many-on-many red">
-                            <div class="title-box menu6-5">
-                                <div class="card-title">경고</div>
-                                <div class="card-desc">시간/패턴 이상 탐지</div>
+                        <div class="card type1 many-on-many white small">
+                            <div class="title-box menu7-5">
+                                <div class="card-title">메신저 전송</div>
+                                <div class="card-desc">카카오톡/라인 등으로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span>1</span>건</div>
+                            <div class="card-content"><span>652</span>건</div>
+                        </div>
+                        <div class="card type1 many-on-many white small">
+                            <div class="title-box menu7-6">
+                                <div class="card-title">프린터 전송</div>
+                                <div class="card-desc">프린터로 출력한 건수</div>
+                            </div>
+                            <div class="card-content"><span>4,263</span>건</div>
                         </div>
                     </div>
-                    <h2 class="type1">PC 별 시스템 파일 전송 현황</h2>
-                    <div class="table-wrap type1">
+                    <h2 class="type1">PC 별 서명파일 전송 처리 현황</h2>
+                    <div class="table-wrap type1 dark-slate">
                         <table class="table-sty01">
                             <caption>
-                                PC 별 시스템 파일 전송 현황
+                                PC 별 서명파일 전송 처리 현황
                             </caption>
                             <thead>
                                 <tr>
@@ -306,17 +189,13 @@
                                     <th>발생 채널</th>
                                     <th>업무시간 차단 수</th>
                                     <th>비업무시간 차단 수</th>
-                                    <th>탐지 결과</th>
-                                    <th>알림전송</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:if="${fileAnalysisListPagination.isEmpty}">
-                                    <td colspan="8">데이터가 없습니다.</td>
+                                    <td colspan="6">데이터가 없습니다.</td>
                                 </tr>
                                 <tr th:each="fileAnalysis : ${fileAnalysisListPagination.dataList}">
-                                    <td></td>
-                                    <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -347,9 +226,6 @@
                     </div>
                 </div>
             </div>
-            <script id="template_contents_file" type="text/template">
-                <img th:src="@{{{=serverUrl}}/file/image/view/{{=fileId}}}" alt="파일이미지"/>
-            </script>
         </div>
     </th:block>
 </html>
