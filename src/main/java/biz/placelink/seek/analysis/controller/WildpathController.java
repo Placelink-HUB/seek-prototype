@@ -230,6 +230,7 @@ public class WildpathController {
         String url = request.getRequestURL().toString();
         String header = S2JsonUtil.toJsonString(S2ServletUtil.convertHeadersToMap(request));
         String queryString = S2ServletUtil.parameterToQueryString(request);
+        String clientIp = S2ServletUtil.getClientIp(request);
 
         if (S2Util.isEmpty(countryCcd)) {
             // 아직 국가 코드를 보내주지 않아 임시로 한국으로 설정
@@ -239,7 +240,7 @@ public class WildpathController {
         switch (documentTypeFromContentType) {
             case "text":
                 String body = IOUtils.toString(request.getInputStream(), StandardCharsets.UTF_8);
-                wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, body, null, null, null);
+                wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, clientIp, body, null, null, null);
                 break;
             case "image":
             case "pdf":
@@ -252,7 +253,7 @@ public class WildpathController {
             case "hwp":
             case "zip":
                 try (InputStream fileData = request.getInputStream()) {
-                    wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, null, contentType, fileData, fileName);
+                    wildpathAnalysisService.createProxyAnalysis(Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_ASYNC_POST, requestId, countryCcd, url, header, queryString, clientIp, null, contentType, fileData, fileName);
                 }
                 break;
         }

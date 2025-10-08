@@ -195,11 +195,12 @@ public class AnalysisService {
     /**
      * 검증 파일을 등록한다.
      *
-     * @param files 파일 목록
+     * @param files    파일 목록
+     * @param clientIp 클라이언트 IP
      * @return 등록 개수
      */
     @Transactional
-    public int createDetectionFile(List<MultipartFile> files) {
+    public int createDetectionFile(List<MultipartFile> files, String clientIp) {
         int result = 0;
         int fileCount = 0;
         long fileSize = 0;
@@ -220,6 +221,8 @@ public class AnalysisService {
             analysis.setAnalysisId(analysisId);
             analysis.setAnalysisModeCcd(Constants.CD_ANALYSIS_MODE_DETECTION_FILE);
             analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
+            analysis.setClientIp(clientIp);
+            analysis.setUserId(SessionUtil.getSessionUserId());
 
             result = this.insertAnalysis(analysis);
 

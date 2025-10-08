@@ -68,7 +68,7 @@ public class WildpathAnalysisService {
     public String encryptionPassword;
 
     @Transactional(readOnly = false)
-    public int createProxyAnalysis(String analysisModeCcd, String requestId, String countryCcd, String url, String header, String queryString, String body, String contentType, InputStream fileData, String fileName) {
+    public int createProxyAnalysis(String analysisModeCcd, String requestId, String countryCcd, String url, String header, String queryString, String clientIp, String body, String contentType, InputStream fileData, String fileName) {
         List<FileDetailVO> fileList = new ArrayList<>();
 
         FileDetailVO fileInfo = new FileDetailVO();
@@ -77,11 +77,11 @@ public class WildpathAnalysisService {
         fileInfo.setFileData(fileData);
 
         fileList.add(fileInfo);
-        return this.createProxyAnalysis(analysisModeCcd, requestId, countryCcd, url, header, queryString, body, fileList);
+        return this.createProxyAnalysis(analysisModeCcd, requestId, countryCcd, url, header, queryString, clientIp, body, fileList);
     }
 
     @Transactional(readOnly = false)
-    public int createProxyAnalysis(String analysisModeCcd, String requestId, String countryCcd, String url, String header, String queryString, String body, List<FileDetailVO> fileList) {
+    public int createProxyAnalysis(String analysisModeCcd, String requestId, String countryCcd, String url, String header, String queryString, String clientIp, String body, List<FileDetailVO> fileList) {
         int result = 0;
         String analysisId = UUID.randomUUID().toString();
 
@@ -90,6 +90,7 @@ public class WildpathAnalysisService {
         analysis.setAnalysisId(analysisId);
         analysis.setAnalysisModeCcd(analysisModeCcd);
         analysis.setAnalysisStatusCcd(Constants.CD_ANALYSIS_STATUS_WAIT);
+        analysis.setClientIp(clientIp);
 
         result = analysisService.insertAnalysis(analysis);
 

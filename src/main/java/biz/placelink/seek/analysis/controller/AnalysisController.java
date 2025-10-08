@@ -36,6 +36,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2DateUtil;
 import kr.s2.ext.util.S2JsonUtil;
+import kr.s2.ext.util.S2ServletUtil;
 import kr.s2.ext.util.S2Util;
 
 /**
@@ -156,7 +157,7 @@ public class AnalysisController {
      * @throws IOException IOException
      */
     @PostMapping(value = "/analysis/create-detection-file")
-    public ResponseEntity<Map<String, Object>> createDetectionFile(@RequestParam("files") List<MultipartFile> files) throws IOException {
+    public ResponseEntity<Map<String, Object>> createDetectionFile(@RequestParam("files") List<MultipartFile> files, HttpServletRequest request) throws IOException {
         Map<String, Object> response = new HashMap<>();
 
         if (files.isEmpty()) {
@@ -167,7 +168,7 @@ public class AnalysisController {
             return ResponseEntity.ok(response);
         }
 
-        response.put(Constants.RESULT_CODE, analysisService.createDetectionFile(files));
+        response.put(Constants.RESULT_CODE, analysisService.createDetectionFile(files, S2ServletUtil.getClientIp(request)));
         return ResponseEntity.ok(response);
     }
 

@@ -8,14 +8,15 @@
  */
 package biz.placelink.seek.com.util;
 
-import biz.placelink.seek.com.security.CustomUserDetails;
-import biz.placelink.seek.system.user.vo.UserVO;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import biz.placelink.seek.com.security.CustomUserDetails;
+import biz.placelink.seek.system.user.vo.UserVO;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * <pre>
@@ -87,6 +88,16 @@ public class SessionUtil {
     public static String getSessionUserUid() {
         UserVO userVO = getSessionUser();
         return userVO != null ? userVO.getUserUid() : null;
+    }
+
+    /**
+     * 현재 세션에서 로그인한 사용자 ID 조회
+     *
+     * @return 로그인한 사용자의 ID. 로그인 정보가 없으면 null 을 반환
+     */
+    public static String getSessionUserId() {
+        UserVO userVO = getSessionUser();
+        return userVO != null ? userVO.getUserId() : null;
     }
 
 }

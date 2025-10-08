@@ -78,6 +78,8 @@
 			ANALYSIS_MODE_CCD,
 			ANALYSIS_STATUS_CCD,
 			ANALYSIS_MODEL,
+			CLIENT_IP,
+			USER_ID,
 			CREATE_DT,
 			MODIFY_DT
 		) VALUES (
@@ -85,6 +87,18 @@
 			#{analysisModeCcd},
 			#{analysisStatusCcd},
 			#{analysisModel},
+			#{clientIp},
+            <choose>
+                <when test='userId != null and userId != ""'>
+                    #{userId}
+                </when>
+                <when test='clientIp != null and clientIp != ""'>
+                    (SELECT USER_ID FROM SEEK_AGENT WHERE CLIENT_IP = #{clientIp} LIMIT 1)
+                </when>
+                <otherwise>
+                    NULL
+                </otherwise>
+            </choose>,
 			NOW(),
 			NOW()
 		)

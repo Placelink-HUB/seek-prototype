@@ -28,6 +28,10 @@ public class AnalysisVO extends DefaultVO {
     private Long analysisTime;
     /* 생성 일시 문자열 */
     private String createDtStr;
+    /* 클라이언트 IP */
+    private String clientIp;
+    /* 유저 ID */
+    private String userId;
 
     /* 사용 중 여부 */
     private boolean inUse = false;
@@ -126,6 +130,22 @@ public class AnalysisVO extends DefaultVO {
 
     public void setCreateDtStr(String createDtStr) {
         this.createDtStr = createDtStr;
+    }
+
+    public String getClientIp() {
+        return clientIp;
+    }
+
+    public void setClientIp(String clientIp) {
+        this.clientIp = clientIp;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public boolean isInUse() {
