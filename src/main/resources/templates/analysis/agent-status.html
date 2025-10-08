@@ -25,15 +25,6 @@
                         console.log('response', response);
 
                         {
-                            response.agentStatusList.push({
-                                clientIp: '1.1.1.1',
-                                macAddr: '11:11:11:11:11:11',
-                                userId: 'admin',
-                                minispySysYn: 'Y',
-                                mspyUserExeYn: 'Y',
-                                wfpBlockerExeYn: 'Y'
-                            });
-
                             // PC별 데이터 보호 프로세스 작동 현황
                             const agentStatusList = document.querySelector('#agentStatusList');
                             if (!response.agentStatusList || response.agentStatusList.length === 0) {
