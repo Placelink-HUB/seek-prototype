@@ -137,10 +137,10 @@
     <select id="selectFileAnalysisListStatus" parameterType="searchVO" resultType="analysisResultVO">
         /** selectFileAnalysisListStatus : 파일 분석 목록 현황을 조회한다. */
         SELECT
-            SUM(case when SIGNED_FILE_ID is not null then 1 else 0 END) as FILE_COUNT,
-		    SUM(coalesce(TOTAL_FILE_SIZE, 0)) as TOTAL_FILE_SIZE,
-		    SUM(coalesce(DOWNLOAD_COUNT, 0)) as DOWNLOAD_COUNT,
-		    SUM(coalesce(TOTAL_DETECTION_COUNT, 0)) as TOTAL_DETECTION_COUNT
+            SUM(CASE WHEN SIGNED_FILE_ID IS NOT NULL THEN 1 ELSE 0 END) as FILE_COUNT,
+		    SUM(COALESCE(TOTAL_FILE_SIZE, 0)) AS TOTAL_FILE_SIZE,
+		    SUM(COALESCE(DOWNLOAD_COUNT, 0)) AS DOWNLOAD_COUNT,
+		    SUM(COALESCE(TOTAL_DETECTION_COUNT, 0)) AS TOTAL_DETECTION_COUNT
         FROM (
             <include refid="sqlFileAnalysis"/>
         )

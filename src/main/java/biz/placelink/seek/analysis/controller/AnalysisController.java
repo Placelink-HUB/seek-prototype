@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import biz.placelink.seek.analysis.service.AgentService;
 import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.AnalysisService;
+import biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
 import biz.placelink.seek.sample.vo.SchArticleVO;
@@ -56,12 +57,14 @@ public class AnalysisController {
     private final AnalysisService analysisService;
     private final AnalysisDetailService analysisDetailService;
     private final AgentService agentService;
+    private final SensitiveInformationUnmaskHistService sensitiveInformationUnmaskHistService;
     private final FileManager fileManager;
 
-    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService, AgentService agentService, FileManager fileManager) {
+    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService, AgentService agentService, SensitiveInformationUnmaskHistService sensitiveInformationUnmaskHistService, FileManager fileManager) {
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
         this.agentService = agentService;
+        this.sensitiveInformationUnmaskHistService = sensitiveInformationUnmaskHistService;
         this.fileManager = fileManager;
     }
 
@@ -201,7 +204,7 @@ public class AnalysisController {
      * @return 민감정보 처리 이력 목록
      */
     @GetMapping(value = "/analysis/sensitive-access-hist")
-    public String sensitiveAccessHist(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
+    public String sensitiveAccessHist(HttpServletResponse response, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
         String pattern = "yyyyMMdd";
@@ -211,11 +214,11 @@ public class AnalysisController {
         searchVO.setSearchStartDate(searchPeriod.searchStartDate());
         searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
-        searchVO.setOrderBy("CREATE_DT DESC");
-        response.setHeader("X-Seek-Mode", seekMode);
+        searchVO.setOrderBy("LAST_REQUEST_DT DESC");
 
         // 민감정보 처리 이력 목록 조회
-        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        model.addAttribute("sensitiveInformationUnmaskHistListStatus", sensitiveInformationUnmaskHistService.selectSensitiveInformationUnmaskHistListStatus(searchVO));
+        model.addAttribute("sensitiveInformationUnmaskHistListPagination", sensitiveInformationUnmaskHistService.selectSensitiveInformationUnmaskHistListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/sensitive-access-hist";

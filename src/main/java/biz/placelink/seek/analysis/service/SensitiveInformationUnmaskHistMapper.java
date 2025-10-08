@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import biz.placelink.seek.analysis.vo.SensitiveInformationUnmaskHistVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import biz.placelink.seek.com.vo.SearchVO;
 
 /**
  * <pre>
@@ -38,5 +39,29 @@ public interface SensitiveInformationUnmaskHistMapper {
      * @return 등록 개수
      */
     int insertSensitiveInformationUnmaskInfo(@Param("requestId") String requestId, @Param("sensitiveInformationList") List<SensitiveInformationVO> sensitiveInformationList);
+
+    /**
+     * 민감 정보 언마스크 이력 목록 현황을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 민감 정보 언마스크 이력 목록
+     */
+    SensitiveInformationUnmaskHistVO selectSensitiveInformationUnmaskHistListStatus(SearchVO searchVO);
+
+    /**
+     * 민감 정보 언마스크 이력 목록을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 민감 정보 언마스크 이력 목록
+     */
+    List<SensitiveInformationUnmaskHistVO> selectSensitiveInformationUnmaskHistList(SearchVO searchVO);
+
+    /**
+     * 민감 정보 언마스크 이력 목록 개수를 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 민감 정보 언마스크 이력 목록 개수
+     */
+    int selectSensitiveInformationUnmaskHistListCount(SearchVO searchVO);
 
 }

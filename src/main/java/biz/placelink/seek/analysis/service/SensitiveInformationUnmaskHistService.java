@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.SensitiveInformationUnmaskHistVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationVO;
+import biz.placelink.seek.com.util.PaginationInfo;
+import biz.placelink.seek.com.vo.SearchVO;
 
 /**
  * <pre>
@@ -48,6 +50,28 @@ public class SensitiveInformationUnmaskHistService {
      */
     public int insertSensitiveInformationUnmaskInfo(String requestId, List<SensitiveInformationVO> sensitiveInformationList) {
         return sensitiveInformationUnmaskHistMapper.insertSensitiveInformationUnmaskInfo(requestId, sensitiveInformationList);
+    }
+
+    /**
+     * 민감 정보 언마스크 이력 목록 현황을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 민감 정보 언마스크 이력 목록 현황
+     */
+    public SensitiveInformationUnmaskHistVO selectSensitiveInformationUnmaskHistListStatus(SearchVO searchVO) {
+        return sensitiveInformationUnmaskHistMapper.selectSensitiveInformationUnmaskHistListStatus(searchVO);
+    }
+
+    /**
+     * 민감 정보 언마스크 이력 목록을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 민감 정보 언마스크 이력 목록
+     */
+    public PaginationInfo selectSensitiveInformationUnmaskHistListWithPagination(SearchVO searchVO) {
+        List<SensitiveInformationUnmaskHistVO> list = sensitiveInformationUnmaskHistMapper.selectSensitiveInformationUnmaskHistList(searchVO);
+        int count = sensitiveInformationUnmaskHistMapper.selectSensitiveInformationUnmaskHistListCount(searchVO);
+        return new PaginationInfo(searchVO, list, count);
     }
 
 }

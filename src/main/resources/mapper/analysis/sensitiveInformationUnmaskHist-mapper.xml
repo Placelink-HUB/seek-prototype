@@ -45,4 +45,67 @@
 		DO NOTHING
     </insert>
 
+    <sql id="sqlSensitiveInformationUnmaskHist">
+        WITH SENSITIVE_INFORMATION_UNMASK_HIST AS (
+            SELECT
+                USER_ID,
+                SENSITIVE_INFORMATION_COUNT,
+                CASE
+                    WHEN CREATE_DT::time >= '09:00:00' AND '18:00:00' >= CREATE_DT::time THEN 'NORMAL'
+                    ELSE 'ABNORMAL'
+                END AS WORKING_HOUR_STATUS,
+                CREATE_DT
+            FROM SEEK_SENSITIVE_INFORMATION_UNMASK_HIST
+            <where>
+                <if test='searchStartDate neq null'>
+                    AND CREATE_DT >= #{searchStartDate}
+                </if>
+                <if test='searchEndDate neq null'>
+                    AND #{searchEndDateNextDay} > CREATE_DT
+                </if>
+            </where>
+        )
+        SELECT
+            USER_ID,
+            COALESCE(SUM(COALESCE(SENSITIVE_INFORMATION_COUNT, 0)), 0) AS TOTAL_SENSITIVE_INFORMATION_COUNT,
+            COALESCE(SUM(CASE WHEN WORKING_HOUR_STATUS = 'NORMAL' THEN COALESCE(SENSITIVE_INFORMATION_COUNT, 0) ELSE 0 END), 0) AS NORMAL_SENSITIVE_INFORMATION_COUNT,
+            COALESCE(SUM(CASE WHEN WORKING_HOUR_STATUS = 'ABNORMAL' THEN COALESCE(SENSITIVE_INFORMATION_COUNT, 0) ELSE 0 END), 0) AS ABNORMAL_SENSITIVE_INFORMATION_COUNT,
+            COUNT(1) AS TOTAL_REQUEST_COUNT,
+            COALESCE(SUM(CASE WHEN WORKING_HOUR_STATUS = 'NORMAL' THEN 1 ELSE 0 END), 0) AS NORMAL_REQUEST_COUNT,
+            COALESCE(SUM(CASE WHEN WORKING_HOUR_STATUS = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS ABNORMAL_REQUEST_COUNT,
+            MAX(CREATE_DT) AS LAST_REQUEST_DT
+        FROM SENSITIVE_INFORMATION_UNMASK_HIST
+        GROUP BY USER_ID
+    </sql>
+
+    <select id="selectSensitiveInformationUnmaskHistListStatus" parameterType="searchVO" resultType="sensitiveInformationUnmaskHistVO">
+        /** selectSensitiveInformationUnmaskHistListStatus : 민감 정보 언마스크 이력 목록 현황을 조회한다. */
+        SELECT
+            COALESCE(SUM(COALESCE(TOTAL_SENSITIVE_INFORMATION_COUNT, 0)), 0) as TOTAL_SENSITIVE_INFORMATION_COUNT,
+            COALESCE(SUM(COALESCE(NORMAL_SENSITIVE_INFORMATION_COUNT, 0)), 0) as NORMAL_SENSITIVE_INFORMATION_COUNT,
+            COALESCE(SUM(COALESCE(ABNORMAL_SENSITIVE_INFORMATION_COUNT, 0)), 0) as ABNORMAL_SENSITIVE_INFORMATION_COUNT,
+            COALESCE(SUM(COALESCE(TOTAL_REQUEST_COUNT, 0)), 0) as TOTAL_REQUEST_COUNT,
+            COALESCE(SUM(COALESCE(NORMAL_REQUEST_COUNT, 0)), 0) as NORMAL_REQUEST_COUNT,
+            COALESCE(SUM(COALESCE(ABNORMAL_REQUEST_COUNT, 0)), 0) as ABNORMAL_REQUEST_COUNT
+        FROM (
+            <include refid="sqlSensitiveInformationUnmaskHist"/>
+        )
+    </select>
+
+    <select id="selectSensitiveInformationUnmaskHistList" parameterType="searchVO" resultType="sensitiveInformationUnmaskHistVO">
+        /** selectSensitiveInformationUnmaskHistList : 민감 정보 언마스크 이력 목록을 조회한다. */
+        <include refid="common.sql.paging_header"/>
+        <include refid="sqlSensitiveInformationUnmaskHist"/>
+        ORDER BY LAST_REQUEST_DT DESC
+        <include refid="common.sql.paging_footer"/>
+    </select>
+
+    <select id="selectSensitiveInformationUnmaskHistListCount" parameterType="searchVO" resultType="integer">
+        /** selectSensitiveInformationUnmaskHistListCount : 민감 정보 언마스크 이력 목록 개수를 조회한다. */
+        SELECT COUNT(1)
+        FROM (
+            <include refid="sqlSensitiveInformationUnmaskHist"/>
+        )
+    </select>
+
 </mapper>

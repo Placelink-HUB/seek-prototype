@@ -8,7 +8,7 @@
 
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
-                location.href = `/analysis/detection-file?pageNo=${pageNo}`;
+                location.href = `/analysis/sensitive-access-hist?pageNo=${pageNo}`;
             }
         </script>
     </th:block>
@@ -39,28 +39,28 @@
                                 <div class="card-title">복호화 처리 총 건수</div>
                                 <div class="card-desc">PC별 복호화 처리 총 합계</div>
                             </div>
-                            <div class="card-content"><span>3,531</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.totalRequestCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 mint">
                             <div class="title-box menu4-2">
                                 <div class="card-title">정상</div>
                                 <div class="card-desc">복호화 요청 이상 없음</div>
                             </div>
-                            <div class="card-content"><span>31</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.normalRequestCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 tangerine">
                             <div class="title-box menu4-3">
                                 <div class="card-title">점검</div>
                                 <div class="card-desc">대량 요청 및 비 업무시간 요청</div>
                             </div>
-                            <div class="card-content"><span>7</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.abnormalRequestCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 red">
                             <div class="title-box menu4-4">
                                 <div class="card-title">경고</div>
                                 <div class="card-desc">시간/패턴 이상 탐지</div>
                             </div>
-                            <div class="card-content"><span>1</span>건</div>
+                            <div class="card-content"><span>0</span>건</div>
                         </div>
                     </div>
                     <h2 class="type1">PC별 복호화 처리 현황</h2>
@@ -81,12 +81,40 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr th:if="${sensitiveInformationUnmaskHistListPagination.isEmpty}">
                                     <td colspan="7">데이터가 없습니다.</td>
+                                </tr>
+                                <tr th:each="sensitiveInformationUnmaskHist : ${sensitiveInformationUnmaskHistListPagination.dataList}">
+                                    <td th:text="${sensitiveInformationUnmaskHist.userId ?: '-'}"></td>
+                                    <td th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHist.totalRequestCount, 0, 'COMMA')}"></td>
+                                    <td>DB</td>
+                                    <td th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHist.normalRequestCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHist.abnormalRequestCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${sensitiveInformationUnmaskHist.requestStatus}"></td>
+                                    <td>
+                                        <button th:if="${sensitiveInformationUnmaskHist.requestStatus != '정상'}" class="table-btn-sty01" th:onclick="S2Util.alert('준비 중입니다.');">전송</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="pagination-wrapper"></div>
+                        <div class="pagination-wrapper">
+                            <ul th:if="${sensitiveInformationUnmaskHistListPagination.isNotEmpty}" class="pagination">
+                                <li th:if="${sensitiveInformationUnmaskHistListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
+                                    <a href="#" th:onclick="goPage([[${sensitiveInformationUnmaskHistListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
+                                </li>
+                                <th:block th:each="pageNo : ${#numbers.sequence(sensitiveInformationUnmaskHistListPagination.firstPageNoOnPageList, sensitiveInformationUnmaskHistListPagination.lastPageNoOnPageList)}">
+                                    <li th:if="${pageNo eq sensitiveInformationUnmaskHistListPagination.pageNo}" class="paginate_button active">
+                                        <a href="#" th:text="${pageNo}"></a>
+                                    </li>
+                                    <li th:if="${pageNo ne sensitiveInformationUnmaskHistListPagination.pageNo}" class="paginate_button">
+                                        <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
+                                    </li>
+                                </th:block>
+                                <li th:if="${sensitiveInformationUnmaskHistListPagination.lastPageNoOnPageList lt sensitiveInformationUnmaskHistListPagination.lastPageNo}" class="paginate_button next">
+                                    <a href="#" th:onclick="goPage([[${sensitiveInformationUnmaskHistListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

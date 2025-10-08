@@ -1,5 +1,7 @@
 package biz.placelink.seek.analysis.vo;
 
+import java.time.LocalDateTime;
+
 import biz.placelink.seek.com.vo.DefaultVO;
 
 public class SensitiveInformationUnmaskHistVO extends DefaultVO {
@@ -12,6 +14,20 @@ public class SensitiveInformationUnmaskHistVO extends DefaultVO {
     private String userId;
     /* 민감 정보 개수 */
     private Integer sensitiveInformationCount;
+    /* 전체 민감 정보 개수 */
+    private Long totalSensitiveInformationCount;
+    /* 정상 요청 민감 정보 개수 */
+    private Long normalSensitiveInformationCount;
+    /* 비정상 요청 민감 정보 개수 */
+    private Long abnormalSensitiveInformationCount;
+    /* 전체 요청 횟수 */
+    private Integer totalRequestCount;
+    /* 정상 요청 횟수 */
+    private Integer normalRequestCount;
+    /* 비정상 요청 횟수 */
+    private Integer abnormalRequestCount;
+    /* 최종 요청 일시 */
+    private LocalDateTime lastRequestDt;
 
     public String getRequestId() {
         return requestId;
@@ -43,6 +59,70 @@ public class SensitiveInformationUnmaskHistVO extends DefaultVO {
 
     public void setSensitiveInformationCount(Integer sensitiveInformationCount) {
         this.sensitiveInformationCount = sensitiveInformationCount;
+    }
+
+    public Long getTotalSensitiveInformationCount() {
+        return totalSensitiveInformationCount;
+    }
+
+    public void setTotalSensitiveInformationCount(Long totalSensitiveInformationCount) {
+        this.totalSensitiveInformationCount = totalSensitiveInformationCount;
+    }
+
+    public Long getNormalSensitiveInformationCount() {
+        return normalSensitiveInformationCount;
+    }
+
+    public void setNormalSensitiveInformationCount(Long normalSensitiveInformationCount) {
+        this.normalSensitiveInformationCount = normalSensitiveInformationCount;
+    }
+
+    public Long getAbnormalSensitiveInformationCount() {
+        return abnormalSensitiveInformationCount;
+    }
+
+    public void setAbnormalSensitiveInformationCount(Long abnormalSensitiveInformationCount) {
+        this.abnormalSensitiveInformationCount = abnormalSensitiveInformationCount;
+    }
+
+    public Integer getTotalRequestCount() {
+        return totalRequestCount;
+    }
+
+    public void setTotalRequestCount(Integer totalRequestCount) {
+        this.totalRequestCount = totalRequestCount;
+    }
+
+    public Integer getNormalRequestCount() {
+        return normalRequestCount;
+    }
+
+    public void setNormalRequestCount(Integer normalRequestCount) {
+        this.normalRequestCount = normalRequestCount;
+    }
+
+    public Integer getAbnormalRequestCount() {
+        return abnormalRequestCount;
+    }
+
+    public void setAbnormalRequestCount(Integer abnormalRequestCount) {
+        this.abnormalRequestCount = abnormalRequestCount;
+    }
+
+    public String getRequestStatus() {
+        if (this.abnormalRequestCount == null || this.abnormalRequestCount == 0) {
+            return "정상";
+        } else {
+            return "점검";
+        }
+    }
+
+    public LocalDateTime getLastRequestDt() {
+        return lastRequestDt;
+    }
+
+    public void setLastRequestDt(LocalDateTime lastRequestDt) {
+        this.lastRequestDt = lastRequestDt;
     }
 
 }
