@@ -51,4 +51,13 @@ public class AgentService {
         return agentMapper.selectAgentStatusList();
     }
 
+    /**
+     * 에이전트 상태 목록 현황을 조회한다.
+     *
+     * @return 에이전트 상태 목록 현황
+     */
+    public AgentVO selectAgentStatusListStatus() {
+        return agentMapper.selectAgentStatusListStatus();
+    }
+
 }

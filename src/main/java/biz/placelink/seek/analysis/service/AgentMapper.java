@@ -43,4 +43,11 @@ public interface AgentMapper {
      */
     List<AgentVO> selectAgentStatusList();
 
+    /**
+     * 에이전트 상태 목록 현황을 조회한다.
+     *
+     * @return 에이전트 상태 목록 현황
+     */
+    AgentVO selectAgentStatusListStatus();
+
 }

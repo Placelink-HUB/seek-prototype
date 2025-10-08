@@ -83,8 +83,7 @@
         )
     </insert>
 
-    <select id="selectAgentStatusList" resultType="agentVO">
-        /** insertAgentHeartBeatHist : 에이전트 상태 목록을 조회한다. */
+    <sql id="sqlAgentAgentStatusList">
         WITH AGENT_STATUS AS (
             SELECT
                 sa.CLIENT_IP,
@@ -134,7 +133,23 @@
             s.MODIFY_DT,
             s.MODIFY_UID
         FROM AGENT_STATUS s
+    </sql>
+
+    <select id="selectAgentStatusList" resultType="agentVO">
+        /** insertAgentHeartBeatHist : 에이전트 상태 목록을 조회한다. */
+        <include refid="sqlAgentAgentStatusList"/>
         ORDER BY s.CREATE_DT DESC
+    </select>
+
+    <select id="selectAgentStatusListStatus" resultType="agentVO">
+        /** selectAgentStatusListStatus : 에이전트 상태 목록 현황을 조회한다. */
+        SELECT
+            COALESCE(SUM(CASE WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 1 ELSE 0 END), 0) AS ACTIVE_COUNT,
+            COALESCE(SUM(CASE WHEN MINISPY_SYS_YN != 'Y' OR MSPY_USER_EXE_YN != 'Y' OR WFP_BLOCKER_EXE_YN != 'Y' OR CLICK_DOMAIN_AGENT_EXE_YN != 'Y' THEN 1 ELSE 0 END), 0) AS CHECK_COUNT,
+            COALESCE(NULL, 0) AS ALERT_COUNT
+        FROM (
+            <include refid="sqlAgentAgentStatusList"/>
+        ) x
     </select>
 
 </mapper>

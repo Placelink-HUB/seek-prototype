@@ -25,6 +25,13 @@
                         console.log('response', response);
 
                         {
+                            // PC 에이전트 상태
+                            document.getElementById('agentActiveCount').textContent = response.agentStatusListStatus.activeCount;
+                            document.getElementById('agentCheckCount').textContent = response.agentStatusListStatus.checkCount;
+                            document.getElementById('agentAlertCount').textContent = response.agentStatusListStatus.alertCount;
+                        }
+
+                        {
                             // PC별 데이터 보호 프로세스 작동 현황
                             const agentStatusList = document.querySelector('#agentStatusList');
                             if (!response.agentStatusList || response.agentStatusList.length === 0) {
@@ -70,21 +77,21 @@
                                 <div class="card-title">정상</div>
                                 <div class="card-desc">데이터 보호 프로세스 모두 작동</div>
                             </div>
-                            <div class="card-content"><span>31</span>건</div>
+                            <div class="card-content"><span id="agentActiveCount">31</span>건</div>
                         </div>
                         <div class="card type1 three-wide tangerine">
                             <div class="title-box menu5-3">
                                 <div class="card-title">점검</div>
                                 <div class="card-desc">일부/전체 프로세스 작동 중지</div>
                             </div>
-                            <div class="card-content"><span>7</span>건</div>
+                            <div class="card-content"><span id="agentCheckCount">7</span>건</div>
                         </div>
                         <div class="card type1 three-wide red">
                             <div class="title-box menu5-4">
                                 <div class="card-title">경고</div>
                                 <div class="card-desc">시간/패턴 이상 탐지</div>
                             </div>
-                            <div class="card-content"><span>1</span>건</div>
+                            <div class="card-content"><span id="agentAlertCount">1</span>건</div>
                         </div>
                     </div>
                     <h2 class="type1">PC별 데이터 보호 프로세스 작동 현황</h2>

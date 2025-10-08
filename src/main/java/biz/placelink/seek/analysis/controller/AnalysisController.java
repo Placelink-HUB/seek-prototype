@@ -246,6 +246,7 @@ public class AnalysisController {
     public ResponseEntity<Map<String, Object>> agentStatusList() {
         Map<String, Object> response = new HashMap<>();
 
+        response.put("agentStatusListStatus", agentService.selectAgentStatusListStatus());
         response.put("agentStatusList", agentService.selectAgentStatusList());
 
         response.put(Constants.RESULT_CODE, 1);
