@@ -173,6 +173,8 @@ public class WildpathAnalysisService {
             pushMap.put("outboundStatusCcd", paramVO.getOutboundStatusCcd());
 
             pushMap.put("analysisId", paramVO.getAnalysisId());
+            pushMap.put("userId", paramVO.getUserId());
+            pushMap.put("clientIp", paramVO.getClientIp());
             pushMap.put("orgCode", paramVO.getOrgCd());
             pushMap.put("outboundChannelCcd", paramVO.getOutboundChannelCcd());
             pushMap.put("outboundReasonCcd", paramVO.getOutboundReasonCcd());

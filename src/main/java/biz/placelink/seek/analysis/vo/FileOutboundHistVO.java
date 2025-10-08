@@ -18,8 +18,10 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
     /* 외부전송 사유 공통코드 */
     private String outboundReasonCcd;
     private String outboundReasonCcdNm;
-    /* 발신자 */
-    private String sender;
+    /* 로그인한 사용자 ID (발신자) */
+    private String userId;
+    /* 전송 요청한 클라이언트 IP */
+    private String clientIp;
     /* 파일 이름(여러개 일때 , 로 구분) */
     private String fileNm;
     /* 기관 코드 */
@@ -92,12 +94,20 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
         this.outboundReasonCcdNm = outboundReasonCcdNm;
     }
 
-    public String getSender() {
-        return sender;
+    public String getUserId() {
+        return userId;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getClientIp() {
+        return clientIp;
+    }
+
+    public void setClientIp(String clientIp) {
+        this.clientIp = clientIp;
     }
 
     public String getFileNm() {

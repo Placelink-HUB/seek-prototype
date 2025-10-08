@@ -4,8 +4,8 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -2911,
-    "scrollLeft": -164,
+    "scrollTop": -1116,
+    "scrollLeft": -881,
     "zoomLevel": 0.94,
     "show": 511,
     "database": 16,
@@ -748,6 +748,7 @@
           "4F7XMEqcbRR0-r1aQT6YQ",
           "XX80CSztWmrybCcYkWyaU",
           "ffVr7XGRcKtvswqN_xzTR",
+          "MN8KxK_1L6n8EYd_v92m6",
           "gQPrmzgSldUOG_1jlJPqk",
           "jI4NQ1MU2Zk-xA0HsyPCF",
           "WnDhBXwuw_05bdkY9v_mn",
@@ -764,6 +765,7 @@
           "4F7XMEqcbRR0-r1aQT6YQ",
           "XX80CSztWmrybCcYkWyaU",
           "ffVr7XGRcKtvswqN_xzTR",
+          "MN8KxK_1L6n8EYd_v92m6",
           "gQPrmzgSldUOG_1jlJPqk",
           "jI4NQ1MU2Zk-xA0HsyPCF",
           "WnDhBXwuw_05bdkY9v_mn",
@@ -783,7 +785,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1759295516184,
+          "updateAt": 1759949792474,
           "createAt": 1750764462488
         }
       },
@@ -4125,20 +4127,20 @@
       "ffVr7XGRcKtvswqN_xzTR": {
         "id": "ffVr7XGRcKtvswqN_xzTR",
         "tableId": "oeP34Oe_AxBEwOalanag0",
-        "name": "SENDER",
-        "comment": "발신자",
-        "dataType": "VARCHAR(255)",
+        "name": "USER_ID",
+        "comment": "사용자_ID(발신자)",
+        "dataType": "VARCHAR(36)",
         "default": "",
         "options": 0,
         "ui": {
           "keys": 0,
           "widthName": 60,
-          "widthComment": 60,
-          "widthDataType": 81,
+          "widthComment": 98,
+          "widthDataType": 75,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1756776949242,
+          "updateAt": 1759949756354,
           "createAt": 1750765470398
         }
       },
@@ -5180,6 +5182,26 @@
         "meta": {
           "updateAt": 1759943127811,
           "createAt": 1759942228455
+        }
+      },
+      "MN8KxK_1L6n8EYd_v92m6": {
+        "id": "MN8KxK_1L6n8EYd_v92m6",
+        "tableId": "oeP34Oe_AxBEwOalanag0",
+        "name": "CLIENT_IP",
+        "comment": "클라이언트_IP",
+        "dataType": "VARCHAR(32)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 77,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1759949789343,
+          "createAt": 1759949765954
         }
       }
     },

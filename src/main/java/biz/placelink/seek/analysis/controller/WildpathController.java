@@ -327,9 +327,11 @@ public class WildpathController {
         if (S2Util.isEmpty(analysisId)) {
             analysisId = params.getFirst("sig_id");
         }
-        if (S2Util.isEmpty(analysisId)) {
-            analysisId = params.getFirst("user_id");
-        }
+
+        /** 로그인한 사용자 ID (발신자) */
+        String userId = params.getFirst("user_id");
+        /** 전송 요청한 클라이언트 IP */
+        String clientIp = params.getFirst("client_ip");
 
         /*
          * 기관 분류 코드
@@ -427,7 +429,8 @@ public class WildpathController {
         paramVO.setOutboundStatusCcd("ALLOW".equals(action) ? Constants.CD_OUTBOUND_STATUS_SENT : Constants.CD_OUTBOUND_STATUS_BLOCKED);
         paramVO.setOutboundChannelCcd(channelCd);
         paramVO.setOutboundReasonCcd(reasonCd);
-        paramVO.setSender(null); // !!s2!! 발신자를 어떻게 할지 생각해보자.
+        paramVO.setUserId(userId);
+        paramVO.setClientIp(clientIp);
         paramVO.setAnalysisId(analysisId);
         paramVO.setFileNm(fileName);
         paramVO.setOrgCd(orgCode);
