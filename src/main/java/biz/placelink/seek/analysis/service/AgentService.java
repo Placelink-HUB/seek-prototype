@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import biz.placelink.seek.analysis.vo.AgentStatusVO;
 import biz.placelink.seek.analysis.vo.AgentVO;
 
 /**
@@ -56,7 +57,7 @@ public class AgentService {
      *
      * @return 에이전트 상태 목록 현황
      */
-    public AgentVO selectAgentStatusListStatus() {
+    public AgentStatusVO selectAgentStatusListStatus() {
         return agentMapper.selectAgentStatusListStatus();
     }
 

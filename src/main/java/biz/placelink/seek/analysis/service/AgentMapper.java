@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import biz.placelink.seek.analysis.vo.AgentStatusVO;
 import biz.placelink.seek.analysis.vo.AgentVO;
 
 /**
@@ -48,6 +49,6 @@ public interface AgentMapper {
      *
      * @return 에이전트 상태 목록 현황
      */
-    AgentVO selectAgentStatusListStatus();
+    AgentStatusVO selectAgentStatusListStatus();
 
 }

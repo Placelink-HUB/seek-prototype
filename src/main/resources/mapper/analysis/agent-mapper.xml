@@ -141,7 +141,7 @@
         ORDER BY s.CREATE_DT DESC
     </select>
 
-    <select id="selectAgentStatusListStatus" resultType="agentVO">
+    <select id="selectAgentStatusListStatus" resultType="agentStatusVO">
         /** selectAgentStatusListStatus : 에이전트 상태 목록 현황을 조회한다. */
         SELECT
             COALESCE(SUM(CASE WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 1 ELSE 0 END), 0) AS ACTIVE_COUNT,

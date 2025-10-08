@@ -36,13 +36,6 @@ public class AgentVO extends DefaultVO {
     /** ClickDomainAgent.exe 활성화 여부 */
     private String clickDomainAgentExeYn;
 
-    /** 정상 개수 */
-    private Integer activeCount;
-    /** 점검 개수 */
-    private Integer checkCount;
-    /** 경고 개수 */
-    private Integer alertCount;
-
     public AgentVO(String clientIp, String userId, String host, String macAddr, String orgCode, String eventTime, String components) {
         this.setClientIp(Optional.ofNullable(clientIp).filter(ip -> !ip.trim().isEmpty()).orElse(host));
         this.setUserId(userId);
@@ -157,30 +150,6 @@ public class AgentVO extends DefaultVO {
 
     public void setClickDomainAgentExeYn(String clickDomainAgentExeYn) {
         this.clickDomainAgentExeYn = clickDomainAgentExeYn;
-    }
-
-    public Integer getActiveCount() {
-        return activeCount;
-    }
-
-    public void setActiveCount(Integer activeCount) {
-        this.activeCount = activeCount;
-    }
-
-    public Integer getCheckCount() {
-        return checkCount;
-    }
-
-    public void setCheckCount(Integer checkCount) {
-        this.checkCount = checkCount;
-    }
-
-    public Integer getAlertCount() {
-        return alertCount;
-    }
-
-    public void setAlertCount(Integer alertCount) {
-        this.alertCount = alertCount;
     }
 
 }
