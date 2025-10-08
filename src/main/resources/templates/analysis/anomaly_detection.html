@@ -10,103 +10,6 @@
             function goPage(pageNo) {
                 location.href = `/analysis/detection-file?pageNo=${pageNo}`;
             }
-
-            /**
-             * 업로드 파일 추가 UI
-             * @param {FileList} fileList - 파일 목록
-             */
-            function addUploadFileUI(fileList) {
-                const uploadFileList = document.querySelector('.upload-file-list');
-
-                if (fileList.length > 0) {
-                    document.querySelector('.file-upload .file-upload-box').classList.add('active');
-                    document.querySelector('.file-upload .file-upload-icon').classList.add('d-none');
-
-                    for (const file of fileList) {
-                        uploadFileList.innerHTML += `
-                            <li class="file-upload-ok">
-                                <img class="checked-file" src="/public/images/icon_file_chk.png" alt="파일선택완료"/>
-                                <div class="file-info">
-                                    <div class="c-flex-sty02">
-                                        <div class="file-border"></div>
-                                        <div class="file-title file-name">${file.name}</div>
-                                    </div>
-                                    <div class="file-remove">
-                                        <a onClick="deleteFile(this);"><img src="/public/images/icon_remove.png" alt="삭제아이콘"/></a>
-                                    </div>
-                                </div>
-                            </li>
-                        `;
-                    }
-                }
-            }
-
-            function initDropZone() {
-                g_uploadFiles = [];
-                const dropZone = document.querySelector('.file-upload .file-upload-box');
-                const fileUpload = document.querySelector('.file-upload .file-upload');
-
-                new S2DropZone({
-                    dropZone: dropZone,
-                    dragenter: function (event, dropZoneElement) {
-                        dropZoneElement.classList.add('highlight');
-                    },
-                    dragover: function (event, dropZoneElement) {
-                        dropZoneElement.classList.add('highlight');
-                    },
-                    dragleave: function (event, dropZoneElement) {
-                        dropZoneElement.classList.remove('highlight');
-                    },
-                    drop: function (event, dropZoneElement, dropFiles) {
-                        dropZoneElement.classList.remove('highlight');
-
-                        if (dropFiles.length > 0 && checkFileExtension(dropFiles)) {
-                            for (const file of dropFiles) {
-                                g_uploadFiles.push(file);
-                            }
-                            addUploadFileUI(dropFiles);
-                        }
-                    }
-                });
-
-                // 파일 선택 버튼 클릭 이벤트
-                const fileUploadButton = dropZone.querySelector('.file-upload-button');
-                if (fileUploadButton) {
-                    fileUploadButton.addEventListener('click', () => fileUpload.click());
-                }
-
-                // 파일 선택 이벤트
-                if (fileUpload) {
-                    fileUpload.addEventListener('change', () => {
-                        if (fileUpload.files.length > 0 && checkFileExtension(fileUpload.files)) {
-                            for (const file of fileUpload.files) {
-                                g_uploadFiles.push(file);
-                            }
-                            addUploadFileUI(fileUpload.files);
-                        }
-                    });
-                }
-            }
-
-            /**
-             * 파일 삭제
-             */
-            // eslint-disable-next-line no-unused-vars
-            function deleteFile(target) {
-                const delElement = target.closest('li');
-
-                const parentUl = delElement.parentElement;
-                const allLiElements = Array.from(parentUl.children);
-                const delIndex = allLiElements.indexOf(delElement);
-
-                g_uploadFiles.splice(delIndex, 1);
-                delElement.remove();
-
-                if (g_uploadFiles.length === 0) {
-                    document.querySelector('.file-upload .file-upload-box').classList.remove('active');
-                    document.querySelector('.file-upload .file-upload-icon').classList.remove('d-none');
-                }
-            }
         </script>
     </th:block>
     <th:block layout:fragment="bodyFragment">
@@ -191,39 +94,12 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:if="${fileAnalysisListPagination.isEmpty}">
-                                    <td colspan="5">데이터가 없습니다.</td>
-                                </tr>
-                                <tr th:each="fileAnalysis : ${fileAnalysisListPagination.dataList}">
-                                    <td th:text="${fileAnalysis.detectionFileName}"></td>
-                                    <td th:text="${#temporals.format(fileAnalysis.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
-                                    <td th:text="${fileAnalysis.analysisStatusCcdNm}"></td>
-                                    <td th:text="${#numbers.formatInteger(fileAnalysis.totalDetectionCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${fileAnalysis.maxDetectionTypeCcdNm}"></td>
-                                    <td>
-                                        <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
-                                    </td>
+                                <tr>
+                                    <td colspan="11">데이터가 없습니다.</td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="pagination-wrapper">
-                            <ul th:if="${fileAnalysisListPagination.isNotEmpty}" class="pagination">
-                                <li th:if="${fileAnalysisListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
-                                    <a href="#" th:onclick="goPage([[${fileAnalysisListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
-                                </li>
-                                <th:block th:each="pageNo : ${#numbers.sequence(fileAnalysisListPagination.firstPageNoOnPageList, fileAnalysisListPagination.lastPageNoOnPageList)}">
-                                    <li th:if="${pageNo eq fileAnalysisListPagination.pageNo}" class="paginate_button active">
-                                        <a href="#" th:text="${pageNo}"></a>
-                                    </li>
-                                    <li th:if="${pageNo ne fileAnalysisListPagination.pageNo}" class="paginate_button">
-                                        <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
-                                    </li>
-                                </th:block>
-                                <li th:if="${fileAnalysisListPagination.lastPageNoOnPageList lt fileAnalysisListPagination.lastPageNo}" class="paginate_button next">
-                                    <a href="#" th:onclick="goPage([[${fileAnalysisListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
-                                </li>
-                            </ul>
-                        </div>
+                        <div class="pagination-wrapper"></div>
                     </div>
                 </div>
             </div>

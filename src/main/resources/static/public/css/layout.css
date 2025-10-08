@@ -58,7 +58,7 @@ a:active {
 =================================================================================================== */
 #main {
   position: relative;
-
+  height: 100%;
   margin: 0 auto;
   transition: 0.5s;
   background: #000;
@@ -90,4 +90,8 @@ a:active {
   font-weight: 200;
   font-size: 0.75rem;
   align-items: center;
+}
+.footer-wrapper .footer-text {
+  width: 100%;
+  text-align: center;
 }

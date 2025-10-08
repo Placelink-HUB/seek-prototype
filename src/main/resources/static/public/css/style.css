@@ -997,6 +997,7 @@ table caption {
 =================================================================================================== */
 #main .main-contents {
   width: calc(100% - 3.8125rem);
+  height: calc(100% - 0.6875rem);
   padding: 0.625rem 0 2.8125rem 0;
   margin-left: 3.8125rem;
 }
