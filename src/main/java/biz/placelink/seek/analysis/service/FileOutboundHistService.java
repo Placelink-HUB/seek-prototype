@@ -1,9 +1,13 @@
 package biz.placelink.seek.analysis.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
+import biz.placelink.seek.com.util.PaginationInfo;
+import biz.placelink.seek.com.vo.SearchVO;
 
 /**
  * <pre>
@@ -34,6 +38,28 @@ public class FileOutboundHistService {
      */
     public int insertFileOutboundHist(FileOutboundHistVO paramVO) {
         return fileOutboundHistMapper.insertFileOutboundHist(paramVO);
+    }
+
+    /**
+     * 파일 외부전송 차단 이력 목록 현황을 조회한다.
+     *
+     * @param searchVO 조회조건
+     * @return 파일 외부전송 차단 이력 목록 현황
+     */
+    public FileOutboundHistVO selectFileOutboundBlockingHistListStatus(SearchVO searchVO) {
+        return fileOutboundHistMapper.selectFileOutboundBlockingHistListStatus(searchVO);
+    }
+
+    /**
+     * 파일 외부전송 차단 이력 목록을 조회한다.
+     *
+     * @param searchVO 조회조건
+     * @return 파일 외부전송 차단 이력 목록
+     */
+    public PaginationInfo selectFileOutboundBlockingHistListWithPagination(SearchVO searchVO) {
+        List<FileOutboundHistVO> list = fileOutboundHistMapper.selectFileOutboundBlockingHistList(searchVO);
+        int count = fileOutboundHistMapper.selectFileOutboundBlockingHistListCount(searchVO);
+        return new PaginationInfo(searchVO, list, count);
     }
 
 }

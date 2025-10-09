@@ -38,6 +38,13 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
     private LocalDateTime eventDt;
     private String eventDtStr;
 
+    /* 액션(전송/차단) 건수 */
+    private Integer actionCount;
+    /* 정상 건수 */
+    private Integer normalCount;
+    /* 비정상 건수 */
+    private Integer abnormalCount;
+
     public Long getOutboundId() {
         return outboundId;
     }
@@ -180,6 +187,38 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
 
     public void setEventDtStr(String eventDtStr) {
         this.eventDtStr = eventDtStr;
+    }
+
+    public Integer getActionCount() {
+        return actionCount;
+    }
+
+    public void setActionCount(Integer actionCount) {
+        this.actionCount = actionCount;
+    }
+
+    public Integer getNormalCount() {
+        return normalCount;
+    }
+
+    public void setNormalCount(Integer normalCount) {
+        this.normalCount = normalCount;
+    }
+
+    public Integer getAbnormalCount() {
+        return abnormalCount;
+    }
+
+    public void setAbnormalCount(Integer abnormalCount) {
+        this.abnormalCount = abnormalCount;
+    }
+
+    public String getOutboundStatus() {
+        if (this.abnormalCount == null || this.abnormalCount == 0) {
+            return "정상";
+        } else {
+            return "점검";
+        }
     }
 
 }

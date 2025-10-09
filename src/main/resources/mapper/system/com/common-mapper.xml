@@ -12,8 +12,17 @@
                     <when test='orderBy.column eq "MODIFY_DT"'>
                         MODIFY_DT
                     </when>
+                    <when test='orderBy.column eq "REQUEST_DT"'>
+                        REQUEST_DT
+                    </when>
                     <when test='orderBy.column eq "LAST_REQUEST_DT"'>
                         LAST_REQUEST_DT
+                    </when>
+                    <when test='orderBy.column eq "EVENT_DT"'>
+                        EVENT_DT
+                    </when>
+                    <when test='orderBy.column eq "LAST_EVENT_DT"'>
+                        LAST_EVENT_DT
                     </when>
 
                     <!-- 기존 ORDER BY에 사용하지 않은 새로운 Column을 사용하는 경우 <otherwise> 앞에 <when>을 추가 -->

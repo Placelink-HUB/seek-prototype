@@ -39,14 +39,14 @@
                                 <div class="card-title">총 차단 수</div>
                                 <div class="card-desc">외부 전송 중 차단 수</div>
                             </div>
-                            <div class="card-content"><span>3,531</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundBlockingHistListStatus.actionCount, 0, 'COMMA')}"></span>건</div>
                         </div>
                         <div class="card type1 many-on-many white">
                             <div class="title-box menu6-2 padding-left-0">
                                 <div class="card-title">총 차단 파일 용량</div>
                                 <div class="card-desc">외부 전송 중 파일 용량</div>
                             </div>
-                            <div class="card-content"><span>1,277</span>MB</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(fileOutboundBlockingHistListStatus.totalFileSize / 1024.0, 1, 'COMMA', 2, 'POINT')}"></span>MB</div>
                         </div>
                         <div class="card border"></div>
                         <div class="card type1 many-on-many mint">
@@ -54,21 +54,21 @@
                                 <div class="card-title">정상</div>
                                 <div class="card-desc">파일 전송 차단 이상 없음</div>
                             </div>
-                            <div class="card-content"><span>31</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundBlockingHistListStatus.normalCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many tangerine">
                             <div class="title-box menu6-4">
                                 <div class="card-title">점검</div>
                                 <div class="card-desc">대량 차단 및 비 업무시간 차단</div>
                             </div>
-                            <div class="card-content"><span>7</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundBlockingHistListStatus.abnormalCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many red">
                             <div class="title-box menu6-5">
                                 <div class="card-title">경고</div>
                                 <div class="card-desc">시간/패턴 이상 탐지</div>
                             </div>
-                            <div class="card-content"><span>1</span>건</div>
+                            <div class="card-content"><span>0</span>건</div>
                         </div>
                     </div>
                     <h2 class="type1">PC 별 파일 전송 차단 현황</h2>
@@ -79,10 +79,10 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    <th>MAC 주소</th>
+                                    <th>사용자 ID</th>
                                     <th>차단 건수</th>
                                     <th>차단 용량(MB)</th>
-                                    <th>발생 채널</th>
+                                    <th>발생 채널(사용자 기준이라면 빼야함)</th>
                                     <th>업무시간 차단 수</th>
                                     <th>비업무시간 차단 수</th>
                                     <th>탐지 결과</th>
@@ -90,12 +90,41 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr th:if="${fileOutboundBlockingHistListPagination.isEmpty}">
                                     <td colspan="8">데이터가 없습니다.</td>
+                                </tr>
+                                <tr th:each="fileOutboundBlockingHist : ${fileOutboundBlockingHistListPagination.dataList}">
+                                    <td th:text="${fileOutboundBlockingHist.userId}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.actionCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatDecimal(fileOutboundBlockingHist.totalFileSize / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
+                                    <td></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.normalCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.abnormalCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${fileOutboundBlockingHist.outboundStatus}"></td>
+                                    <td>
+                                        <button th:if="${fileOutboundBlockingHist.outboundStatus != '정상'}" class="table-btn-sty01" th:onclick="S2Util.alert('준비 중입니다.');">전송</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="pagination-wrapper"></div>
+                        <div class="pagination-wrapper">
+                            <ul th:if="${fileOutboundBlockingHistListPagination.isNotEmpty}" class="pagination">
+                                <li th:if="${fileOutboundBlockingHistListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
+                                    <a href="#" th:onclick="goPage([[${fileOutboundBlockingHistListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
+                                </li>
+                                <th:block th:each="pageNo : ${#numbers.sequence(fileOutboundBlockingHistListPagination.firstPageNoOnPageList, fileOutboundBlockingHistListPagination.lastPageNoOnPageList)}">
+                                    <li th:if="${pageNo eq fileOutboundBlockingHistListPagination.pageNo}" class="paginate_button active">
+                                        <a href="#" th:text="${pageNo}"></a>
+                                    </li>
+                                    <li th:if="${pageNo ne fileOutboundBlockingHistListPagination.pageNo}" class="paginate_button">
+                                        <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
+                                    </li>
+                                </th:block>
+                                <li th:if="${fileOutboundBlockingHistListPagination.lastPageNoOnPageList lt fileOutboundBlockingHistListPagination.lastPageNo}" class="paginate_button next">
+                                    <a href="#" th:onclick="goPage([[${fileOutboundBlockingHistListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

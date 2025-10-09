@@ -1,8 +1,11 @@
 package biz.placelink.seek.analysis.service;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
+import biz.placelink.seek.com.vo.SearchVO;
 
 /**
  * <pre>
@@ -25,5 +28,29 @@ public interface FileOutboundHistMapper {
      * @return 등록 개수
      */
     int insertFileOutboundHist(FileOutboundHistVO paramVO);
+
+    /**
+     * 파일 외부전송 차단 이력 목록 현황을 조회한다.
+     *
+     * @param searchVO 조회조건
+     * @return 파일 외부전송 차단 이력 목록 현황
+     */
+    FileOutboundHistVO selectFileOutboundBlockingHistListStatus(SearchVO searchVO);
+
+    /**
+     * 파일 외부전송 차단 이력 목록을 조회한다.
+     *
+     * @param searchVO 조회조건
+     * @return 파일 외부전송 차단 이력 목록
+     */
+    List<FileOutboundHistVO> selectFileOutboundBlockingHistList(SearchVO searchVO);
+
+    /**
+     * 파일 외부전송 차단 이력 목록 개수를 조회한다.
+     *
+     * @param searchVO 조회조건
+     * @return 파일 외부전송 차단 이력 목록 개수
+     */
+    int selectFileOutboundBlockingHistListCount(SearchVO searchVO);
 
 }

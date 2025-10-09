@@ -27,6 +27,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import biz.placelink.seek.analysis.service.AgentService;
 import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.AnalysisService;
+import biz.placelink.seek.analysis.service.FileOutboundHistService;
 import biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
@@ -58,13 +59,15 @@ public class AnalysisController {
     private final AnalysisDetailService analysisDetailService;
     private final AgentService agentService;
     private final SensitiveInformationUnmaskHistService sensitiveInformationUnmaskHistService;
+    private final FileOutboundHistService fileOutboundHistService;
     private final FileManager fileManager;
 
-    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService, AgentService agentService, SensitiveInformationUnmaskHistService sensitiveInformationUnmaskHistService, FileManager fileManager) {
+    public AnalysisController(AnalysisService analysisService, AnalysisDetailService analysisDetailService, AgentService agentService, SensitiveInformationUnmaskHistService sensitiveInformationUnmaskHistService, FileOutboundHistService fileOutboundHistService, FileManager fileManager) {
         this.analysisService = analysisService;
         this.analysisDetailService = analysisDetailService;
         this.agentService = agentService;
         this.sensitiveInformationUnmaskHistService = sensitiveInformationUnmaskHistService;
+        this.fileOutboundHistService = fileOutboundHistService;
         this.fileManager = fileManager;
     }
 
@@ -204,7 +207,7 @@ public class AnalysisController {
      * @return 민감정보 처리 이력 목록
      */
     @GetMapping(value = "/analysis/sensitive-access-hist")
-    public String sensitiveAccessHist(HttpServletResponse response, @RequestParam(required = false) Integer pageNo, ModelMap model,
+    public String sensitiveAccessHist(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
         String pattern = "yyyyMMdd";
@@ -215,6 +218,7 @@ public class AnalysisController {
         searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("LAST_REQUEST_DT DESC");
+        response.setHeader("X-Seek-Mode", seekMode);
 
         // 민감정보 처리 이력 목록 조회
         model.addAttribute("sensitiveInformationUnmaskHistListStatus", sensitiveInformationUnmaskHistService.selectSensitiveInformationUnmaskHistListStatus(searchVO));
@@ -235,9 +239,10 @@ public class AnalysisController {
         SchArticleVO searchVO = new SchArticleVO();
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
+        response.setHeader("X-Seek-Mode", seekMode);
+
         // PC 에이전트 상태 목록 조회
         // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
-        response.setHeader("X-Seek-Mode", seekMode);
         return "analysis/agent-status";
     }
 
@@ -274,11 +279,12 @@ public class AnalysisController {
         searchVO.setSearchStartDate(searchPeriod.searchStartDate());
         searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
-        searchVO.setOrderBy("CREATE_DT DESC");
+        searchVO.setOrderBy("LAST_EVENT_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 파일전송 차단 현황 목록 조회
-        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        model.addAttribute("fileOutboundBlockingHistListStatus", fileOutboundHistService.selectFileOutboundBlockingHistListStatus(searchVO));
+        model.addAttribute("fileOutboundBlockingHistListPagination", fileOutboundHistService.selectFileOutboundBlockingHistListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/file-blocking";

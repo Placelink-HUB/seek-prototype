@@ -37,4 +37,80 @@
         )
     </insert>
 
+    <sql id="sqlFileOutboundHist">
+        SELECT
+            sfoh.OUTBOUND_ID,
+            sfoh.OUTBOUND_STATUS_CCD,
+            sfoh.OUTBOUND_CHANNEL_CCD,
+            sfoh.OUTBOUND_REASON_CCD,
+            sfoh.USER_ID,
+            sfoh.CLIENT_IP,
+            sfoh.FILE_NM,
+            sfoh.ORG_CD,
+            sfoh.MAC_ADDR,
+            sfoh.DEST_HOST,
+            sfoh.TOTAL_FILE_COUNT,
+            sfoh.TOTAL_FILE_SIZE,
+            sfoh.EVENT_DT,
+            CASE
+                WHEN sfoh.EVENT_DT::time >= '09:00:00' AND '18:00:00' >= sfoh.EVENT_DT::time THEN 'NORMAL'
+                ELSE 'ABNORMAL'
+            END AS WORKING_HOUR_STATUS_CCD,
+            sfoh.CREATE_DT
+        FROM SEEK_FILE_OUTBOUND_HIST sfoh
+        <where>
+            <if test='searchStartDate neq null'>
+                AND sfoh.EVENT_DT >= #{searchStartDate}
+            </if>
+            <if test='searchEndDate neq null'>
+                AND #{searchEndDateNextDay} > sfoh.EVENT_DT
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectFileOutboundBlockingHistListStatus" parameterType="searchVO" resultType="fileOutboundHistVO">
+        /** selectFileOutboundBlockingHistListStatus : 파일 외부전송 차단 이력 목록 현황을 조회한다. */
+        SELECT
+            COUNT(1) AS ACTION_COUNT,
+            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 1 ELSE 0 END), 0) AS NORMAL_COUNT,
+            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS ABNORMAL_COUNT,
+            COALESCE(SUM(COALESCE(foh.TOTAL_FILE_COUNT, 0)), 0) AS TOTAL_FILE_COUNT,
+            COALESCE(SUM(COALESCE(foh.TOTAL_FILE_SIZE, 0)), 0) AS TOTAL_FILE_SIZE
+        FROM (
+            <include refid="sqlFileOutboundHist"/>
+        ) foh
+        WHERE foh.OUTBOUND_STATUS_CCD = 'BLOCKED'
+    </select>
+
+    <sql id="sqlFileOutboundBlockingHistList">
+        SELECT
+            foh.USER_ID,
+            COUNT(1) AS ACTION_COUNT,
+            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 1 ELSE 0 END), 0) AS NORMAL_COUNT,
+            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS ABNORMAL_COUNT,
+            COALESCE(SUM(COALESCE(foh.TOTAL_FILE_COUNT, 0)), 0) AS TOTAL_FILE_COUNT,
+            COALESCE(SUM(COALESCE(foh.TOTAL_FILE_SIZE, 0)), 0) AS TOTAL_FILE_SIZE,
+            MAX(foh.EVENT_DT) AS LAST_EVENT_DT
+        FROM (
+            <include refid="sqlFileOutboundHist"/>
+        ) foh
+        WHERE foh.OUTBOUND_STATUS_CCD = 'BLOCKED'
+        GROUP BY foh.USER_ID
+    </sql>
+
+    <select id="selectFileOutboundBlockingHistList" parameterType="searchVO" resultType="fileOutboundHistVO">
+        /** selectFileOutboundBlockingHistList : 파일 외부전송 차단 이력 목록을 조회한다. */
+        <include refid="common.sql.paging_header"/>
+        <include refid="sqlFileOutboundBlockingHistList"/>
+        <include refid="common.sql.paging_footer"/>
+    </select>
+
+    <select id="selectFileOutboundBlockingHistListCount" parameterType="searchVO" resultType="integer">
+        /** selectFileOutboundBlockingHistListCount : 파일 외부전송 차단 이력 목록 개수를 조회한다. */
+        SELECT COUNT(1)
+        FROM (
+            <include refid="sqlFileOutboundBlockingHistList"/>
+        )
+    </select>
+
 </mapper>
