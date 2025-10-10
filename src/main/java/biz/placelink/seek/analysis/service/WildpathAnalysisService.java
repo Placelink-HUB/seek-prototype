@@ -208,6 +208,7 @@ public class WildpathAnalysisService {
      *
      * @param agentVO SEEK 에이전트 정보
      */
+    @Transactional
     public void receiveAgentHeartbeat(AgentVO agentVO) {
         Map<String, Object> pushMap = new HashMap<>();
         pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_AGENT_HEARTBEAT);

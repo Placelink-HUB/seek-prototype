@@ -47,8 +47,8 @@
                                             <td class="agent-status-indicator ${agentStatus.wfpBlockerExeYn}"></td>
                                             <td class="agent-status-indicator ${agentStatus.clickDomainAgentExeYn}"></td>
                                             <td>${agentStatus.eventDateTime ? dayjs(agentStatus.eventDateTime, 'YYYY-MM-DDTHH:mm:ss').format('YYYY년 MM월 DD일 HH시 mm분') : '-'}</td>
-                                            <td>-</td>
-                                            <td>-</td>
+                                            <td class="${agentStatus.conditionLevel}">${agentStatus.conditionLevel}</td>
+                                            <td>${agentStatus.conditionLevelCcd === 'ACTIVE' ? '' : '<button class="table-btn-sty01" onclick="S2Util.alert(\'준비 중입니다.\');">전송</button>'}</td>
                                         </tr>
                                     `;
                                 }

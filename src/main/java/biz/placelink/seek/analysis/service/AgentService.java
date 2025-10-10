@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.AgentStatusVO;
 import biz.placelink.seek.analysis.vo.AgentVO;
+import biz.placelink.seek.com.constants.Constants;
 
 /**
  * <pre>
@@ -37,6 +38,9 @@ public class AgentService {
      */
     @Transactional
     public int insertAgentHeartBeatHist(AgentVO paramVO) {
+        if (paramVO != null) {
+            paramVO.setCreateUid(Constants.SYSTEM_UID);
+        }
         int result = agentMapper.insertAgentHeartBeatHist(paramVO);
         if (result > 0) {
             agentMapper.insertAgent(paramVO);

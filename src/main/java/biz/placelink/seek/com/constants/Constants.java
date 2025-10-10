@@ -241,4 +241,17 @@ public class Constants {
      */
     public static final String CD_ARTICLE_TYPE_FILE = "FILE";
 
+    /**
+     * 상태_수준_공통코드 - 정상
+     */
+    public static final String CD_CONDITION_LEVEL_ACTIVE = "ACTIVE";
+    /**
+     * 상태_수준_공통코드 - 점검
+     */
+    public static final String CD_CONDITION_LEVEL_CHECK = "CHECK";
+    /**
+     * 상태_수준_공통코드 - 경고
+     */
+    public static final String CD_CONDITION_LEVEL_ALERT = "ALERT";
+
 }

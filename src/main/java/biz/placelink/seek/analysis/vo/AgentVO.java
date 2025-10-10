@@ -35,6 +35,8 @@ public class AgentVO extends DefaultVO {
     private String wfpBlockerExeYn;
     /** ClickDomainAgent.exe 활성화 여부 */
     private String clickDomainAgentExeYn;
+    /** 상태 수준 공통코드 */
+    private String conditionLevelCcd;
 
     public AgentVO(String clientIp, String userId, String host, String macAddr, String orgCode, String eventTime, String components) {
         this.setClientIp(Optional.ofNullable(clientIp).filter(ip -> !ip.trim().isEmpty()).orElse(host));
@@ -150,6 +152,30 @@ public class AgentVO extends DefaultVO {
 
     public void setClickDomainAgentExeYn(String clickDomainAgentExeYn) {
         this.clickDomainAgentExeYn = clickDomainAgentExeYn;
+    }
+
+    public String getConditionLevelCcd() {
+        return conditionLevelCcd;
+    }
+
+    public void setConditionLevelCcd(String conditionLevelCcd) {
+        this.conditionLevelCcd = conditionLevelCcd;
+    }
+
+    public String getConditionLevel() {
+        String conditionLevel = "";
+        switch (Optional.ofNullable(conditionLevelCcd).orElse("")) {
+            case "ACTIVE":
+                conditionLevel = "정상";
+                break;
+            case "CHECK":
+                conditionLevel = "점검";
+                break;
+            case "ALERT":
+                conditionLevel = "경고";
+                break;
+        }
+        return conditionLevel;
     }
 
 }

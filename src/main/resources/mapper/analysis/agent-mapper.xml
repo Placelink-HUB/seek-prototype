@@ -47,7 +47,7 @@
 			WFP_BLOCKER_EXE_YN = EXCLUDED.WFP_BLOCKER_EXE_YN,
             CLICK_DOMAIN_AGENT_EXE_YN = EXCLUDED.CLICK_DOMAIN_AGENT_EXE_YN,
 			MODIFY_DT = NOW(),
-            MODIFY_UIDc = EXCLUDED.MODIFY_UID
+            MODIFY_UID = EXCLUDED.MODIFY_UID
     </insert>
 
     <insert id="insertAgentHeartBeatHist" parameterType="agentVO">
@@ -103,50 +103,60 @@
                 (sa.EVENT_DT >= NOW() - INTERVAL '1 minute') AS IS_ACTIVE_RECENTLY
             FROM SEEK_AGENT sa
             WHERE sa.MODIFY_DT >= NOW() - INTERVAL '1 month'
+        ),
+        AGENT_STATUS_DETAIL AS (
+            SELECT
+                s.CLIENT_IP,
+                s.USER_ID,
+                s.HOST,
+                s.MAC_ADDR,
+                s.ORG_CODE,
+                s.EVENT_DT,
+                /* '최근 1분 이내 활동 여부'에 따라 해당 활동이 있는 값들만 유효하게 처리한다. */
+                CASE
+                    WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.MINISPY_SYS_YN, 'N')
+                    ELSE 'X'
+                END AS MINISPY_SYS_YN,
+                CASE
+                    WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.MSPY_USER_EXE_YN, 'N')
+                    ELSE 'X'
+                END AS MSPY_USER_EXE_YN,
+                CASE
+                    WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.WFP_BLOCKER_EXE_YN, 'N')
+                    ELSE 'X'
+                END AS WFP_BLOCKER_EXE_YN,
+                CASE
+                    WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.CLICK_DOMAIN_AGENT_EXE_YN, 'N')
+                    ELSE 'X'
+                END AS CLICK_DOMAIN_AGENT_EXE_YN,
+                s.CREATE_DT,
+                s.CREATE_UID,
+                s.MODIFY_DT,
+                s.MODIFY_UID
+            FROM AGENT_STATUS s
         )
         SELECT
-            s.CLIENT_IP,
-            s.USER_ID,
-            s.HOST,
-            s.MAC_ADDR,
-            s.ORG_CODE,
-            s.EVENT_DT,
-            /* '최근 1분 이내 활동 여부'에 따라 해당 활동이 있는 값들만 유효하게 처리한다. */
+            sd.*,
             CASE
-                WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.MINISPY_SYS_YN, 'N')
-                ELSE 'X'
-            END AS MINISPY_SYS_YN,
-            CASE
-                WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.MSPY_USER_EXE_YN, 'N')
-                ELSE 'X'
-            END AS MSPY_USER_EXE_YN,
-            CASE
-                WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.WFP_BLOCKER_EXE_YN, 'N')
-                ELSE 'X'
-            END AS WFP_BLOCKER_EXE_YN,
-            CASE
-                WHEN s.IS_ACTIVE_RECENTLY THEN COALESCE(s.CLICK_DOMAIN_AGENT_EXE_YN, 'N')
-                ELSE 'X'
-            END AS CLICK_DOMAIN_AGENT_EXE_YN,
-            s.CREATE_DT,
-            s.CREATE_UID,
-            s.MODIFY_DT,
-            s.MODIFY_UID
-        FROM AGENT_STATUS s
+                WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 'ACTIVE'
+                WHEN MINISPY_SYS_YN != 'Y' AND MSPY_USER_EXE_YN != 'Y' AND WFP_BLOCKER_EXE_YN != 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN != 'Y' THEN 'ALERT'
+                ELSE 'CHECK'
+            END AS CONDITION_LEVEL_CCD
+        FROM AGENT_STATUS_DETAIL sd
     </sql>
 
     <select id="selectAgentStatusList" resultType="agentVO">
-        /** insertAgentHeartBeatHist : 에이전트 상태 목록을 조회한다. */
+        /** selectAgentStatusList : 에이전트 상태 목록을 조회한다. */
         <include refid="sqlAgentAgentStatusList"/>
-        ORDER BY s.CREATE_DT DESC
+        ORDER BY sd.CREATE_DT DESC
     </select>
 
     <select id="selectAgentStatusListStatus" resultType="agentStatusVO">
         /** selectAgentStatusListStatus : 에이전트 상태 목록 현황을 조회한다. */
         SELECT
-            COALESCE(SUM(CASE WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 1 ELSE 0 END), 0) AS ACTIVE_COUNT,
-            COALESCE(SUM(CASE WHEN MINISPY_SYS_YN != 'Y' OR MSPY_USER_EXE_YN != 'Y' OR WFP_BLOCKER_EXE_YN != 'Y' OR CLICK_DOMAIN_AGENT_EXE_YN != 'Y' THEN 1 ELSE 0 END), 0) AS CHECK_COUNT,
-            COALESCE(NULL, 0) AS ALERT_COUNT
+            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS ACTIVE_COUNT,
+            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'CHECK' THEN 1 ELSE 0 END), 0) AS CHECK_COUNT,
+            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'ALERT' THEN 1 ELSE 0 END), 0) AS ALERT_COUNT
         FROM (
             <include refid="sqlAgentAgentStatusList"/>
         ) x
