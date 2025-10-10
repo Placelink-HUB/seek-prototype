@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.AgentVO;
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
-import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.AnalysisVO;
 import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
 import biz.placelink.seek.analysis.vo.SchSensitiveInformationVO;
@@ -184,15 +183,6 @@ public class WildpathAnalysisService {
             pushMap.put("fileNm", paramVO.getFileNm());
             pushMap.put("totalFileSize", paramVO.getTotalFileSize());
             pushMap.put("totalFileCount", paramVO.getTotalFileCount());
-
-            if (Constants.CD_OUTBOUND_STATUS_SENT.equals(paramVO.getOutboundStatusCcd())) {
-                // 전송 되었다면 최초 분석한 파일 정보의 파일 개수와 크기를 가져온다. (totalFileSize 와 totalFileCount 가 정확하다면 중복되어 불필요함)
-                AnalysisResultVO fileInfo = analysisDetailService.selectFileAnalysis(paramVO.getAnalysisId());
-                if (fileInfo != null) {
-                    pushMap.put("fileCount", fileInfo.getFileCount());
-                    pushMap.put("totalFileSize", fileInfo.getTotalFileSize());
-                }
-            }
 
             if (StringUtils.isNotEmpty(allParamsStr)) {
                 pushMap.put("allParamsStr", allParamsStr);

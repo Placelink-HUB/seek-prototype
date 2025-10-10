@@ -171,11 +171,9 @@
         SELECT
             sfoh.OUTBOUND_STATUS_CCD,
             COUNT(1) AS OUTBOUND_HIST_COUNT,
-            SUM(COALESCE(sfa.FILE_COUNT, 0)) AS OUTBOUND_FILE_COUNT,
-            SUM(COALESCE(sfa.TOTAL_FILE_SIZE, 0)) AS OUTBOUND_FILE_SIZE
+            SUM(COALESCE(sfoh.TOTAL_FILE_COUNT, 0)) AS OUTBOUND_FILE_COUNT,
+            SUM(COALESCE(sfoh.TOTAL_FILE_SIZE, 0)) AS OUTBOUND_FILE_SIZE
         FROM SEEK_FILE_OUTBOUND_HIST sfoh
-            LEFT JOIN SEEK_FILE_ANALYSIS sfa
-                ON sfoh.ANALYSIS_ID = sfa.ANALYSIS_ID
         <where>
             <if test='schDe != null and schDe != ""'>
                 AND (sfoh.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sfoh.CREATE_DT)

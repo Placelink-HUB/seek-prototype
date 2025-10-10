@@ -68,12 +68,14 @@
 
             const semicircleChartInfo2 = {
                 // 첨부 파일 외부 전송 현황
-                mailOutboundStatus: {
+                fileOutboundStatus: {
                     text: '전송 수',
-                    sentCount: 0,
-                    fileCount: 0,
-                    fileSize: 0,
-                    blockedCount: 0,
+                    sentCount: 0, // 전송 수
+                    sentFileCount: 0, // 전송 파일 수
+                    sentFileSize: 0, // 전송 파일 크기(Byte)
+                    blockedCount: 0, // 차단 수
+                    blockedFileCount: 0, // 차단 파일 수
+                    blockedFileSize: 0, // 차단 파일 크기(Byte)
                     color1: '#04e6f9',
                     color2: '#096fdb',
                     backColor: '#707a85'
@@ -192,9 +194,9 @@
                     case '[[${@Constants.CD_PUSH_TYPE_FILE_OUTBOUND}]]':
                         // 파일 외부전송 탐지 현황
                         if (event.data.data['outboundStatusCcd'] === '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]') {
-                            semicircleChartInfo2.mailOutboundStatus.sentCount++;
-                            semicircleChartInfo2.mailOutboundStatus.fileCount += Number(event.data.data['fileCount'] || 0);
-                            semicircleChartInfo2.mailOutboundStatus.fileSize += Number(event.data.data['totalFileSize'] || 0);
+                            semicircleChartInfo2.fileOutboundStatus.sentCount++;
+                            semicircleChartInfo2.fileOutboundStatus.sentFileCount += Number(event.data.data['totalFileCount'] || 0);
+                            semicircleChartInfo2.fileOutboundStatus.sentFileSize += Number(event.data.data['totalFileSize'] || 0);
 
                             // 전송 채널 현황
                             const fileOutboundChannelInfo = pieChartInfo['fileOutboundChannelInfo'];
@@ -209,7 +211,9 @@
                             }
                             updatePieChart();
                         } else {
-                            semicircleChartInfo2.mailOutboundStatus.blockedCount++;
+                            semicircleChartInfo2.fileOutboundStatus.blockedCount++;
+                            semicircleChartInfo2.fileOutboundStatus.blockedFileCount += Number(event.data.data['fileCount'] || 0);
+                            semicircleChartInfo2.fileOutboundStatus.blockedFileSize += Number(event.data.data['totalFileSize'] || 0);
                         }
 
                         updateSemicircleChart2();
@@ -288,15 +292,20 @@
                                 for (const fileOutboundHistInfo of fileOutboundHistStatusInfoList) {
                                     switch (fileOutboundHistInfo.outboundStatusCcd) {
                                         case '[[${@Constants.CD_OUTBOUND_STATUS_SENT}]]':
-                                            semicircleChartInfo2.mailOutboundStatus.sentCount = fileOutboundHistInfo.outboundHistCount || 0;
-                                            semicircleChartInfo2.mailOutboundStatus.fileCount += fileOutboundHistInfo.outboundFileCount || 0;
-                                            semicircleChartInfo2.mailOutboundStatus.fileSize += fileOutboundHistInfo.outboundFileSize || 0;
+                                            semicircleChartInfo2.fileOutboundStatus.sentCount = fileOutboundHistInfo.outboundHistCount || 0;
+                                            semicircleChartInfo2.fileOutboundStatus.sentFileCount += fileOutboundHistInfo.outboundFileCount || 0;
+                                            semicircleChartInfo2.fileOutboundStatus.sentFileSize += fileOutboundHistInfo.outboundFileSize || 0;
                                             break;
                                         case '[[${@Constants.CD_OUTBOUND_STATUS_BLOCKED}]]':
-                                            semicircleChartInfo2.mailOutboundStatus.blockedCount = fileOutboundHistInfo.outboundHistCount || 0;
+                                            semicircleChartInfo2.fileOutboundStatus.blockedCount = fileOutboundHistInfo.outboundHistCount || 0;
+                                            semicircleChartInfo2.fileOutboundStatus.blockedFileCount += fileOutboundHistInfo.outboundFileCount || 0;
+                                            semicircleChartInfo2.fileOutboundStatus.blockedFileSize += fileOutboundHistInfo.outboundFileSize || 0;
                                             break;
                                     }
                                 }
+
+                                console.log('fileOutboundHistStatusInfoList', fileOutboundHistStatusInfoList);
+                                console.log('semicircleChartInfo2', semicircleChartInfo2);
 
                                 updateSemicircleChart2();
                             }
@@ -557,7 +566,7 @@
             }
 
             function initSemicircleChart2() {
-                semicircleChart['mailOutboundStatus'] = echarts.init(document.getElementById('semicircleChart2'));
+                semicircleChart['fileOutboundStatus'] = echarts.init(document.getElementById('semicircleChart2'));
                 const count = 0;
                 const totalCount = 0;
 
@@ -715,16 +724,16 @@
             }
 
             function updateSemicircleChart2() {
-                const fileKilobyte = semicircleChartInfo2.mailOutboundStatus.fileSize > 0 ? (semicircleChartInfo2.mailOutboundStatus.fileSize / 1024).toFixed(1) : 0;
+                const fileKilobyte = semicircleChartInfo2.fileOutboundStatus.sentFleSize > 0 ? (semicircleChartInfo2.fileOutboundStatus.sentFileSize / 1024).toFixed(1) : 0;
 
-                document.querySelector('.overseasDetectionStatus .file-count').textContent = semicircleChartInfo2.mailOutboundStatus.fileCount.toLocaleString('ko-KR');
-                document.querySelector('.overseasDetectionStatus .file-size').textContent = fileKilobyte.toLocaleString('ko-KR');
-                document.querySelector('.overseasDetectionStatus .blocked-count').textContent = semicircleChartInfo2.mailOutboundStatus.blockedCount.toLocaleString('ko-KR');
+                document.querySelector('.overseasDetectionStatus .sent-file-count').textContent = semicircleChartInfo2.fileOutboundStatus.sentFileCount.toLocaleString('ko-KR');
+                document.querySelector('.overseasDetectionStatus .sent-file-size').textContent = fileKilobyte.toLocaleString('ko-KR');
+                document.querySelector('.overseasDetectionStatus .blocked-file-count').textContent = semicircleChartInfo2.fileOutboundStatus.blockedFileCount.toLocaleString('ko-KR');
 
-                let totalCount = semicircleChartInfo2.mailOutboundStatus.sentCount + semicircleChartInfo2.mailOutboundStatus.blockedCount;
-                let count = semicircleChartInfo2.mailOutboundStatus.sentCount;
+                let totalCount = semicircleChartInfo2.fileOutboundStatus.sentCount + semicircleChartInfo2.fileOutboundStatus.blockedCount;
+                let count = semicircleChartInfo2.fileOutboundStatus.sentCount;
 
-                semicircleChart['mailOutboundStatus'].setOption(
+                semicircleChart['fileOutboundStatus'].setOption(
                     {
                         graphic: [
                             {},
@@ -744,11 +753,11 @@
                                                 colorStops: [
                                                     {
                                                         offset: 0,
-                                                        color: semicircleChartInfo2.mailOutboundStatus.color1
+                                                        color: semicircleChartInfo2.fileOutboundStatus.color1
                                                     },
                                                     {
                                                         offset: 1,
-                                                        color: semicircleChartInfo2.mailOutboundStatus.color2
+                                                        color: semicircleChartInfo2.fileOutboundStatus.color2
                                                     }
                                                 ]
                                             }
@@ -756,7 +765,7 @@
                                     }, // 실제 값
                                     {
                                         value: totalCount - count,
-                                        itemStyle: {color: semicircleChartInfo2.mailOutboundStatus.backColor}
+                                        itemStyle: {color: semicircleChartInfo2.fileOutboundStatus.backColor}
                                     } // 변경 필요 (100)
                                 ]
                             }
@@ -1165,19 +1174,19 @@
                                     <div class="data data1 type2">
                                         <div class="data-title">전송된 파일 수</div>
                                         <div class="data-contents">
-                                            <div><span class="low-count file-count"></span><span> 건</span></div>
+                                            <div><span class="low-count sent-file-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
                                     <div class="data data2 type2">
                                         <div class="data-title">전송된 파일 용량</div>
                                         <div class="data-contents">
-                                            <div><span class="mid-count file-size"></span><span> KB</span></div>
+                                            <div><span class="mid-count sent-file-size"></span><span> KB</span></div>
                                         </div>
                                     </div>
                                     <div class="data data3">
-                                        <div class="data-title">차단된 파일</div>
+                                        <div class="data-title">차단된 파일 수</div>
                                         <div class="data-contents">
-                                            <div><span class="high-count blocked-count"></span><span> 건</span></div>
+                                            <div><span class="high-count blocked-file-count"></span><span> 건</span></div>
                                         </div>
                                     </div>
                                 </div>
