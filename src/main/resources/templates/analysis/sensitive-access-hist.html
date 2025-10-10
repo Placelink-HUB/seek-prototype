@@ -90,9 +90,9 @@
                                     <td>DB</td>
                                     <td th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHist.normalRequestCount, 0, 'COMMA')}"></td>
                                     <td th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHist.abnormalRequestCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${sensitiveInformationUnmaskHist.requestStatus}"></td>
+                                    <td th:class="${sensitiveInformationUnmaskHist.conditionLevel}" th:text="${sensitiveInformationUnmaskHist.conditionLevel}"></td>
                                     <td>
-                                        <button th:if="${sensitiveInformationUnmaskHist.requestStatus != '정상'}" class="table-btn-sty01" th:onclick="S2Util.alert('준비 중입니다.');">전송</button>
+                                        <button th:if="${sensitiveInformationUnmaskHist.conditionLevel != '정상'}" class="table-btn-sty01" th:onclick="S2Util.alert('준비 중입니다.');">전송</button>
                                     </td>
                                 </tr>
                             </tbody>

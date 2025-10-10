@@ -200,13 +200,31 @@ table caption {
     Common
 =================================================================================================== */
 .c-dp-inline-block {
-  display: inline-block;
+  /* eslint-disable-next-line css/no-important */
+  display: inline-block !important;
 }
 .c-color-white {
-  color: #fff;
+  /* eslint-disable-next-line css/no-important */
+  color: #fff !important;
+}
+.c-color-active,
+.정상 {
+  /* eslint-disable-next-line css/no-important */
+  color: #5ef0a7 !important;
+}
+.c-color-check,
+.점검 {
+  /* eslint-disable-next-line css/no-important */
+  color: #fe8e10 !important;
+}
+.c-color-alert,
+.경고 {
+  /* eslint-disable-next-line css/no-important */
+  color: #fe0000 !important;
 }
 .c-cursor-pointer {
-  cursor: pointer;
+  /* eslint-disable-next-line css/no-important */
+  cursor: pointer !important;
 }
 
 .custom-select {

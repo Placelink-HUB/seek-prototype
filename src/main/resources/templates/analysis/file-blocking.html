@@ -89,7 +89,7 @@
                                     <th th:text="${searchGroupingType == 'channel' ? '채널' : '사용자'}">사용자 ID</th>
                                     <th>차단 건수</th>
                                     <th>차단 용량(MB)</th>
-                                    <th>발생 채널(사용자 기준이라면 빼야함)</th>
+                                    <th>차단 파일 개수</th>
                                     <th>업무시간 차단 수</th>
                                     <th>비업무시간 차단 수</th>
                                     <th>탐지 결과</th>
@@ -104,12 +104,12 @@
                                     <td th:text="${searchGroupingType == 'channel' ? fileOutboundBlockingHist.outboundChannelCcd : fileOutboundBlockingHist.userId}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.actionCount, 0, 'COMMA')}"></td>
                                     <td th:text="${#numbers.formatDecimal(fileOutboundBlockingHist.totalFileSize / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
-                                    <td></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.totalFileCount, 0, 'COMMA')}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.normalCount, 0, 'COMMA')}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.abnormalCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${fileOutboundBlockingHist.outboundStatus}"></td>
+                                    <td th:class="${fileOutboundBlockingHist.conditionLevel}" th:text="${fileOutboundBlockingHist.conditionLevel}"></td>
                                     <td>
-                                        <button th:if="${fileOutboundBlockingHist.outboundStatus != '정상'}" class="table-btn-sty01" th:onclick="S2Util.alert('준비 중입니다.');">전송</button>
+                                        <button th:if="${fileOutboundBlockingHist.conditionLevel != '정상'}" class="table-btn-sty01" th:onclick="S2Util.alert('준비 중입니다.');">전송</button>
                                     </td>
                                 </tr>
                             </tbody>

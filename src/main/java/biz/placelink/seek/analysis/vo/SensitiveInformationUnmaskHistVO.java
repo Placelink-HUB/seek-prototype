@@ -109,7 +109,7 @@ public class SensitiveInformationUnmaskHistVO extends DefaultVO {
         this.abnormalRequestCount = abnormalRequestCount;
     }
 
-    public String getRequestStatus() {
+    public String getConditionLevel() {
         if (this.abnormalRequestCount == null || this.abnormalRequestCount == 0) {
             return "정상";
         } else {

@@ -213,7 +213,7 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
         this.abnormalCount = abnormalCount;
     }
 
-    public String getOutboundStatus() {
+    public String getConditionLevel() {
         if (this.abnormalCount == null || this.abnormalCount == 0) {
             return "정상";
         } else {
