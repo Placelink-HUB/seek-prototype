@@ -92,7 +92,7 @@ public class AgentVO extends DefaultVO {
 
     public void setEventTime(String eventTime) {
         this.eventTime = eventTime;
-        this.setEventDateTime(Optional.ofNullable(eventTime).map(dt -> S2DateUtil.parseToLocalDateTime(dt, "yyyy-MM-dd HH:mm:ss")).orElse(null));
+        this.setEventDateTime(Optional.ofNullable(eventTime).map(dt -> S2DateUtil.parseToLocalDateTime(dt.replaceAll("[^0-9]", ""), "yyyyMMddHHmmss", false)).orElse(null));
     }
 
     public LocalDateTime getEventDateTime() {
