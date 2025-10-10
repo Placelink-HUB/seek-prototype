@@ -106,7 +106,7 @@ public class DashboardController {
         response.put("maskingData", maskHistService.selectMaskStatus(vSchDe));
         response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(vSchDe));
         response.put("fileOutboundHistStatusInfoList", dashboardService.selectFileOutboundHistStatusInformation(vSchDe));
-        response.put("fileOutboundHistChannelInfoList", dashboardService.selectFileOutboundHistChannelInformation(vSchDe));
+        response.put("fileOutboundHistChannelInfoList", dashboardService.selectFileOutboundHistChannelInformation(vSchDe, Constants.CD_OUTBOUND_STATUS_SENT));
 
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);

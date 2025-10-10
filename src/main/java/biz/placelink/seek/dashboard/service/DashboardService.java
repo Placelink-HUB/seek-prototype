@@ -30,7 +30,8 @@ public class DashboardService {
 
     /**
      * 분석 현황 정보를 조회한다.
-     *
+     * 
+     * @param schDe 조회 일자
      * @return 분석 현황
      */
     public AnalysisStatisticsVO selectAnalysisStatistics(String schDe) {
@@ -52,6 +53,7 @@ public class DashboardService {
     /**
      * 탐지 현황 정보를 조회한다.
      *
+     * @param schDe 조회 일자
      * @return 탐지 현황
      */
     public AnalysisStatisticsVO selectDetectionStatistics(String schDe) {
@@ -61,6 +63,7 @@ public class DashboardService {
     /**
      * 실시간 분석 정보를 조회한다.
      *
+     * @param schDe 조회 일자
      * @return 실시간 분석 현황
      */
     public List<AnalysisStatisticsVO> selectRealtimeAnalysisCount(String schDe) {
@@ -70,6 +73,7 @@ public class DashboardService {
     /**
      * 최종 분석이 완료된 일시를 조회한다.(문자열)
      *
+     * @param schDe 조회 일자
      * @return 최종 분석이 완료된 일시(문자열)
      */
     public String selectLastAnalysisCompleteDateTimeStr(String schDe) {
@@ -79,6 +83,7 @@ public class DashboardService {
     /**
      * 민감정보 상위 항목 정보를 조회한다.
      *
+     * @param schDe 조회 일자
      * @return 민감정보 상위 항목
      */
     public List<AnalysisStatisticsVO> selectTopSensitiveInformation(String schDe) {
@@ -88,6 +93,7 @@ public class DashboardService {
     /**
      * 파일 분석 정보를 조회한다.
      *
+     * @param schDe 조회 일자
      * @return 파일 분석 정보
      */
     public AnalysisStatisticsVO selectFileAnalysisInformation(String schDe) {
@@ -97,6 +103,7 @@ public class DashboardService {
     /**
      * 파일 외부전송 이력 상태 정보를 조회한다.
      *
+     * @param schDe 조회 일자
      * @return 파일 외부전송 이력 상태 정보
      */
     public List<AnalysisStatisticsVO> selectFileOutboundHistStatusInformation(String schDe) {
@@ -106,10 +113,12 @@ public class DashboardService {
     /**
      * 파일 외부전송 이력 채널 정보를 조회한다.
      *
+     * @param schDe                조회 일자
+     * @param schOutboundStatusCcd 외부전송 상태 공통코드
      * @return 파일 외부전송 이력 채널 정보
      */
-    public List<AnalysisStatisticsVO> selectFileOutboundHistChannelInformation(String schDe) {
-        return dashboardMapper.selectFileOutboundHistChannelInformation(schDe);
+    public List<AnalysisStatisticsVO> selectFileOutboundHistChannelInformation(String schDe, String schOutboundStatusCcd) {
+        return dashboardMapper.selectFileOutboundHistChannelInformation(schDe, schOutboundStatusCcd);
     }
 
 }

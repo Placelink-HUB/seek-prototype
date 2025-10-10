@@ -198,6 +198,9 @@
             <if test='schDe != null and schDe != ""'>
                 AND (sfoh.CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > sfoh.CREATE_DT)
             </if>
+            <if test='schOutboundStatusCcd != null and schOutboundStatusCcd != ""'>
+                AND sfoh.OUTBOUND_STATUS_CCD = #{schOutboundStatusCcd}
+            </if>
         </where>
         GROUP BY
             sfoh.OUTBOUND_CHANNEL_CCD,
