@@ -140,7 +140,7 @@
             CASE
                 WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 'ACTIVE'
                 /* 업무시간에 모든 에이전트가 비활성화 일때 */
-                WHEN MINISPY_SYS_YN != 'Y' AND MSPY_USER_EXE_YN != 'Y' AND WFP_BLOCKER_EXE_YN != 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN != 'Y' AND sd.EVENT_DT::time >= '09:00:00' AND '18:00:00' >= sd.EVENT_DT::time THEN 'ALERT'
+                WHEN MINISPY_SYS_YN != 'Y' AND MSPY_USER_EXE_YN != 'Y' AND WFP_BLOCKER_EXE_YN != 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN != 'Y' AND NOW()::time >= '09:00:00' AND '18:00:00' >= NOW()::time THEN 'ALERT'
                 ELSE 'CHECK'
             END AS CONDITION_LEVEL_CCD
         FROM AGENT_STATUS_DETAIL sd
