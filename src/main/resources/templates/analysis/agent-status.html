@@ -23,7 +23,6 @@
                         hideLoading: true
                     },
                     function (response) {
-                        console.log('response', response);
                         {
                             // PC 에이전트 상태
                             document.getElementById('agentActiveCount').textContent = response.agentStatusListStatus.activeCount;
