@@ -35,6 +35,7 @@ public class AgentService {
      * @param paramVO 에이전트 정보
      * @return 수정 개수
      */
+    @Transactional
     public int insertAgentHeartBeatHist(AgentVO paramVO) {
         int result = agentMapper.insertAgentHeartBeatHist(paramVO);
         if (result > 0) {

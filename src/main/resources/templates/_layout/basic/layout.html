@@ -52,6 +52,8 @@
                 const vConsoleType = '[[${consoleType}]]';
                 if (vConsoleType) {
                     sessionStorage.setItem('consoleType', vConsoleType);
+                } else {
+                    sessionStorage.removeItem('consoleType');
                 }
 
                 const targetDate = document.querySelector('.targetDate-wrap .targetDate');
