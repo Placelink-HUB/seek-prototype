@@ -304,9 +304,6 @@
                                     }
                                 }
 
-                                console.log('fileOutboundHistStatusInfoList', fileOutboundHistStatusInfoList);
-                                console.log('semicircleChartInfo2', semicircleChartInfo2);
-
                                 updateSemicircleChart2();
                             }
                         }
@@ -724,7 +721,7 @@
             }
 
             function updateSemicircleChart2() {
-                const fileMegabyte = semicircleChartInfo2.fileOutboundStatus.sentFleSize > 0 ? (semicircleChartInfo2.fileOutboundStatus.sentFileSize / 1024 / 1024).toFixed(1) : 0;
+                const fileMegabyte = semicircleChartInfo2.fileOutboundStatus.sentFileSize > 0 ? parseFloat((semicircleChartInfo2.fileOutboundStatus.sentFileSize / 1024 / 1024).toFixed(2)) : 0;
 
                 document.querySelector('.overseasDetectionStatus .sent-file-count').textContent = semicircleChartInfo2.fileOutboundStatus.sentFileCount.toLocaleString('ko-KR');
                 document.querySelector('.overseasDetectionStatus .sent-file-size').textContent = fileMegabyte.toLocaleString('ko-KR');
