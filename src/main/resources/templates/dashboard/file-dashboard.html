@@ -724,10 +724,10 @@
             }
 
             function updateSemicircleChart2() {
-                const fileKilobyte = semicircleChartInfo2.fileOutboundStatus.sentFleSize > 0 ? (semicircleChartInfo2.fileOutboundStatus.sentFileSize / 1024).toFixed(1) : 0;
+                const fileMegabyte = semicircleChartInfo2.fileOutboundStatus.sentFleSize > 0 ? (semicircleChartInfo2.fileOutboundStatus.sentFileSize / 1024 / 1024).toFixed(1) : 0;
 
                 document.querySelector('.overseasDetectionStatus .sent-file-count').textContent = semicircleChartInfo2.fileOutboundStatus.sentFileCount.toLocaleString('ko-KR');
-                document.querySelector('.overseasDetectionStatus .sent-file-size').textContent = fileKilobyte.toLocaleString('ko-KR');
+                document.querySelector('.overseasDetectionStatus .sent-file-size').textContent = fileMegabyte.toLocaleString('ko-KR');
                 document.querySelector('.overseasDetectionStatus .blocked-file-count').textContent = semicircleChartInfo2.fileOutboundStatus.blockedFileCount.toLocaleString('ko-KR');
 
                 let totalCount = semicircleChartInfo2.fileOutboundStatus.sentCount + semicircleChartInfo2.fileOutboundStatus.blockedCount;
@@ -1180,7 +1180,7 @@
                                     <div class="data data2 type2">
                                         <div class="data-title">전송된 파일 용량</div>
                                         <div class="data-contents">
-                                            <div><span class="mid-count sent-file-size"></span><span> KB</span></div>
+                                            <div><span class="mid-count sent-file-size"></span><span> MB</span></div>
                                         </div>
                                     </div>
                                     <div class="data data3">

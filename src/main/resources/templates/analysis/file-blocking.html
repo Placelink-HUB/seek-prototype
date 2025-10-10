@@ -47,7 +47,7 @@
                                 <div class="card-title">총 차단 파일 용량</div>
                                 <div class="card-desc">외부 전송 중 파일 용량</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatDecimal(fileOutboundBlockingHistListStatus.totalFileSize / 1024.0, 1, 'COMMA', 2, 'POINT')}"></span>MB</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(fileOutboundBlockingHistListStatus.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}"></span>MB</div>
                         </div>
                         <div class="card border"></div>
                         <div class="card type1 many-on-many mint">
@@ -103,7 +103,7 @@
                                 <tr th:each="fileOutboundBlockingHist : ${fileOutboundBlockingHistListPagination.dataList}">
                                     <td th:text="${searchGroupingType == 'channel' ? fileOutboundBlockingHist.outboundChannelCcd : fileOutboundBlockingHist.userId}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.actionCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${#numbers.formatDecimal(fileOutboundBlockingHist.totalFileSize / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
+                                    <td th:text="${#numbers.formatDecimal(fileOutboundBlockingHist.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.totalFileCount, 0, 'COMMA')}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.normalCount, 0, 'COMMA')}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.abnormalCount, 0, 'COMMA')}"></td>
