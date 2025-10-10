@@ -19,9 +19,11 @@
                     '[[@{/analysis/agent-status-list}]]',
                     {
                         method: 'get',
-                        dataType: 'json'
+                        dataType: 'json',
+                        hideLoading: true
                     },
                     function (response) {
+                        console.log('response', response);
                         {
                             // PC 에이전트 상태
                             document.getElementById('agentActiveCount').textContent = response.agentStatusListStatus.activeCount;
@@ -37,6 +39,11 @@
                             } else {
                                 agentStatusList.innerHTML = '';
                                 for (const agentStatus of response.agentStatusList) {
+                                    let eventDateTimeStr = '';
+                                    if (agentStatus.eventDateTime && Array.isArray(agentStatus.eventDateTime) && agentStatus.eventDateTime.length >= 6) {
+                                        eventDateTimeStr = dayjs(new Date(agentStatus.eventDateTime[0], agentStatus.eventDateTime[1] - 1, agentStatus.eventDateTime[2], agentStatus.eventDateTime[3], agentStatus.eventDateTime[4], agentStatus.eventDateTime[5])).format('YYYY-MM-DD HH:mm:ss');
+                                    }
+
                                     agentStatusList.innerHTML += `
                                         <tr>
                                             <td>${agentStatus.clientIp}</td>
@@ -46,7 +53,7 @@
                                             <td class="agent-status-indicator ${agentStatus.mspyUserExeYn}"></td>
                                             <td class="agent-status-indicator ${agentStatus.wfpBlockerExeYn}"></td>
                                             <td class="agent-status-indicator ${agentStatus.clickDomainAgentExeYn}"></td>
-                                            <td>${agentStatus.eventDateTime ? dayjs(agentStatus.eventDateTime, 'YYYY-MM-DDTHH:mm:ss').format('YYYY년 MM월 DD일 HH시 mm분') : '-'}</td>
+                                            <td>${eventDateTimeStr}</td>
                                             <td class="${agentStatus.conditionLevel}">${agentStatus.conditionLevel}</td>
                                             <td>${agentStatus.conditionLevelCcd === 'ACTIVE' ? '' : '<button class="table-btn-sty01" onclick="S2Util.alert(\'준비 중입니다.\');">전송</button>'}</td>
                                         </tr>
