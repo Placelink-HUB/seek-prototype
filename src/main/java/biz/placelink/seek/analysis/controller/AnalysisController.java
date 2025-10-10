@@ -31,6 +31,7 @@ import biz.placelink.seek.analysis.service.FileOutboundHistService;
 import biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
+import biz.placelink.seek.com.vo.SearchVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
@@ -270,14 +271,15 @@ public class AnalysisController {
      */
     @GetMapping(value = "/analysis/file-blocking")
     public String fileBlockingList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
-            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
 
         String pattern = "yyyyMMdd";
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
-        SchArticleVO searchVO = new SchArticleVO();
+        SearchVO searchVO = new SearchVO();
         searchVO.setSearchStartDate(searchPeriod.searchStartDate());
         searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
@@ -287,6 +289,7 @@ public class AnalysisController {
         model.addAttribute("fileOutboundBlockingHistListPagination", fileOutboundHistService.selectFileOutboundBlockingHistListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchGroupingType", searchGroupingType);
         return "analysis/file-blocking";
     }
 

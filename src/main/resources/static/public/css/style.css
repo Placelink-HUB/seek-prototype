@@ -79,10 +79,6 @@ table caption {
   color: red;
 }
 
-.c-pointer {
-  cursor: pointer;
-}
-
 .inline-block {
   display: inline-block;
 }
@@ -170,6 +166,11 @@ table caption {
   margin-top: 1.875rem !important;
 }
 
+.c-ma-l10 {
+  /* eslint-disable-next-line css/no-important */
+  margin-left: 0.625rem !important;
+}
+
 .c-ma-l20 {
   /* eslint-disable-next-line css/no-important */
   margin-left: 1.25rem !important;
@@ -198,6 +199,16 @@ table caption {
 /* ===================================================================================================
     Common
 =================================================================================================== */
+.c-dp-inline-block {
+  display: inline-block;
+}
+.c-color-white {
+  color: #fff;
+}
+.c-cursor-pointer {
+  cursor: pointer;
+}
+
 .custom-select {
   position: relative;
   display: inline-block;

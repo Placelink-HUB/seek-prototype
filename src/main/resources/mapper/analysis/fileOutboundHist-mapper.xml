@@ -84,7 +84,14 @@
 
     <sql id="sqlFileOutboundBlockingHistList">
         SELECT
-            foh.USER_ID,
+            <choose>
+                <when test='searchGroupingType neq null and searchGroupingType eq "channel"'>
+                    foh.OUTBOUND_CHANNEL_CCD,
+                </when>
+                <otherwise>
+                    foh.USER_ID,
+                </otherwise>
+            </choose>
             COUNT(1) AS ACTION_COUNT,
             COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 1 ELSE 0 END), 0) AS NORMAL_COUNT,
             COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS ABNORMAL_COUNT,
@@ -95,7 +102,15 @@
             <include refid="sqlFileOutboundHist"/>
         ) foh
         WHERE foh.OUTBOUND_STATUS_CCD = 'BLOCKED'
-        GROUP BY foh.USER_ID
+        GROUP BY
+            <choose>
+                <when test='searchGroupingType neq null and searchGroupingType eq "channel"'>
+                    foh.OUTBOUND_CHANNEL_CCD
+                </when>
+                <otherwise>
+                    foh.USER_ID
+                </otherwise>
+            </choose>
     </sql>
 
     <select id="selectFileOutboundBlockingHistList" parameterType="searchVO" resultType="fileOutboundHistVO">
