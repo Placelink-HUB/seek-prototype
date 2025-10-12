@@ -34,6 +34,8 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
     private Integer totalFileCount;
     /* 전체 파일 크기(바이트) */
     private Long totalFileSize;
+    /* 파일 확장자 상태 공통코드 */
+    private String fileExtensionStatusCcd;
     /* 이벤트(발생) 일시 (yyyy-MM-dd HH:mm:ss) */
     private LocalDateTime eventDt;
     private String eventDtStr;
@@ -163,6 +165,14 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
 
     public void setTotalFileSize(Long totalFileSize) {
         this.totalFileSize = totalFileSize;
+    }
+
+    public String getFileExtensionStatusCcd() {
+        return fileExtensionStatusCcd;
+    }
+
+    public void setFileExtensionStatusCcd(String fileExtensionStatusCcd) {
+        this.fileExtensionStatusCcd = fileExtensionStatusCcd;
     }
 
     public LocalDateTime getEventDt() {

@@ -29,9 +29,9 @@ import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.AnalysisService;
 import biz.placelink.seek.analysis.service.FileOutboundHistService;
 import biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistService;
+import biz.placelink.seek.analysis.vo.SchFileOutboundHistVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
-import biz.placelink.seek.com.vo.SearchVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
@@ -276,7 +276,7 @@ public class AnalysisController {
         String pattern = "yyyyMMdd";
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
-        SearchVO searchVO = new SearchVO();
+        SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchStartDate(searchPeriod.searchStartDate());
         searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setSearchGroupingType(searchGroupingType);

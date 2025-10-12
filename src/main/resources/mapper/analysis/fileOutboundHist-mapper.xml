@@ -17,6 +17,7 @@
             DEST_HOST,
             TOTAL_FILE_COUNT,
             TOTAL_FILE_SIZE,
+            FILE_EXTENSION_STATUS_CCD,
             EVENT_DT,
             CREATE_DT
         ) VALUES (
@@ -32,6 +33,7 @@
             #{destHost},
             #{totalFileCount},
             #{totalFileSize},
+            #{fileExtensionStatusCcd},
             #{eventDt},
             NOW()
         )
@@ -51,6 +53,7 @@
             sfoh.DEST_HOST,
             sfoh.TOTAL_FILE_COUNT,
             sfoh.TOTAL_FILE_SIZE,
+            sfoh.FILE_EXTENSION_STATUS_CCD,
             sfoh.EVENT_DT,
             CASE
                 WHEN sfoh.EVENT_DT::time >= '09:00:00' AND '18:00:00' >= sfoh.EVENT_DT::time THEN 'NORMAL'
@@ -65,10 +68,13 @@
             <if test='searchEndDate neq null'>
                 AND #{searchEndDateExclusive} > sfoh.EVENT_DT
             </if>
+            <if test='schFileExtensionStatusCcd neq null and schFileExtensionStatusCcd neq ""'>
+                AND sfoh.FILE_EXTENSION_STATUS_CCD = #{schFileExtensionStatusCcd}
+            </if>
         </where>
     </sql>
 
-    <select id="selectFileOutboundBlockingHistListStatus" parameterType="searchVO" resultType="fileOutboundHistVO">
+    <select id="selectFileOutboundBlockingHistListStatus" parameterType="schFileOutboundHistVO" resultType="fileOutboundHistVO">
         /** selectFileOutboundBlockingHistListStatus : 파일 외부전송 차단 이력 목록 현황을 조회한다. */
         SELECT
             COUNT(1) AS ACTION_COUNT,
@@ -113,14 +119,14 @@
             </choose>
     </sql>
 
-    <select id="selectFileOutboundBlockingHistList" parameterType="searchVO" resultType="fileOutboundHistVO">
+    <select id="selectFileOutboundBlockingHistList" parameterType="schFileOutboundHistVO" resultType="fileOutboundHistVO">
         /** selectFileOutboundBlockingHistList : 파일 외부전송 차단 이력 목록을 조회한다. */
         <include refid="common.sql.paging_header"/>
         <include refid="sqlFileOutboundBlockingHistList"/>
         <include refid="common.sql.paging_footer"/>
     </select>
 
-    <select id="selectFileOutboundBlockingHistListCount" parameterType="searchVO" resultType="integer">
+    <select id="selectFileOutboundBlockingHistListCount" parameterType="schFileOutboundHistVO" resultType="integer">
         /** selectFileOutboundBlockingHistListCount : 파일 외부전송 차단 이력 목록 개수를 조회한다. */
         SELECT COUNT(1)
         FROM (

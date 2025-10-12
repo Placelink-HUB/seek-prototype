@@ -2,14 +2,16 @@ package biz.placelink.seek.analysis.service;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -164,7 +166,33 @@ public class WildpathAnalysisService {
      */
     @Transactional(readOnly = false)
     public int createFileOutboundHist(FileOutboundHistVO paramVO, String allParamsStr) {
-        int result = fileOutboundHistService.insertFileOutboundHist(paramVO);
+        int result = 0;
+
+        String fileExtensionStatus = Constants.CD_FILE_EXTENSION_STATUS_NONE_NORMAL;
+        String fileName = paramVO.getFileNm();
+
+        if (fileName != null) {
+            String[] fileNmArr = fileName.split(",");
+            int fileNmCount = 0;
+            int normalExtensionsCount = 0;
+
+            for (String fileNm : fileNmArr) {
+                if (S2Util.isNotEmpty(fileNm)) {
+                    fileNmCount++;
+                    if (NORMAL_EXTENSIONS.contains(S2FileUtil.getExtension(fileNm, true))) {
+                        normalExtensionsCount++;
+                    }
+                }
+            }
+
+            if (fileNmCount > 0 && normalExtensionsCount > 0) {
+                fileExtensionStatus = fileNmCount == normalExtensionsCount ? Constants.CD_FILE_EXTENSION_STATUS_ALL_NORMAL : Constants.CD_FILE_EXTENSION_STATUS_PARTIALLY_NORMAL;
+            }
+        }
+
+        paramVO.setFileExtensionStatusCcd(fileExtensionStatus);
+
+        result = fileOutboundHistService.insertFileOutboundHist(paramVO);
         if (result > 0) {
             // 파일 외부 전송 현황
             Map<String, Object> pushMap = new HashMap<>();
@@ -184,7 +212,7 @@ public class WildpathAnalysisService {
             pushMap.put("totalFileSize", paramVO.getTotalFileSize());
             pushMap.put("totalFileCount", paramVO.getTotalFileCount());
 
-            if (StringUtils.isNotEmpty(allParamsStr)) {
+            if (S2Util.isNotEmpty(allParamsStr)) {
                 pushMap.put("allParamsStr", allParamsStr);
             }
 
@@ -192,6 +220,12 @@ public class WildpathAnalysisService {
         }
         return result;
     }
+
+    private static final Set<String> NORMAL_EXTENSIONS = new HashSet<>(Arrays.asList(
+            "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
+            "pdf", "hwp", "jpg", "jpeg", "png", "gif", "bmp",
+            "mp3", "wav", "mp4", "avi", "mov", "zip", "tar", "gz",
+            "html", "css", "js", "java", "py", "sql"));
 
     /**
      * SEEK 에이전트 하트비트 수신

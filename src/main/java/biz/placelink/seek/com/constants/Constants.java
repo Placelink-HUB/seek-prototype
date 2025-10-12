@@ -254,4 +254,17 @@ public class Constants {
      */
     public static final String CD_CONDITION_LEVEL_ALERT = "ALERT";
 
+    /**
+     * 파일 확장자 상태 - 전체 일반 파일
+     */
+    public static final String CD_FILE_EXTENSION_STATUS_ALL_NORMAL = "ALL_NORMAL";
+    /**
+     * 파일 확장자 상태 - 일부 일반 파일
+     */
+    public static final String CD_FILE_EXTENSION_STATUS_PARTIALLY_NORMAL = "PARTIALLY_NORMAL";
+    /**
+     * 파일 확장자 상태 - 전체 비일반 파일
+     */
+    public static final String CD_FILE_EXTENSION_STATUS_NONE_NORMAL = "NONE_NORMAL";
+
 }

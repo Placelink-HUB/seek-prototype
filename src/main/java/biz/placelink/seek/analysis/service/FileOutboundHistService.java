@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
+import biz.placelink.seek.analysis.vo.SchFileOutboundHistVO;
 import biz.placelink.seek.com.util.PaginationInfo;
-import biz.placelink.seek.com.vo.SearchVO;
 
 /**
  * <pre>
@@ -46,7 +46,7 @@ public class FileOutboundHistService {
      * @param searchVO 조회조건
      * @return 파일 외부전송 차단 이력 목록 현황
      */
-    public FileOutboundHistVO selectFileOutboundBlockingHistListStatus(SearchVO searchVO) {
+    public FileOutboundHistVO selectFileOutboundBlockingHistListStatus(SchFileOutboundHistVO searchVO) {
         return fileOutboundHistMapper.selectFileOutboundBlockingHistListStatus(searchVO);
     }
 
@@ -56,7 +56,7 @@ public class FileOutboundHistService {
      * @param searchVO 조회조건
      * @return 파일 외부전송 차단 이력 목록
      */
-    public PaginationInfo selectFileOutboundBlockingHistListWithPagination(SearchVO searchVO) {
+    public PaginationInfo selectFileOutboundBlockingHistListWithPagination(SchFileOutboundHistVO searchVO) {
         List<FileOutboundHistVO> list = fileOutboundHistMapper.selectFileOutboundBlockingHistList(searchVO);
         int count = fileOutboundHistMapper.selectFileOutboundBlockingHistListCount(searchVO);
         return new PaginationInfo(searchVO, list, count);
