@@ -63,7 +63,7 @@
                 AND sfoh.EVENT_DT >= #{searchStartDate}
             </if>
             <if test='searchEndDate neq null'>
-                AND #{searchEndDateNextDay} > sfoh.EVENT_DT
+                AND #{searchEndDateExclusive} > sfoh.EVENT_DT
             </if>
         </where>
     </sql>

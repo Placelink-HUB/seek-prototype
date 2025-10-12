@@ -61,7 +61,7 @@
                     AND CREATE_DT >= #{searchStartDate}
                 </if>
                 <if test='searchEndDate neq null'>
-                    AND #{searchEndDateNextDay} > CREATE_DT
+                    AND #{searchEndDateExclusive} > CREATE_DT
                 </if>
             </where>
         )

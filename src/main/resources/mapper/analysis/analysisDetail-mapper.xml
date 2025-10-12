@@ -114,7 +114,7 @@
                     AND sa.CREATE_DT >= #{searchStartDate}
                 </if>
                 <if test='searchEndDate neq null'>
-                    AND #{searchEndDateNextDay} > sa.CREATE_DT
+                    AND #{searchEndDateExclusive} > sa.CREATE_DT
                 </if>
             </where>
     </sql>

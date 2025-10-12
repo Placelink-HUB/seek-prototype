@@ -23,7 +23,7 @@
                 AND a.CREATE_DT >= #{searchStartDate}
             </if>
             <if test='searchEndDate neq null'>
-                AND #{searchEndDateNextDay} > a.CREATE_DT
+                AND #{searchEndDateExclusive} > a.CREATE_DT
             </if>
         </where>
     </sql>
