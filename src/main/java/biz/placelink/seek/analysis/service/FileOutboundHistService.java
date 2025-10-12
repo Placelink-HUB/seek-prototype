@@ -41,24 +41,24 @@ public class FileOutboundHistService {
     }
 
     /**
-     * 파일 외부전송 차단 이력 목록 현황을 조회한다.
+     * 파일 외부전송 이력 목록 현황을 조회한다.
      *
      * @param searchVO 조회조건
-     * @return 파일 외부전송 차단 이력 목록 현황
+     * @return 파일 외부전송 이력 목록 현황
      */
-    public FileOutboundHistVO selectFileOutboundBlockingHistListStatus(SchFileOutboundHistVO searchVO) {
-        return fileOutboundHistMapper.selectFileOutboundBlockingHistListStatus(searchVO);
+    public FileOutboundHistVO selectFileOutboundHistListStatus(SchFileOutboundHistVO searchVO) {
+        return fileOutboundHistMapper.selectFileOutboundHistListStatus(searchVO);
     }
 
     /**
-     * 파일 외부전송 차단 이력 목록을 조회한다.
+     * 파일 외부전송 이력 목록을 조회한다.
      *
      * @param searchVO 조회조건
-     * @return 파일 외부전송 차단 이력 목록
+     * @return 파일 외부전송 이력 목록
      */
-    public PaginationInfo selectFileOutboundBlockingHistListWithPagination(SchFileOutboundHistVO searchVO) {
-        List<FileOutboundHistVO> list = fileOutboundHistMapper.selectFileOutboundBlockingHistList(searchVO);
-        int count = fileOutboundHistMapper.selectFileOutboundBlockingHistListCount(searchVO);
+    public PaginationInfo selectFileOutboundHistListWithPagination(SchFileOutboundHistVO searchVO) {
+        List<FileOutboundHistVO> list = fileOutboundHistMapper.selectFileOutboundHistList(searchVO);
+        int count = fileOutboundHistMapper.selectFileOutboundHistListCount(searchVO);
         return new PaginationInfo(searchVO, list, count);
     }
 

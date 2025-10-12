@@ -223,9 +223,9 @@ public class WildpathAnalysisService {
 
     private static final Set<String> NORMAL_EXTENSIONS = new HashSet<>(Arrays.asList(
             "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
-            "pdf", "hwp", "jpg", "jpeg", "png", "gif", "bmp",
-            "mp3", "wav", "mp4", "avi", "mov", "zip", "tar", "gz",
-            "html", "css", "js", "java", "py", "sql"));
+            "pdf", "hwp", "hwpx", "jpg", "jpeg", "png", "gif",
+            "bmp", "mp3", "wav", "mp4", "avi", "mov", "zip", "tar",
+            "gz", "html", "css", "js", "java", "py", "sql"));
 
     /**
      * SEEK 에이전트 하트비트 수신

@@ -4,15 +4,26 @@ import biz.placelink.seek.com.vo.SearchVO;
 
 public class SchFileOutboundHistVO extends SearchVO {
 
-    /* 파일 확장자 상태 공통코드 */
-    private String schFileExtensionStatusCcd;
+    /* 외부전송 상태 공통코드 */
+    private String searchOutboundStatusCcd;
 
-    public String getSchFileExtensionStatusCcd() {
-        return schFileExtensionStatusCcd;
+    /* 파일 확장자 상태 공통코드 */
+    private String searchFileExtensionStatusCcd;
+
+    public String getSearchOutboundStatusCcd() {
+        return searchOutboundStatusCcd;
     }
 
-    public void setSchFileExtensionStatusCcd(String schFileExtensionStatusCcd) {
-        this.schFileExtensionStatusCcd = schFileExtensionStatusCcd;
+    public void setSearchOutboundStatusCcd(String searchOutboundStatusCcd) {
+        this.searchOutboundStatusCcd = searchOutboundStatusCcd;
+    }
+
+    public String getSearchFileExtensionStatusCcd() {
+        return searchFileExtensionStatusCcd;
+    }
+
+    public void setSearchFileExtensionStatusCcd(String searchFileExtensionStatusCcd) {
+        this.searchFileExtensionStatusCcd = searchFileExtensionStatusCcd;
     }
 
 }

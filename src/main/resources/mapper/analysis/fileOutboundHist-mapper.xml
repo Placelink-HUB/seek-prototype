@@ -62,33 +62,40 @@
             sfoh.CREATE_DT
         FROM SEEK_FILE_OUTBOUND_HIST sfoh
         <where>
+            <if test='searchOutboundStatusCcd neq null and searchOutboundStatusCcd neq ""'>
+                AND sfoh.OUTBOUND_STATUS_CCD = #{searchOutboundStatusCcd}
+            </if>
             <if test='searchStartDate neq null'>
                 AND sfoh.EVENT_DT >= #{searchStartDate}
             </if>
             <if test='searchEndDate neq null'>
                 AND #{searchEndDateExclusive} > sfoh.EVENT_DT
             </if>
-            <if test='schFileExtensionStatusCcd neq null and schFileExtensionStatusCcd neq ""'>
-                AND sfoh.FILE_EXTENSION_STATUS_CCD = #{schFileExtensionStatusCcd}
+            <if test='searchFileExtensionStatusCcd neq null and searchFileExtensionStatusCcd neq ""'>
+                AND sfoh.FILE_EXTENSION_STATUS_CCD = #{searchFileExtensionStatusCcd}
             </if>
         </where>
     </sql>
 
-    <select id="selectFileOutboundBlockingHistListStatus" parameterType="schFileOutboundHistVO" resultType="fileOutboundHistVO">
-        /** selectFileOutboundBlockingHistListStatus : 파일 외부전송 차단 이력 목록 현황을 조회한다. */
+    <select id="selectFileOutboundHistListStatus" parameterType="schFileOutboundHistVO" resultType="fileOutboundHistVO">
+        /** selectFileOutboundHistListStatus : 파일 외부전송 이력 목록 현황을 조회한다. */
         SELECT
             COUNT(1) AS ACTION_COUNT,
-            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 1 ELSE 0 END), 0) AS NORMAL_COUNT,
-            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS ABNORMAL_COUNT,
             COALESCE(SUM(COALESCE(foh.TOTAL_FILE_COUNT, 0)), 0) AS TOTAL_FILE_COUNT,
-            COALESCE(SUM(COALESCE(foh.TOTAL_FILE_SIZE, 0)), 0) AS TOTAL_FILE_SIZE
+            COALESCE(SUM(COALESCE(foh.TOTAL_FILE_SIZE, 0)), 0) AS TOTAL_FILE_SIZE,
+            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 1 ELSE 0 END), 0) AS ACTIVE_COUNT,
+            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS CHECK_COUNT,
+            0 AS ALERT_COUNT,
+            COALESCE(SUM(CASE WHEN foh.outbound_channel_ccd = 'https' THEN 1 ELSE 0 END), 0) AS CHANNEL_HTTPS_COUNT,
+            COALESCE(SUM(CASE WHEN foh.outbound_channel_ccd = 'usb' THEN 1 ELSE 0 END), 0) AS CHANNEL_USB_COUNT,
+            COALESCE(SUM(CASE WHEN foh.outbound_channel_ccd = 'messenger' THEN 1 ELSE 0 END), 0) AS CHANNEL_MESSENGER_COUNT,
+            COALESCE(SUM(CASE WHEN foh.outbound_channel_ccd = 'print' THEN 1 ELSE 0 END), 0) AS CHANNEL_PRINT_COUNT
         FROM (
             <include refid="sqlFileOutboundHist"/>
         ) foh
-        WHERE foh.OUTBOUND_STATUS_CCD = 'BLOCKED'
     </select>
 
-    <sql id="sqlFileOutboundBlockingHistList">
+    <sql id="sqlFileOutboundHistList">
         SELECT
             <choose>
                 <when test='searchGroupingType neq null and searchGroupingType eq "channel"'>
@@ -99,15 +106,14 @@
                 </otherwise>
             </choose>
             COUNT(1) AS ACTION_COUNT,
-            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 1 ELSE 0 END), 0) AS NORMAL_COUNT,
-            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS ABNORMAL_COUNT,
+            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 1 ELSE 0 END), 0) AS WORKING_HOUR_STATUS_NORMAL_COUNT,
+            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS WORKING_HOUR_STATUS_ABNORMAL_COUNT,
             COALESCE(SUM(COALESCE(foh.TOTAL_FILE_COUNT, 0)), 0) AS TOTAL_FILE_COUNT,
             COALESCE(SUM(COALESCE(foh.TOTAL_FILE_SIZE, 0)), 0) AS TOTAL_FILE_SIZE,
             MAX(foh.EVENT_DT) AS LAST_EVENT_DT
         FROM (
             <include refid="sqlFileOutboundHist"/>
         ) foh
-        WHERE foh.OUTBOUND_STATUS_CCD = 'BLOCKED'
         GROUP BY
             <choose>
                 <when test='searchGroupingType neq null and searchGroupingType eq "channel"'>
@@ -119,18 +125,18 @@
             </choose>
     </sql>
 
-    <select id="selectFileOutboundBlockingHistList" parameterType="schFileOutboundHistVO" resultType="fileOutboundHistVO">
-        /** selectFileOutboundBlockingHistList : 파일 외부전송 차단 이력 목록을 조회한다. */
+    <select id="selectFileOutboundHistList" parameterType="schFileOutboundHistVO" resultType="fileOutboundHistVO">
+        /** selectFileOutboundHistList : 파일 외부전송 이력 목록을 조회한다. */
         <include refid="common.sql.paging_header"/>
-        <include refid="sqlFileOutboundBlockingHistList"/>
+        <include refid="sqlFileOutboundHistList"/>
         <include refid="common.sql.paging_footer"/>
     </select>
 
-    <select id="selectFileOutboundBlockingHistListCount" parameterType="schFileOutboundHistVO" resultType="integer">
-        /** selectFileOutboundBlockingHistListCount : 파일 외부전송 차단 이력 목록 개수를 조회한다. */
+    <select id="selectFileOutboundHistListCount" parameterType="schFileOutboundHistVO" resultType="integer">
+        /** selectFileOutboundHistListCount : 파일 외부전송 이력 목록 개수를 조회한다. */
         SELECT COUNT(1)
         FROM (
-            <include refid="sqlFileOutboundBlockingHistList"/>
+            <include refid="sqlFileOutboundHistList"/>
         )
     </select>
 

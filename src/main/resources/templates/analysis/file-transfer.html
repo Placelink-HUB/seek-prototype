@@ -8,7 +8,8 @@
 
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
-                location.href = `/analysis/file-transfer?pageNo=${pageNo}`;
+                const searchGroupingType = document.querySelector('input[name="searchGroupingType"]:checked').value;
+                location.href = `/analysis/file-transfer?pageNo=${pageNo}&searchGroupingType=${searchGroupingType}`;
             }
         </script>
     </th:block>
@@ -39,14 +40,14 @@
                                 <div class="card-title">전송한 총 파일 수</div>
                                 <div class="card-desc">외부로 전송한 총 파일 수</div>
                             </div>
-                            <div class="card-content"><span>3,531</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.totalFileCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many white small">
                             <div class="title-box menu7-2 padding-left-0">
                                 <div class="card-title">전송한 총 파일 용량</div>
                                 <div class="card-desc">외부로 전송한 총 파일 용량</div>
                             </div>
-                            <div class="card-content"><span>1,277</span>MB</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(fileOutboundHistListStatus.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}">0</span>MB</div>
                         </div>
                         <div class="card border"></div>
                         <div class="card type1 many-on-many white small">
@@ -54,31 +55,37 @@
                                 <div class="card-title">HTTPS 전송</div>
                                 <div class="card-desc">메일/클라우드로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span>749</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelHttpsCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many white small">
                             <div class="title-box menu7-4">
                                 <div class="card-title">USB 전송</div>
                                 <div class="card-desc">USB로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span>5,749</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelUsbCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many white small">
                             <div class="title-box menu7-5">
                                 <div class="card-title">메신저 전송</div>
                                 <div class="card-desc">카카오톡/라인 등으로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span>652</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelMessengerCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many white small">
                             <div class="title-box menu7-6">
                                 <div class="card-title">프린터 전송</div>
                                 <div class="card-desc">프린터로 출력한 건수</div>
                             </div>
-                            <div class="card-content"><span>4,263</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelPrintCount, 0, 'COMMA')}">0</span>건</div>
                         </div>
                     </div>
-                    <h2 class="type1">PC 별 서명파일 전송 처리 현황</h2>
+                    <h2 class="type1 c-dp-inline-block">PC 별 서명파일 전송 처리 현황</h2>
+                    <div class="c-dp-inline-block c-ma-l10 c-color-white">
+                        <input type="radio" name="searchGroupingType" class="c-cursor-pointer" id="searchGroupingType_user" value="user" th:checked="${searchGroupingType == 'user'}" th:onchange="goPage([[${fileOutboundHistListPagination.pageNo}]])" />
+                        <label for="searchGroupingType_user" class="c-cursor-pointer">사용자</label>
+                        <input type="radio" name="searchGroupingType" class="c-cursor-pointer" id="searchGroupingType_channel" value="channel" th:checked="${searchGroupingType == 'channel'}" th:onchange="goPage([[${fileOutboundHistListPagination.pageNo}]])" />
+                        <label for="searchGroupingType_channel" class="c-cursor-pointer">채널</label>
+                    </div>
                     <div class="table-wrap type1 dark-slate">
                         <table class="table-sty01">
                             <caption>
@@ -86,21 +93,46 @@
                             </caption>
                             <thead>
                                 <tr>
-                                    <th>MAC 주소</th>
-                                    <th>차단 건수</th>
-                                    <th>차단 용량(MB)</th>
-                                    <th>발생 채널</th>
-                                    <th>업무시간 차단 수</th>
-                                    <th>비업무시간 차단 수</th>
+                                    <th th:text="${searchGroupingType == 'channel' ? '채널' : '사용자 ID'}">사용자 ID</th>
+                                    <th class="c-width-15p">전송 건수</th>
+                                    <th class="c-width-15p">전송 용량(MB)</th>
+                                    <th class="c-width-15p">전송 파일 개수</th>
+                                    <th class="c-width-15p">업무시간 전송 수</th>
+                                    <th class="c-width-15p">비업무시간 전송 수</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
+                                <tr th:if="${fileOutboundHistListPagination.isEmpty}">
                                     <td colspan="6">데이터가 없습니다.</td>
+                                </tr>
+                                <tr th:each="fileOutboundBlockingHist : ${fileOutboundHistListPagination.dataList}">
+                                    <td th:text="${searchGroupingType == 'channel' ? fileOutboundBlockingHist.outboundChannelCcd : fileOutboundBlockingHist.userId}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.actionCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatDecimal(fileOutboundBlockingHist.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.totalFileCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.workingHourStatusNormalCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.workingHourStatusAbnormalCount, 0, 'COMMA')}"></td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="pagination-wrapper"></div>
+                        <div class="pagination-wrapper">
+                            <ul th:if="${fileOutboundHistListPagination.isNotEmpty}" class="pagination">
+                                <li th:if="${fileOutboundHistListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
+                                    <a href="#" th:onclick="goPage([[${fileOutboundHistListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
+                                </li>
+                                <th:block th:each="pageNo : ${#numbers.sequence(fileOutboundHistListPagination.firstPageNoOnPageList, fileOutboundHistListPagination.lastPageNoOnPageList)}">
+                                    <li th:if="${pageNo eq fileOutboundHistListPagination.pageNo}" class="paginate_button active">
+                                        <a href="#" th:text="${pageNo}"></a>
+                                    </li>
+                                    <li th:if="${pageNo ne fileOutboundHistListPagination.pageNo}" class="paginate_button">
+                                        <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
+                                    </li>
+                                </th:block>
+                                <li th:if="${fileOutboundHistListPagination.lastPageNoOnPageList lt fileOutboundHistListPagination.lastPageNo}" class="paginate_button next">
+                                    <a href="#" th:onclick="goPage([[${fileOutboundHistListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>

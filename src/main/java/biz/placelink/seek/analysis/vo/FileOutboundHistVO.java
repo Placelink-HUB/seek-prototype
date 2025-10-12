@@ -42,10 +42,26 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
 
     /* 액션(전송/차단) 건수 */
     private Integer actionCount;
-    /* 정상 건수 */
-    private Integer normalCount;
-    /* 비정상 건수 */
-    private Integer abnormalCount;
+    /* 업무시간 상태 정상 건수 */
+    private Integer workingHourStatusNormalCount;
+    /* 업무시간 상태 비정상 건수 */
+    private Integer workingHourStatusAbnormalCount;
+
+    /** 정상 개수 */
+    private Integer activeCount;
+    /** 점검 개수 */
+    private Integer checkCount;
+    /** 경고 개수 */
+    private Integer alertCount;
+
+    /** HTTPS 채널 전송 수 */
+    private Integer channelHttpsCount;
+    /** USB 채널 전송 수 */
+    private Integer channelUsbCount;
+    /** 메신저 채널 전송 수 */
+    private Integer channelMessengerCount;
+    /** 프린터 채널 전송 수 */
+    private Integer channelPrintCount;
 
     public Long getOutboundId() {
         return outboundId;
@@ -207,28 +223,84 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
         this.actionCount = actionCount;
     }
 
-    public Integer getNormalCount() {
-        return normalCount;
+    public Integer getWorkingHourStatusNormalCount() {
+        return workingHourStatusNormalCount;
     }
 
-    public void setNormalCount(Integer normalCount) {
-        this.normalCount = normalCount;
+    public void setWorkingHourStatusNormalCount(Integer workingHourStatusNormalCount) {
+        this.workingHourStatusNormalCount = workingHourStatusNormalCount;
     }
 
-    public Integer getAbnormalCount() {
-        return abnormalCount;
+    public Integer getWorkingHourStatusAbnormalCount() {
+        return workingHourStatusAbnormalCount;
     }
 
-    public void setAbnormalCount(Integer abnormalCount) {
-        this.abnormalCount = abnormalCount;
+    public void setWorkingHourStatusAbnormalCount(Integer workingHourStatusAbnormalCount) {
+        this.workingHourStatusAbnormalCount = workingHourStatusAbnormalCount;
     }
 
     public String getConditionLevel() {
-        if (this.abnormalCount == null || this.abnormalCount == 0) {
+        if (this.workingHourStatusAbnormalCount == null || this.workingHourStatusAbnormalCount == 0) {
             return "정상";
         } else {
             return "점검";
         }
+    }
+
+    public Integer getActiveCount() {
+        return activeCount;
+    }
+
+    public void setActiveCount(Integer activeCount) {
+        this.activeCount = activeCount;
+    }
+
+    public Integer getCheckCount() {
+        return checkCount;
+    }
+
+    public void setCheckCount(Integer checkCount) {
+        this.checkCount = checkCount;
+    }
+
+    public Integer getAlertCount() {
+        return alertCount;
+    }
+
+    public void setAlertCount(Integer alertCount) {
+        this.alertCount = alertCount;
+    }
+
+    public Integer getChannelHttpsCount() {
+        return channelHttpsCount;
+    }
+
+    public void setChannelHttpsCount(Integer channelHttpsCount) {
+        this.channelHttpsCount = channelHttpsCount;
+    }
+
+    public Integer getChannelUsbCount() {
+        return channelUsbCount;
+    }
+
+    public void setChannelUsbCount(Integer channelUsbCount) {
+        this.channelUsbCount = channelUsbCount;
+    }
+
+    public Integer getChannelMessengerCount() {
+        return channelMessengerCount;
+    }
+
+    public void setChannelMessengerCount(Integer channelMessengerCount) {
+        this.channelMessengerCount = channelMessengerCount;
+    }
+
+    public Integer getChannelPrintCount() {
+        return channelPrintCount;
+    }
+
+    public void setChannelPrintCount(Integer channelPrintCount) {
+        this.channelPrintCount = channelPrintCount;
     }
 
 }

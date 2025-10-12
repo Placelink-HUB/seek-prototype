@@ -30,27 +30,27 @@ public interface FileOutboundHistMapper {
     int insertFileOutboundHist(FileOutboundHistVO paramVO);
 
     /**
-     * 파일 외부전송 차단 이력 목록 현황을 조회한다.
+     * 파일 외부전송 이력 목록 현황을 조회한다.
      *
      * @param searchVO 조회조건
-     * @return 파일 외부전송 차단 이력 목록 현황
+     * @return 파일 외부전송 이력 목록 현황
      */
-    FileOutboundHistVO selectFileOutboundBlockingHistListStatus(SchFileOutboundHistVO searchVO);
+    FileOutboundHistVO selectFileOutboundHistListStatus(SchFileOutboundHistVO searchVO);
 
     /**
-     * 파일 외부전송 차단 이력 목록을 조회한다.
+     * 파일 외부전송 이력 목록을 조회한다.
      *
      * @param searchVO 조회조건
-     * @return 파일 외부전송 차단 이력 목록
+     * @return 파일 외부전송 이력 목록
      */
-    List<FileOutboundHistVO> selectFileOutboundBlockingHistList(SchFileOutboundHistVO searchVO);
+    List<FileOutboundHistVO> selectFileOutboundHistList(SchFileOutboundHistVO searchVO);
 
     /**
-     * 파일 외부전송 차단 이력 목록 개수를 조회한다.
+     * 파일 외부전송 이력 목록 개수를 조회한다.
      *
      * @param searchVO 조회조건
-     * @return 파일 외부전송 차단 이력 목록 개수
+     * @return 파일 외부전송 이력 목록 개수
      */
-    int selectFileOutboundBlockingHistListCount(SchFileOutboundHistVO searchVO);
+    int selectFileOutboundHistListCount(SchFileOutboundHistVO searchVO);
 
 }

@@ -277,6 +277,7 @@ public class AnalysisController {
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
+        searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_BLOCKED);
         searchVO.setSearchStartDate(searchPeriod.searchStartDate());
         searchVO.setSearchEndDate(searchPeriod.searchEndDate());
         searchVO.setSearchGroupingType(searchGroupingType);
@@ -285,8 +286,8 @@ public class AnalysisController {
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 파일전송 차단 현황 목록 조회
-        model.addAttribute("fileOutboundBlockingHistListStatus", fileOutboundHistService.selectFileOutboundBlockingHistListStatus(searchVO));
-        model.addAttribute("fileOutboundBlockingHistListPagination", fileOutboundHistService.selectFileOutboundBlockingHistListWithPagination(searchVO));
+        model.addAttribute("fileOutboundHistListStatus", fileOutboundHistService.selectFileOutboundHistListStatus(searchVO));
+        model.addAttribute("fileOutboundHistListPagination", fileOutboundHistService.selectFileOutboundHistListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchGroupingType", searchGroupingType);
@@ -301,22 +302,27 @@ public class AnalysisController {
      */
     @GetMapping(value = "/analysis/file-transfer")
     public String fileTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
-            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
 
         String pattern = "yyyyMMdd";
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
-        SchArticleVO searchVO = new SchArticleVO();
+        SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
+        searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
+        searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_ALL_NORMAL);
         searchVO.setSearchStartDate(searchPeriod.searchStartDate());
         searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
-        searchVO.setOrderBy("CREATE_DT DESC");
+        searchVO.setOrderBy("LAST_EVENT_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 서명파일 전송 현황 목록 조회
-        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        model.addAttribute("fileOutboundHistListStatus", fileOutboundHistService.selectFileOutboundHistListStatus(searchVO));
+        model.addAttribute("fileOutboundHistListPagination", fileOutboundHistService.selectFileOutboundHistListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchGroupingType", searchGroupingType);
         return "analysis/file-transfer";
     }
 
@@ -328,22 +334,27 @@ public class AnalysisController {
      */
     @GetMapping(value = "/analysis/system-transfer")
     public String systemTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
-            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
+            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
 
         String pattern = "yyyyMMdd";
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
-        SchArticleVO searchVO = new SchArticleVO();
+        SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
+        searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
+        searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_NONE_NORMAL);
         searchVO.setSearchStartDate(searchPeriod.searchStartDate());
         searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
-        searchVO.setOrderBy("CREATE_DT DESC");
+        searchVO.setOrderBy("LAST_EVENT_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 시스템 파일 전송 현황 목록 조회
-        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
+        model.addAttribute("fileOutboundHistListStatus", fileOutboundHistService.selectFileOutboundHistListStatus(searchVO));
+        model.addAttribute("fileOutboundHistListPagination", fileOutboundHistService.selectFileOutboundHistListWithPagination(searchVO));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchGroupingType", searchGroupingType);
         return "analysis/system-transfer";
     }
 
