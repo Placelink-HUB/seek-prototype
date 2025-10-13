@@ -56,7 +56,13 @@
             sfoh.FILE_EXTENSION_STATUS_CCD,
             sfoh.EVENT_DT,
             CASE
-                WHEN sfoh.EVENT_DT::time >= '09:00:00' AND '18:00:00' >= sfoh.EVENT_DT::time THEN 'NORMAL'
+                /* NORMAL 조건: 09:00 ~ 18:00 이면서 평일(월~금)인 경우 */
+                WHEN sfoh.EVENT_DT::TIME >= '09:00:00'
+                    AND '18:00:00' >= sfoh.EVENT_DT::TIME
+                    /* 평일(월요일=1, 금요일=5) 조건 추가 */
+                    AND EXTRACT(DOW FROM sfoh.EVENT_DT) BETWEEN 1 AND 5
+                THEN 'NORMAL'
+                /* 그 외 (야간 또는 주말) */
                 ELSE 'ABNORMAL'
             END AS WORKING_HOUR_STATUS_CCD,
             sfoh.CREATE_DT

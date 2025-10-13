@@ -140,8 +140,13 @@
             sd.*,
             CASE
                 WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 'ACTIVE'
-                /* 업무시간에 모든 에이전트가 비활성화 일때 */
-                WHEN MINISPY_SYS_YN != 'Y' AND MSPY_USER_EXE_YN != 'Y' AND WFP_BLOCKER_EXE_YN != 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN != 'Y' AND NOW()::time >= '09:00:00' AND '18:00:00' >= NOW()::time THEN 'ALERT'
+                /* 평일 업무시간(09:00~18:00)에 모든 에이전트가 비활성화 일때 */
+                WHEN sd.MINISPY_SYS_YN != 'Y' AND sd.MSPY_USER_EXE_YN != 'Y' AND sd.WFP_BLOCKER_EXE_YN != 'Y' AND sd.CLICK_DOMAIN_AGENT_EXE_YN != 'Y'
+                    /* 평일 조건: 월요일(1) ~ 금요일(5) */
+                    AND EXTRACT(DOW FROM NOW()) BETWEEN 1 AND 5
+                    /* 업무 시간 조건: 09:00 ~ 18:00 */
+                    AND NOW()::time >= '09:00:00' AND '18:00:00' >= NOW()::time
+                THEN 'ALERT'
                 ELSE 'CHECK'
             END AS CONDITION_LEVEL_CCD
         FROM AGENT_STATUS_DETAIL sd
