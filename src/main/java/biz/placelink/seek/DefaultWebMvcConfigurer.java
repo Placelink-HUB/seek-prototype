@@ -1,6 +1,22 @@
+/*
+ * SEEK
+ * Copyright (C) 2025 placelink
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package biz.placelink.seek;
 
-import jakarta.servlet.Filter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -16,6 +32,8 @@ import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+
+import jakarta.servlet.Filter;
 
 /**
  * Spring MVC 환경 설정
@@ -66,8 +84,7 @@ public class DefaultWebMvcConfigurer implements WebMvcConfigurer {
         registry.addResourceHandler(this.webMvcProperties.getStaticPathPattern())
                 .addResourceLocations(this.resourceProperties.getStaticLocations())
                 .setCacheControl(this.resourceProperties.getCache().getCachecontrol().toHttpCacheControl())
-                .setUseLastModified(this.resourceProperties.getCache().isUseLastModified())
-        ;
+                .setUseLastModified(this.resourceProperties.getCache().isUseLastModified());
     }
 
     @Bean

@@ -1,8 +1,22 @@
+/*
+ * SEEK
+ * Copyright (C) 2025 placelink
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
 package biz.placelink.seek.com.config;
 
-import biz.placelink.seek.com.security.CustomAccessDeniedHandler;
-import biz.placelink.seek.com.security.CustomAuthenticationEntryPoint;
-import biz.placelink.seek.com.security.CustomUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +28,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import biz.placelink.seek.com.security.CustomAccessDeniedHandler;
+import biz.placelink.seek.com.security.CustomAuthenticationEntryPoint;
+import biz.placelink.seek.com.security.CustomUserDetailsService;
 
 /**
  * <pre>
@@ -43,9 +61,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, CustomUserDetailsService userDetailsService) throws Exception {
         http.exceptionHandling(exceptionHandling -> exceptionHandling
-                        .accessDeniedHandler(accessDeniedHandler) // 권한이 없는 사용자 처리
-                        .authenticationEntryPoint(authenticationEntryPoint) // 미 인증 사용자 처리
-                )
+                .accessDeniedHandler(accessDeniedHandler) // 권한이 없는 사용자 처리
+                .authenticationEntryPoint(authenticationEntryPoint) // 미 인증 사용자 처리
+        )
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers("/", "/console/**", "/public/**", "/api/public/**", "/error").permitAll()
                         .anyRequest().authenticated())
@@ -62,18 +80,18 @@ public class SecurityConfig implements WebMvcConfigurer {
                             response.sendRedirect("/login?error=true");
                         }).permitAll())
                 .logout(logout -> logout
-                        .logoutUrl("/logout")  // 기본값이지만, 명시적으로 설정
-                        .logoutSuccessUrl("/?logout")  // 로그아웃 성공 후 리다이렉트 URL
-                        .deleteCookies("JSESSIONID")  // 로그아웃 시 삭제할 쿠키
-                        .invalidateHttpSession(true)  // 세션 무효화
-                        .clearAuthentication(true)  // 인증 정보 제거
-                        .permitAll()  // 모든 사용자가 로그아웃 가능하도록 설정
+                        .logoutUrl("/logout") // 기본값이지만, 명시적으로 설정
+                        .logoutSuccessUrl("/?logout") // 로그아웃 성공 후 리다이렉트 URL
+                        .deleteCookies("JSESSIONID") // 로그아웃 시 삭제할 쿠키
+                        .invalidateHttpSession(true) // 세션 무효화
+                        .clearAuthentication(true) // 인증 정보 제거
+                        .permitAll() // 모든 사용자가 로그아웃 가능하도록 설정
                 )
 
                 .csrf(AbstractHttpConfigurer::disable) // POST 요청에 대한 CSRF 보호를 비활성화
-                //.csrf(csrf -> csrf.ignoringRequestMatchers("/api/url...")) //  특정 URL 만 POST 요청에 대한 CSRF 보호를 비활성화
+                // .csrf(csrf -> csrf.ignoringRequestMatchers("/api/url...")) // 특정 URL 만 POST 요청에 대한 CSRF 보호를 비활성화
 
-                //.httpBasic(Customizer.withDefaults());
+                // .httpBasic(Customizer.withDefaults());
                 .httpBasic(AbstractHttpConfigurer::disable); // Spring Security 의 기본 HTTP Basic 인증 팝업을 비활성화
         return http.build();
     }
