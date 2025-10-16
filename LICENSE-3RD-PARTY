@@ -25,16 +25,6 @@ Copyright (c) 1997, PostgreSQL Global Development Group
 Licensed under BSD 2-Clause License
 For the full license text see licenses/LICENSE-BSD-2-CLAUSE
 
-Hazelcast
-Copyright Hazelcast, Inc.
-Licensed under Hazelcast Community License
-For the full license text see licenses/LICENSE-HAZELCAST-COMMUNITY
-
-OpenHTMLToPDF
-Copyright 2015-2024 OpenHTMLToPDF Contributors
-Licensed under Apache License, Version 2.0
-For the full license text see licenses/LICENSE-APACHE-2.0
-
 Apache ECharts
 Copyright The Apache Software Foundation
 Licensed under Apache License, Version 2.0
@@ -54,3 +44,8 @@ Flatpickr
 Copyright (c) 2016-2024 Gregory Hewitt
 Licensed under MIT License
 For the full license text see licenses/LICENSE-MIT
+
+Pretendard Font
+Copyright (c) 길형진 (orioncactus)
+Licensed under SIL Open Font License, Version 1.1 (OFL-1.1)
+For the full license text see licenses/LICENSE-OFL-1.1
