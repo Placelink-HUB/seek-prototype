@@ -14,8 +14,15 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * =========================================================================
+ *
+ * 상업적 이용 또는 AGPL-3.0의 공개 의무를 면제받기
+ * 위해서는, placelink로부터 별도의 상업용 라이선스(Commercial License)를 구매해야 합니다.
+ * For commercial use or to obtain an exemption from the AGPL-3.0 license
+ * requirements, please purchase a commercial license from placelink.
+ * *** 문의처: help@placelink.shop (README.md 참조)
  */
-
 // eslint-disable-next-line no-unused-vars
 class S2DropZone {
     /**

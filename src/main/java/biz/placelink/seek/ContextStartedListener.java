@@ -14,6 +14,14 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ *
+ * =========================================================================
+ *
+ * 상업적 이용 또는 AGPL-3.0의 공개 의무를 면제받기
+ * 위해서는, placelink로부터 별도의 상업용 라이선스(Commercial License)를 구매해야 합니다.
+ * For commercial use or to obtain an exemption from the AGPL-3.0 license
+ * requirements, please purchase a commercial license from placelink.
+ * *** 문의처: help@placelink.shop (README.md 참조)
  */
 package biz.placelink.seek;
 
@@ -29,7 +37,6 @@ import org.springframework.util.Assert;
 
 import jakarta.annotation.Nonnull;
 
-@SuppressWarnings("unused")
 public class ContextStartedListener implements ApplicationListener<ContextStartedEvent> {
 
     private static final Logger log = LoggerFactory.getLogger(ContextStartedListener.class);
@@ -41,6 +48,7 @@ public class ContextStartedListener implements ApplicationListener<ContextStarte
         this.file = file;
     }
 
+    @SuppressWarnings("null")
     @Override
     public void onApplicationEvent(@Nonnull ContextStartedEvent event) {
         try (FileWriter writer = new FileWriter(this.file)) {
