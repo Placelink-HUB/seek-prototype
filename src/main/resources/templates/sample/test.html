@@ -34,7 +34,7 @@ requirements, please purchase a commercial license from placelink.
 
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
-                location.href = `/sample/test?pageNo=${pageNo}`;
+                location.href = `/public/sample/test?pageNo=${pageNo}`;
             }
 
             // eslint-disable-next-line no-unused-vars
@@ -120,7 +120,7 @@ requirements, please purchase a commercial license from placelink.
                                     const desc = document.querySelector(`${modalSelector} [name=desc]`);
 
                                     S2Util.fetch(
-                                        `/public/sample/create-article`,
+                                        `/sample/create-article`,
                                         {
                                             method: 'post',
                                             content: desc.value
@@ -130,6 +130,9 @@ requirements, please purchase a commercial license from placelink.
                                             setTimeout(function () {
                                                 location.reload();
                                             }, 500);
+                                        },
+                                        function () {
+                                            isRegistering = false;
                                         }
                                     );
                                 } else if (activeTab === 'tab-file') {
@@ -152,6 +155,9 @@ requirements, please purchase a commercial license from placelink.
                                             setTimeout(function () {
                                                 location.reload();
                                             }, 500);
+                                        },
+                                        function () {
+                                            isRegistering = false;
                                         }
                                     );
                                 }
@@ -162,6 +168,18 @@ requirements, please purchase a commercial license from placelink.
             }
 
             // eslint-disable-next-line no-unused-vars
+            function openSecuredArticleModal(articleId, seekMode) {
+                S2Util.fetch(
+                    '/api/check/login',
+                    {
+                        method: 'get'
+                    },
+                    function () {
+                        openModalArticleContents(articleId, seekMode);
+                    }
+                );
+            }
+
             function openModalArticleContents(articleId, seekMode) {
                 S2Util.fetch(
                     `/public/sample/article-info` + (seekMode ? `?seek_mode=${seekMode}` : ''),
@@ -398,7 +416,7 @@ requirements, please purchase a commercial license from placelink.
                                         <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
                                     </td>
                                     <td>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openSecuredArticleModal([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
                                         <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
                                     </td>
                                 </tr>

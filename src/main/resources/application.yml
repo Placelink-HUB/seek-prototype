@@ -61,7 +61,7 @@ logging:
     file: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n'
 
   level:
-    root: debug
+    root: info
     '[org.springframework.jdbc.support.JdbcTransactionManager]': info
     '[biz.placelink.seek.analysis.schedule.AnalysisScheduler]': info
     '[org.mybatis.spring.SqlSessionUtils]': info

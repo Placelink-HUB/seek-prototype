@@ -28,12 +28,14 @@ package biz.placelink.seek.com.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.system.user.service.UserService;
 import biz.placelink.seek.system.user.vo.UserVO;
 
@@ -64,7 +66,7 @@ public class CommonController {
      */
     @GetMapping(value = {"/", "/index"})
     public String index() {
-        return "redirect:/dashboard/file";
+        return "redirect:/public/dashboard/file";
     }
 
     @RequestMapping("/api/public/login")
@@ -82,6 +84,13 @@ public class CommonController {
             result.put("message", "아이디 또는 비밀번호가 일치하지 않습니다.");
         }
         return result;
+    }
+
+    @GetMapping("/api/check/login")
+    public ResponseEntity<Map<String, Object>> checkLogin() {
+        Map<String, Object> response = new HashMap<>();
+        response.put(Constants.RESULT_CODE, 1);
+        return ResponseEntity.ok(response);
     }
 
 }

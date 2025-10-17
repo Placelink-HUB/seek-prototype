@@ -35,7 +35,7 @@ requirements, please purchase a commercial license from placelink.
 
             // eslint-disable-next-line no-unused-vars
             function goPage(pageNo) {
-                location.href = `/analysis/detection-file?pageNo=${pageNo}`;
+                location.href = `/public/analysis/detection-file?pageNo=${pageNo}`;
             }
 
             // eslint-disable-next-line no-unused-vars
@@ -99,6 +99,9 @@ requirements, please purchase a commercial license from placelink.
                                         setTimeout(function () {
                                             location.reload();
                                         }, 500);
+                                    },
+                                    function () {
+                                        isRegistering = false;
                                     }
                                 );
                             }

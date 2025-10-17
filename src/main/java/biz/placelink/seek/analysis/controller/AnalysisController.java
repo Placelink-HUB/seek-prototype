@@ -158,7 +158,7 @@ public class AnalysisController {
      * @param model ModelMap
      * @return 파일 검증 화면
      */
-    @GetMapping(value = "/analysis/detection-file")
+    @GetMapping(value = "/public/analysis/detection-file")
     public String file(
             HttpServletResponse response, ModelMap model,
             @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo,
@@ -232,7 +232,7 @@ public class AnalysisController {
      * @param model ModelMap
      * @return 민감정보 처리 이력 목록
      */
-    @GetMapping(value = "/analysis/sensitive-access-hist")
+    @GetMapping(value = "/public/analysis/sensitive-access-hist")
     public String sensitiveAccessHist(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
@@ -260,7 +260,7 @@ public class AnalysisController {
      * @param model ModelMap
      * @return PC 에이전트 상태 화면
      */
-    @GetMapping(value = "/analysis/agent-status")
+    @GetMapping(value = "/public/analysis/agent-status")
     public String agentStatus(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
         SchArticleVO searchVO = new SchArticleVO();
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
@@ -277,7 +277,7 @@ public class AnalysisController {
      *
      * @return PC 에이전트 상태 목록
      */
-    @GetMapping(value = "/analysis/agent-status-list")
+    @GetMapping(value = "/public/analysis/agent-status-list")
     public ResponseEntity<Map<String, Object>> agentStatusList() {
         Map<String, Object> response = new HashMap<>();
 
@@ -294,7 +294,7 @@ public class AnalysisController {
      * @param model ModelMap
      * @return 파일전송 차단 현황 화면
      */
-    @GetMapping(value = "/analysis/file-blocking")
+    @GetMapping(value = "/public/analysis/file-blocking")
     public String fileBlockingList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
 
@@ -325,7 +325,7 @@ public class AnalysisController {
      * @param model ModelMap
      * @return 서명파일 전송 현황
      */
-    @GetMapping(value = "/analysis/file-transfer")
+    @GetMapping(value = "/public/analysis/file-transfer")
     public String fileTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
 
@@ -357,7 +357,7 @@ public class AnalysisController {
      * @param model ModelMap
      * @return 시스템 파일 전송 현황 화면
      */
-    @GetMapping(value = "/analysis/system-transfer")
+    @GetMapping(value = "/public/analysis/system-transfer")
     public String systemTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
 
@@ -389,7 +389,7 @@ public class AnalysisController {
      * @param model ModelMap
      * @return 이상 패턴 탐지 현황 목록
      */
-    @GetMapping(value = "/analysis/anomaly_detection")
+    @GetMapping(value = "/public/analysis/anomaly_detection")
     public String anomalyDetectionList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 

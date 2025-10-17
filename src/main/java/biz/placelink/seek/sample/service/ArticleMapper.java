@@ -28,7 +28,6 @@ package biz.placelink.seek.sample.service;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.sample.vo.ArticleVO;
@@ -75,10 +74,10 @@ public interface ArticleMapper {
     /**
      * 게시글 상세정보를 조회한다.
      *
-     * @param schArticleId 게시글 ID
+     * @param searchVO 조회 조건
      * @return 게시글
      */
-    ArticleVO selectArticle(@Param("schArticleId") String schArticleId);
+    ArticleVO selectArticle(SchArticleVO searchVO);
 
     /**
      * 게시글을 등록한다.

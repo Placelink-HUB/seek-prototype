@@ -91,7 +91,7 @@ public class ArticleController {
      *
      * @return Sample 페이지 경로
      */
-    @GetMapping(value = "/sample/test")
+    @GetMapping(value = "/public/sample/test")
     public String tissue(HttpServletRequest request, HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, Model model,
             @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
 
@@ -118,7 +118,7 @@ public class ArticleController {
      * @param articleVO 등록 정보
      * @return 게시글 등록 결과
      */
-    @PostMapping(value = "/public/sample/create-article")
+    @PostMapping(value = "/sample/create-article")
     public ResponseEntity<Map<String, Object>> createArticle(ArticleVO articleVO) {
         Map<String, Object> response = new HashMap<>();
 

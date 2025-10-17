@@ -96,7 +96,9 @@ public class ArticleService {
      * @return 게시글
      */
     public ArticleVO selectArticle(String articleId) {
-        return articleMapper.selectArticle(articleId);
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSchArticleId(articleId);
+        return articleMapper.selectArticle(searchVO);
     }
 
     /**

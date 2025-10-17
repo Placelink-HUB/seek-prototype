@@ -79,7 +79,7 @@ public class DashboardController {
      * @param model       뷰 렌더링 시 사용되는 모델 객체.
      * @return 사용한 사이트 ID에 따라 지정된 대시보드 뷰 이름.
      */
-    @GetMapping(value = "/dashboard/{siteId}")
+    @GetMapping(value = "/public/dashboard/{siteId}")
     protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "console", defaultValue = "") String console, @RequestParam(name = "consoleType", defaultValue = "") String consoleType, HttpSession session, Model model) {
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
         model.addAttribute("schDe", this.getSchDe(schDe));
@@ -117,7 +117,7 @@ public class DashboardController {
      *
      * @return 분석 현황
      */
-    @GetMapping(value = "/dashboard/analysis-statistics")
+    @GetMapping(value = "/public/dashboard/analysis-statistics")
     public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", defaultValue = "") String schDe, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 

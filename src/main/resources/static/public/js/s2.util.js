@@ -81,6 +81,22 @@ const S2Util = (function () {
     }
 
     return {
+        /**
+         * 자바스크립트의 기본 fetch API를 활용하여 다양한 요청 처리
+         *
+         * @typedef {object} FetchConfig
+         * @property {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} [method='GET'] 요청 메소드
+         * @property {'JSON'|'FORM'} [dataType] 요청 본문(body) 데이터 타입. 'JSON'일 경우 Content-Type: application/json 설정 및 서버 Controller 에서 @RequestBody 로 처리.
+         * @property {'JSON'|'BLOB'|'HTML'} [responseType='JSON'] 응답 데이터 타입.
+         * @property {boolean} [disableDefaultErrorHandler=false] 오류 발생 시 기본 오류 핸들링 처리(alert, confirm 등) 비활성화 여부
+         * @property {number} [timeout=600000] 응답 대기 시간 (밀리초). 기본 10분(600000ms).
+         * @property {boolean} [hideLoading=false] 응답 대기 로딩 표시 숨김 여부
+         *
+         * @param {string} url 요청을 보낼 서버 엔드포인트 URL
+         * @param {object|FormData|string} param 요청 설정값(FetchConfig의 속성)과 서버로 전송할 데이터가 담긴 객체 (JSON, FormData, 또는 QueryString 형태)
+         * @param {function(any): void} [success] 요청 성공 시 호출될 콜백 함수. 응답 데이터(JSON/HTML/BLOB URL)를 인자로 받는다.
+         * @param {function(Error): void} [fail] 요청 실패 시(HTTP 오류, 타임아웃, 서버 커스텀 오류 등) 호출될 콜백 함수. Error 객체를 인자로 받는다.
+         */
         fetch: function (url, param, success, fail) {
             console.debug('fetch start:', new Date());
             const option = {
@@ -96,41 +112,55 @@ const S2Util = (function () {
             let dataTypeChecker = '';
             let responseType = 'JSON';
             let responseTypeChecker = '';
+            let disableDefaultErrorHandler;
             let timeout;
+            let hideLoading;
 
             if (S2Util.isFormData(param)) {
                 paramType = 'FormData';
                 methodChecker = param.get('method');
                 dataTypeChecker = param.get('dataType');
                 responseTypeChecker = param.get('responseType');
+                disableDefaultErrorHandler = param.get('disableDefaultErrorHandler');
                 timeout = param.get('timeout');
+                hideLoading = param.get('hideLoading');
 
                 param.delete('method');
                 param.delete('dataType');
                 param.delete('responseType');
+                param.delete('disableDefaultErrorHandler');
                 param.delete('timeout');
+                param.delete('hideLoading');
             } else if (S2Util.isJSON(param)) {
                 paramType = 'JSON';
                 methodChecker = param.method;
                 dataTypeChecker = param.dataType;
                 responseTypeChecker = param.responseType;
+                disableDefaultErrorHandler = param.disableDefaultErrorHandler;
                 timeout = param.timeout;
+                hideLoading = param.hideLoading;
 
                 delete param.method;
                 delete param.dataType;
                 delete param.responseType;
+                delete param.disableDefaultErrorHandler;
                 delete param.timeout;
+                delete param.hideLoading;
             } else if (S2Util.isQueryString(param)) {
                 paramType = 'QueryString';
                 methodChecker = S2Util.getQueryStringParameter(param, 'method');
                 dataTypeChecker = S2Util.getQueryStringParameter(param, 'dataType');
                 responseTypeChecker = S2Util.getQueryStringParameter(param, 'responseType');
+                disableDefaultErrorHandler = S2Util.getQueryStringParameter(param, 'disableDefaultErrorHandler');
                 timeout = S2Util.getQueryStringParameter(param, 'timeout');
+                hideLoading = S2Util.getQueryStringParameter(param, 'hideLoading');
 
                 param = S2Util.removeQueryStringParameter(param, 'method');
                 param = S2Util.removeQueryStringParameter(param, 'dataType');
                 param = S2Util.removeQueryStringParameter(param, 'responseType');
+                param = S2Util.removeQueryStringParameter(param, 'disableDefaultErrorHandler');
                 param = S2Util.removeQueryStringParameter(param, 'timeout');
+                param = S2Util.removeQueryStringParameter(param, 'hideLoading');
                 param = param.trim();
             }
 
@@ -207,7 +237,7 @@ const S2Util = (function () {
 
             option['method'] = method;
 
-            if (window['showLoadingPage'] && (!param || !param.hideLoading)) {
+            if (window['showLoadingPage'] && hideLoading !== true && hideLoading !== 'true') {
                 // 로딩 표시
                 window['showLoadingPage']();
             }
@@ -295,25 +325,29 @@ const S2Util = (function () {
                     }
                 })
                 .catch((error) => {
-                    if (error.name === 'AbortError') {
-                        S2Util.alert('요청 시간이 초과되었습니다.');
-                    } else if (fail && typeof fail === 'function') {
+                    if (disableDefaultErrorHandler !== true && disableDefaultErrorHandler !== 'true') {
+                        if (error.name === 'AbortError') {
+                            S2Util.alert('요청 시간이 초과되었습니다.');
+                        } else if (typeof error.message === 'string' && (error.message.startsWith('S2Exception:') || error.message.startsWith('S2RuntimeException:'))) {
+                            S2Util.alert(error.message);
+                        } else if (error.status === 401) {
+                            S2Util.confirm('인증이 필요합니다.<br/>로그인 페이지로 이동하시겠습니까?', function () {
+                                // 로그인 페이지로 리다이렉트 등 추가 처리 가능
+                                location.href = '/login';
+                            });
+                        } else if (error.status === 403) {
+                            S2Util.alert('접근 권한이 없습니다.');
+                        } else {
+                            S2Util.alert(error.message && error.message.length < 100 ? error.message : '오류가 발생했습니다.');
+                        }
+                    }
+
+                    if (fail && typeof fail === 'function') {
                         fail(error);
-                    } else if (typeof error.message === 'string' && (error.message.startsWith('S2Exception:') || error.message.startsWith('S2RuntimeException:'))) {
-                        S2Util.alert(error.message);
-                    } else if (error.status === 401) {
-                        S2Util.confirm('인증이 필요합니다.<br/>로그인 페이지로 이동하시겠습니까?', function () {
-                            // 로그인 페이지로 리다이렉트 등 추가 처리 가능
-                            location.href = '/login';
-                        });
-                    } else if (error.status === 403) {
-                        S2Util.alert('접근 권한이 없습니다.');
-                    } else {
-                        S2Util.alert(error.message && error.message.length < 100 ? error.message : '오류가 발생했습니다.');
                     }
                 })
                 .finally(() => {
-                    if (window['hideLoadingPage'] && (!param || !param.hideLoading)) {
+                    if (window['hideLoadingPage'] && hideLoading !== true && hideLoading !== 'true') {
                         console.debug('hideLoading');
                         // 로딩 숨김
                         window['hideLoadingPage']();
