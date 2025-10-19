@@ -27,20 +27,24 @@ requirements, please purchase a commercial license from placelink.
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
     <th:block layout:fragment="bodyStyle"></th:block>
     <th:block layout:fragment="bodyScript">
-        <script type="text/javascript">
-            // eslint-disable-next-line no-unused-vars
-            function initPage() {}
+        <script type="module">
+            import {S2Util} from '[[@{/public/js/s2.util.js}]]';
+            import {S2DropZone} from '[[@{/public/js/s2.dropzone.js}]]';
+
+            window.initPage = () => {
+                document.querySelector('.btn-open-validate-file')?.addEventListener('click', openValidateFile);
+                document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.showToast('준비 중입니다.')));
+                document.querySelectorAll('.btn-download-signed-file')?.forEach((btn) => btn.addEventListener('click', (event) => downloadFile(event.currentTarget.dataset.signedFileId)));
+            };
+
+            window.goPage = (pageNo) => {
+                location.href = `/public/analysis/detection-file?pageNo=${pageNo}`;
+            };
 
             let isRegistering = false;
 
-            // eslint-disable-next-line no-unused-vars
-            function goPage(pageNo) {
-                location.href = `/public/analysis/detection-file?pageNo=${pageNo}`;
-            }
-
-            // eslint-disable-next-line no-unused-vars
             function openValidateFile() {
-                S2Util.showModal(
+                const modalSelector = S2Util.showModal(
                     `
                         <div class="risk-inspection-wrap modal">
                             <div class="tab-container">
@@ -76,8 +80,8 @@ requirements, please purchase a commercial license from placelink.
                         initDropZone();
 
                         // 파일 검증 등록 버튼 클릭 이벤트 처리
-                        document.body.addEventListener('click', (event) => {
-                            if (event.target.classList.contains('create-article-btn') && !isRegistering) {
+                        document.querySelector('.risk-inspection-wrap.modal .create-article-btn')?.addEventListener('click', () => {
+                            if (!isRegistering) {
                                 isRegistering = true;
 
                                 if (g_uploadFiles.length === 0) {
@@ -95,10 +99,11 @@ requirements, please purchase a commercial license from placelink.
                                         files: g_uploadFiles
                                     },
                                     function () {
+                                        S2Util.hideModal(modalSelector);
                                         S2Util.showToast('등록되었습니다.');
                                         setTimeout(function () {
                                             location.reload();
-                                        }, 500);
+                                        }, 1000);
                                     },
                                     function () {
                                         isRegistering = false;
@@ -110,7 +115,6 @@ requirements, please purchase a commercial license from placelink.
                 );
             }
 
-            // eslint-disable-next-line no-unused-vars
             function downloadFile(fileId) {
                 S2Util.fetch(
                     `/file/image/view/${fileId}`,
@@ -151,22 +155,36 @@ requirements, please purchase a commercial license from placelink.
                     document.querySelector('.file-upload .file-upload-box').classList.add('active');
                     document.querySelector('.file-upload .file-upload-icon').classList.add('d-none');
 
+                    // DocumentFragment를 사용하여 DOM 조작 최소화
+                    const fragment = document.createDocumentFragment();
+
                     for (const file of fileList) {
-                        uploadFileList.innerHTML += `
-                            <li class="file-upload-ok">
-                                <img class="checked-file" src="/public/images/icon_file_chk.png" alt="파일선택완료"/>
-                                <div class="file-info">
-                                    <div class="c-flex-sty02">
-                                        <div class="file-border"></div>
-                                        <div class="file-title file-name">${file.name}</div>
-                                    </div>
-                                    <div class="file-remove">
-                                        <a onClick="deleteFile(this);"><img src="/public/images/icon_remove.png" alt="삭제아이콘"/></a>
-                                    </div>
+                        const listItem = document.createElement('li');
+                        listItem.className = 'file-upload-ok';
+
+                        listItem.innerHTML = `
+                            <img class="checked-file" src="/public/images/icon_file_chk.png" alt="파일선택완료"/>
+                            <div class="file-info">
+                                <div class="c-flex-sty02">
+                                    <div class="file-border"></div>
+                                    <div class="file-title file-name">${file.name}</div>
                                 </div>
-                            </li>
+                                <div class="file-remove">
+                                    <a href="#" class="btn-remove-selected-file"><img src="/public/images/icon_remove.png" alt="삭제아이콘"/></a>
+                                </div>
+                            </div>
                         `;
+
+                        listItem.querySelector('.btn-remove-selected-file')?.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            removeSelectedFile(e.currentTarget);
+                        });
+
+                        fragment.appendChild(listItem);
                     }
+
+                    //  최종적으로 DOM을 한 번만 업데이트
+                    uploadFileList.appendChild(fragment);
                 }
             }
 
@@ -218,10 +236,9 @@ requirements, please purchase a commercial license from placelink.
             }
 
             /**
-             * 파일 삭제
+             * 선택한 파일 제거
              */
-            // eslint-disable-next-line no-unused-vars
-            function deleteFile(target) {
+            function removeSelectedFile(target) {
                 const delElement = target.closest('li');
 
                 const parentUl = delElement.parentElement;
@@ -246,9 +263,9 @@ requirements, please purchase a commercial license from placelink.
                     <span class="sub-title">민감정보 탐지 현황 및 서명 파일 다운로드</span>
                 </h1>
                 <span class="btn-group">
-                    <button class="btn-type1" onclick="openValidateFile();">파일 검증</button>
-                    <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">기간 검색</button>
-                    <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">전체 현황 다운로드</button>
+                    <button class="btn-type1 btn-open-validate-file">파일 검증</button>
+                    <button class="btn-type1 btn-coming-soon">기간 검색</button>
+                    <button class="btn-type1 btn-coming-soon">전체 현황 다운로드</button>
                 </span>
             </div>
             <div class="wrap-contents">
@@ -321,7 +338,7 @@ requirements, please purchase a commercial license from placelink.
                                     <td th:text="${fileAnalysis.maxDetectionTypeCcdNm}"></td>
                                     <td th:text="${#numbers.formatInteger(fileAnalysis.downloadCount, 0, 'COMMA')}"></td>
                                     <td>
-                                        <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01" th:onclick="downloadFile([[${fileAnalysis.signedFileId}]]);">다운로드</button>
+                                        <button th:if="${fileAnalysis.signedFileId}" class="table-btn-sty01 btn-download-signed-file" th:attr="data-signed-file-id=${fileAnalysis.signedFileId}">다운로드</button>
                                     </td>
                                 </tr>
                             </tbody>

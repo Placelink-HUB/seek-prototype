@@ -60,16 +60,16 @@ requirements, please purchase a commercial license from placelink.
         </style>
 
         <script th:src="@{/public/js/jquery-3.4.1.min.js}"></script>
-        <script th:src="@{/public/js/s2.util.js}"></script>
-        <script th:src="@{/public/js/s2.dropzone.js}"></script>
-        <script th:src="@{/public/js/loading.js}"></script>
         <script th:src="@{/public/js/lib/dayjs.min.js}"></script>
         <script th:src="@{/public/js/lib/flatpickr/flatpickr.min.js}"></script>
         <script th:src="@{/public/js/lib/flatpickr/ko.js}"></script>
 
         <th:block layout:fragment="bodyScript"></th:block>
-        <script type="text/javascript">
+        <script type="module">
+            import {initializeS2DomEvents} from '[[@{/public/js/s2.util.js}]]';
             document.addEventListener('DOMContentLoaded', () => {
+                initializeS2DomEvents();
+
                 const vConsole = '[[${console}]]';
                 if (vConsole) {
                     sessionStorage.setItem('console', vConsole);

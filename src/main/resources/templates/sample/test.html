@@ -27,15 +27,18 @@ requirements, please purchase a commercial license from placelink.
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
     <th:block layout:fragment="bodyStyle"></th:block>
     <th:block layout:fragment="bodyScript">
-        <script type="text/javascript">
+        <script type="module">
+            import {S2Util} from '[[@{/public/js/s2.util.js}]]';
+            import {S2DropZone} from '[[@{/public/js/s2.dropzone.js}]]';
+
             let isRegistering = false;
 
             document.addEventListener('DOMContentLoaded', () => {});
 
             // eslint-disable-next-line no-unused-vars
-            function goPage(pageNo) {
+            window.goPage = (pageNm) => {
                 location.href = `/public/sample/test?pageNo=${pageNo}`;
-            }
+            };
 
             // eslint-disable-next-line no-unused-vars
             function openCreateArticle() {
@@ -196,7 +199,7 @@ requirements, please purchase a commercial license from placelink.
                             innerHtml = `<pre class="detail_contents">${data.content}</pre>`;
                         } else if (data.articleTypeCcd === '[[${@Constants.CD_ARTICLE_TYPE_FILE}]]') {
                             data.serverUrl = '';
-                            innerHtml = S2Util.s2Template('template_contents_file', data);
+                            innerHtml = S2Util.template('template_contents_file', data);
                         }
 
                         S2Util.showModal(

@@ -27,9 +27,10 @@ requirements, please purchase a commercial license from placelink.
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
     <th:block layout:fragment="bodyScript">
         <script th:src="@{/public/js/echarts.min.js}"></script>
-        <script type="text/javascript">
-            // eslint-disable-next-line no-unused-vars
-            function initPage() {
+        <script type="module">
+            import {S2Util} from '[[@{/public/js/s2.util.js}]]';
+
+            window.initPage = () => {
                 initDoughnutChart();
                 initSemicircleChart();
                 initSemicircleChart2();
@@ -38,8 +39,10 @@ requirements, please purchase a commercial license from placelink.
 
                 getAnalysisStatistics();
 
+                document.querySelector('.btn-download-report')?.addEventListener('click', () => downloadReport());
+
                 S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
-            }
+            };
 
             const doughnutChart = {};
             const semicircleChart = {};
@@ -278,7 +281,7 @@ requirements, please purchase a commercial license from placelink.
                                 let maskingCount = 0;
                                 let unmaskingCount = 0;
 
-                                for (maskingData of maskingDataArray) {
+                                for (const maskingData of maskingDataArray) {
                                     totalMaskingCount += maskingData.maskCount;
                                     switch (maskingData.maskModeCcd) {
                                         case 'mask':
@@ -1083,7 +1086,6 @@ requirements, please purchase a commercial license from placelink.
                 document.querySelector('.detection-file-count').textContent = fileDetectionInfo.fileCount.toLocaleString('ko-KR');
             }
 
-            // eslint-disable-next-line no-unused-vars
             function downloadReport() {
                 S2Util.fetch(
                     '/analysis/download-report',
@@ -1122,7 +1124,7 @@ requirements, please purchase a commercial license from placelink.
                     </div>
                     <!--
                     <div class="button-wrap-po-a">
-                        <button class="btn-sty-02 btn-download" onclick="downloadReport();">보고서 다운로드</button>
+                        <button class="btn-sty-02 btn-download btn-download-report">보고서 다운로드</button>
                     </div>
                     -->
                 </div>

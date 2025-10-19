@@ -26,7 +26,7 @@ requirements, please purchase a commercial license from placelink.
 -->
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
     <th:block th:fragment="headerFragment">
-        <script type="text/javascript">
+        <script type="module">
             document.addEventListener('DOMContentLoaded', () => {
                 setInterval(function () {
                     document.querySelector('.todayTxt').textContent = dayjs().format('YYYY/MM/DD HH:mm:ss');

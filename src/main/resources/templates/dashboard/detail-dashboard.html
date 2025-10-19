@@ -27,9 +27,10 @@ requirements, please purchase a commercial license from placelink.
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
     <th:block layout:fragment="bodyScript">
         <script th:src="@{/public/js/echarts.min.js}"></script>
-        <script type="text/javascript">
-            // eslint-disable-next-line no-unused-vars
-            function initPage() {
+        <script type="module">
+            import {S2Util} from '[[@{/public/js/s2.util.js}]]';
+
+            window.initPage = () => {
                 initDoughnutChart();
                 initSemicircleChart();
                 initLineChart();
@@ -39,7 +40,7 @@ requirements, please purchase a commercial license from placelink.
                 getAnalysisStatistics();
 
                 S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
-            }
+            };
 
             const doughnutChart = {};
             const semicircleChart = {};

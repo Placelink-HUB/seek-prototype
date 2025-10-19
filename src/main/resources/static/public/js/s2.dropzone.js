@@ -23,19 +23,28 @@
  * requirements, please purchase a commercial license from placelink.
  * *** 문의처: help@placelink.shop (README.md 참조)
  */
-// eslint-disable-next-line no-unused-vars
-class S2DropZone {
+
+/**
+ * 드롭영역
+ * @author devers2
+ * @since  2025
+ * @version 1.0
+ * @see
+ * Copyright (C)  All right reserved.
+ */
+export class S2DropZone {
     /**
-     * 생성자
+     * DropZone 생성자
      * @param {Object} options - 드롭존 설정 옵션
      * @param {Element|string} options.dropZone - 드롭존으로 사용할 DOM 요소 또는 선택자
      * @param {Function} [options.dragenter] - 드래그 엔터 이벤트 발생 시 호출될 콜백 함수
      * @param {Function} [options.dragleave] - 드래그 리브 이벤트 발생 시 호출될 콜백 함수
      * @param {Function} [options.dragover] - 드래그 오버 이벤트 발생 시 호출될 콜백 함수
      * @param {Function} [options.drop] - 파일이 드롭됐을 때 호출될 콜백 함수
-     * @example
      *
-     *          <pre>{@code
+     * @example
+     * import { S2DropZone } from './js/s2.dropzone.js'; // Thymeleaf 는 '[[@{/js/s2.dropzone.js}]]' 형태로 경로 지정
+     *
      * const dropZone = new S2DropZone({
      *     dropZone: document.querySelector('.dropZone'),
      *     dragenter: function (event, dropZoneElement) {
@@ -56,7 +65,6 @@ class S2DropZone {
      *         // dropFiles: 드롭된 파일 목록 (File 객체 배열)
      *     }
      * });
-     * }</pre>
      */
     constructor(options = {}) {
         let dropZone = options.dropZone;

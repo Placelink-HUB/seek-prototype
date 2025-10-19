@@ -27,15 +27,14 @@ requirements, please purchase a commercial license from placelink.
 <html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{_layout/basic/layout}">
     <th:block layout:fragment="bodyStyle"></th:block>
     <th:block layout:fragment="bodyScript">
-        <script type="text/javascript">
-            // eslint-disable-next-line no-unused-vars
-            function initPage() {}
+        <script type="module">
+            window.initPage = () => {};
 
             // eslint-disable-next-line no-unused-vars
-            function goPage(pageNo) {
+            window.goPage = (pageNm) => {
                 const searchGroupingType = document.querySelector('input[name="searchGroupingType"]:checked').value;
                 location.href = `/public/analysis/file-blocking?pageNo=${pageNo}&searchGroupingType=${searchGroupingType}`;
-            }
+            };
         </script>
     </th:block>
     <th:block layout:fragment="bodyFragment">
