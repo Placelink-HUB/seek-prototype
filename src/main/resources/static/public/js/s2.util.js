@@ -227,6 +227,7 @@ export const S2Util = {
      * @property {'JSON'|'BLOB'|'HTML'} [responseType='JSON'] 응답 데이터 타입.
      * @property {boolean} [disableDefaultErrorHandler=false] 오류 발생 시 기본 오류 핸들링 처리(alert, confirm 등) 비활성화 여부
      * @property {number} [timeout=600000] 응답 대기 시간 (밀리초). 기본 10분(600000ms).
+     * @property {boolean} [showOverlay=false] 응답 대기 로딩 오버레이 표시 여부
      * @property {boolean} [hideLoading=false] 응답 대기 로딩 표시 숨김 여부
      *
      * @param {string} url 요청을 보낼 서버 엔드포인트 URL
@@ -252,6 +253,7 @@ export const S2Util = {
         let responseTypeChecker = '';
         let disableDefaultErrorHandler;
         let timeout;
+        let showOverlay;
         let hideLoading;
 
         if (S2Util.isFormData(param)) {
@@ -261,6 +263,7 @@ export const S2Util = {
             responseTypeChecker = param.get('responseType');
             disableDefaultErrorHandler = param.get('disableDefaultErrorHandler');
             timeout = param.get('timeout');
+            showOverlay = param.get('showOverlay');
             hideLoading = param.get('hideLoading');
 
             param.delete('method');
@@ -268,6 +271,7 @@ export const S2Util = {
             param.delete('responseType');
             param.delete('disableDefaultErrorHandler');
             param.delete('timeout');
+            param.delete('showOverlay');
             param.delete('hideLoading');
         } else if (S2Util.isJSON(param)) {
             paramType = 'JSON';
@@ -276,6 +280,7 @@ export const S2Util = {
             responseTypeChecker = param.responseType;
             disableDefaultErrorHandler = param.disableDefaultErrorHandler;
             timeout = param.timeout;
+            showOverlay = param.showOverlay;
             hideLoading = param.hideLoading;
 
             delete param.method;
@@ -283,6 +288,7 @@ export const S2Util = {
             delete param.responseType;
             delete param.disableDefaultErrorHandler;
             delete param.timeout;
+            delete param.showOverlay;
             delete param.hideLoading;
         } else if (S2Util.isQueryString(param)) {
             paramType = 'QueryString';
@@ -291,6 +297,7 @@ export const S2Util = {
             responseTypeChecker = S2Util.getQueryStringParameter(param, 'responseType');
             disableDefaultErrorHandler = S2Util.getQueryStringParameter(param, 'disableDefaultErrorHandler');
             timeout = S2Util.getQueryStringParameter(param, 'timeout');
+            showOverlay = S2Util.getQueryStringParameter(param, 'showOverlay');
             hideLoading = S2Util.getQueryStringParameter(param, 'hideLoading');
 
             param = S2Util.removeQueryStringParameter(param, 'method');
@@ -298,6 +305,7 @@ export const S2Util = {
             param = S2Util.removeQueryStringParameter(param, 'responseType');
             param = S2Util.removeQueryStringParameter(param, 'disableDefaultErrorHandler');
             param = S2Util.removeQueryStringParameter(param, 'timeout');
+            param = S2Util.removeQueryStringParameter(param, 'showOverlay');
             param = S2Util.removeQueryStringParameter(param, 'hideLoading');
             param = param.trim();
         }
@@ -380,7 +388,7 @@ export const S2Util = {
         option['method'] = method;
 
         if (hideLoading !== true && hideLoading !== 'true') {
-            showS2Loading();
+            showS2Loading({showOverlay: showOverlay});
         }
 
         fetch(url, option)
@@ -2257,6 +2265,114 @@ export const S2Util = {
             console.error('UUID 생성 실패:', e);
         }
         return uuid;
+    },
+    /**
+     * 지정된 요소(들)의 숫자를 애니메이션으로 카운트업하는 함수
+     * @param {HTMLElement | HTMLElement[] | NodeList} elements - 숫자가 표시될 HTML 요소(들)
+     * @param {Object} [options] - 설정 옵션
+     * @param {number} [options.duration=2000] - 애니메이션 지속 시간 (밀리초)
+     * @param {string} [options.locale='ko-KR'] - 'ko-KR': 한국식(1,234,567), 'de-DE' 유럽식(1.234.567), 지정하지 않음: 숫자만 표시
+     * @returns {Object} - 애니메이션 제어 객체 { stop: (index) => void, stopAll: () => void }
+     *   - stop(index): 지정된 인덱스의 요소 애니메이션 중지
+     *   - stopAll(): 모든 요소의 애니메이션 중지
+     *
+     * - 요소(들)의 innerText에서 숫자를 추출하여 0부터 목표값까지 부드럽게 증가.
+     * - 애니메이션은 options.duration 후 자동 종료.
+     * - 입력값이 유효하지 않은 경우 경고를 출력하고 0을 표시.
+     *
+     * @example
+     * // 단일 요소 (한국식 포맷)
+     * const singleElement = document.querySelector('.counter');
+     * const singleCounter = animateNumber(singleElement, { duration: 3000 }); // 3초 후 자동 종료
+     *
+     * // 다중 요소 (미국식 포맷)
+     * const multipleElements = document.querySelectorAll('.counter');
+     * const multiCounter = animateNumber(multipleElements, {
+     *   duration: 3000,
+     *   locale: 'de-DE' // 유럽식 포맷
+     * }); // 3초 후 자동 종료
+     *
+     * // 수동 중지
+     * setTimeout(() => multiCounter.stop(0), 1000); // 첫 번째 요소 1초 후 중지
+     * setTimeout(() => multiCounter.stopAll(), 2000); // 모든 요소 2초 후 중지
+     */
+    animateNumber: function (elements, options) {
+        const defaultOptions = {
+            duration: 2000,
+            locale: ''
+        };
+
+        // 1. 객체 전개 구문 ({...}) 대신 Object.assign() 사용 (ES6)
+        var settings = Object.assign({}, defaultOptions, options);
+
+        // 2. 옵셔널 체이닝 (?.) 대신 명시적인 조건문 사용
+        // options && Number.isFinite(options.duration) 로직으로 대체
+        settings.duration = options && Number.isFinite(options.duration) ? options.duration : defaultOptions.duration;
+
+        // options && typeof options.locale === 'string' 로직으로 대체
+        settings.locale = options && typeof options.locale === 'string' ? options.locale : null;
+
+        // 단일 요소를 배열로 변환
+        // Array.from()은 ES6 문법입니다.
+        const elementArray = elements instanceof NodeList ? Array.from(elements) : Array.isArray(elements) ? elements : [elements];
+
+        // 각 요소별 애니메이션 상태 관리
+        const animations = elementArray.map(() => ({frameId: null}));
+
+        function formatNumber(num) {
+            if (settings.locale) {
+                // toLocaleString은 ES1(1997)부터 존재하지만, options 객체를 받는 것은 ES2018입니다.
+                // 하지만 locale 인자만 받는 기본 형태는 구형 브라우저에서도 지원될 수 있으므로 유지합니다.
+                return Math.round(num).toLocaleString(settings.locale);
+            }
+            return Math.round(num).toString(); // 콤마 없이 숫자만
+        }
+
+        // 각 요소에 대해 애니메이션 실행
+        elementArray.forEach((element, index) => {
+            const targetString = element.innerText;
+            const cleanedString = targetString.replace(/,/g, '');
+            const target = parseInt(cleanedString, 10);
+
+            if (!Number.isFinite(target)) {
+                console.warn('유효하지 않은 숫자 형식 (요소 ' + index + '):', targetString); // 템플릿 리터럴(ES6) 대신 문자열 연결 사용
+                element.innerText = '0';
+                return;
+            }
+
+            const startTime = performance.now();
+
+            // 화살표 함수는 ES6 문법이므로 유지합니다.
+            const animate = function (currentTime) {
+                // 함수 선언식으로 변경해도 무방하지만, const animate = (currentTime) => ... 도 ES6이므로 유지
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / settings.duration, 1);
+                const current = target * progress;
+                element.innerText = formatNumber(current);
+
+                if (progress < 1) {
+                    animations[index].frameId = requestAnimationFrame(animate);
+                } else {
+                    element.innerText = targetString; // 원본 문자열 복원
+                }
+            };
+
+            animations[index].frameId = requestAnimationFrame(animate);
+        });
+
+        return {
+            stop: function (index) {
+                if (Number.isFinite(index) && animations[index]) {
+                    cancelAnimationFrame(animations[index].frameId);
+                }
+            },
+            stopAll: function () {
+                animations.forEach(function (anim) {
+                    // 화살표 함수 대신 function 키워드 사용 (호환성 확보)
+                    cancelAnimationFrame(anim.frameId);
+                });
+            }
+        };
     },
     /**
      * 웹 푸시 알림을 위한 Service Worker를 등록하고, PushManager를 통해 사용자를 구독(Subscription)시킨 후,

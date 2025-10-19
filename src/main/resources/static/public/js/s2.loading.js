@@ -51,18 +51,19 @@ const controlProgressBar = (timeout) => {
  * @private
  * @param {number} percent - 진행률 (0-100)
  */
-function setProgressBar(percent) {
+const setProgressBar = (percent) => {
     const progressBar = document.querySelector('.progress-bar');
     const progressPercent = document.querySelector('.progress-text');
     if (progressBar) progressBar.style.width = percent + '%';
     if (progressPercent) progressPercent.textContent = percent + '%';
-}
+};
 
 /**
  * 로딩 페이지 오버레이를 화면에 표시합니다.
  * 옵션에 따라 프로그레스 바를 표시하고 애니메이션을 시작합니다.
  *
  * @param {Object} [options] - 로딩 설정 옵션
+ * @param {boolean} [options.showOverlay=false] - 오버레이 표시 여부
  * @param {boolean} [options.showProgress=false] - 프로그레스 바 표시 여부
  * @param {number} [options.timeout=1200] - 프로그레스 바 진행 속도 (인터벌 시간, 기본 1200ms)
  * @returns {void}
@@ -118,7 +119,7 @@ export const showS2Loading = (options) => {
     S2Util.replaceChildren(document.body, loadingHtml, {
         isAppend: true,
         onNodeReady: (node) => {
-            if (options && options.showProgress) {
+            if (options && (options.showOverlay || options.showProgress)) {
                 node.classList.add('background');
             }
         }

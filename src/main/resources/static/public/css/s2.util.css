@@ -23,6 +23,19 @@
  * requirements, please purchase a commercial license from placelink.
  * *** 문의처: help@placelink.shop (README.md 참조)
  */
+
+/* Step 1: HTML 요소에 기본 박스 모델 설정 */
+html {
+  box-sizing: border-box;
+}
+
+/* Step 2: 모든 요소와 가상 요소가 이를 상속받도록 설정 */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
 /* ===================================================================================================
     Modal
 =================================================================================================== */
