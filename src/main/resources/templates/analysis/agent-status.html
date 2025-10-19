@@ -80,12 +80,16 @@ requirements, please purchase a commercial license from placelink.
                                             <td class="agent-status-indicator ${agentStatus.clickDomainAgentExeYn}"></td>
                                             <td>${eventDateTimeStr}</td>
                                             <td class="${agentStatus.conditionLevel}">${agentStatus.conditionLevel}</td>
-                                            <td>${agentStatus.conditionLevelCcd === 'ACTIVE' ? '' : '<button class="table-btn-sty01" onclick="S2Util.alert(\'준비 중입니다.\');">전송</button>'}</td>
+                                            <td>${agentStatus.conditionLevelCcd === 'ACTIVE' ? '' : '<button class="table-btn-sty01 btn-coming-soon">전송</button>'}</td>
                                         </tr>
                                     `;
                                 }
 
-                                S2Util.replaceChildren(agentStatusList, agentStatusListHTML);
+                                S2Util.replaceChildren(agentStatusList, agentStatusListHTML, {
+                                    onNodeReady: (node) => {
+                                        node.querySelector('.btn-coming-soon')?.addEventListener('click', () => S2Util.alert('준비 중입니다.'));
+                                    }
+                                });
                             }
                         }
                     }
