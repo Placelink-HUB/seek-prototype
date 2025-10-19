@@ -31,8 +31,16 @@ import {hideS2Loading, showS2Loading} from './s2.loading.js';
  * @returns {string} 들여쓰기가 제거된 문자열
  */
 String.prototype.dedent = function () {
+    // !!s2!! this 가 문자열 객체(String Object)를 참조 하도록 정규 함수를 사용하여야 한다. (화살표 함수 사용시 this 바인딩 문제 발생)
     const lines = this.split('\n');
-    const minIndent = Math.min(...lines.filter((line) => line.trim()).map((line) => line.match(/^(\s*)/)[0].length));
+    const nonBlankLines = lines.filter((line) => line.trim());
+
+    if (nonBlankLines.length === 0) {
+        return this.trim(); // 전체 문자열을 trim하여 반환
+    }
+
+    const minIndent = Math.min(...nonBlankLines.map((line) => line.match(/^(\s*)/)[0].length));
+
     return lines
         .map((line) => line.slice(minIndent))
         .join('\n')
@@ -76,13 +84,24 @@ export const S2Util = {
      * 이 유틸리티는 일부 레거시 환경에서 지원하지 않을 수 있는 **네이티브 Element.replaceChildren (ES2021)** 메서드를
      * 안전하게 대체하기 위해 설계되었다. 이를 통해 target.innerHTML = '';와 같은 파괴적인 DOM 조작 대신
      * DOM 노드의 이벤트 리스너 파괴 위험 없이 자식 노드를 처리한다.
-     * * 두 번째 인자가 없으면, 기존 자식을 모두 삭제하여 안전하게 초기화하는 역할을 수행한다.
+     * * 두 번째 인자가 없고 options.isAppend를 true로 설정하지 않는다면, 기존 자식을 모두 삭제하여 안전하게 초기화하는 역할을 수행한다.
+     *
+     * @typedef {object} ReplaceChildrenOptions
+     * @property {boolean} [isAppend=false] - 기존 대상 요소의 자식 노드를 삭제하지 않고 유지할지 여부. true: 기존 자식 뒤에 새로운 노드가 추가(append 모드), false: 기존 자식을 모두 삭제하고 새로운 노드로 대체(replace 모드)
+     * @property {function(Node, number): void} [onNodeReady=null] - 각 새 노드(Node 객체)가 DocumentFragment에 추가되기 직전에 실행되는 콜백 함수 (주로 이벤트 리스너 바인딩, 속성 추가 등 DOM 삽입 전 최종 작업을 수행하는 데 사용된다.)
      *
      * @param {Element|string} target - 자식을 대체할 대상 DOM 요소 또는 CSS 선택자 문자열.
      * @param {Array<Element|string|DocumentFragment>|Element|string|DocumentFragment} [newChildren=[]] - 대상의 새로운 자식으로 삽입할 노드(Element), DocumentFragment, 또는 HTML 문자열/노드 배열.
+     * @param {ReplaceChildrenOptions} [options={}] - 옵션 객체
      * @returns {Element|null} - 자식이 대체된 대상 DOM 요소 (target)를 반환한다.
      */
-    replaceChildren: function (target, newChildren = []) {
+    replaceChildren: function (target, newChildren = [], options = {}) {
+        const defaultOptions = {
+            isAppend: false, // 기본값: 기존 자식을 지운다 (replace)
+            onNodeReady: null
+        };
+        const finalOptions = {...defaultOptions, ...options};
+
         // 대상 DOM 요소 확보
         const targetEl = typeof target === 'string' ? document.querySelector(target) : target;
 
@@ -114,20 +133,35 @@ export const S2Util = {
             });
         }
 
-        // DocumentFragment를 활용한 최종 노드 준비 (성능 최적화)
-        const fragment = document.createDocumentFragment();
-        // 삽입할 노드들을 메모리의 fragment에 먼저 추가한다
-        nodesToInsert.forEach((node) => {
-            fragment.appendChild(node);
-        });
+        {
+            /*
+             * [ES Module 환경에서 안전한 DOM 삽입]
+             * !!s2!! 기존 DOM 구조를 파괴하지 않기 위해 임시 컨테이너(tempContainer)를 생성한 후 모달의 HTML을 삽입한다.
+             * document.body.innerHTML += modalHTML; 와 같은 직접적인 innerHTML 조작은 대입 연산자(=)든 덧셈 대입 연산자(+=)든
+             * 해당 요소(여기서는 body 전체)의 내부 DOM 구조를 문자열로 대체하여 기존에 바인딩된 모든 이벤트 리스너를 제거하므로 사용하지 않는다.
+             * 대신, appendChild()를 사용하여 기존 DOM 트리를 파괴하지 않고 새로운 요소만 안전하게 추가한다.
+             */
+            // !!s2!! 메모리에만 존재하는 DocumentFragment를 활용한 최종 노드 준비 (성능 최적화)
+            const fragment = document.createDocumentFragment();
+            // !!s2!! 삽입할 노드들을 실제 DOM이 아닌 fragment에 추가 (리플로우 방지)
+            nodesToInsert.forEach((node, index) => {
+                if (typeof finalOptions.onNodeReady === 'function') {
+                    // Node가 준비되었을 때 콜백에 현재 노드와 인덱스를 전달하여 필요한 이벤트 바인딩 및 추가 작업을 수행할 수 있도록 한다.
+                    finalOptions.onNodeReady(node, index);
+                }
+                fragment.appendChild(node);
+            });
 
-        // 기존 자식 노드를 모두 안전하게 삭제한다.
-        while (targetEl.firstChild) {
-            targetEl.removeChild(targetEl.firstChild);
+            if (!finalOptions.isAppend) {
+                // 기존 자식 노드를 모두 안전하게 삭제한다.
+                while (targetEl.firstChild) {
+                    targetEl.removeChild(targetEl.firstChild);
+                }
+            }
+
+            // !!s2!! fragment의 내용을 appendChild로 한 번에 추가한다. (최적화, DocumentFragment를 사용하여 단 한 번의 DOM 조작으로 삽입한다.)
+            targetEl.appendChild(fragment);
         }
-
-        // fragment의 내용을 appendChild로 한 번에 추가한다. (DocumentFragment를 사용하여 단 한 번의 DOM 조작으로 삽입한다.)
-        targetEl.appendChild(fragment);
 
         return targetEl;
     },
@@ -658,25 +692,24 @@ export const S2Util = {
                     option.items = [option.items];
                 }
 
-                // !!s2!! 메모리에만 존재하는 DocumentFragment 생성
-                const fragment = document.createDocumentFragment();
-
-                option.items.forEach((item) => {
+                const optionElements = option.items.map((item) => {
                     const itemValue = String(option.itemValue);
                     const itemLabel = String(option.itemLabel);
+
+                    // 값 및 레이블 계산 로직 (기존 로직 유지)
                     const value = itemValue.match(/{{=([^}}]+)}}/) ? S2Util.template(itemValue, item) : item[itemValue];
                     const label = itemLabel && itemLabel.match(/{{=([^}}]+)}}/) ? S2Util.template(itemLabel, item) : item[itemLabel];
 
+                    // <option> 요소 생성
                     const optionElement = document.createElement('option');
                     optionElement.value = value || '';
                     optionElement.textContent = label || value;
 
-                    // !!s2!! option 요소를 실제 DOM이 아닌 fragment에 추가 (리플로우 방지)
-                    fragment.appendChild(optionElement);
+                    // S2Util.replaceChildren에 전달할 Node 객체 배열로 반환
+                    return optionElement;
                 });
 
-                // !!s2!! DocumentFragment를 target에 단 한 번 추가 (최적화)
-                target.appendChild(fragment);
+                S2Util.replaceChildren(target, optionElements, {isAppend: true});
 
                 if (option.initVal) {
                     target.value = option.initVal;
@@ -2065,37 +2098,36 @@ export const S2Util = {
         const modelNo = document.querySelectorAll('.s2modal').length + 1;
         const modalSelector = `#s2-modal-${modelNo}`;
 
-        {
-            /*
-             * [ES Module 환경에서 안전한 DOM 삽입]
-             * !!s2!! 기존 DOM 구조를 파괴하지 않기 위해 임시 컨테이너(tempContainer)를 생성한 후 모달의 HTML을 삽입한다.
-             * document.body.innerHTML += modalHTML; 와 같은 직접적인 innerHTML 조작은 대입 연산자(=)든 덧셈 대입 연산자(+=)든
-             * 해당 요소(여기서는 body 전체)의 내부 DOM 구조를 문자열로 대체하여 기존에 바인딩된 모든 이벤트 리스너를 제거하므로 사용하지 않는다.
-             * 대신, appendChild()를 사용하여 기존 DOM 트리를 파괴하지 않고 새로운 요소만 안전하게 추가한다.
-             */
-            const tempContainer = document.createElement('div');
-            tempContainer.innerHTML = `
-                    <div id="s2-modal-${modelNo}" class="s2-modal" role="dialog" aria-modal="true" aria-labelledby="s2-modal-title-${modelNo}" aria-describedby="s2-modal-description-${modelNo}">
-                        <div class="modal-content" style="width: ${option.width ? option.width : '80%'}">
-                            <div class="modal-header">
-                                <h2 class="modal-title" id="s2-modal-title-${modelNo}" style="text-align: ${option.titleAlign ? option.titleAlign : 'center'}; font-size: ${option.titleSize ? option.titleSize : '1.125rem'}">${option.title || ''}&nbsp;</h2>
-                                ${option.headerHtml ? option.headerHtml : ''}
-                                <button class="close-button" aria-label="닫기">&times;</button>
-                            </div>
-                            <div class="modal-body" id="s2-modal-description-${modelNo}">
-                                ${content}
-                            </div>
+        S2Util.replaceChildren(
+            document.body,
+            `
+                <div id="s2-modal-${modelNo}" class="s2-modal" role="dialog" aria-modal="true" aria-labelledby="s2-modal-title-${modelNo}" aria-describedby="s2-modal-description-${modelNo}">
+                    <div class="modal-content" style="width: ${option.width ? option.width : '80%'}">
+                        <div class="modal-header">
+                            <h2 class="modal-title" id="s2-modal-title-${modelNo}" style="text-align: ${option.titleAlign ? option.titleAlign : 'center'}; font-size: ${option.titleSize ? option.titleSize : '1.125rem'}">${option.title || ''}&nbsp;</h2>
+                            ${option.headerHtml ? option.headerHtml : ''}
+                            <button class="close-button" aria-label="닫기">&times;</button>
+                        </div>
+                        <div class="modal-body" id="s2-modal-description-${modelNo}">
+                            ${content}
                         </div>
                     </div>
-                `;
-
-            const modalElement = tempContainer.querySelector(modalSelector);
-            modalElement.querySelector('.close-button').addEventListener('click', () => {
-                modalElement.remove();
-            });
-
-            document.body.appendChild(modalElement);
-        }
+                </div>
+            `,
+            {
+                isAppend: true,
+                onNodeReady: (node) => {
+                    if (node) {
+                        const closeButton = node.querySelector('.close-button');
+                        if (closeButton) {
+                            closeButton.addEventListener('click', () => {
+                                node.remove();
+                            });
+                        }
+                    }
+                }
+            }
+        );
 
         if (typeof callback === 'function') {
             callback(modalSelector, option);

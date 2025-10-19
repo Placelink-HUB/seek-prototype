@@ -84,9 +84,8 @@ requirements, please purchase a commercial license from placelink.
                                         </tr>
                                     `;
                                 }
-                                console.log('agentStatusListHTML', agentStatusListHTML);
-                                console.log('agentStatusListHTML3', S2Util.createNodeFragment(agentStatusListHTML));
-                                S2Util.replaceChildren(agentStatusList, S2Util.createNodeFragment(agentStatusListHTML));
+
+                                S2Util.replaceChildren(agentStatusList, agentStatusListHTML);
                             }
                         }
                     }

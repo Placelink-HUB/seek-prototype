@@ -23,6 +23,8 @@
  * requirements, please purchase a commercial license from placelink.
  * *** 문의처: help@placelink.shop (README.md 참조)
  */
+import {S2Util} from './s2.util.js';
+
 let g_interval;
 
 /**
@@ -30,7 +32,7 @@ let g_interval;
  * @private
  * @param {number} timeout - 인터벌 시간 (밀리초)
  */
-function controlProgressBar(timeout) {
+const controlProgressBar = (timeout) => {
     let progress = 0;
     g_interval = setInterval(
         function () {
@@ -42,7 +44,7 @@ function controlProgressBar(timeout) {
         },
         timeout && !isNaN(timeout) ? timeout : 1200
     );
-}
+};
 
 /**
  * 프로그레스 바의 너비와 텍스트를 업데이트합니다.
@@ -73,53 +75,60 @@ function setProgressBar(percent) {
  * ex2) 프로그레스 바를 표시하며 로딩 시작
  * showS2Loading({ showProgress: true, timeout: 800 });
  */
-export function showS2Loading(options) {
+export const showS2Loading = (options) => {
     // 기존에 존재하는 로딩 오버레이 제거
     hideS2Loading();
 
-    const loadingOverlay = document.createElement('div');
-    loadingOverlay.id = 'loading-overlay';
-    loadingOverlay.innerHTML = `
-        <div class="loader-container">
-            <div class="hexagon-wrap">
-                <div>
-                    <div class="hexagon hex1 blue">
-                        <div class="inner-line"></div>
+    const loadingHtml = `
+        <div id="s2-loading-overlay">
+            <div class="loader-container">
+                <div class="hexagon-wrap">
+                    <div>
+                        <div class="hexagon hex1 blue">
+                            <div class="inner-line"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="hexagon hex2 gray">
+                            <div class="inner-line"></div>
+                            <div class="hexagon-line"></div>
+                        </div>
+                        <div class="hexagon hex3 gray">
+                            <div class="inner-line"></div>
+                            <div class="hexagon-line"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="hexagon hex4 blue">
+                            <div class="inner-line"></div>
+                            <div class="hexagon-line blue line1"></div>
+                            <div class="hexagon-line blue line2"></div>
+                            <div class="hexagon-line blue line3"></div>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <div class="hexagon hex2 gray">
-                        <div class="inner-line"></div>
-                        <div class="hexagon-line"></div>
-                    </div>
-                    <div class="hexagon hex3 gray">
-                        <div class="inner-line"></div>
-                        <div class="hexagon-line"></div>
-                    </div>
+                <div class="progress-wrap ${options && options.showProgress ? '' : 'd-none'}">
+                    <span class="progress-text"></span>
+                    <div class="progress-bar"></div>
                 </div>
-                <div>
-                    <div class="hexagon hex4 blue">
-                        <div class="inner-line"></div>
-                        <div class="hexagon-line blue line1"></div>
-                        <div class="hexagon-line blue line2"></div>
-                        <div class="hexagon-line blue line3"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="progress-wrap ${options && options.showProgress ? '' : 'd-none'}">
-                <span class="progress-text"></span>
-                <div class="progress-bar"></div>
             </div>
         </div>
     `;
-    document.body.appendChild(loadingOverlay);
+
+    S2Util.replaceChildren(document.body, loadingHtml, {
+        isAppend: true,
+        onNodeReady: (node) => {
+            if (options && options.showProgress) {
+                node.classList.add('background');
+            }
+        }
+    });
 
     if (options && options.showProgress) {
-        loadingOverlay.classList.add('background');
         setProgressBar(0);
         controlProgressBar(options ? options.timeout : 0);
     }
-}
+};
 
 /**
  * 화면에 표시된 로딩 페이지 오버레이를 제거하고, 프로그레스 바 애니메이션을 중지합니다.
@@ -131,12 +140,13 @@ export function showS2Loading(options) {
  * ex) 로딩 페이지 숨기기
  * hideS2Loading();
  */
-export function hideS2Loading() {
+export const hideS2Loading = () => {
     // 기존에 설정된 인터벌 제거
     if (g_interval) {
         clearInterval(g_interval);
     }
-    document.querySelectorAll('#loading-overlay').forEach((element) => {
-        if (element) element.remove();
-    });
-}
+    const loadingOverlay = document.querySelector('#s2-loading-overlay');
+    if (loadingOverlay) {
+        loadingOverlay.remove();
+    }
+};

@@ -36,6 +36,29 @@ requirements, please purchase a commercial license from placelink.
             window.initPage = () => {
                 document.querySelector('.btn-open-create-article')?.addEventListener('click', openCreateArticle);
                 document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
+
+                document.querySelectorAll('.btn-open-modal-article-contents')?.forEach((btn) =>
+                    btn.addEventListener('click', (event) => {
+                        const articleId = event.currentTarget.closest('tr').dataset.articleId;
+                        const maskMode = event.currentTarget.dataset.maskMode;
+                        openModalArticleContents(articleId, maskMode);
+                    })
+                );
+
+                document.querySelectorAll('.btn-open-secured-article-contents')?.forEach((btn) =>
+                    btn.addEventListener('click', (event) => {
+                        const articleId = event.currentTarget.closest('tr').dataset.articleId;
+                        const maskMode = event.currentTarget.dataset.maskMode;
+                        openSecuredArticleContents(articleId, maskMode);
+                    })
+                );
+
+                document.querySelectorAll('.btn-download-file')?.forEach((btn) =>
+                    btn.addEventListener('click', (event) => {
+                        const articleId = event.currentTarget.closest('tr').dataset.articleId;
+                        downloadFile(articleId);
+                    })
+                );
             };
 
             // eslint-disable-next-line no-unused-vars
@@ -174,8 +197,7 @@ requirements, please purchase a commercial license from placelink.
                 );
             }
 
-            // eslint-disable-next-line no-unused-vars
-            function openSecuredArticleModal(articleId, seekMode) {
+            function openSecuredArticleContents(articleId, seekMode) {
                 S2Util.fetch(
                     '/api/check/login',
                     {
@@ -411,19 +433,19 @@ requirements, please purchase a commercial license from placelink.
                                 <tr th:if="${articleListPagination.isEmpty}">
                                     <td colspan="6">데이터가 없습니다.</td>
                                 </tr>
-                                <tr th:each="article : ${articleListPagination.dataList}">
+                                <tr th:each="article : ${articleListPagination.dataList}" th:attr="data-article-id=${article.articleId}">
                                     <td th:text="${#temporals.format(article.createDt, 'yyyy-MM-dd HH:mm:ss')}">2025-01-26: 15:00</td>
                                     <td></td>
                                     <td th:text="${article.articleTypeCcdNm}"></td>
                                     <td>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_RAW}]]);">원시 데이터</button>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01 btn-open-modal-article-contents" th:attr="data-mask-mode=${@Constants.CD_MASK_MODE_RAW}">원시 데이터</button>
                                     </td>
                                     <td>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openModalArticleContents([[${article.articleId}]]);">내용 보기</button>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01 btn-open-modal-article-contents">내용 보기</button>
                                     </td>
                                     <td>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01" th:onclick="openSecuredArticleModal([[${article.articleId}]], [[${@Constants.CD_MASK_MODE_UNMASK}]]);">원본보기</button>
-                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01" th:onclick="downloadFile([[${article.articleId}]]);">다운로드</button>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_TEXT}" class="table-btn-sty01 btn-open-secured-article-contents" th:attr="data-mask-mode=${@Constants.CD_MASK_MODE_UNMASK}">원본보기</button>
+                                        <button th:if="${article.articleTypeCcd eq @Constants.CD_ARTICLE_TYPE_FILE}" class="table-btn-sty01 btn-download-file">다운로드</button>
                                     </td>
                                 </tr>
                             </tbody>
