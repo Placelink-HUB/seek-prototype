@@ -95,7 +95,7 @@ export const S2Util = {
      * @param {ReplaceChildrenOptions} [options={}] - 옵션 객체
      * @returns {Element|null} - 자식이 대체된 대상 DOM 요소 (target)를 반환한다.
      */
-    replaceChildren: function (target, newChildren = [], options = {}) {
+    replaceChildren(target, newChildren = [], options = {}) {
         const defaultOptions = {
             isAppend: false, // 기본값: 기존 자식을 지운다 (replace)
             onNodeReady: null
@@ -181,39 +181,37 @@ export const S2Util = {
             return [];
         }
 
-        // 임시 컨테이너 생성
-        const tempDiv = document.createElement('div');
-        const tagName = trimmedHtml.substring(0, 4).toLowerCase();
+        // HTML 문자열의 시작 부분을 효율적으로 확인하기 위해 최대 7글자만 추출한다.
+        const htmlPrefix = trimmedHtml.substring(0, Math.min(trimmedHtml.length, 7)).toLowerCase();
 
-        // tr (테이블 행) 처리: 가장 복잡하므로 먼저 처리하고 바로 반환
-        if (tagName.startsWith('<tr')) {
-            // 가장 안전하게 파싱하기 위해 <table><tbody>로 감쌈
-            tempDiv.innerHTML = `<table><tbody>${trimmedHtml}</tbody></table>`;
+        let containerHtml;
+        let extractionSelector;
 
-            // <tbody>를 찾아 그 자식인 <tr> 노드들을 반환
-            const tbody = tempDiv.querySelector('tbody');
-            if (tbody) {
-                return Array.from(tbody.children);
-            }
-            return [];
+        // DOMParser 사용을 위해 비표준 태그를 보정한다. (테이블 파편화 문제 해결)
+        if (htmlPrefix.startsWith('<tbody')) {
+            containerHtml = `<table>${trimmedHtml}</table>`;
+            extractionSelector = 'table';
+        } else if (htmlPrefix.startsWith('<tr')) {
+            containerHtml = `<table><tbody>${trimmedHtml}</tbody></table>`;
+            extractionSelector = 'table > tbody';
+        } else if (htmlPrefix.startsWith('<td') || htmlPrefix.startsWith('<th')) {
+            containerHtml = `<table><tbody><tr>${trimmedHtml}</tr></tbody></table>`;
+            extractionSelector = 'table > tbody >tr';
+        } else if (htmlPrefix.startsWith('<li')) {
+            containerHtml = `<ul>${trimmedHtml}</ul>`;
+            extractionSelector = 'ul';
+        } else {
+            containerHtml = `<div>${trimmedHtml}</div>`;
+            extractionSelector = 'div';
         }
 
-        // tr이 아닌 경우 (td/th, li, 기타) 래퍼 태그 설정
-        let wrapTag = 'div';
-        if (tagName.startsWith('<td') || tagName.startsWith('<th')) {
-            wrapTag = 'tr';
-        } else if (tagName.startsWith('<li')) {
-            wrapTag = 'ul';
-        }
+        // DOMParser 생성 (XSS 방지를 위해 innerHTML 대신 DOMParser 사용)
+        const parser = new DOMParser();
+        const parsedDocument = parser.parseFromString(containerHtml, 'text/html');
+        const container = parsedDocument.querySelector(extractionSelector);
 
-        // 래퍼 태그로 감싸서 innerHTML 설정
-        tempDiv.innerHTML = `<${wrapTag}>${trimmedHtml}</${wrapTag}>`;
-
-        // 파싱된 실제 자식 Node 객체들을 추출
-        // tempDiv.firstElementChild는 항상 래퍼 태그(div, tr, ul 등)가 됨
-        if (tempDiv.firstElementChild) {
-            // 추출 대상은 래퍼 태그의 자식들 (td/th의 경우 <tr>의 자식인 <td>/<th>)
-            return Array.from(tempDiv.firstElementChild.children);
+        if (container) {
+            return Array.from(container.children);
         }
 
         return [];
@@ -567,62 +565,11 @@ export const S2Util = {
                             replacedHtml = replacedHtml.replace(new RegExp(`{{=${key}}}`, 'g'), value || value === 0 ? value : '');
                         }
 
-                        /**
-                         * document.createElement 를 사용하는 경우 비표준 태그를 보정한다.
-                         * - innerHtml 이 tr 태그로 시작될때 tbody 외 다른 태그를 사용하면 해당 태그가 삭제 되어 아래와 같이 수정했었으나
-                         * - 반대로 tbody 태그 안에 form 태그 등을 넣어도 해당 태그가 삭제됨
-                         * ※ 그외의 상황이 있는지 확인 필요
-                         */
                         const trimmedHtml = replacedHtml.trim();
-                        const resultContainer = document.createElement(trimmedHtml.startsWith('<tr') ? 'tbody' : 'div');
+                        const htmlPrefix = trimmedHtml.substring(0, Math.min(trimmedHtml.length, 7)).toLowerCase();
 
-                        /**
-                         * XSS 방지를 위해 innerHTML 대신 DOMParser 사용
-                         * (innerHTML 사용할 때 기존 코드 "tempDiv.innerHTML = innerHtml;"를 변경 함)
-                         */
-                        {
-                            // DOMParser 사용을 위해 비표준 태그를 보정한다.
-                            let normalizedHtml, normalizedParentTag;
-                            if (trimmedHtml.startsWith('<tbody')) {
-                                normalizedHtml = `<table>${replacedHtml}</table>`;
-                                normalizedParentTag = 'table';
-                            } else if (trimmedHtml.startsWith('<tr')) {
-                                normalizedHtml = `<table><tbody>${replacedHtml}</tbody></table>`;
-                                normalizedParentTag = 'tbody';
-                            } else if (trimmedHtml.startsWith('<td')) {
-                                normalizedHtml = `<table><tbody><tr>${replacedHtml}</tr></tbody></table>`;
-                                normalizedParentTag = 'tr';
-                            } else {
-                                normalizedHtml = replacedHtml;
-                            }
-
-                            // htmlParentTag에 따라 파싱된 DOM에서 원하는 노드를 선택
-                            const parser = new DOMParser();
-                            const parsedDocument = parser.parseFromString(normalizedHtml, 'text/html');
-                            let targetElement;
-                            switch (normalizedParentTag) {
-                                case 'table':
-                                    // <tbody>로 시작한 경우 <table> 에서 추출
-                                    targetElement = parsedDocument.body.firstChild.querySelector('table');
-                                    break;
-                                case 'tbody':
-                                    // <tr>로 시작한 경우 <table><tbody> 에서 추출
-                                    targetElement = parsedDocument.body.firstChild.querySelector('table > tbody');
-                                    break;
-                                case 'tr':
-                                    // <td>로 시작한 경우 <table><tbody><tr> 에서 추출
-                                    targetElement = parsedDocument.body.firstChild.querySelector('table > tbody > tr');
-                                    break;
-                                default:
-                                    targetElement = parsedDocument.body;
-                                    break;
-                            }
-
-                            // DOMParser를 사용하여 HTML 문자열을 파싱한다.
-                            while (targetElement.firstChild) {
-                                resultContainer.appendChild(targetElement.firstChild);
-                            }
-                        }
+                        const resultContainer = document.createElement(htmlPrefix.startsWith('<tr') ? 'tbody' : 'div');
+                        S2Util.replaceChildren(resultContainer, trimmedHtml);
 
                         const elements = resultContainer.querySelectorAll('[if], [else]');
                         elements.forEach((element) => {
@@ -680,7 +627,7 @@ export const S2Util = {
      * @param {OptionConfig} option - 옵션 설정을 담고 있는 객체.
      * @returns {void}
      */
-    options: function (option) {
+    options(option) {
         if (!option) {
             return;
         }
@@ -781,7 +728,7 @@ export const S2Util = {
      * @param {Array<string|number>|string|number} [jsParams] - 페이지 처리 함수에 추가로 전달할 매개변수 (페이지 번호는 함수 내부에서 자동으로 추가됨).
      * @returns {string} - `<ul class="pagination">...</ul>` 형태의 HTML 페이지네이션 마크업 문자열.
      */
-    pagination: function (paginationInfo, jsFunction, jsParams) {
+    pagination(paginationInfo, jsFunction, jsParams) {
         let pagination = '';
         let functionParamStr = '';
 
