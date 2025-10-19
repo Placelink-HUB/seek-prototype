@@ -33,14 +33,16 @@ requirements, please purchase a commercial license from placelink.
 
             let isRegistering = false;
 
-            document.addEventListener('DOMContentLoaded', () => {});
+            window.initPage = () => {
+                document.querySelector('.btn-open-create-article')?.addEventListener('click', openCreateArticle);
+                document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
+            };
 
             // eslint-disable-next-line no-unused-vars
             window.goPage = (pageNm) => {
                 location.href = `/public/sample/test?pageNo=${pageNo}`;
             };
 
-            // eslint-disable-next-line no-unused-vars
             function openCreateArticle() {
                 S2Util.showModal(
                     `
@@ -129,10 +131,11 @@ requirements, please purchase a commercial license from placelink.
                                             content: desc.value
                                         },
                                         function () {
+                                            S2Util.hideModal(modalSelector);
                                             S2Util.showToast('등록되었습니다.');
                                             setTimeout(function () {
                                                 location.reload();
-                                            }, 500);
+                                            }, 1000);
                                         },
                                         function () {
                                             isRegistering = false;
@@ -154,10 +157,11 @@ requirements, please purchase a commercial license from placelink.
                                             files: g_uploadFiles
                                         },
                                         function () {
+                                            S2Util.hideModal(modalSelector);
                                             S2Util.showToast('등록되었습니다.');
                                             setTimeout(function () {
                                                 location.reload();
-                                            }, 500);
+                                            }, 1000);
                                         },
                                         function () {
                                             isRegistering = false;
@@ -221,7 +225,6 @@ requirements, please purchase a commercial license from placelink.
                 );
             }
 
-            // eslint-disable-next-line no-unused-vars
             function downloadFile(articleId) {
                 S2Util.fetch(
                     '/sample/downloadFile',
@@ -358,9 +361,9 @@ requirements, please purchase a commercial license from placelink.
                     <span class="sub-title">PC별 데이터 복호화 처리 현황</span>
                 </h1>
                 <span class="btn-group">
-                    <button class="btn-type1" onclick="openCreateArticle();">데이터 등록</button>
-                    <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">기간 검색</button>
-                    <button class="btn-type1" onclick="S2Util.alert('준비 중입니다.');">전체 현황 다운로드</button>
+                    <button class="btn-type1 btn-open-create-article">데이터 등록</button>
+                    <button class="btn-type1 btn-coming-soon">기간 검색</button>
+                    <button class="btn-type1 btn-coming-soon">전체 현황 다운로드</button>
                 </span>
             </div>
             <div class="wrap-contents">

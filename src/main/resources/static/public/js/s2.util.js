@@ -71,6 +71,120 @@ String.prototype.dedent = function () {
  */
 export const S2Util = {
     /**
+     * 대상 DOM 요소의 모든 자식 노드를 안전하게 삭제하거나, 주어진 새로운 노드들로 한 번에 대체한다.
+     *
+     * 이 유틸리티는 일부 레거시 환경에서 지원하지 않을 수 있는 **네이티브 Element.replaceChildren (ES2021)** 메서드를
+     * 안전하게 대체하기 위해 설계되었다. 이를 통해 target.innerHTML = '';와 같은 파괴적인 DOM 조작 대신
+     * DOM 노드의 이벤트 리스너 파괴 위험 없이 자식 노드를 처리한다.
+     * * 두 번째 인자가 없으면, 기존 자식을 모두 삭제하여 안전하게 초기화하는 역할을 수행한다.
+     *
+     * @param {Element|string} target - 자식을 대체할 대상 DOM 요소 또는 CSS 선택자 문자열.
+     * @param {Array<Element|string|DocumentFragment>|Element|string|DocumentFragment} [newChildren=[]] - 대상의 새로운 자식으로 삽입할 노드(Element), DocumentFragment, 또는 HTML 문자열/노드 배열.
+     * @returns {Element|null} - 자식이 대체된 대상 DOM 요소 (target)를 반환한다.
+     */
+    replaceChildren: function (target, newChildren = []) {
+        // 대상 DOM 요소 확보
+        const targetEl = typeof target === 'string' ? document.querySelector(target) : target;
+
+        if (!targetEl || !(targetEl instanceof Element)) {
+            console.error('replaceChildren: 유효한 DOM 요소를 찾을 수 없습니다. 대상:', target);
+            return null;
+        }
+
+        let nodesToInsert = [];
+
+        // 인자 처리: 새로운 자식 노드 배열 생성
+        if (newChildren) {
+            // 단일 값이면 배열로 만든다
+            if (!Array.isArray(newChildren)) {
+                newChildren = [newChildren];
+            }
+
+            newChildren.forEach((child) => {
+                if (child instanceof Element || child instanceof DocumentFragment) {
+                    // DOM 노드나 Fragment는 그대로 추가한다
+                    nodesToInsert.push(child);
+                } else if (typeof child === 'string') {
+                    // HTML 문자열이면 임시 컨테이너를 이용해 DOM 객체로 안전하게 변환한다
+                    nodesToInsert.push(...S2Util.createNodeFragment(child));
+                } else {
+                    // 그 외 값(숫자 등)은 text node로 전달 가능하니 그대로 추가한다
+                    nodesToInsert.push(child);
+                }
+            });
+        }
+
+        // DocumentFragment를 활용한 최종 노드 준비 (성능 최적화)
+        const fragment = document.createDocumentFragment();
+        // 삽입할 노드들을 메모리의 fragment에 먼저 추가한다
+        nodesToInsert.forEach((node) => {
+            fragment.appendChild(node);
+        });
+
+        // 기존 자식 노드를 모두 안전하게 삭제한다.
+        while (targetEl.firstChild) {
+            targetEl.removeChild(targetEl.firstChild);
+        }
+
+        // fragment의 내용을 appendChild로 한 번에 추가한다. (DocumentFragment를 사용하여 단 한 번의 DOM 조작으로 삽입한다.)
+        targetEl.appendChild(fragment);
+
+        return targetEl;
+    },
+    /**
+     * HTML 문자열을 파싱하여 DOM 노드 배열을 생성한다.
+     *
+     * @param {string} htmlString - 파싱할 HTML 문자열 (예: '<tr><td>...</td></tr>')
+     * @returns {Node[]} Node 객체의 배열
+     */
+    createNodeFragment(htmlString) {
+        // 유효성 검사 및 문자열 정리
+        if (typeof htmlString !== 'string') {
+            return [];
+        }
+        const trimmedHtml = htmlString.trim();
+        if (trimmedHtml.length === 0) {
+            return [];
+        }
+
+        // 임시 컨테이너 생성
+        const tempDiv = document.createElement('div');
+        const tagName = trimmedHtml.substring(0, 4).toLowerCase();
+
+        // tr (테이블 행) 처리: 가장 복잡하므로 먼저 처리하고 바로 반환
+        if (tagName.startsWith('<tr')) {
+            // 가장 안전하게 파싱하기 위해 <table><tbody>로 감쌈
+            tempDiv.innerHTML = `<table><tbody>${trimmedHtml}</tbody></table>`;
+
+            // <tbody>를 찾아 그 자식인 <tr> 노드들을 반환
+            const tbody = tempDiv.querySelector('tbody');
+            if (tbody) {
+                return Array.from(tbody.children);
+            }
+            return [];
+        }
+
+        // tr이 아닌 경우 (td/th, li, 기타) 래퍼 태그 설정
+        let wrapTag = 'div';
+        if (tagName.startsWith('<td') || tagName.startsWith('<th')) {
+            wrapTag = 'tr';
+        } else if (tagName.startsWith('<li')) {
+            wrapTag = 'ul';
+        }
+
+        // 래퍼 태그로 감싸서 innerHTML 설정
+        tempDiv.innerHTML = `<${wrapTag}>${trimmedHtml}</${wrapTag}>`;
+
+        // 파싱된 실제 자식 Node 객체들을 추출
+        // tempDiv.firstElementChild는 항상 래퍼 태그(div, tr, ul 등)가 됨
+        if (tempDiv.firstElementChild) {
+            // 추출 대상은 래퍼 태그의 자식들 (td/th의 경우 <tr>의 자식인 <td>/<th>)
+            return Array.from(tempDiv.firstElementChild.children);
+        }
+
+        return [];
+    },
+    /**
      * 자바스크립트의 기본 fetch API를 활용하여 다양한 요청 처리
      *
      * @typedef {object} FetchConfig

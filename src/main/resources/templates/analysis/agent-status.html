@@ -62,14 +62,14 @@ requirements, please purchase a commercial license from placelink.
                             if (!response.agentStatusList || response.agentStatusList.length === 0) {
                                 agentStatusList.innerHTML = '<tr><td colspan="10">데이터가 없습니다.</td></tr>';
                             } else {
-                                agentStatusList.innerHTML = '';
+                                let agentStatusListHTML = '';
                                 for (const agentStatus of response.agentStatusList) {
                                     let eventDateTimeStr = '';
                                     if (agentStatus.eventDateTime && Array.isArray(agentStatus.eventDateTime) && agentStatus.eventDateTime.length >= 6) {
                                         eventDateTimeStr = dayjs(new Date(agentStatus.eventDateTime[0], agentStatus.eventDateTime[1] - 1, agentStatus.eventDateTime[2], agentStatus.eventDateTime[3], agentStatus.eventDateTime[4], agentStatus.eventDateTime[5])).format('YYYY-MM-DD HH:mm:ss');
                                     }
 
-                                    agentStatusList.innerHTML += `
+                                    agentStatusListHTML += `
                                         <tr>
                                             <td>${agentStatus.clientIp}</td>
                                             <td>${agentStatus.macAddr}</td>
@@ -84,6 +84,9 @@ requirements, please purchase a commercial license from placelink.
                                         </tr>
                                     `;
                                 }
+                                console.log('agentStatusListHTML', agentStatusListHTML);
+                                console.log('agentStatusListHTML3', S2Util.createNodeFragment(agentStatusListHTML));
+                                S2Util.replaceChildren(agentStatusList, S2Util.createNodeFragment(agentStatusListHTML));
                             }
                         }
                     }

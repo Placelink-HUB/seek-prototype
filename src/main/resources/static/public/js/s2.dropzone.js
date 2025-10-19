@@ -35,6 +35,7 @@
 export class S2DropZone {
     /**
      * DropZone 생성자
+     *
      * @param {Object} options - 드롭존 설정 옵션
      * @param {Element|string} options.dropZone - 드롭존으로 사용할 DOM 요소 또는 선택자
      * @param {Function} [options.dragenter] - 드래그 엔터 이벤트 발생 시 호출될 콜백 함수
