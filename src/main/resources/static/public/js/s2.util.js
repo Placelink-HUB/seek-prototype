@@ -136,7 +136,7 @@ export const S2Util = {
         {
             /*
              * [ES Module 환경에서 안전한 DOM 삽입]
-             * !!s2!! 기존 DOM 구조를 파괴하지 않기 위해 임시 컨테이너(tempContainer)를 생성한 후 모달의 HTML을 삽입한다.
+             * !!s2!! 기존 DOM 구조를 파괴하지 않기 위해 임시 컨테이너(tempContainer)를 생성한 후 HTML을 삽입한다.
              * document.body.innerHTML += modalHTML; 와 같은 직접적인 innerHTML 조작은 대입 연산자(=)든 덧셈 대입 연산자(+=)든
              * 해당 요소(여기서는 body 전체)의 내부 DOM 구조를 문자열로 대체하여 기존에 바인딩된 모든 이벤트 리스너를 제거하므로 사용하지 않는다.
              * 대신, appendChild()를 사용하여 기존 DOM 트리를 파괴하지 않고 새로운 요소만 안전하게 추가한다.
