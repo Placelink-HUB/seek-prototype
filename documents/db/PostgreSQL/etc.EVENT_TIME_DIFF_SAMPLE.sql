@@ -1,0 +1,191 @@
+WITH BASE_EVENTS AS (
+    -- 조건에 맞는 실제 이벤트 데이터
+    SELECT
+        USER_ID,
+        EVENT_DT,
+        -- 에이전트 기능 상태
+        CASE
+            -- 모든 기능이 활성화된 경우
+            WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 'ALL_FUNCTIONAL'
+            -- 하나 이상의 기능이 활성화된 경우
+            ELSE 'PARTIAL_FUNCTIONAL'
+        END AS AGENT_FUNCTIONALITY_STATUS
+    FROM SEEK_AGENT_HEARTBEAT_HIST sahh
+    WHERE EVENT_DT >= NOW() - INTERVAL '1 month'
+        AND (
+            -- 에이전트 기능이 하나라도 활성화된 경우만 조회
+            MINISPY_SYS_YN = 'Y'
+            OR MSPY_USER_EXE_YN = 'Y'
+            OR WFP_BLOCKER_EXE_YN = 'Y'
+            OR CLICK_DOMAIN_AGENT_EXE_YN = 'Y'
+        )
+),
+ALL_FUNCTIONAL_EVENTS AS (
+    -- 1.1.1. 모든 기능이 활성화된 실제 이벤트 데이터
+    SELECT
+        USER_ID,
+        'REAL' AS EVENT_TYPE,
+        EVENT_DT,
+        -- 에이전트 기능 상태
+        AGENT_FUNCTIONALITY_STATUS
+    FROM BASE_EVENTS
+    WHERE AGENT_FUNCTIONALITY_STATUS = 'ALL_FUNCTIONAL'
+    UNION ALL
+    -- 1.1.2. BASE_EVENTS에 포함된 모든 USER_ID에 대해 '현재 시간'을 가상 이벤트로 추가
+    SELECT
+        DISTINCT USER_ID,
+        'CURRENT' AS EVENT_TYPE,
+        NOW() AS EVENT_DT,
+        -- 에이전트 기능 상태: 대상아님
+        'NOT_APPLICABLE' AS AGENT_FUNCTIONALITY_STATUS
+    FROM BASE_EVENTS
+),
+ANY_FUNCTIONAL_EVENTS AS (
+    -- 1.2.1. 하나 이상의 기능이 활성화된 실제 이벤트 데이터
+    SELECT
+        USER_ID,
+        'REAL' AS EVENT_TYPE,
+        EVENT_DT,
+        -- 에이전트 기능 상태
+        AGENT_FUNCTIONALITY_STATUS
+    FROM BASE_EVENTS
+    WHERE AGENT_FUNCTIONALITY_STATUS IN ('ALL_FUNCTIONAL', 'PARTIAL_FUNCTIONAL')
+    UNION ALL
+    -- 1.2.2. BASE_EVENTS에 포함된 모든 USER_ID에 대해 '현재 시간'을 가상 이벤트로 추가
+    SELECT
+        DISTINCT USER_ID,
+        'CURRENT' AS EVENT_TYPE,
+        NOW() AS EVENT_DT,
+        -- 에이전트 기능 상태: 대상아님
+        'NOT_APPLICABLE' AS AGENT_FUNCTIONALITY_STATUS
+    FROM BASE_EVENTS
+),
+-- 2.1. 모든 기능이 활성화된 전체 이벤트 데이터(실제+가상)에 대해 LAG를 적용합니다.
+ALL_FUNCTIONAL_EVENT_DATA_WITH_LAG AS (
+    SELECT
+        USER_ID,
+        EVENT_TYPE,
+        EVENT_DT AS CURRENT_EVENT_DT,
+        LAG(EVENT_DT) OVER (
+            PARTITION BY USER_ID
+            ORDER BY EVENT_DT
+        ) AS PREVIOUS_EVENT_DT,
+        AGENT_FUNCTIONALITY_STATUS
+    FROM ALL_FUNCTIONAL_EVENTS
+),
+-- 2.2. 하나 이상의 기능이 활성화된 전체 이벤트 데이터(실제+가상)에 대해 LAG를 적용합니다.
+ANY_FUNCTIONAL_EVENT_DATA_WITH_LAG AS (
+    SELECT
+        USER_ID,
+        EVENT_TYPE,
+        EVENT_DT AS CURRENT_EVENT_DT,
+        LAG(EVENT_DT) OVER (
+            PARTITION BY USER_ID
+            ORDER BY EVENT_DT
+        ) AS PREVIOUS_EVENT_DT,
+        AGENT_FUNCTIONALITY_STATUS
+    FROM ANY_FUNCTIONAL_EVENTS
+),
+-- 3.1. 모든 기능이 활성화된 전체 이벤트의 최종 시간 차이를 계산합니다.
+ALL_FUNCTIONAL_EVENT_INTERVALS AS (
+    SELECT
+        USER_ID,
+        EVENT_TYPE,
+        CURRENT_EVENT_DT AS EVENT_DT,
+        -- 전체 시간 차이
+        (CURRENT_EVENT_DT - PREVIOUS_EVENT_DT) AS TIME_DIFF,
+        -- 업무 시간 차이 (UDF 사용)
+        FN_CALCULATE_BUSINESS_HOURS(PREVIOUS_EVENT_DT, CURRENT_EVENT_DT) AS BUSINESS_TIME_DIFF,
+        AGENT_FUNCTIONALITY_STATUS
+    FROM ALL_FUNCTIONAL_EVENT_DATA_WITH_LAG
+    -- 첫 번째 로우(PREVIOUS_EVENT_DT = NULL)는 제외하고 싶다면 아래 주석 해제
+    -- WHERE PREVIOUS_EVENT_DT IS NOT NULL
+    ORDER BY USER_ID, CURRENT_EVENT_DT
+),
+-- 3.2. 하나 이상의 기능이 활성화된 전체 이벤트의 최종 시간 차이를 계산합니다.
+ANY_FUNCTIONAL_EVENT_INTERVALS AS (
+    SELECT
+        USER_ID,
+        EVENT_TYPE,
+        CURRENT_EVENT_DT AS EVENT_DT,
+        -- 전체 시간 차이
+        (CURRENT_EVENT_DT - PREVIOUS_EVENT_DT) AS TIME_DIFF,
+        -- 업무 시간 차이 (UDF 사용)
+        FN_CALCULATE_BUSINESS_HOURS(PREVIOUS_EVENT_DT, CURRENT_EVENT_DT) AS BUSINESS_TIME_DIFF,
+        AGENT_FUNCTIONALITY_STATUS
+    FROM ANY_FUNCTIONAL_EVENT_DATA_WITH_LAG
+    -- 첫 번째 로우(PREVIOUS_EVENT_DT = NULL)는 제외하고 싶다면 아래 주석 해제
+    -- WHERE PREVIOUS_EVENT_DT IS NOT NULL
+    ORDER BY USER_ID, CURRENT_EVENT_DT
+),
+-- 4.1. 모든 기능이 활성화된 기간에 대한 사용자별 통계 요약
+ALL_FUNCTIONAL_SUMMARY AS (
+	SELECT
+        USER_ID,
+        -- 첫 번째 이벤트 시각 (BaseEvents 기준)
+        MIN(EVENT_DT) AS ALL_FUNCTIONAL_FIRST_EVENT_DT,
+        -- 마지막 이벤트 시각 (BaseEvents 기준, NOW() 제외)
+        MAX(CASE WHEN EVENT_TYPE = 'REAL' THEN EVENT_DT ELSE NULL END) AS ALL_FUNCTIONAL_LAST_EVENT_DT,
+        -- 최대 시간 차이
+        MAX(TIME_DIFF) AS ALL_FUNCTIONAL_MAX_TIME_DIFF,
+        -- 최대 업무 시간 차이
+        MAX(BUSINESS_TIME_DIFF) AS ALL_FUNCTIONAL_MAX_BUSINESS_TIME_DIFF,
+        -- 전체 시간 차이의 총합
+        SUM(TIME_DIFF) AS ALL_FUNCTIONAL_TOTAL_TIME_DIFF,
+        -- 업무 시간 차이의 총합
+        SUM(BUSINESS_TIME_DIFF) AS ALL_FUNCTIONAL_TOTAL_BUSINESS_TIME_DIFF,
+        -- TIME_DIFF이 5분 이상인 간격의 개수 추가
+        COUNT(CASE WHEN TIME_DIFF >= INTERVAL '5 minutes' THEN 1 END) AS ALL_FUNCTIONAL_COUNT_TIME_DIFF_OVER,
+        -- BUSINESS_TIME_DIFF이 5분 이상인 간격의 개수 추가
+        COUNT(CASE WHEN BUSINESS_TIME_DIFF >= INTERVAL '5 minutes' THEN 1 END) AS ALL_FUNCTIONAL_COUNT_BUSINESS_TIME_DIFF_OVER
+	FROM ALL_FUNCTIONAL_EVENT_INTERVALS
+	GROUP BY USER_ID
+),
+-- 4.2. 하나 이상의 기능이 활성화된 기간에 대한 사용자별 통계 요약
+ANY_FUNCTIONAL_SUMMARY AS (
+	SELECT
+        USER_ID,
+        -- 첫 번째 이벤트 시각 (BaseEvents 기준)
+        MIN(EVENT_DT) AS ANY_FUNCTIONAL_FIRST_EVENT_DT,
+        -- 마지막 이벤트 시각 (BaseEvents 기준, NOW() 제외)
+        MAX(CASE WHEN EVENT_TYPE = 'REAL' THEN EVENT_DT ELSE NULL END) AS ANY_FUNCTIONAL_LAST_EVENT_DT,
+        -- 최대 시간 차이
+        MAX(TIME_DIFF) AS ANY_FUNCTIONAL_MAX_TIME_DIFF,
+        -- 최대 업무 시간 차이
+        MAX(BUSINESS_TIME_DIFF) AS ANY_FUNCTIONAL_MAX_BUSINESS_TIME_DIFF,
+        -- 전체 시간 차이의 총합
+        SUM(TIME_DIFF) AS ANY_FUNCTIONAL_TOTAL_TIME_DIFF,
+        -- 업무 시간 차이의 총합
+        SUM(BUSINESS_TIME_DIFF) AS ANY_FUNCTIONAL_TOTAL_BUSINESS_TIME_DIFF,
+        -- TIME_DIFF이 5분 이상인 간격의 개수 추가
+        COUNT(CASE WHEN TIME_DIFF >= INTERVAL '5 minutes' THEN 1 END) AS ANY_FUNCTIONAL_COUNT_TIME_DIFF_OVER,
+        -- BUSINESS_TIME_DIFF이 5분 이상인 간격의 개수 추가
+        COUNT(CASE WHEN BUSINESS_TIME_DIFF >= INTERVAL '5 minutes' THEN 1 END) AS ANY_FUNCTIONAL_COUNT_BUSINESS_TIME_DIFF_OVER
+	FROM ANY_FUNCTIONAL_EVENT_INTERVALS
+	GROUP BY USER_ID
+),
+-- 5. 최종 에이전트 결과 보고서
+FINAL_AGENT_ACTIVITY_REPORT AS (
+    SELECT
+        COALESCE(a.USER_ID, b.USER_ID) AS USER_ID,
+        -- ALL_FUNCTIONAL 결과
+        b.ALL_FUNCTIONAL_FIRST_EVENT_DT,
+        b.ALL_FUNCTIONAL_LAST_EVENT_DT,
+        b.ALL_FUNCTIONAL_MAX_TIME_DIFF,
+        b.ALL_FUNCTIONAL_TOTAL_TIME_DIFF,
+        -- ANY_FUNCTIONAL 결과
+        a.ANY_FUNCTIONAL_FIRST_EVENT_DT,
+        a.ANY_FUNCTIONAL_LAST_EVENT_DT,
+        a.ANY_FUNCTIONAL_MAX_TIME_DIFF,
+        a.ANY_FUNCTIONAL_TOTAL_TIME_DIFF,
+        -- 필요한 모든 필드 추가...
+        a.ANY_FUNCTIONAL_COUNT_TIME_DIFF_OVER,
+        b.ALL_FUNCTIONAL_COUNT_TIME_DIFF_OVER
+    FROM ANY_FUNCTIONAL_SUMMARY a
+    FULL JOIN ALL_FUNCTIONAL_SUMMARY b
+        ON a.USER_ID = b.USER_ID
+)
+SELECT *
+FROM FINAL_AGENT_ACTIVITY_REPORT
+ORDER BY USER_ID
+;
