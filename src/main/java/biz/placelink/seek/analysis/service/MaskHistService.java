@@ -58,13 +58,14 @@ public class MaskHistService {
      *
      * @param requestId       요청 ID
      * @param analysisModeCcd 분석 모드 공통코드
+     * @param clientIp        클라이언트 IP
      * @param maskModeCcd     마스크 모드 공통코드
      * @param maskCount       마스크 개수
      * @return 등록 개수
      */
     @Transactional(readOnly = false)
-    public int insertMaskHist(String requestId, String analysisModeCcd, String maskModeCcd, int maskCount) {
-        return maskHistMapper.insertMaskHist(requestId, analysisModeCcd, maskModeCcd, maskCount);
+    public int insertMaskHist(String requestId, String analysisModeCcd, String clientIp, String maskModeCcd, int maskCount) {
+        return maskHistMapper.insertMaskHist(requestId, analysisModeCcd, clientIp, maskModeCcd, maskCount);
     }
 
     /**

@@ -383,33 +383,6 @@ public class AnalysisController {
         return "analysis/system-transfer";
     }
 
-    /**
-     * 이상 패턴 탐지 현황
-     *
-     * @param model ModelMap
-     * @return 이상 패턴 탐지 현황 목록
-     */
-    @GetMapping(value = "/public/analysis/anomaly_detection")
-    public String anomalyDetectionList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
-            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe) {
-
-        String pattern = "yyyyMMdd";
-        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
-
-        SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
-        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
-        searchVO.setOrderBy("CREATE_DT DESC");
-        response.setHeader("X-Seek-Mode", seekMode);
-
-        // 이상 패턴 탐지 현황 목록 조회
-        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
-        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
-        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
-        return "analysis/anomaly_detection";
-    }
-
     public record SearchPeriod(LocalDate searchStartDate, LocalDate searchEndDate) {
         public SearchPeriod {
         }

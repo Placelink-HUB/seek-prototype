@@ -25,13 +25,10 @@
  */
 package biz.placelink.seek.dashboard.controller;
 
-import java.text.SimpleDateFormat;
-import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,9 +45,11 @@ import biz.placelink.seek.analysis.service.MaskHistService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.GlobalSharedStore;
 import biz.placelink.seek.dashboard.service.DashboardService;
+import biz.placelink.seek.sample.vo.SchArticleVO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import kr.s2.ext.util.S2Util;
+import kr.s2.ext.util.S2DateUtil;
 
 @Controller
 public class DashboardController {
@@ -81,8 +81,10 @@ public class DashboardController {
      */
     @GetMapping(value = "/public/dashboard/{siteId}")
     protected String detailDashboard(@PathVariable String siteId, @RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "console", defaultValue = "") String console, @RequestParam(name = "consoleType", defaultValue = "") String consoleType, HttpSession session, Model model) {
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), "yyyyMMdd", LocalDate.now());
+
         model.addAttribute("pl_webpush_s2_key_public", publicKey);
-        model.addAttribute("schDe", this.getSchDe(schDe));
+        model.addAttribute("schDe", vSchDe);
 
         /*
          * Push 메시지 console.log 작성 방법
@@ -121,7 +123,7 @@ public class DashboardController {
     public ResponseEntity<Map<String, Object>> analysisStatistics(@RequestParam(name = "schDe", defaultValue = "") String schDe, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
 
-        String vSchDe = this.getSchDe(schDe);
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), "yyyyMMdd", LocalDate.now());
 
         response.put("analysisData", dashboardService.selectAnalysisStatistics(vSchDe));
         response.put("detectionData", dashboardService.selectDetectionStatistics(vSchDe));
@@ -138,34 +140,27 @@ public class DashboardController {
     }
 
     /**
-     * 날짜를 확인하여 정상일때만 그대로 리턴하고 미래의 날짜거나 형식이 잘못되었다면 오늘을 리턴한다.
+     * 이상 패턴 탐지 현황
      *
-     * @param pSchDe
-     * @return
+     * @param model ModelMap
+     * @return 이상 패턴 탐지 현황 목록
      */
-    private String getSchDe(String pSchDe) {
-        String vSchDe = "";
+    @GetMapping(value = "/public/dashboard/anomaly_detection")
+    public String anomalyDetectionList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, @RequestParam(name = "schDe", defaultValue = "") String schDe, ModelMap model) {
+        String pattern = "yyyyMMdd";
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), pattern, LocalDate.now());
 
-        if (S2Util.isNotEmpty(pSchDe)) {
-            vSchDe = pSchDe.replaceAll("-", "");
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(vSchDe, pattern);
+        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setOrderBy("CREATE_DT DESC");
+        response.setHeader("X-Seek-Mode", seekMode);
 
-            try {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-                LocalDate schDate = LocalDate.parse(vSchDe, formatter);
-                if (schDate.isAfter(LocalDate.now())) {
-                    // 조회일이 미래(오늘 이후)라면 초기화 하여 오늘로 설정되도록 한다.
-                    vSchDe = "";
-                }
-            } catch (DateTimeException e) {
-                vSchDe = "";
-            }
-        }
-
-        if (S2Util.isEmpty(vSchDe)) {
-            vSchDe = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        }
-
-        return vSchDe;
+        // 이상 패턴 탐지 현황 목록 조회
+        model.addAttribute("userIntegratedActivityInformation", dashboardService.selectUserIntegratedActivityInformation(vSchDe));
+        model.addAttribute("schDe", vSchDe);
+        return "dashboard/anomaly_detection";
     }
 
 }

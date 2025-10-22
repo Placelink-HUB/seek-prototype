@@ -4,9 +4,9 @@
   "settings": {
     "width": 6000,
     "height": 6000,
-    "scrollTop": -2125,
-    "scrollLeft": -1033,
-    "zoomLevel": 0.97,
+    "scrollTop": -585.8294,
+    "scrollLeft": -533.8353,
+    "zoomLevel": 0.76,
     "show": 511,
     "database": 16,
     "databaseName": "",
@@ -608,6 +608,7 @@
         "columnIds": [
           "8qdjDXJR51l571tpwUz6g",
           "J6teJF8fE7l7gTnUbPpFp",
+          "iyMzzALYoGqcFdYb3YsN1",
           "0gjjIff2Mo7Gkqn7i8kwk",
           "-OTLCFLHexN8mxpjO8JXA",
           "ooYvgkGr71-eXtfKm9uVE"
@@ -615,6 +616,7 @@
         "seqColumnIds": [
           "8qdjDXJR51l571tpwUz6g",
           "J6teJF8fE7l7gTnUbPpFp",
+          "iyMzzALYoGqcFdYb3YsN1",
           "0gjjIff2Mo7Gkqn7i8kwk",
           "-OTLCFLHexN8mxpjO8JXA",
           "ooYvgkGr71-eXtfKm9uVE",
@@ -623,15 +625,15 @@
           "miHh5R6TIAQk5uj8NxHRJ"
         ],
         "ui": {
-          "x": 1583.9938,
-          "y": 919.5124,
+          "x": 1582.678,
+          "y": 912.9334,
           "zIndex": 3106,
           "widthName": 94,
           "widthComment": 67,
           "color": ""
         },
         "meta": {
-          "updateAt": 1747371803562,
+          "updateAt": 1761109394614,
           "createAt": 1746593007798
         }
       },
@@ -5378,6 +5380,26 @@
         "meta": {
           "updateAt": 1760695031811,
           "createAt": 1760695005407
+        }
+      },
+      "iyMzzALYoGqcFdYb3YsN1": {
+        "id": "iyMzzALYoGqcFdYb3YsN1",
+        "tableId": "hSlPLMDbQzka6JTyc9D6N",
+        "name": "USER_ID",
+        "comment": "사용자_ID",
+        "dataType": "VARCHAR(36)",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 75,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1761109450190,
+          "createAt": 1761109373714
         }
       }
     },

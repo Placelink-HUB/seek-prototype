@@ -121,4 +121,12 @@ public interface DashboardMapper {
      */
     List<AnalysisStatisticsVO> selectFileOutboundHistChannelInformation(@Param("schDe") String schDe, @Param("schOutboundStatusCcd") String schOutboundStatusCcd);
 
+    /**
+     * 사용자 통합 활동 정보를 조회한다.
+     *
+     * @param schDe 조회 일자
+     * @return 사용자 통합 활동 정보를
+     */
+    List<AnalysisStatisticsVO> selectUserIntegratedActivityInformation(@Param("schDe") String schDe);
+
 }

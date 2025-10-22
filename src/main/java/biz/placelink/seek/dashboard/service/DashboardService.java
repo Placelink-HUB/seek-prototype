@@ -146,4 +146,14 @@ public class DashboardService {
         return dashboardMapper.selectFileOutboundHistChannelInformation(schDe, schOutboundStatusCcd);
     }
 
+    /**
+     * 사용자 통합 활동 정보를 조회한다.
+     *
+     * @param schDe 조회 일자
+     * @return 사용자 통합 활동 정보를
+     */
+    public List<AnalysisStatisticsVO> selectUserIntegratedActivityInformation(String schDe) {
+        return dashboardMapper.selectUserIntegratedActivityInformation(schDe);
+    }
+
 }

@@ -207,7 +207,8 @@ public class WildpathController {
             }
 
             if (!this.isExcludedPath(request, "/postprocess/", true)) {
-                payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_POST, payload, seekMode, S2ServletUtil.getClientIp(request));
+                String clientIp = S2ServletUtil.getClientIp(request);
+                payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_POST, payload, seekMode, clientIp);
             }
             return ResponseEntity.ok()
                     .contentType(new MediaType(MediaType.valueOf(StringUtils.defaultIfEmpty(request.getHeader("X-Origin-Content-Type"), request.getContentType())), StandardCharsets.UTF_8))

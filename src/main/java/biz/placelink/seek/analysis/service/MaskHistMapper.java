@@ -51,11 +51,12 @@ public interface MaskHistMapper {
      *
      * @param requestId       요청 ID
      * @param analysisModeCcd 분석 모드 공통코드
+     * @param clientIp        클라이언트 IP
      * @param maskModeCcd     마스크 모드 공통코드
      * @param maskCount       마스크 개수
      * @return 등록 개수
      */
-    int insertMaskHist(@Param("requestId") String requestId, @Param("analysisModeCcd") String analysisModeCcd, @Param("maskModeCcd") String maskModeCcd, @Param("maskCount") int maskCount);
+    int insertMaskHist(@Param("requestId") String requestId, @Param("analysisModeCcd") String analysisModeCcd, @Param("clientIp") String clientIp, @Param("maskModeCcd") String maskModeCcd, @Param("maskCount") int maskCount);
 
     /**
      * 마스크 이력 정보를 조회한다.

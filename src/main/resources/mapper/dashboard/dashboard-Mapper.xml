@@ -230,4 +230,256 @@ requirements, please purchase a commercial license from placelink.
             cc1.COM_CD_NM
     </select>
 
+    <select id="selectUserIntegratedActivityInformation" resultType="analysisStatisticsVO">
+        /** selectUserIntegratedActivityInformation : 사용자 통합 활동 정보를 조회한다. */
+        /* 1.1. 조건에 맞는 에이전트 이력 */
+        WITH BASE_AGENT_HIST AS (
+            SELECT
+                USER_ID,
+                EVENT_DT,
+                /* 에이전트 기능 상태 */
+                CASE
+                    /* 모든 기능이 활성화된 경우 */
+                    WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 'ALL_FUNCTIONAL'
+                    /* 하나 이상의 기능이 활성화된 경우 */
+                    ELSE 'PARTIAL_FUNCTIONAL'
+                END AS AGENT_FUNCTIONALITY_STATUS
+            FROM SEEK_AGENT_HEARTBEAT_HIST sahh
+            WHERE (EVENT_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > EVENT_DT)
+                AND (
+                    /* 에이전트 기능이 하나라도 활성화된 경우만 조회 */
+                    MINISPY_SYS_YN = 'Y'
+                    OR MSPY_USER_EXE_YN = 'Y'
+                    OR WFP_BLOCKER_EXE_YN = 'Y'
+                    OR CLICK_DOMAIN_AGENT_EXE_YN = 'Y'
+                )
+        ),
+        /* 1.2. 모든 기능이 활성화된 에이전트 이력 */
+        ALL_FUNCTIONAL_AGENT_HIST AS (
+            SELECT
+                USER_ID,
+                'REAL' AS EVENT_TYPE,
+                EVENT_DT,
+                /* 에이전트 기능 상태 */
+                AGENT_FUNCTIONALITY_STATUS
+            FROM BASE_AGENT_HIST
+            WHERE AGENT_FUNCTIONALITY_STATUS = 'ALL_FUNCTIONAL'
+            UNION ALL
+            /* BASE_EVENTS에 포함된 모든 USER_ID에 대해 '현재 시간'을 가상 이벤트로 추가 */
+            SELECT
+                DISTINCT USER_ID,
+                'CURRENT' AS EVENT_TYPE,
+                NOW() AS EVENT_DT,
+                /* 에이전트 기능 상태: 대상아님 */
+                'NOT_APPLICABLE' AS AGENT_FUNCTIONALITY_STATUS
+            FROM BASE_AGENT_HIST
+        ),
+        /* 1.3. 하나 이상의 기능이 활성화된 에이전트 이력 */
+        ANY_FUNCTIONAL_AGENT_HIST AS (
+            SELECT
+                USER_ID,
+                'REAL' AS EVENT_TYPE,
+                EVENT_DT,
+                /* 에이전트 기능 상태 */
+                AGENT_FUNCTIONALITY_STATUS
+            FROM BASE_AGENT_HIST
+            WHERE AGENT_FUNCTIONALITY_STATUS IN ('ALL_FUNCTIONAL', 'PARTIAL_FUNCTIONAL')
+            UNION ALL
+            /* BASE_EVENTS에 포함된 모든 USER_ID에 대해 '현재 시간'을 가상 이벤트로 추가 */
+            SELECT
+                DISTINCT USER_ID,
+                'CURRENT' AS EVENT_TYPE,
+                NOW() AS EVENT_DT,
+                /* 에이전트 기능 상태: 대상아님 */
+                'NOT_APPLICABLE' AS AGENT_FUNCTIONALITY_STATUS
+            FROM BASE_AGENT_HIST
+        ),
+        /* 1.4.1. 모든 기능이 활성화된 에이전트 이력(실제+가상)에 대해 LAG를 적용합니다. */
+        ALL_FUNCTIONAL_AGENT_HIST_WITH_LAG AS (
+            SELECT
+                USER_ID,
+                EVENT_TYPE,
+                EVENT_DT AS CURRENT_EVENT_DT,
+                LAG(EVENT_DT) OVER (
+                    PARTITION BY USER_ID
+                    ORDER BY EVENT_DT
+                ) AS PREVIOUS_EVENT_DT,
+                AGENT_FUNCTIONALITY_STATUS
+            FROM ALL_FUNCTIONAL_AGENT_HIST
+        ),
+        /* 1.4.2. 하나 이상의 기능이 활성화된 에이전트 이력(실제+가상)에 대해 LAG를 적용합니다. */
+        ANY_FUNCTIONAL_AGENT_HIST_WITH_LAG AS (
+            SELECT
+                USER_ID,
+                EVENT_TYPE,
+                EVENT_DT AS CURRENT_EVENT_DT,
+                LAG(EVENT_DT) OVER (
+                    PARTITION BY USER_ID
+                    ORDER BY EVENT_DT
+                ) AS PREVIOUS_EVENT_DT,
+                AGENT_FUNCTIONALITY_STATUS
+            FROM ANY_FUNCTIONAL_AGENT_HIST
+        ),
+        /* 1.5.1. 모든 기능이 활성화된 에이전트 이력의 최종 시간 차이를 계산합니다. */
+        ALL_FUNCTIONAL_AGENT_HIST_INTERVALS AS (
+            SELECT
+                USER_ID,
+                EVENT_TYPE,
+                CURRENT_EVENT_DT AS EVENT_DT,
+                /* 전체 시간 차이 */
+                (CURRENT_EVENT_DT - PREVIOUS_EVENT_DT) AS TIME_DIFF,
+                /* 업무 시간 차이 (UDF 사용) */
+                FN_CALCULATE_BUSINESS_HOURS(PREVIOUS_EVENT_DT, CURRENT_EVENT_DT) AS BUSINESS_TIME_DIFF,
+                AGENT_FUNCTIONALITY_STATUS
+            FROM ALL_FUNCTIONAL_AGENT_HIST_WITH_LAG
+            ORDER BY USER_ID, CURRENT_EVENT_DT
+        ),
+        /* 1.5.2. 하나 이상의 기능이 활성화된 에이전트 이력의 최종 시간 차이를 계산합니다. */
+        ANY_FUNCTIONAL_AGENT_HIST_INTERVALS AS (
+            SELECT
+                USER_ID,
+                EVENT_TYPE,
+                CURRENT_EVENT_DT AS EVENT_DT,
+                /* 전체 시간 차이 */
+                (CURRENT_EVENT_DT - PREVIOUS_EVENT_DT) AS TIME_DIFF,
+                /* 업무 시간 차이 (UDF 사용) */
+                FN_CALCULATE_BUSINESS_HOURS(PREVIOUS_EVENT_DT, CURRENT_EVENT_DT) AS BUSINESS_TIME_DIFF,
+                AGENT_FUNCTIONALITY_STATUS
+            FROM ANY_FUNCTIONAL_AGENT_HIST_WITH_LAG
+            ORDER BY USER_ID, CURRENT_EVENT_DT
+        ),
+        /* 1.6. 모든 기능이 활성화된 에이전트 이력에 대한 사용자별 통계 요약 */
+        ALL_FUNCTIONAL_AGENT_HIST_SUMMARY AS (
+            SELECT
+                USER_ID,
+                /* 첫 번째 이벤트 시각 (BaseEvents 기준) */
+                MIN(EVENT_DT) AS ALL_FUNCTIONAL_FIRST_EVENT_DT,
+                /* 마지막 이벤트 시각 (BaseEvents 기준, NOW() 제외) */
+                MAX(CASE WHEN EVENT_TYPE = 'REAL' THEN EVENT_DT ELSE NULL END) AS ALL_FUNCTIONAL_LAST_EVENT_DT,
+                /* 최대 시간 차이 */
+                MAX(TIME_DIFF) AS ALL_FUNCTIONAL_MAX_TIME_DIFF,
+                /* 최대 업무 시간 차이 */
+                MAX(BUSINESS_TIME_DIFF) AS ALL_FUNCTIONAL_MAX_BUSINESS_TIME_DIFF,
+                /* 전체 시간 차이의 총합 */
+                SUM(TIME_DIFF) AS ALL_FUNCTIONAL_TOTAL_TIME_DIFF,
+                /* 업무 시간 차이의 총합 */
+                SUM(BUSINESS_TIME_DIFF) AS ALL_FUNCTIONAL_TOTAL_BUSINESS_TIME_DIFF,
+                /* TIME_DIFF이 5분 이상인 간격의 개수 추가 */
+                COUNT(CASE WHEN TIME_DIFF >= INTERVAL '5 minutes' THEN 1 END) AS ALL_FUNCTIONAL_COUNT_TIME_DIFF_OVER,
+                /* BUSINESS_TIME_DIFF이 5분 이상인 간격의 개수 추가 */
+                COUNT(CASE WHEN BUSINESS_TIME_DIFF >= INTERVAL '5 minutes' THEN 1 END) AS ALL_FUNCTIONAL_COUNT_BUSINESS_TIME_DIFF_OVER
+            FROM ALL_FUNCTIONAL_AGENT_HIST_INTERVALS
+            GROUP BY USER_ID
+        ),
+        /* 1.7. 하나 이상의 기능이 활성화된 에이전트 이력에 대한 사용자별 통계 요약 */
+        ANY_FUNCTIONAL_AGENT_HIST_SUMMARY AS (
+            SELECT
+                USER_ID,
+                /* 첫 번째 이벤트 시각 (BaseEvents 기준) */
+                MIN(EVENT_DT) AS ANY_FUNCTIONAL_FIRST_EVENT_DT,
+                /* 마지막 이벤트 시각 (BaseEvents 기준, NOW() 제외) */
+                MAX(CASE WHEN EVENT_TYPE = 'REAL' THEN EVENT_DT ELSE NULL END) AS ANY_FUNCTIONAL_LAST_EVENT_DT,
+                /* 최대 시간 차이 */
+                MAX(TIME_DIFF) AS ANY_FUNCTIONAL_MAX_TIME_DIFF,
+                /* 최대 업무 시간 차이 */
+                MAX(BUSINESS_TIME_DIFF) AS ANY_FUNCTIONAL_MAX_BUSINESS_TIME_DIFF,
+                /* 전체 시간 차이의 총합 */
+                SUM(TIME_DIFF) AS ANY_FUNCTIONAL_TOTAL_TIME_DIFF,
+                /* 업무 시간 차이의 총합 */
+                SUM(BUSINESS_TIME_DIFF) AS ANY_FUNCTIONAL_TOTAL_BUSINESS_TIME_DIFF,
+                /* TIME_DIFF이 5분 이상인 간격의 개수 추가 */
+                COUNT(CASE WHEN TIME_DIFF >= INTERVAL '5 minutes' THEN 1 END) AS ANY_FUNCTIONAL_COUNT_TIME_DIFF_OVER,
+                /* BUSINESS_TIME_DIFF이 5분 이상인 간격의 개수 추가 */
+                COUNT(CASE WHEN BUSINESS_TIME_DIFF >= INTERVAL '5 minutes' THEN 1 END) AS ANY_FUNCTIONAL_COUNT_BUSINESS_TIME_DIFF_OVER
+            FROM ANY_FUNCTIONAL_AGENT_HIST_INTERVALS
+            GROUP BY USER_ID
+        ),
+        /* 1.8. 최종 에이전트 결과 보고서 */
+        FINAL_AGENT_ACTIVITY_REPORT AS (
+            SELECT
+                COALESCE(a.USER_ID, b.USER_ID) AS USER_ID,
+                /* ALL_FUNCTIONAL 결과 */
+                b.ALL_FUNCTIONAL_FIRST_EVENT_DT,
+                b.ALL_FUNCTIONAL_LAST_EVENT_DT,
+                b.ALL_FUNCTIONAL_MAX_TIME_DIFF,
+                b.ALL_FUNCTIONAL_TOTAL_TIME_DIFF,
+                /* ANY_FUNCTIONAL 결과 */
+                a.ANY_FUNCTIONAL_FIRST_EVENT_DT,
+                a.ANY_FUNCTIONAL_LAST_EVENT_DT,
+                a.ANY_FUNCTIONAL_MAX_TIME_DIFF,
+                a.ANY_FUNCTIONAL_TOTAL_TIME_DIFF,
+                /* 필요한 모든 필드 추가... */
+                a.ANY_FUNCTIONAL_COUNT_TIME_DIFF_OVER,
+                b.ALL_FUNCTIONAL_COUNT_TIME_DIFF_OVER
+            FROM ANY_FUNCTIONAL_AGENT_HIST_SUMMARY a
+            FULL JOIN ALL_FUNCTIONAL_AGENT_HIST_SUMMARY b
+                ON COALESCE(a.USER_ID, 'UNKNOWN') = COALESCE(b.USER_ID, 'UNKNOWN')
+        ),
+        /* 2. 언마스킹 결과 보고서 */
+        UNMASK_REPORT AS (
+            SELECT
+                USER_ID,
+                COUNT(1) AS UNMASK_COUNT,
+                SUM(CASE WHEN FN_IS_BUSINESS_HOUR(CREATE_DT::TIMESTAMPTZ) THEN 1 ELSE 0 END) AS BUSINESS_UNMASK_COUNT,
+                SUM(MASK_COUNT) AS UNMASK_ITEM_COUNT
+            FROM SEEK_MASK_HIST
+            WHERE MASK_MODE_CCD = 'unmask'
+                AND (CREATE_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > CREATE_DT)
+            GROUP BY USER_ID
+        ),
+        /* 3.1. 조건에 맞는 파일 외부전송 이력 */
+        BASE_FILE_OUTBOUND_HIST AS (
+            SELECT *
+            FROM SEEK_FILE_OUTBOUND_HIST
+            WHERE (EVENT_DT >= #{schDe}::DATE AND (#{schDe}::DATE + INTERVAL '1 DAY') > EVENT_DT)
+        ),
+        /* 3.2. 파일 외부전송 이력 요약 */
+        FILE_OUTBOUND_SUMMARY AS (
+            SELECT
+                USER_ID,
+                COUNT(1) AS TOTAL_COUNT,
+                SUM(CASE WHEN OUTBOUND_STATUS_CCD = 'SENT' THEN 1 ELSE 0 END) AS SENT_COUNT,
+                SUM(CASE WHEN OUTBOUND_STATUS_CCD = 'SENT' AND FN_IS_BUSINESS_HOUR(CREATE_DT::TIMESTAMPTZ) THEN 1 ELSE 0 END) AS SENT_BUSINESS_COUNT,
+                SUM(CASE WHEN OUTBOUND_STATUS_CCD = 'BLOCKED' THEN 1 ELSE 0 END) AS BLOCKED_COUNT,
+                SUM(CASE WHEN OUTBOUND_STATUS_CCD = 'BLOCKED' AND FN_IS_BUSINESS_HOUR(CREATE_DT::TIMESTAMPTZ) THEN 1 ELSE 0 END) AS BLOCKED_BUSINESS_COUNT,
+                SUM(TOTAL_FILE_COUNT) AS TOTAL_FILE_COUNT,
+                SUM(TOTAL_FILE_SIZE) AS TOTAL_FILE_SIZE
+            FROM BASE_FILE_OUTBOUND_HIST
+            GROUP BY USER_ID
+        ),
+        /* 3.3. 파일 외부전송 보고서 */
+        FILE_OUTBOUND_REPORT AS (
+            SELECT
+                fos.*,
+                fj.MAX_DUPLICATE_FILE_COUNT
+            FROM FILE_OUTBOUND_SUMMARY fos
+                FULL JOIN (
+                    SELECT
+                        USER_ID,
+                        MAX(DUPLICATE_FILE_COUNT) AS MAX_DUPLICATE_FILE_COUNT
+                    FROM (
+                        SELECT
+                            USER_ID,
+                            TOTAL_FILE_COUNT,
+                            TOTAL_FILE_SIZE,
+                            COUNT(1) AS DUPLICATE_FILE_COUNT
+                        FROM BASE_FILE_OUTBOUND_HIST
+                        GROUP BY
+                            USER_ID,
+                            TOTAL_FILE_COUNT,
+                            TOTAL_FILE_SIZE
+                    )
+                    GROUP BY USER_ID
+                ) fj
+                    ON COALESCE(fos.USER_ID, 'UNKNOWN') = COALESCE(fj.USER_ID, 'UNKNOWN')
+        )
+        SELECT *
+        FROM FINAL_AGENT_ACTIVITY_REPORT far
+            FULL JOIN UNMASK_REPORT ur
+                ON COALESCE(far.USER_ID, 'UNKNOWN') = COALESCE(ur.USER_ID, 'UNKNOWN')
+            FULL JOIN FILE_OUTBOUND_REPORT fobr
+                ON COALESCE(far.USER_ID, 'UNKNOWN') = COALESCE(fobr.USER_ID, 'UNKNOWN')
+        ORDER BY far.USER_ID
+    </select>
+
 </mapper>

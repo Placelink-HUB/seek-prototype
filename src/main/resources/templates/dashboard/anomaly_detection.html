@@ -31,7 +31,7 @@ requirements, please purchase a commercial license from placelink.
             window.initPage = () => {};
 
             window.goPage = (pageNo) => {
-                location.href = `/public/analysis/anomaly_detection?pageNo=${pageNo}`;
+                location.href = `/public/dashboard/anomaly_detection?pageNo=${pageNo}`;
             };
         </script>
     </th:block>
@@ -46,9 +46,12 @@ requirements, please purchase a commercial license from placelink.
             <div class="wrap-contents">
                 <div class="top">
                     <div class="c-flex-sty01 targetDate-wrap">
-                        <span th:text="${searchStartDeStr}"></span>
-                        <span>&nbsp;~&nbsp;</span>
-                        <span th:text="${searchEndDeStr}"></span>
+                        <div class="arrow-left"></div>
+                        <div class="data-date">
+                            <div class="date targetDate">0000년 00월 00일</div>
+                            <div class="icon-today">TODAY</div>
+                        </div>
+                        <div class="arrow-right"></div>
                     </div>
                 </div>
                 <div class="contents">

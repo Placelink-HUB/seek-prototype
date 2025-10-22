@@ -2414,12 +2414,16 @@ export const S2Util = {
      * S2Util.receiveServiceWorkerEvents();
      */
     receiveServiceWorkerEvents: function () {
-        navigator.serviceWorker.addEventListener('message', (event) => {
-            if (event.data.type === 'notification') {
-                console.debug('ReceiveServiceWorker Notification', event.data);
-                S2Util.showToast(event.data.message);
-            }
-        });
+        if (navigator.serviceWorker && typeof navigator.serviceWorker.addEventListener === 'function') {
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                if (event.data.type === 'notification') {
+                    console.debug('ReceiveServiceWorker Notification', event.data);
+                    S2Util.showToast(event.data.message);
+                }
+            });
+        } else {
+            console.error('Service Worker 이벤트를 등록할 수 없습니다.\nnavigator.serviceWorker 또는 addEventListener가 지원되지 않습니다.');
+        }
     }
 };
 

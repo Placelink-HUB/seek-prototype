@@ -335,7 +335,7 @@ public class WildpathAnalysisService {
 
         if (!Constants.CD_MASK_MODE_RAW.equals(maskModeCcd) && maskCount > 0) {
             // 마스킹 이력 등록
-            maskHistService.insertMaskHist(requestId, analysisModeCcd, maskModeCcd, maskCount);
+            maskHistService.insertMaskHist(requestId, analysisModeCcd, clientIp, maskModeCcd, maskCount);
 
             Map<String, Object> pushMap = new HashMap<>();
             pushMap.put("pushTypeCcd", Constants.CD_PUSH_TYPE_MASKING);
