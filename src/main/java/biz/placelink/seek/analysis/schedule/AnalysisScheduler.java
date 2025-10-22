@@ -106,7 +106,7 @@ public class AnalysisScheduler {
             }
         }
 
-        // 처리 중인 분석 목록 등록
+        // 처리 중인 분석 목록 등록 (최대 analysisScheduleRequestMaxcnt 만큼 등록한다.)
         analysisRequestStatus.add(analysisService.selectProcessingAnalysisList(60));
     }
 

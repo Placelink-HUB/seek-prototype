@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import biz.placelink.seek.analysis.vo.AnalysisDetailVO;
@@ -53,11 +54,15 @@ public class AnalysisRequestStatus {
         this.processingAnalysisMap = new ConcurrentHashMap<>();
     }
 
+    @Value("${analysis.schedule.request.maxcnt}")
+    private Integer analysisScheduleRequestMaxcnt;
+
     public void add(List<AnalysisDetailVO> analysisList) {
         if (analysisList != null) {
             for (AnalysisDetailVO analysis : analysisList) {
                 String analysisId = analysis.getAnalysisId();
-                if (!processingAnalysisMap.containsKey(analysisId)) {
+                // !!S2!! 최대 개수는 AI 서버에 따라 결정하자
+                if (!processingAnalysisMap.containsKey(analysisId) && processingAnalysisMap.size() <= analysisScheduleRequestMaxcnt) {
                     processingAnalysisMap.put(analysisId, analysis);
                 }
             }
