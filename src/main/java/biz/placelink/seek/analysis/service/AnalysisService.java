@@ -84,10 +84,11 @@ public class AnalysisService {
     /**
      * 실행중인 분석 정보 목록을 조회한다.
      *
+     * @param searchPeriodMinutes 최근 몇 분 이내의 데이터를 조회할 기간(분)
      * @return 분석 정보 목록
      */
-    public List<AnalysisDetailVO> selectProcessingAnalysisList() {
-        return analysisMapper.selectProcessingAnalysisList();
+    public List<AnalysisDetailVO> selectProcessingAnalysisList(int searchPeriodMinutes) {
+        return analysisMapper.selectProcessingAnalysisList(searchPeriodMinutes);
     }
 
     /**

@@ -31,6 +31,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
+import biz.placelink.seek.dashboard.vo.UserIntegratedActivityVO;
 
 /**
  * <pre>
@@ -127,6 +128,6 @@ public interface DashboardMapper {
      * @param schDe 조회 일자
      * @return 사용자 통합 활동 정보를
      */
-    List<AnalysisStatisticsVO> selectUserIntegratedActivityInformation(@Param("schDe") String schDe);
+    List<UserIntegratedActivityVO> selectUserIntegratedActivityInformation(@Param("schDe") String schDe);
 
 }

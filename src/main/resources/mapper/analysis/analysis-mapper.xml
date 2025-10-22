@@ -65,7 +65,7 @@ requirements, please purchase a commercial license from placelink.
                 AND COALESCE(sa.ANALYSIS_MODE_CCD, '') = 'DETECTION_FILE'
     </sql>
 
-    <select id="selectAnalysisHistListToExecuted" parameterType="integer" resultType="analysisDetailVO">
+    <select id="selectAnalysisHistListToExecuted" resultType="analysisDetailVO">
 		/** selectAnalysisHistListToExecuted : 실행하려는 분석 목록을 조회한다. */
 		WITH PROCESSING AS (
 			/* 현재 진행중인 분석 요청을 포함하여 분석 서버에 요청할 수 있는 최대(스레드) 수 만큼 조회 */
@@ -86,10 +86,11 @@ requirements, please purchase a commercial license from placelink.
 		)
     </select>
 
-    <select id="selectProcessingAnalysisList" parameterType="integer" resultType="analysisDetailVO">
+    <select id="selectProcessingAnalysisList" resultType="analysisDetailVO">
 		/** selectProcessingAnalysisList : 실행중인 분석 정보 목록을 조회한다. */
 		<include refid="sqlAnalysis"/>
 		WHERE sa.ANALYSIS_STATUS_CCD = 'PROCESSING'
+            AND sa.ANALYSIS_START_DT >= NOW() - #{searchPeriodMinutes} * INTERVAL  '1 month'
 		ORDER BY sa.CREATE_DT
     </select>
 

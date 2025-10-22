@@ -357,7 +357,7 @@ public class WildpathController {
             }
 
             /** 로그인한 사용자 ID (발신자) */
-            String userId = Optional.ofNullable(params.getFirst("user_id")).map(s -> s.trim()).orElse("");
+            String userId = Optional.ofNullable(params.getFirst("user_id")).map(s -> s.trim()).orElse(null);
             /** 전송 요청한 클라이언트 IP */
             String clientIp = params.getFirst("client_ip");
 

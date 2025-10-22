@@ -158,7 +158,7 @@ public class DashboardController {
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 이상 패턴 탐지 현황 목록 조회
-        model.addAttribute("userIntegratedActivityInformation", dashboardService.selectUserIntegratedActivityInformation(vSchDe));
+        model.addAttribute("userIntegratedActivityList", dashboardService.selectUserIntegratedActivityInformation(vSchDe));
         model.addAttribute("schDe", vSchDe);
         return "dashboard/anomaly_detection";
     }

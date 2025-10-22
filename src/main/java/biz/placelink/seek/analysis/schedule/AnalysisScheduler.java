@@ -107,7 +107,7 @@ public class AnalysisScheduler {
         }
 
         // 처리 중인 분석 목록 등록
-        analysisRequestStatus.add(analysisService.selectProcessingAnalysisList());
+        analysisRequestStatus.add(analysisService.selectProcessingAnalysisList(60));
     }
 
     @Scheduled(fixedRate = 2000)

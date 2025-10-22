@@ -58,9 +58,10 @@ public interface AnalysisMapper {
     /**
      * 실행중인 분석 정보 목록을 조회한다.
      *
+     * @param searchPeriodMinutes 최근 몇 분 이내의 데이터를 조회할 기간(분)
      * @return 분석 정보 목록
      */
-    List<AnalysisDetailVO> selectProcessingAnalysisList();
+    List<AnalysisDetailVO> selectProcessingAnalysisList(@Param("searchPeriodMinutes") int searchPeriodMinutes);
 
     /**
      * 분석 정보를 등록한다.

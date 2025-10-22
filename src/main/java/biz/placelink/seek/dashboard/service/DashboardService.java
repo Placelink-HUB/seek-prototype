@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
+import biz.placelink.seek.dashboard.vo.UserIntegratedActivityVO;
 
 /**
  * <pre>
@@ -152,7 +153,7 @@ public class DashboardService {
      * @param schDe 조회 일자
      * @return 사용자 통합 활동 정보를
      */
-    public List<AnalysisStatisticsVO> selectUserIntegratedActivityInformation(String schDe) {
+    public List<UserIntegratedActivityVO> selectUserIntegratedActivityInformation(String schDe) {
         return dashboardMapper.selectUserIntegratedActivityInformation(schDe);
     }
 
