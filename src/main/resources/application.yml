@@ -45,7 +45,7 @@ spring:
     suffix: .html
     mode: HTML
     encoding: UTF-8
-    cache: false # Thymeleaf 템플릿 엔진의 캐싱 기능: 개발 중에는 false, 운영 중에는 true
+    cache: true # Thymeleaf 템플릿 엔진의 캐싱 기능: 개발 중에는 false, 운영 중에는 true
   servlet:
     multipart:
       max-file-size: 20MB # 개별 파일의 최대 크기

@@ -28,6 +28,7 @@ package biz.placelink.seek.dashboard.vo;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.vo.DefaultVO;
 
 public class UserIntegratedActivityVO extends DefaultVO {
@@ -40,13 +41,13 @@ public class UserIntegratedActivityVO extends DefaultVO {
     /** Agent: 모든 기능 활성화 상태에서의 최종 하트비트 시각 */
     private LocalDateTime allFunctionalLastEventDt;
     /** Agent: 모든 기능 활성화 상태에서 측정된 최대 하트비트 단절 기간 (총 시간) */
-    private Duration allFunctionalMaxDisconnectDuration;
+    private Double allFunctionalMaxDisconnectDuration;
     /** Agent: 모든 기능 활성화 상태에서 측정된 최대 하트비트 단절 기간 (업무 시간 기준) */
-    private Duration allFunctionalMaxBusinessDisconnectDuration;
+    private Double allFunctionalMaxBusinessDisconnectDuration;
     /** Agent: 모든 기능 활성화 상태에서 발생한 하트비트 단절 기간의 총합 (총 시간) */
-    private Duration allFunctionalTotalDisconnectDuration;
+    private Double allFunctionalTotalDisconnectDuration;
     /** Agent: 모든 기능 활성화 상태에서 발생한 하트비트 단절 기간의 총합 (업무 시간 기준) */
-    private Duration allFunctionalTotalBusinessDisconnectDuration;
+    private Double allFunctionalTotalBusinessDisconnectDuration;
     /** Agent: 모든 기능 활성화 상태에서 하트비트 단절이 특정 시간(5분)을 초과한 총 횟수 (총 시간) */
     private Long allFunctionalCountDisconnectDurationOver;
     /** Agent: 모든 기능 활성화 상태에서 하트비트 단절이 특정 시간(5분)을 초과한 총 횟수 (업무 시간 기준) */
@@ -57,13 +58,13 @@ public class UserIntegratedActivityVO extends DefaultVO {
     /** Agent: 하나 이상 기능 활성화 상태에서의 최종 하트비트 시각 */
     private LocalDateTime anyFunctionalLastEventDt;
     /** Agent: 하나 이상 기능 활성화 상태에서 측정된 최대 하트비트 단절 기간 (총 시간) */
-    private Duration anyFunctionalMaxDisconnectDuration;
+    private Double anyFunctionalMaxDisconnectDuration;
     /** Agent: 하나 이상 기능 활성화 상태에서 측정된 최대 하트비트 단절 기간 (업무 시간 기준) */
-    private Duration anyFunctionalMaxBusinessDisconnectDuration;
+    private Double anyFunctionalMaxBusinessDisconnectDuration;
     /** Agent: 하나 이상 기능 활성화 상태에서 발생한 하트비트 단절 기간의 총합 (총 시간) */
-    private Duration anyFunctionalTotalDisconnectDuration;
+    private Double anyFunctionalTotalDisconnectDuration;
     /** Agent: 하나 이상 기능 활성화 상태에서 발생한 하트비트 단절 기간의 총합 (업무 시간 기준) */
-    private Duration anyFunctionalTotalBusinessDisconnectDuration;
+    private Double anyFunctionalTotalBusinessDisconnectDuration;
     /** Agent: 하나 이상 기능 활성화 상태에서 하트비트 단절이 특정 시간(5분)을 초과한 총 횟수 (총 시간) */
     private Long anyFunctionalCountDisconnectDurationOver;
     /** Agent: 하나 이상 기능 활성화 상태에서 하트비트 단절이 특정 시간(5분)을 초과한 총 횟수 (업무 시간 기준) */
@@ -71,45 +72,97 @@ public class UserIntegratedActivityVO extends DefaultVO {
 
     /** Unmask: 언마스킹 총 횟수 */
     private Long unmaskCount;
-    /** Unmask: 업무 시간 내 언마스킹 횟수 */
-    private Long unmaskBusinessCount;
+    /** Unmask: 비 업무 시간 언마스킹 횟수 */
+    private Long unmaskNonBusinessCount;
     /** Unmask: 언마스킹된 아이템 총 개수 */
     private Long unmaskItemCount;
-    /** Unmask: 업무 시간 내 언마스킹된 아이템 개수 */
-    private Long unmaskBusinessItemCount;
+    /** Unmask: 비 업무 시간 언마스킹된 아이템 개수 */
+    private Long unmaskNonBusinessItemCount;
 
     /** FileOutbound: 파일 외부전송 총 횟수 */
     private Long fileOutboundTotalCount;
     /** FileOutbound: 파일 외부전송 성공 횟수 */
     private Long fileOutboundSentCount;
-    /** FileOutbound: 업무 시간 내 파일 외부전송 성공 횟수 */
-    private Long fileOutboundBusinessSentCount;
+    /** FileOutbound: 비 업무 시간 파일 외부전송 성공 횟수 */
+    private Long fileOutboundNonBusinessSentCount;
     /** FileOutbound: 파일 외부전송 차단 횟수 */
     private Long fileOutboundBlockedCount;
-    /** FileOutbound: 업무 시간 내 파일 외부전송 차단 횟수 */
-    private Long fileOutboundBusinessBlockedCount;
+    /** FileOutbound: 비 업무 시간 파일 외부전송 차단 횟수 */
+    private Long fileOutboundNonBusinessBlockedCount;
     /** FileOutbound: 파일 외부전송 총 파일 개수 */
     private Long fileOutboundTotalFileCount;
     /** FileOutbound: 파일 외부전송 성공 파일 개수 */
     private Long fileOutboundSentFileCount;
-    /** FileOutbound: 업무 시간 내 파일 외부전송 성공 파일 개수 */
-    private Long fileOutboundBusinessSentFileCount;
+    /** FileOutbound: 비 업무 시간 파일 외부전송 성공 파일 개수 */
+    private Long fileOutboundNonBusinessSentFileCount;
     /** FileOutbound: 파일 외부전송 차단 파일 개수 */
     private Long fileOutboundBlockedFileCount;
-    /** FileOutbound: 업무 시간 내 파일 외부전송 차단 파일 개수 */
-    private Long fileOutboundBusinessBlockedFileCount;
+    /** FileOutbound: 비 업무 시간 파일 외부전송 차단 파일 개수 */
+    private Long fileOutboundNonBusinessBlockedFileCount;
     /** FileOutbound: 파일 외부전송 총 파일 크기 */
     private Long fileOutboundTotalFileSize;
     /** FileOutbound: 파일 외부전송 성공 파일 크기 */
     private Long fileOutboundSentFileSize;
-    /** FileOutbound: 업무 시간 내 파일 외부전송 성공 파일 크기 */
-    private Long fileOutboundBusinessSentFileSize;
+    /** FileOutbound: 비 업무 시간 파일 외부전송 성공 파일 크기 */
+    private Long fileOutboundNonBusinessSentFileSize;
     /** FileOutbound: 파일 외부전송 차단 파일 크기 */
     private Long fileOutboundBlockedFileSize;
-    /** FileOutbound: 업무 시간 내 파일 외부전송 차단 파일 크기 */
-    private Long fileOutboundBusinessBlockedFileSize;
+    /** FileOutbound: 비 업무 시간 파일 외부전송 차단 파일 크기 */
+    private Long fileOutboundNonBusinessBlockedFileSize;
     /** FileOutbound: 가장 많은 중복 파일 개수 */
     private Long fileOutboundMaxDuplicateFileCount;
+
+    private Duration doubleToDuration(Double seconds) {
+        long longSeconds = seconds.longValue(); // 정수 초 부분: 1971
+        long nano = (long) ((seconds - longSeconds) * 1_000_000_000); // 소수점 이하 나노초 변환: 740581000
+
+        return Duration.ofSeconds(longSeconds, nano);
+    }
+
+    public String getAllFunctionalMaxDisconnectDurationStatus() {
+        if (this.allFunctionalMaxDisconnectDuration == null) {
+            return Constants.CD_STATUS_UNKNOWN;
+        } else {
+            Duration duration = this.doubleToDuration(this.allFunctionalMaxDisconnectDuration);
+            if (Duration.ofMinutes(5).compareTo(duration) > 0) {
+                return Constants.CD_STATUS_NORMAL;
+            } else if (Duration.ofMinutes(10).compareTo(duration) > 0) {
+                return Constants.CD_STATUS_INSPECT;
+            } else {
+                return Constants.CD_STATUS_WARNING;
+            }
+        }
+    }
+
+    public String getAllFunctionalMaxBusinessDisconnectDurationStatus() {
+        if (this.allFunctionalMaxBusinessDisconnectDuration == null) {
+            return Constants.CD_STATUS_UNKNOWN;
+        } else {
+            Duration duration = this.doubleToDuration(this.allFunctionalMaxBusinessDisconnectDuration);
+            if (Duration.ofMinutes(5).compareTo(duration) > 0) {
+                return Constants.CD_STATUS_NORMAL;
+            } else if (Duration.ofMinutes(10).compareTo(duration) > 0) {
+                return Constants.CD_STATUS_INSPECT;
+            } else {
+                return Constants.CD_STATUS_WARNING;
+            }
+        }
+    }
+
+    public String getAnyFunctionalMaxDisconnectDurationStatus() {
+        if (this.anyFunctionalMaxDisconnectDuration == null) {
+            return Constants.CD_STATUS_UNKNOWN;
+        } else {
+            Duration duration = this.doubleToDuration(this.anyFunctionalMaxDisconnectDuration);
+            if (Duration.ofMinutes(5).compareTo(duration) > 0) {
+                return Constants.CD_STATUS_NORMAL;
+            } else if (Duration.ofMinutes(10).compareTo(duration) > 0) {
+                return Constants.CD_STATUS_INSPECT;
+            } else {
+                return Constants.CD_STATUS_WARNING;
+            }
+        }
+    }
 
     public String getUserId() {
         return userId;
@@ -135,35 +188,35 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.allFunctionalLastEventDt = allFunctionalLastEventDt;
     }
 
-    public Duration getAllFunctionalMaxDisconnectDuration() {
+    public Double getAllFunctionalMaxDisconnectDuration() {
         return allFunctionalMaxDisconnectDuration;
     }
 
-    public void setAllFunctionalMaxDisconnectDuration(Duration allFunctionalMaxDisconnectDuration) {
+    public void setAllFunctionalMaxDisconnectDuration(Double allFunctionalMaxDisconnectDuration) {
         this.allFunctionalMaxDisconnectDuration = allFunctionalMaxDisconnectDuration;
     }
 
-    public Duration getAllFunctionalMaxBusinessDisconnectDuration() {
+    public Double getAllFunctionalMaxBusinessDisconnectDuration() {
         return allFunctionalMaxBusinessDisconnectDuration;
     }
 
-    public void setAllFunctionalMaxBusinessDisconnectDuration(Duration allFunctionalMaxBusinessDisconnectDuration) {
+    public void setAllFunctionalMaxBusinessDisconnectDuration(Double allFunctionalMaxBusinessDisconnectDuration) {
         this.allFunctionalMaxBusinessDisconnectDuration = allFunctionalMaxBusinessDisconnectDuration;
     }
 
-    public Duration getAllFunctionalTotalDisconnectDuration() {
+    public Double getAllFunctionalTotalDisconnectDuration() {
         return allFunctionalTotalDisconnectDuration;
     }
 
-    public void setAllFunctionalTotalDisconnectDuration(Duration allFunctionalTotalDisconnectDuration) {
+    public void setAllFunctionalTotalDisconnectDuration(Double allFunctionalTotalDisconnectDuration) {
         this.allFunctionalTotalDisconnectDuration = allFunctionalTotalDisconnectDuration;
     }
 
-    public Duration getAllFunctionalTotalBusinessDisconnectDuration() {
+    public Double getAllFunctionalTotalBusinessDisconnectDuration() {
         return allFunctionalTotalBusinessDisconnectDuration;
     }
 
-    public void setAllFunctionalTotalBusinessDisconnectDuration(Duration allFunctionalTotalBusinessDisconnectDuration) {
+    public void setAllFunctionalTotalBusinessDisconnectDuration(Double allFunctionalTotalBusinessDisconnectDuration) {
         this.allFunctionalTotalBusinessDisconnectDuration = allFunctionalTotalBusinessDisconnectDuration;
     }
 
@@ -199,35 +252,35 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.anyFunctionalLastEventDt = anyFunctionalLastEventDt;
     }
 
-    public Duration getAnyFunctionalMaxDisconnectDuration() {
+    public Double getAnyFunctionalMaxDisconnectDuration() {
         return anyFunctionalMaxDisconnectDuration;
     }
 
-    public void setAnyFunctionalMaxDisconnectDuration(Duration anyFunctionalMaxDisconnectDuration) {
+    public void setAnyFunctionalMaxDisconnectDuration(Double anyFunctionalMaxDisconnectDuration) {
         this.anyFunctionalMaxDisconnectDuration = anyFunctionalMaxDisconnectDuration;
     }
 
-    public Duration getAnyFunctionalMaxBusinessDisconnectDuration() {
+    public Double getAnyFunctionalMaxBusinessDisconnectDuration() {
         return anyFunctionalMaxBusinessDisconnectDuration;
     }
 
-    public void setAnyFunctionalMaxBusinessDisconnectDuration(Duration anyFunctionalMaxBusinessDisconnectDuration) {
+    public void setAnyFunctionalMaxBusinessDisconnectDuration(Double anyFunctionalMaxBusinessDisconnectDuration) {
         this.anyFunctionalMaxBusinessDisconnectDuration = anyFunctionalMaxBusinessDisconnectDuration;
     }
 
-    public Duration getAnyFunctionalTotalDisconnectDuration() {
+    public Double getAnyFunctionalTotalDisconnectDuration() {
         return anyFunctionalTotalDisconnectDuration;
     }
 
-    public void setAnyFunctionalTotalDisconnectDuration(Duration anyFunctionalTotalDisconnectDuration) {
+    public void setAnyFunctionalTotalDisconnectDuration(Double anyFunctionalTotalDisconnectDuration) {
         this.anyFunctionalTotalDisconnectDuration = anyFunctionalTotalDisconnectDuration;
     }
 
-    public Duration getAnyFunctionalTotalBusinessDisconnectDuration() {
+    public Double getAnyFunctionalTotalBusinessDisconnectDuration() {
         return anyFunctionalTotalBusinessDisconnectDuration;
     }
 
-    public void setAnyFunctionalTotalBusinessDisconnectDuration(Duration anyFunctionalTotalBusinessDisconnectDuration) {
+    public void setAnyFunctionalTotalBusinessDisconnectDuration(Double anyFunctionalTotalBusinessDisconnectDuration) {
         this.anyFunctionalTotalBusinessDisconnectDuration = anyFunctionalTotalBusinessDisconnectDuration;
     }
 
@@ -255,12 +308,12 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.unmaskCount = unmaskCount;
     }
 
-    public Long getUnmaskBusinessCount() {
-        return unmaskBusinessCount;
+    public Long getUnmaskNonBusinessCount() {
+        return unmaskNonBusinessCount;
     }
 
-    public void setUnmaskBusinessCount(Long unmaskBusinessCount) {
-        this.unmaskBusinessCount = unmaskBusinessCount;
+    public void setUnmaskNonBusinessCount(Long unmaskNonBusinessCount) {
+        this.unmaskNonBusinessCount = unmaskNonBusinessCount;
     }
 
     public Long getUnmaskItemCount() {
@@ -271,12 +324,12 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.unmaskItemCount = unmaskItemCount;
     }
 
-    public Long getUnmaskBusinessItemCount() {
-        return unmaskBusinessItemCount;
+    public Long getUnmaskNonBusinessItemCount() {
+        return unmaskNonBusinessItemCount;
     }
 
-    public void setUnmaskBusinessItemCount(Long unmaskBusinessItemCount) {
-        this.unmaskBusinessItemCount = unmaskBusinessItemCount;
+    public void setUnmaskNonBusinessItemCount(Long unmaskNonBusinessItemCount) {
+        this.unmaskNonBusinessItemCount = unmaskNonBusinessItemCount;
     }
 
     public Long getFileOutboundTotalCount() {
@@ -295,12 +348,12 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.fileOutboundSentCount = fileOutboundSentCount;
     }
 
-    public Long getFileOutboundBusinessSentCount() {
-        return fileOutboundBusinessSentCount;
+    public Long getFileOutboundNonBusinessSentCount() {
+        return fileOutboundNonBusinessSentCount;
     }
 
-    public void setFileOutboundBusinessSentCount(Long fileOutboundBusinessSentCount) {
-        this.fileOutboundBusinessSentCount = fileOutboundBusinessSentCount;
+    public void setFileOutboundNonBusinessSentCount(Long fileOutboundNonBusinessSentCount) {
+        this.fileOutboundNonBusinessSentCount = fileOutboundNonBusinessSentCount;
     }
 
     public Long getFileOutboundBlockedCount() {
@@ -311,12 +364,12 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.fileOutboundBlockedCount = fileOutboundBlockedCount;
     }
 
-    public Long getFileOutboundBusinessBlockedCount() {
-        return fileOutboundBusinessBlockedCount;
+    public Long getFileOutboundNonBusinessBlockedCount() {
+        return fileOutboundNonBusinessBlockedCount;
     }
 
-    public void setFileOutboundBusinessBlockedCount(Long fileOutboundBusinessBlockedCount) {
-        this.fileOutboundBusinessBlockedCount = fileOutboundBusinessBlockedCount;
+    public void setFileOutboundNonBusinessBlockedCount(Long fileOutboundNonBusinessBlockedCount) {
+        this.fileOutboundNonBusinessBlockedCount = fileOutboundNonBusinessBlockedCount;
     }
 
     public Long getFileOutboundTotalFileCount() {
@@ -335,12 +388,12 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.fileOutboundSentFileCount = fileOutboundSentFileCount;
     }
 
-    public Long getFileOutboundBusinessSentFileCount() {
-        return fileOutboundBusinessSentFileCount;
+    public Long getFileOutboundNonBusinessSentFileCount() {
+        return fileOutboundNonBusinessSentFileCount;
     }
 
-    public void setFileOutboundBusinessSentFileCount(Long fileOutboundBusinessSentFileCount) {
-        this.fileOutboundBusinessSentFileCount = fileOutboundBusinessSentFileCount;
+    public void setFileOutboundNonBusinessSentFileCount(Long fileOutboundNonBusinessSentFileCount) {
+        this.fileOutboundNonBusinessSentFileCount = fileOutboundNonBusinessSentFileCount;
     }
 
     public Long getFileOutboundBlockedFileCount() {
@@ -351,12 +404,12 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.fileOutboundBlockedFileCount = fileOutboundBlockedFileCount;
     }
 
-    public Long getFileOutboundBusinessBlockedFileCount() {
-        return fileOutboundBusinessBlockedFileCount;
+    public Long getFileOutboundNonBusinessBlockedFileCount() {
+        return fileOutboundNonBusinessBlockedFileCount;
     }
 
-    public void setFileOutboundBusinessBlockedFileCount(Long fileOutboundBusinessBlockedFileCount) {
-        this.fileOutboundBusinessBlockedFileCount = fileOutboundBusinessBlockedFileCount;
+    public void setFileOutboundNonBusinessBlockedFileCount(Long fileOutboundNonBusinessBlockedFileCount) {
+        this.fileOutboundNonBusinessBlockedFileCount = fileOutboundNonBusinessBlockedFileCount;
     }
 
     public Long getFileOutboundTotalFileSize() {
@@ -375,12 +428,12 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.fileOutboundSentFileSize = fileOutboundSentFileSize;
     }
 
-    public Long getFileOutboundBusinessSentFileSize() {
-        return fileOutboundBusinessSentFileSize;
+    public Long getFileOutboundNonBusinessSentFileSize() {
+        return fileOutboundNonBusinessSentFileSize;
     }
 
-    public void setFileOutboundBusinessSentFileSize(Long fileOutboundBusinessSentFileSize) {
-        this.fileOutboundBusinessSentFileSize = fileOutboundBusinessSentFileSize;
+    public void setFileOutboundNonBusinessSentFileSize(Long fileOutboundNonBusinessSentFileSize) {
+        this.fileOutboundNonBusinessSentFileSize = fileOutboundNonBusinessSentFileSize;
     }
 
     public Long getFileOutboundBlockedFileSize() {
@@ -391,12 +444,12 @@ public class UserIntegratedActivityVO extends DefaultVO {
         this.fileOutboundBlockedFileSize = fileOutboundBlockedFileSize;
     }
 
-    public Long getFileOutboundBusinessBlockedFileSize() {
-        return fileOutboundBusinessBlockedFileSize;
+    public Long getFileOutboundNonBusinessBlockedFileSize() {
+        return fileOutboundNonBusinessBlockedFileSize;
     }
 
-    public void setFileOutboundBusinessBlockedFileSize(Long fileOutboundBusinessBlockedFileSize) {
-        this.fileOutboundBusinessBlockedFileSize = fileOutboundBusinessBlockedFileSize;
+    public void setFileOutboundNonBusinessBlockedFileSize(Long fileOutboundNonBusinessBlockedFileSize) {
+        this.fileOutboundNonBusinessBlockedFileSize = fileOutboundNonBusinessBlockedFileSize;
     }
 
     public Long getFileOutboundMaxDuplicateFileCount() {

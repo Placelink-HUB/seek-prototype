@@ -8,6 +8,11 @@ logging.file.path: ${user.home}/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/see
 # -Dpid.file.path=C:/Users/eseun/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/run
 # -Dstate.file.path=C:/Users/eseun/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/state
 
+spring:
+  thymeleaf:
+    prefix: file:c:/Users/eseun/Workspaces/SEEK/seek-prototype/src/main/resources/templates/
+    cache: false # 개발 환경에서는 Thymeleaf 템플릿 엔진의 캐싱을 비활성화한다.
+
 # 파일 관리자 구현체 이름
 file.manager.impl.name: sftpFileManagerImpl
 

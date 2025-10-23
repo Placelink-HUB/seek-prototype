@@ -101,7 +101,7 @@ requirements, please purchase a commercial license from placelink.
                             </caption>
                             <thead>
                                 <tr>
-                                    <th rowspan="2">사용자 ID</th>
+                                    <th rowspan="2" class="c-width-9p">사용자 ID</th>
                                     <th colspan="3">에이전트 중지 패턴</th>
                                     <th colspan="2">복호화 시도 패턴</th>
                                     <th colspan="3">외부 유출 시도 패턴</th>
@@ -109,36 +109,68 @@ requirements, please purchase a commercial license from placelink.
                                     <th rowspan="2">알림 전송</th>
                                 </tr>
                                 <tr>
-                                    <th>반복 중지</th>
-                                    <th>비 업무시간대 중지</th>
-                                    <th>일부 프로세스 중지</th>
-                                    <th>비 업무시간대 복호화</th>
-                                    <th>대량 복호화</th>
-                                    <th>비 업무시간대 전송</th>
-                                    <th>중복 전송</th>
-                                    <th>대량 전송</th>
+                                    <th class="c-width-9dot5p">반복 중지</th>
+                                    <th class="c-width-9dot5p">업무시간대 중지</th>
+                                    <th class="c-width-9dot5p">일부 프로세스 중지</th>
+                                    <th class="c-width-9dot5p">비 업무시간대 복호화</th>
+                                    <th class="c-width-9dot5p">대량 복호화</th>
+                                    <th class="c-width-9dot5p">비 업무시간대 전송</th>
+                                    <th class="c-width-9dot5p">중복 전송</th>
+                                    <th class="c-width-9dot5p">대량 전송</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                <!-- 데이터가 없을 경우 -->
                                 <tr th:if="${#lists.isEmpty(userIntegratedActivityList)}">
                                     <td colspan="11">데이터가 없습니다.</td>
+                                    <td colspan="11" class="no-data">데이터가 없습니다.</td>
                                 </tr>
-                                <tr th:unless="${#lists.isEmpty(userIntegratedActivityList)}">
-                                    <tr th:each="userIntegratedActivity : ${userIntegratedActivityList}">
-                                        <td th:text="${userIntegratedActivity.userId}"></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td>
-                                            <button class="table-btn-sty01 btn-coming-soon">전송</button>
-                                        </td>
-                                    </tr>
+                                <tr th:unless="${#lists.isEmpty(userIntegratedActivityList)}" th:each="userIntegratedActivity : ${userIntegratedActivityList}">
+                                    <td th:text="${userIntegratedActivity.userId}"></td>
+                                    <td class="status-td">
+                                        <div th:if="${userIntegratedActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                    </td>
+                                    <td class="status-td">
+                                        <div th:if="${userIntegratedActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                    </td>
+                                    <td class="status-td">
+                                        <div th:if="${userIntegratedActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                    </td>
+                                    <td class="status-td">
+                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCount >= 10}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCount &lt; 10 and userIntegratedActivity.unmaskNonBusinessCount >= 5}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCount &lt; 5}" class="status-icon normal">정상</div>
+                                    </td>
+                                    <td class="status-td">
+                                        <div th:if="${userIntegratedActivity.unmaskItemCount >= 10}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.unmaskItemCount &lt; 10 and userIntegratedActivity.unmaskItemCount >= 5}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.unmaskItemCount &lt; 5}" class="status-icon normal">정상</div>
+                                    </td>
+                                    <td class="status-td">
+                                        <div th:if="${userIntegratedActivity.unmaskItemCount >= 10}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.unmaskItemCount &lt; 10 and userIntegratedActivity.unmaskItemCount >= 5}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.unmaskItemCount &lt; 5}" class="status-icon normal">정상</div>
+                                    </td>
+                                    <td class="status-td">
+                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCount >= 10}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCount &lt; 10 and userIntegratedActivity.fileOutboundMaxDuplicateFileCount >= 5}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCount &lt; 5}" class="status-icon normal">정상</div>
+                                    </td>
+                                    <td class="status-td">
+                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCount >= 10}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCount &lt; 10 and userIntegratedActivity.fileOutboundTotalCount >= 5}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCount &lt; 5}" class="status-icon normal">정상</div>
+                                    </td>
+                                    <td></td>
+                                    <td>
+                                        <button class="table-btn-sty01 btn-coming-soon">전송</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>

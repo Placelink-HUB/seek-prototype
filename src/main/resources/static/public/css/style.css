@@ -155,6 +155,15 @@ table caption {
 .c-width-200 {
   width: 12.5rem;
 }
+.c-width-8p {
+  width: 8%;
+}
+.c-width-9p {
+  width: 9%;
+}
+.c-width-9dot5p {
+  width: 9.5%;
+}
 .c-width-10p {
   width: 10%;
 }
@@ -1896,6 +1905,35 @@ td.agent-status-indicator {
 
 td.agent-status-indicator.Y {
   background-image: url(../images/5-on-button.png);
+}
+
+td.status-td {
+  position: relative;
+}
+
+.status-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background-color: #094f2c;
+  border: 0.0625rem solid #094f2c;
+  border-radius: 0.5rem;
+  padding: 0.3125rem 1.25rem;
+  color: white;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.status-icon.inspect {
+  background-color: #d37811;
+  border-color: #d37811;
+}
+
+.status-icon.warning {
+  background-color: #cf0404;
+  border-color: #cf0404;
 }
 
 @media (max-width: 112.5rem) {

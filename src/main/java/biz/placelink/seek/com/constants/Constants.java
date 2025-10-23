@@ -292,4 +292,21 @@ public class Constants {
      */
     public static final String CD_FILE_EXTENSION_STATUS_NONE_NORMAL = "NONE_NORMAL";
 
+    /**
+     * 상태 - 정상
+     */
+    public static final String CD_STATUS_NORMAL = "normal";
+    /**
+     * 상태 - 점검
+     */
+    public static final String CD_STATUS_INSPECT = "inspect";
+    /**
+     * 상태 - 경고
+     */
+    public static final String CD_STATUS_WARNING = "warning";
+    /**
+     * 상태 - 미확인/알 수 없음
+     */
+    public static final String CD_STATUS_UNKNOWN = "unknown";
+
 }
