@@ -81,6 +81,8 @@ public class UserIntegratedActivityVO extends DefaultVO {
 
     /** FileOutbound: 파일 외부전송 총 횟수 */
     private Long fileOutboundTotalCount;
+    /** FileOutbound: 비 업무 시간 파일 외부전송 총 횟수 */
+    private Long fileOutboundNonBusinessTotalCount;
     /** FileOutbound: 파일 외부전송 성공 횟수 */
     private Long fileOutboundSentCount;
     /** FileOutbound: 비 업무 시간 파일 외부전송 성공 횟수 */
@@ -112,56 +114,142 @@ public class UserIntegratedActivityVO extends DefaultVO {
     /** FileOutbound: 가장 많은 중복 파일 개수 */
     private Long fileOutboundMaxDuplicateFileCount;
 
-    private Duration doubleToDuration(Double seconds) {
-        long longSeconds = seconds.longValue(); // 정수 초 부분: 1971
-        long nano = (long) ((seconds - longSeconds) * 1_000_000_000); // 소수점 이하 나노초 변환: 740581000
+    /**
+     * 측정된 시간(초 단위)과 분 단위 임계값을 기준으로 상태 코드(정상, 점검, 경고)를 결정한다.
+     *
+     * <p>
+     * 상태 결정 로직은 다음과 같다:
+     * </p>
+     * <ul>
+     * <li>{@code durationSeconds} < {@code normalThresholdMinutes}분: {@code CD_STATUS_NORMAL} (정상)</li>
+     * <li>{@code normalThresholdMinutes}분 <= {@code durationSeconds} < {@code inspectThresholdMinutes}분: {@code CD_STATUS_INSPECT} (점검)</li>
+     * <li>{@code durationSeconds} >= {@code inspectThresholdMinutes}분: {@code CD_STATUS_WARNING} (경고)</li>
+     * <li>{@code durationSeconds}가 null일 경우: {@code CD_STATUS_UNKNOWN} (미확인/정보 없음)</li>
+     * </ul>
+     *
+     * @param durationSeconds         측정된 시간 간격 (PostgreSQL INTERVAL에서 변환된 Double 형태의 총 초)
+     * @param normalThresholdMinutes  정상으로 간주되는 최대 시간 임계값 (분 단위)
+     * @param inspectThresholdMinutes 점검으로 간주되는 최대 시간 임계값 (분 단위)
+     * @return 상태 코드 (Constants.CD_STATUS_NORMAL, CD_STATUS_INSPECT, CD_STATUS_WARNING, CD_STATUS_UNKNOWN 중 하나)
+     */
+    private String getDurationStatus(Double durationSeconds, int normalThresholdMinutes, int inspectThresholdMinutes) {
+        if (durationSeconds == null) {
+            return Constants.CD_STATUS_UNKNOWN;
+        } else {
+            long longSeconds = durationSeconds.longValue(); // 정수 초 부분: 1971
+            long nano = (long) ((durationSeconds - longSeconds) * 1_000_000_000); // 소수점 이하 나노초 변환: 740581000
 
-        return Duration.ofSeconds(longSeconds, nano);
+            Duration duration = Duration.ofSeconds(longSeconds, nano);
+            if (Duration.ofMinutes(normalThresholdMinutes).compareTo(duration) > 0) {
+                return Constants.CD_STATUS_NORMAL;
+            } else if (Duration.ofMinutes(inspectThresholdMinutes).compareTo(duration) > 0) {
+                return Constants.CD_STATUS_INSPECT;
+            } else {
+                return Constants.CD_STATUS_WARNING;
+            }
+        }
     }
 
+    /**
+     * 에이전트 중지 패턴: 반복 중지
+     *
+     * @return 상태 코드
+     */
     public String getAllFunctionalMaxDisconnectDurationStatus() {
-        if (this.allFunctionalMaxDisconnectDuration == null) {
-            return Constants.CD_STATUS_UNKNOWN;
-        } else {
-            Duration duration = this.doubleToDuration(this.allFunctionalMaxDisconnectDuration);
-            if (Duration.ofMinutes(5).compareTo(duration) > 0) {
-                return Constants.CD_STATUS_NORMAL;
-            } else if (Duration.ofMinutes(10).compareTo(duration) > 0) {
-                return Constants.CD_STATUS_INSPECT;
-            } else {
-                return Constants.CD_STATUS_WARNING;
-            }
-        }
+        return this.getDurationStatus(this.allFunctionalMaxDisconnectDuration, 5, 10);
     }
 
+    /**
+     * 에이전트 중지 패턴: 업무시간대 중지
+     *
+     * @return 상태 코드
+     */
     public String getAllFunctionalMaxBusinessDisconnectDurationStatus() {
-        if (this.allFunctionalMaxBusinessDisconnectDuration == null) {
+        return this.getDurationStatus(this.allFunctionalMaxBusinessDisconnectDuration, 5, 10);
+    }
+
+    /**
+     * 에이전트 중지 패턴: 일부 프로세스 중지
+     *
+     * @return 상태 코드
+     */
+    public String getAnyFunctionalMaxDisconnectDurationStatus() {
+        return this.getDurationStatus(this.anyFunctionalMaxDisconnectDuration, 5, 10);
+    }
+
+    /**
+     * Count 와 분 단위 임계값을 기준으로 상태 코드(정상, 점검, 경고)를 결정한다.
+     *
+     * <p>
+     * 상태 결정 로직은 다음과 같다:
+     * </p>
+     * <ul>
+     * <li>{@code count} < {@code normalThreshold}: {@code CD_STATUS_NORMAL} (정상)</li>
+     * <li>{@code normalThreshold} <= {@code count} < {@code inspectThreshold}: {@code CD_STATUS_INSPECT} (점검)</li>
+     * <li>{@code count} >= {@code inspectThreshold}: {@code CD_STATUS_WARNING} (경고)</li>
+     * <li>{@code count}가 null일 경우: {@code CD_STATUS_UNKNOWN} (미확인/정보 없음)</li>
+     * </ul>
+     *
+     * @param count            대상 개수
+     * @param normalThreshold  정상으로 간주되는 최대 시간 임계값
+     * @param inspectThreshold 점검으로 간주되는 최대 시간 임계값
+     * @return 상태 코드 (Constants.CD_STATUS_NORMAL, CD_STATUS_INSPECT, CD_STATUS_WARNING, CD_STATUS_UNKNOWN 중 하나)
+     */
+    private String getCountStatus(Long count, int normalThreshold, int inspectThreshold) {
+        if (count == null) {
             return Constants.CD_STATUS_UNKNOWN;
+        } else if (count < normalThreshold) {
+            return Constants.CD_STATUS_NORMAL;
+        } else if (count < inspectThreshold) {
+            return Constants.CD_STATUS_INSPECT;
         } else {
-            Duration duration = this.doubleToDuration(this.allFunctionalMaxBusinessDisconnectDuration);
-            if (Duration.ofMinutes(5).compareTo(duration) > 0) {
-                return Constants.CD_STATUS_NORMAL;
-            } else if (Duration.ofMinutes(10).compareTo(duration) > 0) {
-                return Constants.CD_STATUS_INSPECT;
-            } else {
-                return Constants.CD_STATUS_WARNING;
-            }
+            return Constants.CD_STATUS_WARNING;
         }
     }
 
-    public String getAnyFunctionalMaxDisconnectDurationStatus() {
-        if (this.anyFunctionalMaxDisconnectDuration == null) {
-            return Constants.CD_STATUS_UNKNOWN;
-        } else {
-            Duration duration = this.doubleToDuration(this.anyFunctionalMaxDisconnectDuration);
-            if (Duration.ofMinutes(5).compareTo(duration) > 0) {
-                return Constants.CD_STATUS_NORMAL;
-            } else if (Duration.ofMinutes(10).compareTo(duration) > 0) {
-                return Constants.CD_STATUS_INSPECT;
-            } else {
-                return Constants.CD_STATUS_WARNING;
-            }
-        }
+    /**
+     * 복호화 시도 패턴: 비 업무시간대 복호화
+     *
+     * @return 상태 코드
+     */
+    public String getUnmaskNonBusinessCountStatus() {
+        return this.getCountStatus(this.unmaskNonBusinessCount, 5, 10);
+    }
+
+    /**
+     * 복호화 시도 패턴: 대량 복호화
+     *
+     * @return 상태 코드
+     */
+    public String getUnmaskItemCountStatus() {
+        return this.getCountStatus(this.unmaskItemCount, 5, 10);
+    }
+
+    /**
+     * 외부 유출 시도 패턴: 비 업무시간대 전송
+     *
+     * @return 상태 코드
+     */
+    public String getFileOutboundNonBusinessTotalCountStatus() {
+        return this.getCountStatus(this.fileOutboundNonBusinessTotalCount, 5, 10);
+    }
+
+    /**
+     * 외부 유출 시도 패턴: 중복 전송
+     *
+     * @return 상태 코드
+     */
+    public String getFileOutboundMaxDuplicateFileCountStatus() {
+        return this.getCountStatus(this.fileOutboundMaxDuplicateFileCount, 5, 10);
+    }
+
+    /**
+     * 외부 유출 시도 패턴: 대량 전송
+     *
+     * @return 상태 코드
+     */
+    public String getFileOutboundTotalCountStatus() {
+        return this.getCountStatus(this.fileOutboundTotalCount, 5, 10);
     }
 
     public String getUserId() {
@@ -338,6 +426,14 @@ public class UserIntegratedActivityVO extends DefaultVO {
 
     public void setFileOutboundTotalCount(Long fileOutboundTotalCount) {
         this.fileOutboundTotalCount = fileOutboundTotalCount;
+    }
+
+    public Long getFileOutboundNonBusinessTotalCount() {
+        return fileOutboundNonBusinessTotalCount;
+    }
+
+    public void setFileOutboundNonBusinessTotalCount(Long fileOutboundNonBusinessTotalCount) {
+        this.fileOutboundNonBusinessTotalCount = fileOutboundNonBusinessTotalCount;
     }
 
     public Long getFileOutboundSentCount() {

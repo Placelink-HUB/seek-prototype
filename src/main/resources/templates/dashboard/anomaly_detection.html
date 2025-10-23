@@ -143,29 +143,29 @@ requirements, please purchase a commercial license from placelink.
                                         <div th:if="${userIntegratedActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCount >= 10}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCount &lt; 10 and userIntegratedActivity.unmaskNonBusinessCount >= 5}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCount &lt; 5}" class="status-icon normal">정상</div>
+                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.unmaskItemCount >= 10}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.unmaskItemCount &lt; 10 and userIntegratedActivity.unmaskItemCount >= 5}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.unmaskItemCount &lt; 5}" class="status-icon normal">정상</div>
+                                        <div th:if="${userIntegratedActivity.unmaskItemCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.unmaskItemCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.unmaskItemCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.unmaskItemCount >= 10}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.unmaskItemCount &lt; 10 and userIntegratedActivity.unmaskItemCount >= 5}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.unmaskItemCount &lt; 5}" class="status-icon normal">정상</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCount >= 10}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCount &lt; 10 and userIntegratedActivity.fileOutboundMaxDuplicateFileCount >= 5}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCount &lt; 5}" class="status-icon normal">정상</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCount >= 10}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCount &lt; 10 and userIntegratedActivity.fileOutboundTotalCount >= 5}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCount &lt; 5}" class="status-icon normal">정상</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td></td>
                                     <td>
