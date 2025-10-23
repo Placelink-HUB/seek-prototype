@@ -122,7 +122,6 @@ requirements, please purchase a commercial license from placelink.
                             <tbody>
                                 <!-- 데이터가 없을 경우 -->
                                 <tr th:if="${#lists.isEmpty(userIntegratedActivityList)}">
-                                    <td colspan="11">데이터가 없습니다.</td>
                                     <td colspan="11" class="no-data">데이터가 없습니다.</td>
                                 </tr>
                                 <tr th:unless="${#lists.isEmpty(userIntegratedActivityList)}" th:each="userIntegratedActivity : ${userIntegratedActivityList}">
