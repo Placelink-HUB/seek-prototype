@@ -28,6 +28,7 @@ package biz.placelink.seek.analysis.vo;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import kr.s2.ext.util.S2FileUtil.FileSizeFormat;
 import kr.s2.ext.util.S2Util;
 
 public class FileOutboundHistVO extends AnalysisDetailVO {
@@ -59,6 +60,8 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
     private Integer totalFileCount;
     /* 전체 파일 크기(바이트) */
     private Long totalFileSize;
+    /* 전체 파일 크기(바이트) 포맷 객체 */
+    private FileSizeFormat totalFileSizeFormat;
     /* 파일 확장자 상태 공통코드 */
     private String fileExtensionStatusCcd;
     /* 이벤트(발생) 일시 (yyyy-MM-dd HH:mm:ss) */
@@ -206,6 +209,15 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
 
     public void setTotalFileSize(Long totalFileSize) {
         this.totalFileSize = totalFileSize;
+        this.totalFileSizeFormat = new FileSizeFormat(totalFileSize);
+    }
+
+    public String getFormattedTotalFileSize() {
+        return this.totalFileSizeFormat != null ? this.totalFileSizeFormat.getFormattedValue() : "";
+    }
+
+    public String getFormattedTotalFileSizeUnit() {
+        return this.totalFileSizeFormat != null ? this.totalFileSizeFormat.getUnit() : "";
     }
 
     public String getFileExtensionStatusCcd() {

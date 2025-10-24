@@ -25,6 +25,8 @@
  */
 package biz.placelink.seek.analysis.vo;
 
+import kr.s2.ext.util.S2FileUtil.FileSizeFormat;
+
 public class AnalysisDetailVO extends AnalysisVO {
 
     // ---------- 프록시 ----------//
@@ -63,8 +65,10 @@ public class AnalysisDetailVO extends AnalysisVO {
     private String signedFileHash;
     /* 파일 개수 */
     private Integer fileCount;
-    /* 전체 파일 사이즈 */
+    /* 전체 파일 크기(바이트) */
     private Long totalFileSize;
+    /* 전체 파일 크기(바이트) 포맷 객체 */
+    private FileSizeFormat totalFileSizeFormat;
     /* 파일 다운로드 수 */
     private Long downloadCount;
     /* 요청자 식별자 */
@@ -188,6 +192,15 @@ public class AnalysisDetailVO extends AnalysisVO {
 
     public void setTotalFileSize(Long totalFileSize) {
         this.totalFileSize = totalFileSize;
+        this.totalFileSizeFormat = new FileSizeFormat(totalFileSize);
+    }
+
+    public String getFormattedTotalFileSize() {
+        return this.totalFileSizeFormat != null ? this.totalFileSizeFormat.getFormattedValue() : "";
+    }
+
+    public String getFormattedTotalFileSizeUnit() {
+        return this.totalFileSizeFormat != null ? this.totalFileSizeFormat.getUnit() : "";
     }
 
     public Long getDownloadCount() {

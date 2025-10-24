@@ -76,7 +76,7 @@ requirements, please purchase a commercial license from placelink.
                                 <div class="card-title">전송한 총 파일 용량</div>
                                 <div class="card-desc">외부로 전송한 총 파일 용량</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatDecimal(fileOutboundHistListStatus.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}" class="size">0</span> <span class="size-unit">MB</span></div>
+                            <div class="card-content"><span th:text="${fileOutboundHistListStatus.formattedTotalFileSize}" class="size">0</span> <span th:text="${fileOutboundHistListStatus.formattedTotalFileSizeUnit}" class="size-unit">MB</span></div>
                         </div>
                         <div class="card border"></div>
                         <div class="card type1 many-on-many white small">
@@ -124,7 +124,7 @@ requirements, please purchase a commercial license from placelink.
                                 <tr>
                                     <th th:text="${searchGroupingType == 'channel' ? '채널' : '사용자 ID'}">사용자 ID</th>
                                     <th class="c-width-15p">전송 건수</th>
-                                    <th class="c-width-15p">전송 용량(MB)</th>
+                                    <th class="c-width-15p">전송 용량</th>
                                     <th class="c-width-15p">전송 파일 개수</th>
                                     <th class="c-width-15p">업무시간 전송 수</th>
                                     <th class="c-width-15p">비업무시간 전송 수</th>
@@ -137,7 +137,7 @@ requirements, please purchase a commercial license from placelink.
                                 <tr th:unless="${#lists.isEmpty(fileOutboundHistList)}" th:each="fileOutboundHist : ${fileOutboundHistList}">
                                     <td th:text="${searchGroupingType == 'channel' ? fileOutboundHist.outboundChannelCcd : fileOutboundHist.userId}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundHist.actionCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${#numbers.formatDecimal(fileOutboundHist.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
+                                    <td><span th:text="${fileOutboundHist.formattedTotalFileSize}"></span> <span th:text="${fileOutboundHist.formattedTotalFileSizeUnit}"></span></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundHist.totalFileCount, 0, 'COMMA')}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundHist.workingHourStatusNormalCount, 0, 'COMMA')}"></td>
                                     <td th:text="${#numbers.formatInteger(fileOutboundHist.workingHourStatusAbnormalCount, 0, 'COMMA')}"></td>

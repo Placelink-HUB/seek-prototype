@@ -2181,24 +2181,28 @@ export const S2Util = {
         }
     },
     /**
-     * 바이트(Byte) 값을 B, KB, MB, GB로 자동 변환하고 단위 정보를 반환한다.
+     * 바이트(Byte) 값을 B, KB, MB, GB, TB, PB로 자동 변환하고 단위 정보를 반환한다.
      *
      * @param {number} bytes - 변환할 파일 크기 (바이트 단위).
      * @returns {{value: number, unit: string, formattedValue: string}}
      * - value: 변환된 숫자 값 (Number, toFixed 적용).
-     * - unit: 적용된 단위 문자열 ('B', 'KB', 'MB', 'GB').
+     * - unit: 적용된 단위 문자열 ('B', 'KB', 'MB', 'GB', 'TB', 'PB').
      * - formattedValue: 로케일(ko-KR)이 적용된 최종 표시 문자열 (String, 쉼표 포함).
      */
     formatBytes(bytes) {
         const KB_IN_BYTES = 1024;
         const MB_IN_BYTES = 1024 * KB_IN_BYTES;
         const GB_IN_BYTES = 1024 * MB_IN_BYTES;
+        const TB_IN_BYTES = 1024 * GB_IN_BYTES;
+        const PB_IN_BYTES = 1024 * TB_IN_BYTES;
 
         const FILE_SIZE_UNITS = {
             B: 'B',
             KB: 'KB',
             MB: 'MB',
-            GB: 'GB'
+            GB: 'GB',
+            TB: 'TB',
+            PB: 'PB'
         };
 
         let value;
@@ -2207,6 +2211,12 @@ export const S2Util = {
         if (!bytes || bytes <= 0) {
             value = 0;
             unit = FILE_SIZE_UNITS.B;
+        } else if (bytes >= PB_IN_BYTES) {
+            value = parseFloat((bytes / PB_IN_BYTES).toFixed(2));
+            unit = FILE_SIZE_UNITS.PB;
+        } else if (bytes >= TB_IN_BYTES) {
+            value = parseFloat((bytes / TB_IN_BYTES).toFixed(2));
+            unit = FILE_SIZE_UNITS.TB;
         } else if (bytes >= GB_IN_BYTES) {
             value = parseFloat((bytes / GB_IN_BYTES).toFixed(2));
             unit = FILE_SIZE_UNITS.GB;
