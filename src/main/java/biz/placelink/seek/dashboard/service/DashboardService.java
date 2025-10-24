@@ -26,11 +26,14 @@
 package biz.placelink.seek.dashboard.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.dashboard.vo.AnalysisStatisticsVO;
+import biz.placelink.seek.dashboard.vo.UserActivityVO;
 import biz.placelink.seek.dashboard.vo.UserIntegratedActivityVO;
 
 /**
@@ -151,10 +154,79 @@ public class DashboardService {
      * 사용자 통합 활동 정보를 조회한다.
      *
      * @param schDe 조회 일자
-     * @return 사용자 통합 활동 정보를
+     * @return 사용자 통합 활동 정보
      */
-    public List<UserIntegratedActivityVO> selectUserIntegratedActivityInformation(String schDe) {
-        return dashboardMapper.selectUserIntegratedActivityInformation(schDe);
+    public UserIntegratedActivityVO selectUserActivityInformation(String schDe) {
+        UserIntegratedActivityVO result = new UserIntegratedActivityVO();
+
+        int totalAnomalyCount = 0;
+
+        int normalCount = 0;
+        int inspectCount = 0;
+        int warningCount = 0;
+
+        Integer activityScore = 0;
+
+        List<UserActivityVO> userActivityList = dashboardMapper.selectUserActivityList(schDe);
+        if (userActivityList != null) {
+
+            for (UserActivityVO userActivity : userActivityList) {
+                if (userActivity != null) {
+                    normalCount += userActivity.getStatusCount(Constants.CD_STATUS_NORMAL);
+                    inspectCount += userActivity.getStatusCount(Constants.CD_STATUS_INSPECT);
+                    warningCount += userActivity.getStatusCount(Constants.CD_STATUS_WARNING);
+
+                    totalAnomalyCount += inspectCount + warningCount +
+                            Optional.ofNullable(userActivity.getAllFunctionalCountBusinessDisconnectDurationOver()).orElse(0L) +
+                            Optional.ofNullable(userActivity.getUnmaskNonBusinessItemCount()).orElse(0L) +
+                            Optional.ofNullable(userActivity.getFileOutboundNonBusinessTotalCount()).orElse(0L);
+                }
+            }
+
+            activityScore = this.calculateActivityScore(normalCount, inspectCount, warningCount);
+        }
+
+        result.setTotalAnomalyCount(totalAnomalyCount);
+        result.setNormalCount(normalCount);
+        result.setInspectCount(inspectCount);
+        result.setWarningCount(warningCount);
+        result.setActivityScore(activityScore);
+        result.setUserActivityList(userActivityList);
+
+        return result;
+    }
+
+    /**
+     * 정상, 점검, 경고 개수를 기반으로 점수(100점 만점)를 산정한다.
+     * (감점 가중치 모델 적용)
+     *
+     * @param normalCount  정상 개수
+     * @param inspectCount 점검 개수
+     * @param warningCount 경고 개수
+     * @return 산정된 점수 (0.0 ~ 100.0)
+     */
+    private int calculateActivityScore(int normalCount, int inspectCount, int warningCount) {
+        // 1. 총 개수 계산
+        int totalCount = normalCount + inspectCount + warningCount;
+
+        // 2. 예외 처리: 총 개수가 0일 경우 (데이터 없음)
+        if (totalCount == 0) {
+            return 0;
+        }
+
+        // 3. 가중치 설정 (점검: 0.5, 경고: 1.0)
+        final double WEIGHT_INSPECT = 0.5;
+        final double WEIGHT_WARNING = 1.0;
+
+        // 4. 가중치가 적용된 총 감점 기여분 계산
+        double weightedDeduction = (inspectCount * WEIGHT_INSPECT) + (warningCount * WEIGHT_WARNING);
+
+        // 5. 점수 계산 (100점 만점에서 감점 비율을 빼기)
+        // Score = 100 - [(가중 감점 합계 / 총 개수) * 100]
+        int score = 100 - (int) Math.ceil((weightedDeduction / totalCount) * 100);
+
+        // 6. 점수는 0점 미만으로 내려가지 않도록 처리
+        return Math.max(0, score);
     }
 
 }

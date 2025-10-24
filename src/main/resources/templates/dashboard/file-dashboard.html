@@ -1111,8 +1111,8 @@ requirements, please purchase a commercial license from placelink.
             <div class="wrap-contents">
                 <div class="top">
                     <div class="summary">
-                        <div class="info inspection"><b>점검</b> (3/12)</div>
-                        <div class="info warning"><b>경고</b> (1/5)</div>
+                        <div class="info inspection"><b>점검</b> (<span th:text="${activityInspectCount}">0</span>/<span th:text="${activityTotalCount}">0</span>)</div>
+                        <div class="info warning"><b>경고</b> (<span th:text="${activityWarningCount}">0</span>/<span th:text="${activityTotalCount}">0</span>)</div>
                     </div>
                     <div class="c-flex-sty01 targetDate-wrap">
                         <div class="arrow-left"></div>

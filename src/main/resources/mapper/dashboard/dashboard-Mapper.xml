@@ -230,8 +230,8 @@ requirements, please purchase a commercial license from placelink.
             cc1.COM_CD_NM
     </select>
 
-    <select id="selectUserIntegratedActivityInformation" resultType="userIntegratedActivityVO">
-        /** selectUserIntegratedActivityInformation : 사용자 통합 활동 정보를 조회한다. */
+    <select id="selectUserActivityList" resultType="userActivityVO">
+        /** selectUserActivityList : 사용자 활동 목록을 조회한다. */
         /* 1.1. 조건에 맞는 에이전트 이력 */
         WITH BASE_AGENT_HIST AS (
             SELECT
@@ -354,10 +354,12 @@ requirements, please purchase a commercial license from placelink.
         ALL_FUNCTIONAL_AGENT_HIST_SUMMARY AS (
             SELECT
                 USER_ID,
+                /* 실제 에이전트 이력 개수 */
+                SUM(CASE WHEN EVENT_TYPE = 'REAL' THEN 1 ELSE 0 END) AS ALL_FUNCTIONAL_REAL_COUNT,
                 /* 첫 번째 이벤트 시각 (BaseEvents 기준) */
-                MIN(EVENT_DT) AS ALL_FUNCTIONAL_FIRST_EVENT_DT,
+                MIN(EVENT_DT) FILTER (WHERE EVENT_TYPE = 'REAL') AS ALL_FUNCTIONAL_FIRST_EVENT_DT,
                 /* 마지막 이벤트 시각 (BaseEvents 기준, NOW() 제외) */
-                MAX(CASE WHEN EVENT_TYPE = 'REAL' THEN EVENT_DT ELSE NULL END) AS ALL_FUNCTIONAL_LAST_EVENT_DT,
+                MAX(EVENT_DT) FILTER (WHERE EVENT_TYPE = 'REAL') AS ALL_FUNCTIONAL_LAST_EVENT_DT,
                 /* 최대 시간 차이 */
                 EXTRACT(EPOCH FROM MAX(DISCONNECT_DURATION)) AS ALL_FUNCTIONAL_MAX_DISCONNECT_DURATION,
                 /* 최대 업무 시간 차이 */
@@ -377,10 +379,12 @@ requirements, please purchase a commercial license from placelink.
         ANY_FUNCTIONAL_AGENT_HIST_SUMMARY AS (
             SELECT
                 USER_ID,
+                /* 실제 에이전트 이력 개수 */
+                SUM(CASE WHEN EVENT_TYPE = 'REAL' THEN 1 ELSE 0 END) AS ANY_FUNCTIONAL_REAL_COUNT,
                 /* 첫 번째 이벤트 시각 (BaseEvents 기준) */
-                MIN(EVENT_DT) AS ANY_FUNCTIONAL_FIRST_EVENT_DT,
+                MIN(EVENT_DT) FILTER (WHERE EVENT_TYPE = 'REAL') AS ANY_FUNCTIONAL_FIRST_EVENT_DT,
                 /* 마지막 이벤트 시각 (BaseEvents 기준, NOW() 제외) */
-                MAX(CASE WHEN EVENT_TYPE = 'REAL' THEN EVENT_DT ELSE NULL END) AS ANY_FUNCTIONAL_LAST_EVENT_DT,
+                MAX(EVENT_DT) FILTER (WHERE EVENT_TYPE = 'REAL') AS ANY_FUNCTIONAL_LAST_EVENT_DT,
                 /* 최대 시간 차이 */
                 EXTRACT(EPOCH FROM MAX(DISCONNECT_DURATION)) AS ANY_FUNCTIONAL_MAX_DISCONNECT_DURATION,
                 /* 최대 업무 시간 차이 */
@@ -401,6 +405,7 @@ requirements, please purchase a commercial license from placelink.
             SELECT
                 COALESCE(a.USER_ID, b.USER_ID) AS USER_ID,
                 /* ALL_FUNCTIONAL 결과 */
+                b.ALL_FUNCTIONAL_REAL_COUNT,
                 b.ALL_FUNCTIONAL_FIRST_EVENT_DT,
                 b.ALL_FUNCTIONAL_LAST_EVENT_DT,
                 b.ALL_FUNCTIONAL_MAX_DISCONNECT_DURATION,
@@ -410,6 +415,7 @@ requirements, please purchase a commercial license from placelink.
                 b.ALL_FUNCTIONAL_COUNT_DISCONNECT_DURATION_OVER,
                 b.ALL_FUNCTIONAL_COUNT_BUSINESS_DISCONNECT_DURATION_OVER,
                 /* ANY_FUNCTIONAL 결과 */
+                a.ANY_FUNCTIONAL_REAL_COUNT,
                 a.ANY_FUNCTIONAL_FIRST_EVENT_DT,
                 a.ANY_FUNCTIONAL_LAST_EVENT_DT,
                 a.ANY_FUNCTIONAL_MAX_DISCONNECT_DURATION,

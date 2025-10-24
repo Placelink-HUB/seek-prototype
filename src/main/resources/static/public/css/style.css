@@ -242,16 +242,19 @@ table caption {
   color: #fff !important;
 }
 .c-color-active,
+.status.normal,
 .정상 {
   /* eslint-disable-next-line css/no-important */
   color: #5ef0a7 !important;
 }
 .c-color-check,
+.status.inspect,
 .점검 {
   /* eslint-disable-next-line css/no-important */
   color: #fe8e10 !important;
 }
 .c-color-alert,
+.status.warning,
 .경고 {
   /* eslint-disable-next-line css/no-important */
   color: #fe0000 !important;

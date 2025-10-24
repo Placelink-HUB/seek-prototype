@@ -45,6 +45,7 @@ import biz.placelink.seek.analysis.service.MaskHistService;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.GlobalSharedStore;
 import biz.placelink.seek.dashboard.service.DashboardService;
+import biz.placelink.seek.dashboard.vo.UserIntegratedActivityVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -106,6 +107,17 @@ public class DashboardController {
             model.addAttribute("consoleType", consoleType);
         }
 
+        UserIntegratedActivityVO userIntegratedActivity = dashboardService.selectUserActivityInformation(vSchDe);
+        if (userIntegratedActivity != null) {
+            int inspectCount = userIntegratedActivity.getInspectCount();
+            int warningCount = userIntegratedActivity.getWarningCount();
+            int totalCount = userIntegratedActivity.getNormalCount() + inspectCount + warningCount;
+
+            model.addAttribute("activityInspectCount", inspectCount);
+            model.addAttribute("activityWarningCount", warningCount);
+            model.addAttribute("activityTotalCount", totalCount);
+        }
+
         String viewName = switch (siteId) {
             case "integrated" -> "dashboard/integrated-dashboard";
             case "file" -> "dashboard/file-dashboard";
@@ -158,7 +170,7 @@ public class DashboardController {
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 이상 패턴 탐지 현황 목록 조회
-        model.addAttribute("userIntegratedActivityList", dashboardService.selectUserIntegratedActivityInformation(vSchDe));
+        model.addAttribute("userIntegratedActivity", dashboardService.selectUserActivityInformation(vSchDe));
         model.addAttribute("schDe", vSchDe);
         return "dashboard/anomaly_detection";
     }

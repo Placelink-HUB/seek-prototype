@@ -28,7 +28,11 @@ requirements, please purchase a commercial license from placelink.
     <th:block layout:fragment="bodyStyle"></th:block>
     <th:block layout:fragment="bodyScript">
         <script type="module">
-            window.initPage = () => {};
+            import {S2Util} from '[[@{/public/js/s2.util.js}]]';
+            
+            window.initPage = () => {
+                document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
+            };
 
             window.goPage = (pageNo) => {
                 location.href = `/public/dashboard/anomaly_detection?pageNo=${pageNo}`;
@@ -61,14 +65,14 @@ requirements, please purchase a commercial license from placelink.
                                 <div class="card-title">전체 이상패턴 탐지 건수</div>
                                 <div class="card-desc">PC별 이상패턴 탐지 합계</div>
                             </div>
-                            <div class="card-content"><span>3,531</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(userIntegratedActivity.totalAnomalyCount, 0, 'COMMA', 0, 'POINT')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many white">
                             <div class="title-box menu6-2 padding-left-0">
                                 <div class="card-title">위험 점수</div>
                                 <div class="card-desc">이상 탐지 분석 등을 종합한 위험 지수</div>
                             </div>
-                            <div class="card-content"><span>65</span>점</div>
+                            <div class="card-content"><span th:text="${userIntegratedActivity.activityScore}">0</span>점</div>
                         </div>
                         <div class="card border"></div>
                         <div class="card type1 many-on-many mint">
@@ -76,21 +80,21 @@ requirements, please purchase a commercial license from placelink.
                                 <div class="card-title">정상</div>
                                 <div class="card-desc">이상 탐지 정상 건수</div>
                             </div>
-                            <div class="card-content"><span>31</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(userIntegratedActivity.normalCount, 0, 'COMMA', 0, 'POINT')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many tangerine">
                             <div class="title-box menu6-4">
                                 <div class="card-title">점검</div>
                                 <div class="card-desc">이상 패턴 점검 건수</div>
                             </div>
-                            <div class="card-content"><span>7</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(userIntegratedActivity.inspectCount, 0, 'COMMA', 0, 'POINT')}">0</span>건</div>
                         </div>
                         <div class="card type1 many-on-many red">
                             <div class="title-box menu6-5">
                                 <div class="card-title">경고</div>
                                 <div class="card-desc">이상 패턴 경고 건수</div>
                             </div>
-                            <div class="card-content"><span>1</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(userIntegratedActivity.warningCount, 0, 'COMMA', 0, 'POINT')}"></span>건</div>
                         </div>
                     </div>
                     <h2 class="type1">PC별 이상 패턴 탐지 현황</h2>
@@ -121,54 +125,58 @@ requirements, please purchase a commercial license from placelink.
                             </thead>
                             <tbody>
                                 <!-- 데이터가 없을 경우 -->
-                                <tr th:if="${#lists.isEmpty(userIntegratedActivityList)}">
+                                <tr th:if="${#lists.isEmpty(userIntegratedActivity.userActivityList)}">
                                     <td colspan="11" class="no-data">데이터가 없습니다.</td>
                                 </tr>
-                                <tr th:unless="${#lists.isEmpty(userIntegratedActivityList)}" th:each="userIntegratedActivity : ${userIntegratedActivityList}">
-                                    <td th:text="${userIntegratedActivity.userId}"></td>
+                                <tr th:unless="${#lists.isEmpty(userIntegratedActivity.userActivityList)}" th:each="userActivity : ${userIntegratedActivity.userActivityList}">
+                                    <td th:text="${userActivity.userId}"></td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.unmaskItemCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.unmaskItemCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.unmaskItemCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userIntegratedActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
-                                    <td></td>
                                     <td>
-                                        <button class="table-btn-sty01 btn-coming-soon">전송</button>
+                                        <span th:if="${userActivity.highestStatus == @Constants.CD_STATUS_WARNING}" class="status warning">경고</span>
+                                        <span th:if="${userActivity.highestStatus == @Constants.CD_STATUS_INSPECT}" class="status inspect">점검</span>
+                                        <span th:if="${userActivity.highestStatus == @Constants.CD_STATUS_NORMAL}" class="status normal">정상</span>
+                                    </td>
+                                    <td>
+                                        <button th:if="${userActivity.highestStatus == @Constants.CD_STATUS_INSPECT or userActivity.highestStatus == @Constants.CD_STATUS_WARNING}" class="table-btn-sty01 btn-coming-soon">전송</button>
                                     </td>
                                 </tr>
                             </tbody>
