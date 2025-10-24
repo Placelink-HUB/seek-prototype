@@ -402,6 +402,22 @@ requirements, please purchase a commercial license from placelink.
                                 updatePieChart();
                             }
                         }
+
+                        {
+                            // 날짜 좌측 점검/경고
+                            document.querySelectorAll('.activityTotalCount').forEach((e) => {
+                                e.textContent = response.activityTotalCount;
+                            });
+                            document.querySelector('.activityInspectCount').textContent = response.activityInspectCount;
+                            document.querySelector('.activityWarningCount').textContent = response.activityWarningCount;
+                        }
+
+                        {
+                            // 유출 위험도 분석
+                            document.querySelector('.blocking-active-count').textContent = response.fileOutboundBlockingStatus.activeCount;
+                            document.querySelector('.blocking-check-count').textContent = response.fileOutboundBlockingStatus.checkCount;
+                            document.querySelector('.blocking-alert-count').textContent = response.fileOutboundBlockingStatus.alertCount;
+                        }
                     }
                 );
             }
@@ -1111,8 +1127,8 @@ requirements, please purchase a commercial license from placelink.
             <div class="wrap-contents">
                 <div class="top">
                     <div class="summary">
-                        <div class="info inspection"><b>점검</b> (<span th:text="${activityInspectCount}">0</span>/<span th:text="${activityTotalCount}">0</span>)</div>
-                        <div class="info warning"><b>경고</b> (<span th:text="${activityWarningCount}">0</span>/<span th:text="${activityTotalCount}">0</span>)</div>
+                        <div class="info inspection"><b>점검</b> (<span class="activityInspectCount">0</span>/<span class="activityTotalCount">0</span>)</div>
+                        <div class="info warning"><b>경고</b> (<span class="activityWarningCount">0</span>/<span class="activityTotalCount">0</span>)</div>
                     </div>
                     <div class="c-flex-sty01 targetDate-wrap">
                         <div class="arrow-left"></div>
@@ -1259,15 +1275,15 @@ requirements, please purchase a commercial license from placelink.
                                     <div class="row-box">
                                         <div class="row-box-inner normal">
                                             <div class="title">정상</div>
-                                            <div class="content"><span>134</span>건</div>
+                                            <div class="content"><span class="blocking-active-count">0</span>건</div>
                                         </div>
                                         <div class="row-box-inner inspect">
                                             <div class="title">점검</div>
-                                            <div class="content"><span>12</span>건</div>
+                                            <div class="content"><span class="blocking-check-count">0</span>건</div>
                                         </div>
                                         <div class="row-box-inner warning">
                                             <div class="title">경고</div>
-                                            <div class="content"><span>5</span>건</div>
+                                            <div class="content"><span class="Blocking-alert-Count">0</span>건</div>
                                         </div>
                                     </div>
                                 </div>

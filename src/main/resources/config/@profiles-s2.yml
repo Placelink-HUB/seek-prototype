@@ -2,7 +2,9 @@
 # -Dspring.profiles.active=0_DEVELOP,s2
 #
 
-logging.file.path: ${user.home}/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/logs
+logging:
+  file.path: ${user.home}/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/logs
+  level.root: DEBUG
 
 # 시스템 속성의 "pid.file.path", "state.file.path" 경로를 배포용 모듈(경로) 하위로 설정하려면 VM 옵션에 아래의 내용을 추가한다.
 # -Dpid.file.path=C:/Users/eseun/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/run

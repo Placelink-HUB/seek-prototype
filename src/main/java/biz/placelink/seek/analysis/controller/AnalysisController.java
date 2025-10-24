@@ -33,6 +33,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -295,26 +296,24 @@ public class AnalysisController {
      * @return 파일전송 차단 현황 화면
      */
     @GetMapping(value = "/public/analysis/file-blocking")
-    public String fileBlockingList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
-            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
-
+    public String fileBlockingList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, ModelMap model,
+            @RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
         String pattern = "yyyyMMdd";
-        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), pattern, LocalDate.now());
 
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_BLOCKED);
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartDate(vSchDe, pattern);
+        searchVO.setSearchEndDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
-        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 파일전송 차단 현황 목록 조회
         model.addAttribute("fileOutboundHistListStatus", fileOutboundHistService.selectFileOutboundHistListStatus(searchVO));
-        model.addAttribute("fileOutboundHistListPagination", fileOutboundHistService.selectFileOutboundHistListWithPagination(searchVO));
-        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
-        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
+        model.addAttribute("fileOutboundHistList", fileOutboundHistService.selectFileOutboundHistList(searchVO));
+        model.addAttribute("schDe", vSchDe);
         model.addAttribute("searchGroupingType", searchGroupingType);
         return "analysis/file-blocking";
     }
@@ -326,27 +325,25 @@ public class AnalysisController {
      * @return 서명파일 전송 현황
      */
     @GetMapping(value = "/public/analysis/file-transfer")
-    public String fileTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
-            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
-
+    public String fileTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, ModelMap model,
+            @RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
         String pattern = "yyyyMMdd";
-        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), pattern, LocalDate.now());
 
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
         searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_ALL_NORMAL);
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartDate(vSchDe, pattern);
+        searchVO.setSearchEndDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
-        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 서명파일 전송 현황 목록 조회
         model.addAttribute("fileOutboundHistListStatus", fileOutboundHistService.selectFileOutboundHistListStatus(searchVO));
-        model.addAttribute("fileOutboundHistListPagination", fileOutboundHistService.selectFileOutboundHistListWithPagination(searchVO));
-        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
-        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
+        model.addAttribute("fileOutboundHistList", fileOutboundHistService.selectFileOutboundHistList(searchVO));
+        model.addAttribute("schDe", vSchDe);
         model.addAttribute("searchGroupingType", searchGroupingType);
         return "analysis/file-transfer";
     }
@@ -358,35 +355,30 @@ public class AnalysisController {
      * @return 시스템 파일 전송 현황 화면
      */
     @GetMapping(value = "/public/analysis/system-transfer")
-    public String systemTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model,
-            @RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
-
+    public String systemTransferList(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, ModelMap model,
+            @RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType) {
         String pattern = "yyyyMMdd";
-        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), pattern, LocalDate.now());
 
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
         searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_NONE_NORMAL);
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartDate(vSchDe, pattern);
+        searchVO.setSearchEndDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
-        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
+        searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
 
         // 시스템 파일 전송 현황 목록 조회
         model.addAttribute("fileOutboundHistListStatus", fileOutboundHistService.selectFileOutboundHistListStatus(searchVO));
-        model.addAttribute("fileOutboundHistListPagination", fileOutboundHistService.selectFileOutboundHistListWithPagination(searchVO));
-        model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
-        model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
+        model.addAttribute("fileOutboundHistList", fileOutboundHistService.selectFileOutboundHistList(searchVO));
+        model.addAttribute("schDe", vSchDe);
         model.addAttribute("searchGroupingType", searchGroupingType);
         return "analysis/system-transfer";
     }
 
     public record SearchPeriod(LocalDate searchStartDate, LocalDate searchEndDate) {
-        public SearchPeriod {
-        }
-
         public String searchStartDe(String pattern) {
             return this.searchStartDate() != null ? this.searchStartDate().format(DateTimeFormatter.ofPattern(S2Util.isNotEmpty(pattern) ? pattern : "yyyyMMdd")) : null;
         }

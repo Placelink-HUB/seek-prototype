@@ -34,9 +34,9 @@ requirements, please purchase a commercial license from placelink.
                 document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
             };
 
-            window.goPage = (pageNo) => {
+            window.goPage = () => {
                 const searchGroupingType = document.querySelector('input[name="searchGroupingType"]:checked').value;
-                location.href = `/public/analysis/file-transfer?pageNo=${pageNo}&searchGroupingType=${searchGroupingType}`;
+                location.href = `/public/analysis/file-transfer?schDe=[[${schDe}]]&searchGroupingType=${searchGroupingType}`;
             };
         </script>
     </th:block>
@@ -48,16 +48,18 @@ requirements, please purchase a commercial license from placelink.
                     <span class="sub-title">서명 파일의 외부 전송 처리 현황</span>
                 </h1>
                 <span class="btn-group">
-                    <button class="btn-type1 btn-coming-soon">기간 검색</button>
                     <button class="btn-type1 btn-coming-soon">전체 현황 다운로드</button>
                 </span>
             </div>
             <div class="wrap-contents">
                 <div class="top">
                     <div class="c-flex-sty01 targetDate-wrap">
-                        <span th:text="${searchStartDeStr}"></span>
-                        <span>&nbsp;~&nbsp;</span>
-                        <span th:text="${searchEndDeStr}"></span>
+                        <div class="arrow-left"></div>
+                        <div class="data-date">
+                            <div class="date targetDate">0000년 00월 00일</div>
+                            <div class="icon-today">TODAY</div>
+                        </div>
+                        <div class="arrow-right"></div>
                     </div>
                 </div>
                 <div class="contents">
@@ -108,9 +110,9 @@ requirements, please purchase a commercial license from placelink.
                     </div>
                     <h2 class="type1 c-dp-inline-block">PC 별 서명파일 전송 처리 현황</h2>
                     <div class="c-dp-inline-block c-ma-l10 c-color-white">
-                        <input type="radio" name="searchGroupingType" class="c-cursor-pointer" id="searchGroupingType_user" value="user" th:checked="${searchGroupingType == 'user'}" th:onchange="goPage([[${fileOutboundHistListPagination.pageNo}]])" />
+                        <input type="radio" name="searchGroupingType" class="c-cursor-pointer" id="searchGroupingType_user" value="user" th:checked="${searchGroupingType == 'user'}" th:onchange="goPage()" />
                         <label for="searchGroupingType_user" class="c-cursor-pointer">사용자</label>
-                        <input type="radio" name="searchGroupingType" class="c-cursor-pointer" id="searchGroupingType_channel" value="channel" th:checked="${searchGroupingType == 'channel'}" th:onchange="goPage([[${fileOutboundHistListPagination.pageNo}]])" />
+                        <input type="radio" name="searchGroupingType" class="c-cursor-pointer" id="searchGroupingType_channel" value="channel" th:checked="${searchGroupingType == 'channel'}" th:onchange="goPage()" />
                         <label for="searchGroupingType_channel" class="c-cursor-pointer">채널</label>
                     </div>
                     <div class="table-wrap type1 dark-slate">
@@ -129,37 +131,19 @@ requirements, please purchase a commercial license from placelink.
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr th:if="${fileOutboundHistListPagination.isEmpty}">
+                                <tr th:if="${#lists.isEmpty(fileOutboundHistList)}">
                                     <td colspan="6">데이터가 없습니다.</td>
                                 </tr>
-                                <tr th:each="fileOutboundBlockingHist : ${fileOutboundHistListPagination.dataList}">
-                                    <td th:text="${searchGroupingType == 'channel' ? fileOutboundBlockingHist.outboundChannelCcd : fileOutboundBlockingHist.userId}"></td>
-                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.actionCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${#numbers.formatDecimal(fileOutboundBlockingHist.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
-                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.totalFileCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.workingHourStatusNormalCount, 0, 'COMMA')}"></td>
-                                    <td th:text="${#numbers.formatInteger(fileOutboundBlockingHist.workingHourStatusAbnormalCount, 0, 'COMMA')}"></td>
+                                <tr th:unless="${#lists.isEmpty(fileOutboundHistList)}" th:each="fileOutboundHist : ${fileOutboundHistList}">
+                                    <td th:text="${searchGroupingType == 'channel' ? fileOutboundHist.outboundChannelCcd : fileOutboundHist.userId}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundHist.actionCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatDecimal(fileOutboundHist.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundHist.totalFileCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundHist.workingHourStatusNormalCount, 0, 'COMMA')}"></td>
+                                    <td th:text="${#numbers.formatInteger(fileOutboundHist.workingHourStatusAbnormalCount, 0, 'COMMA')}"></td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="pagination-wrapper">
-                            <ul th:if="${fileOutboundHistListPagination.isNotEmpty}" class="pagination">
-                                <li th:if="${fileOutboundHistListPagination.firstPageNoOnPageList gt 1}" class="paginate_button prev">
-                                    <a href="#" th:onclick="goPage([[${fileOutboundHistListPagination.firstPageNoOnPageList - 1}]])">&lt;</a>
-                                </li>
-                                <th:block th:each="pageNo : ${#numbers.sequence(fileOutboundHistListPagination.firstPageNoOnPageList, fileOutboundHistListPagination.lastPageNoOnPageList)}">
-                                    <li th:if="${pageNo eq fileOutboundHistListPagination.pageNo}" class="paginate_button active">
-                                        <a href="#" th:text="${pageNo}"></a>
-                                    </li>
-                                    <li th:if="${pageNo ne fileOutboundHistListPagination.pageNo}" class="paginate_button">
-                                        <a href="#" th:onclick="goPage([[${pageNo}]])" th:text="${pageNo}"></a>
-                                    </li>
-                                </th:block>
-                                <li th:if="${fileOutboundHistListPagination.lastPageNoOnPageList lt fileOutboundHistListPagination.lastPageNo}" class="paginate_button next">
-                                    <a href="#" th:onclick="goPage([[${fileOutboundHistListPagination.lastPageNoOnPageList + 1}]])">&gt;</a>
-                                </li>
-                            </ul>
-                        </div>
                     </div>
                 </div>
             </div>

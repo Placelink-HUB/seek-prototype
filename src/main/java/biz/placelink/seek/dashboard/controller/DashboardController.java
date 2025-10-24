@@ -41,7 +41,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import biz.placelink.seek.analysis.service.FileOutboundHistService;
 import biz.placelink.seek.analysis.service.MaskHistService;
+import biz.placelink.seek.analysis.vo.SchFileOutboundHistVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.GlobalSharedStore;
 import biz.placelink.seek.dashboard.service.DashboardService;
@@ -60,11 +62,13 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
     private final MaskHistService maskHistService;
+    private final FileOutboundHistService fileOutboundHistService;
     private final GlobalSharedStore store;
 
-    public DashboardController(DashboardService dashboardService, MaskHistService maskHistService, GlobalSharedStore store) {
+    public DashboardController(DashboardService dashboardService, MaskHistService maskHistService, FileOutboundHistService fileOutboundHistService, GlobalSharedStore store) {
         this.dashboardService = dashboardService;
         this.maskHistService = maskHistService;
+        this.fileOutboundHistService = fileOutboundHistService;
         this.store = store;
     }
 
@@ -107,17 +111,6 @@ public class DashboardController {
             model.addAttribute("consoleType", consoleType);
         }
 
-        UserIntegratedActivityVO userIntegratedActivity = dashboardService.selectUserActivityInformation(vSchDe);
-        if (userIntegratedActivity != null) {
-            int inspectCount = userIntegratedActivity.getInspectCount();
-            int warningCount = userIntegratedActivity.getWarningCount();
-            int totalCount = userIntegratedActivity.getNormalCount() + inspectCount + warningCount;
-
-            model.addAttribute("activityInspectCount", inspectCount);
-            model.addAttribute("activityWarningCount", warningCount);
-            model.addAttribute("activityTotalCount", totalCount);
-        }
-
         String viewName = switch (siteId) {
             case "integrated" -> "dashboard/integrated-dashboard";
             case "file" -> "dashboard/file-dashboard";
@@ -146,6 +139,28 @@ public class DashboardController {
         response.put("fileAnalysisInfo", dashboardService.selectFileAnalysisInformation(vSchDe));
         response.put("fileOutboundHistStatusInfoList", dashboardService.selectFileOutboundHistStatusInformation(vSchDe));
         response.put("fileOutboundHistChannelInfoList", dashboardService.selectFileOutboundHistChannelInformation(vSchDe, Constants.CD_OUTBOUND_STATUS_SENT));
+
+        UserIntegratedActivityVO userIntegratedActivity = dashboardService.selectUserActivityInformation(vSchDe);
+        if (userIntegratedActivity != null) {
+            int inspectCount = userIntegratedActivity.getInspectCount();
+            int warningCount = userIntegratedActivity.getWarningCount();
+            int totalCount = userIntegratedActivity.getNormalCount() + inspectCount + warningCount;
+
+            response.put("activityInspectCount", inspectCount);
+            response.put("activityWarningCount", warningCount);
+            response.put("activityTotalCount", totalCount);
+        }
+
+        {
+            String pattern = "yyyyMMdd";
+            SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
+            searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_BLOCKED);
+            searchVO.setSearchStartDate(vSchDe, pattern);
+            searchVO.setSearchEndDate(vSchDe, pattern);
+            searchVO.setPagingYn("N");
+
+            response.put("fileOutboundBlockingStatus", fileOutboundHistService.selectFileOutboundHistListStatus(searchVO));
+        }
 
         response.put(Constants.RESULT_CODE, 1);
         return ResponseEntity.ok(response);

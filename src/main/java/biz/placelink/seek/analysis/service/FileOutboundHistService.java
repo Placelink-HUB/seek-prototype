@@ -81,6 +81,16 @@ public class FileOutboundHistService {
      * @param searchVO 조회조건
      * @return 파일 외부전송 이력 목록
      */
+    public List<FileOutboundHistVO> selectFileOutboundHistList(SchFileOutboundHistVO searchVO) {
+        return fileOutboundHistMapper.selectFileOutboundHistList(searchVO);
+    }
+
+    /**
+     * 파일 외부전송 이력 목록을 조회한다.
+     *
+     * @param searchVO 조회조건
+     * @return 파일 외부전송 이력 목록
+     */
     public PaginationInfo selectFileOutboundHistListWithPagination(SchFileOutboundHistVO searchVO) {
         List<FileOutboundHistVO> list = fileOutboundHistMapper.selectFileOutboundHistList(searchVO);
         int count = fileOutboundHistMapper.selectFileOutboundHistListCount(searchVO);
