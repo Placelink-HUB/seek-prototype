@@ -55,6 +55,7 @@ import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.AnalysisService;
 import biz.placelink.seek.analysis.service.FileOutboundHistService;
 import biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistService;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.SchFileOutboundHistVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
@@ -64,6 +65,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2DateUtil;
+import kr.s2.ext.util.S2FileUtil;
 import kr.s2.ext.util.S2JsonUtil;
 import kr.s2.ext.util.S2ServletUtil;
 import kr.s2.ext.util.S2Util;
@@ -175,8 +177,13 @@ public class AnalysisController {
         searchVO.setOrderBy("CREATE_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
 
+        AnalysisResultVO fileAnalysisListStatus = analysisDetailService.selectFileAnalysisListStatus(searchVO);
+        if (fileAnalysisListStatus != null) {
+            model.addAttribute("totalFileSizeFormat", new S2FileUtil.FileSizeFormat(fileAnalysisListStatus.getTotalFileSize()));
+        }
+
         model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
-        model.addAttribute("fileAnalysisListStatus", analysisDetailService.selectFileAnalysisListStatus(searchVO));
+        model.addAttribute("fileAnalysisListStatus", fileAnalysisListStatus);
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/detection-file";

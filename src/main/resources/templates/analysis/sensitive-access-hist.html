@@ -66,28 +66,28 @@ requirements, please purchase a commercial license from placelink.
                                 <div class="card-title">복호화 처리 총 건수</div>
                                 <div class="card-desc">PC별 복호화 처리 총 합계</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.totalRequestCount, 0, 'COMMA')}">0</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.totalRequestCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 mint">
                             <div class="title-box menu4-2">
                                 <div class="card-title">정상</div>
                                 <div class="card-desc">복호화 요청 이상 없음</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.normalRequestCount, 0, 'COMMA')}">0</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.normalRequestCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 tangerine">
                             <div class="title-box menu4-3">
                                 <div class="card-title">점검</div>
                                 <div class="card-desc">대량 요청 및 비 업무시간 요청</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.abnormalRequestCount, 0, 'COMMA')}">0</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(sensitiveInformationUnmaskHistListStatus.abnormalRequestCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 red">
                             <div class="title-box menu4-4">
                                 <div class="card-title">경고</div>
                                 <div class="card-desc">시간/패턴 이상 탐지</div>
                             </div>
-                            <div class="card-content"><span>0</span>건</div>
+                            <div class="card-content"><span class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                     </div>
                     <h2 class="type1">PC별 복호화 처리 현황</h2>

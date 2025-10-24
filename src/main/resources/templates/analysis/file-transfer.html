@@ -69,14 +69,14 @@ requirements, please purchase a commercial license from placelink.
                                 <div class="card-title">전송한 총 파일 수</div>
                                 <div class="card-desc">외부로 전송한 총 파일 수</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.totalFileCount, 0, 'COMMA')}">0</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.totalFileCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 many-on-many white small">
                             <div class="title-box menu7-2 padding-left-0">
                                 <div class="card-title">전송한 총 파일 용량</div>
                                 <div class="card-desc">외부로 전송한 총 파일 용량</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatDecimal(fileOutboundHistListStatus.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}">0</span>MB</div>
+                            <div class="card-content"><span th:text="${#numbers.formatDecimal(fileOutboundHistListStatus.totalFileSize / 1024.0 / 1024.0, 1, 'COMMA', 2, 'POINT')}" class="size">0</span> <span class="size-unit">MB</span></div>
                         </div>
                         <div class="card border"></div>
                         <div class="card type1 many-on-many white small">
@@ -84,28 +84,28 @@ requirements, please purchase a commercial license from placelink.
                                 <div class="card-title">HTTPS 전송</div>
                                 <div class="card-desc">메일/클라우드로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelHttpsCount, 0, 'COMMA')}">0</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelHttpsCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 many-on-many white small">
                             <div class="title-box menu7-4">
                                 <div class="card-title">USB 전송</div>
                                 <div class="card-desc">USB로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelUsbCount, 0, 'COMMA')}">0</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelUsbCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 many-on-many white small">
                             <div class="title-box menu7-5">
                                 <div class="card-title">메신저 전송</div>
                                 <div class="card-desc">카카오톡/라인 등으로 전송한 건수</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelMessengerCount, 0, 'COMMA')}">0</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelMessengerCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 many-on-many white small">
                             <div class="title-box menu7-6">
                                 <div class="card-title">프린터 전송</div>
                                 <div class="card-desc">프린터로 출력한 건수</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelPrintCount, 0, 'COMMA')}">0</span>건</div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.channelPrintCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                     </div>
                     <h2 class="type1 c-dp-inline-block">PC 별 서명파일 전송 처리 현황</h2>

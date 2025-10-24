@@ -780,10 +780,11 @@ requirements, please purchase a commercial license from placelink.
             }
 
             function updateSemicircleChart2() {
-                const fileMegabyte = semicircleChartInfo2.fileOutboundStatus.sentFileSize > 0 ? parseFloat((semicircleChartInfo2.fileOutboundStatus.sentFileSize / 1024 / 1024).toFixed(2)) : 0;
+                const fileSizeFormat = S2Util.formatBytes(semicircleChartInfo2.fileOutboundStatus.sentFileSize);
 
                 document.querySelector('.overseasDetectionStatus .sent-file-count').textContent = semicircleChartInfo2.fileOutboundStatus.sentFileCount.toLocaleString('ko-KR');
-                document.querySelector('.overseasDetectionStatus .sent-file-size').textContent = fileMegabyte.toLocaleString('ko-KR');
+                document.querySelector('.overseasDetectionStatus .sent-file-size').textContent = fileSizeFormat.formattedValue;
+                document.querySelector('.overseasDetectionStatus .sent-file-size-unit').textContent = fileSizeFormat.unit;
                 document.querySelector('.overseasDetectionStatus .blocked-file-count').textContent = semicircleChartInfo2.fileOutboundStatus.blockedFileCount.toLocaleString('ko-KR');
 
                 let totalCount = semicircleChartInfo2.fileOutboundStatus.sentCount + semicircleChartInfo2.fileOutboundStatus.blockedCount;
@@ -1045,7 +1046,8 @@ requirements, please purchase a commercial license from placelink.
                             label: {
                                 show: true,
                                 position: 'inside',
-                                formatter: '{b}\n{c}',
+                                // 라벨 포매터 변경: {b} 이름, {c} 값, {d} 백분율
+                                formatter: '{b}\n{d}%',
                                 fontSize: 10,
                                 color: '#fff',
                                 overflow: 'truncate',
@@ -1066,13 +1068,7 @@ requirements, please purchase a commercial license from placelink.
                                     color: '#ffd10a'
                                 }
                             },
-                            data: [
-                                {name: 'FTP/SSH', value: 5.6},
-                                {name: '메일/클라우드', value: 1},
-                                {name: '메신저', value: 0.8},
-                                {name: '프린트', value: 0.5},
-                                {name: 'USB', value: 3.8}
-                            ]
+                            data: []
                         }
                     ]
                 });
@@ -1113,7 +1109,10 @@ requirements, please purchase a commercial license from placelink.
             }
 
             function updateFileDetectionInfo() {
-                document.querySelector('.detection-file-size').textContent = (fileDetectionInfo.fileSize / 1024).toFixed(1).toLocaleString('ko-KR');
+                const fileSizeFormat = S2Util.formatBytes(fileDetectionInfo.fileSize);
+
+                document.querySelector('.detection-file-size').textContent = fileSizeFormat.formattedValue;
+                document.querySelector('.detection-file-size-unit').textContent = fileSizeFormat.unit;
                 document.querySelector('.detection-file-count').textContent = fileDetectionInfo.fileCount.toLocaleString('ko-KR');
             }
 
@@ -1229,19 +1228,19 @@ requirements, please purchase a commercial license from placelink.
                                     <div class="data data1 type2">
                                         <div class="data-title">전송된 파일 수</div>
                                         <div class="data-contents">
-                                            <div><span class="low-count sent-file-count"></span><span> 건</span></div>
+                                            <div><span class="low-count sent-file-count"></span> <span>건</span></div>
                                         </div>
                                     </div>
                                     <div class="data data2 type2">
                                         <div class="data-title">전송된 파일 용량</div>
                                         <div class="data-contents">
-                                            <div><span class="mid-count sent-file-size"></span><span> MB</span></div>
+                                            <div><span class="mid-count sent-file-size"></span> <span class="sent-file-size-unit">B</span></div>
                                         </div>
                                     </div>
                                     <div class="data data3">
                                         <div class="data-title">차단된 파일 수</div>
                                         <div class="data-contents">
-                                            <div><span class="high-count blocked-file-count"></span><span> 건</span></div>
+                                            <div><span class="high-count blocked-file-count"></span> <span>건</span></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1267,7 +1266,7 @@ requirements, please purchase a commercial license from placelink.
                                                     <div class="card-desc">민감정보 분석한 총 파일 용량</div>
                                                 </div>
                                                 <div class="text-content">
-                                                    <div><span class="file-count detection-file-size">0</span> <span class="num-item">KB</span></div>
+                                                    <div><span class="file-count detection-file-size">0</span> <span class="num-item detection-file-size-unit">B</span></div>
                                                 </div>
                                             </div>
                                         </div>

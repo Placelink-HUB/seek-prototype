@@ -2181,6 +2181,58 @@ export const S2Util = {
         }
     },
     /**
+     * 바이트(Byte) 값을 B, KB, MB, GB로 자동 변환하고 단위 정보를 반환한다.
+     *
+     * @param {number} bytes - 변환할 파일 크기 (바이트 단위).
+     * @returns {{value: number, unit: string, formattedValue: string}}
+     * - value: 변환된 숫자 값 (Number, toFixed 적용).
+     * - unit: 적용된 단위 문자열 ('B', 'KB', 'MB', 'GB').
+     * - formattedValue: 로케일(ko-KR)이 적용된 최종 표시 문자열 (String, 쉼표 포함).
+     */
+    formatBytes(bytes) {
+        const KB_IN_BYTES = 1024;
+        const MB_IN_BYTES = 1024 * KB_IN_BYTES;
+        const GB_IN_BYTES = 1024 * MB_IN_BYTES;
+
+        const FILE_SIZE_UNITS = {
+            B: 'B',
+            KB: 'KB',
+            MB: 'MB',
+            GB: 'GB'
+        };
+
+        let value;
+        let unit;
+
+        if (!bytes || bytes <= 0) {
+            value = 0;
+            unit = FILE_SIZE_UNITS.B;
+        } else if (bytes >= GB_IN_BYTES) {
+            value = parseFloat((bytes / GB_IN_BYTES).toFixed(2));
+            unit = FILE_SIZE_UNITS.GB;
+        } else if (bytes >= MB_IN_BYTES) {
+            value = parseFloat((bytes / MB_IN_BYTES).toFixed(2));
+            unit = FILE_SIZE_UNITS.MB;
+        } else if (bytes >= KB_IN_BYTES) {
+            value = parseFloat((bytes / KB_IN_BYTES).toFixed(1)); // KB는 소수점 1자리
+            unit = FILE_SIZE_UNITS.KB;
+        } else {
+            value = bytes;
+            unit = FILE_SIZE_UNITS.B;
+        }
+
+        // B 단위일 경우 소수점 없이 정수로 표시, 그 외 단위는 소수점을 포함하여 표시 (최대 2자리)
+        const formattedValue = value.toLocaleString('ko-KR', {
+            maximumFractionDigits: unit === FILE_SIZE_UNITS.B ? 0 : 2
+        });
+
+        return {
+            value: value,
+            unit: unit,
+            formattedValue: formattedValue
+        };
+    },
+    /**
      * 범용 고유 식별자(UUID) 버전 4를 생성하여 반환한다.
      * 가능하다면 window.crypto.randomUUID()를 사용하고, 지원하지 않는 경우
      * 암호화적으로 안전한 난수(getRandomValues)를 사용하여 UUID v4 형식에 맞게 생성한다.
