@@ -5,7 +5,7 @@ analysis:
   file-signed-server:
     url: http://43.200.240.163:8090 # 파일 서명 URL
   schedule:
-    enabled: false
+    enabled: true
     request:
       maxcnt: 2
   excluded-paths: /dashboard/,/public/js/,/public/css/,/public/images/,/public/ico/,/forward/response/heartbeat

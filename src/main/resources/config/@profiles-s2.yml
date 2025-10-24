@@ -10,6 +10,8 @@ logging:
 # -Dpid.file.path=C:/Users/eseun/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/run
 # -Dstate.file.path=C:/Users/eseun/Workspaces/SEEK/_deploy/gw.placelink.biz/opt/seek/var/state
 
+analysis.schedule.enabled: false
+
 spring:
   thymeleaf:
     prefix: file:${user.home}/Workspaces/SEEK/seek-prototype/src/main/resources/templates/
