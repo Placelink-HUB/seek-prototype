@@ -2243,7 +2243,7 @@ export const S2Util = {
      * setTimeout(() => multiCounter.stop(0), 1000); // 첫 번째 요소 1초 후 중지
      * setTimeout(() => multiCounter.stopAll(), 2000); // 모든 요소 2초 후 중지
      */
-    animateNumber: function (elements, options) {
+    animateNumber(elements, options) {
         const defaultOptions = {
             duration: 2000,
             locale: ''
@@ -2338,10 +2338,12 @@ export const S2Util = {
      * @example
      * S2Util.subscribeServiceWorker('BObv3x9...');
      */
-    subscribeServiceWorker: async function (publicKey) {
+    async subscribeServiceWorker(publicKey, userId) {
         if ('PushManager' in window && 'serviceWorker' in navigator) {
-            const lastSubscriptionsDate = S2Util.getLocalStorage('plSubscriptionsDate');
-            const today = dayjs().format('YYYYMMDD');
+            const SUBSCRIPTION_STORAGE_KEY = 's2-subscription-data';
+
+            const lastSubscriptionData = S2Util.getLocalStorage(SUBSCRIPTION_STORAGE_KEY);
+            const subscriptionCacheKey = dayjs().format('YYYYMMDD') + (userId ? `-${userId}` : '');
 
             // 알림 컨펌 사용 여부 ("구노에서 알림 받기를 수락하시겠습니까?")
             const isOpenNotificationConfirm = false;
@@ -2349,14 +2351,14 @@ export const S2Util = {
             if (!publicKey) {
                 console.debug('Public key 가 없습니다.');
                 return;
-            } else if (today === lastSubscriptionsDate) {
+            } else if (subscriptionCacheKey === lastSubscriptionData) {
                 console.debug('금일 구독 완료');
                 return;
             }
 
             // 금일 구독을 안했다면 구독을 신청(갱신)한다.
             try {
-                let confirmResult = !!lastSubscriptionsDate;
+                let confirmResult = !!lastSubscriptionData;
 
                 const registration = await navigator.serviceWorker.register('/public/js/service-worker.s2.js', {scope: '/public/js/'}).then((reg) => {
                     reg.update();
@@ -2391,7 +2393,7 @@ export const S2Util = {
                         }
                     });
                     if (response.ok) {
-                        S2Util.setLocalStorage('plSubscriptionsDate', today);
+                        S2Util.setLocalStorage(SUBSCRIPTION_STORAGE_KEY, subscriptionCacheKey);
                         console.debug('Push 구독 정보 서버 전송 성공');
                     }
                 }
@@ -2413,7 +2415,7 @@ export const S2Util = {
      * // 페이지 로드 시점에 호출하여 Service Worker의 이벤트를 수신 대기한다.
      * S2Util.receiveServiceWorkerEvents();
      */
-    receiveServiceWorkerEvents: function () {
+    receiveServiceWorkerEvents() {
         if (navigator.serviceWorker && typeof navigator.serviceWorker.addEventListener === 'function') {
             navigator.serviceWorker.addEventListener('message', (event) => {
                 if (event.data.type === 'notification') {
