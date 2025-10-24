@@ -263,13 +263,6 @@ public class AnalysisController {
      */
     @GetMapping(value = "/public/analysis/agent-status")
     public String agentStatus(HttpServletResponse response, @RequestParam(required = false, name = "seek_mode") String seekMode, @RequestParam(required = false) Integer pageNo, ModelMap model) {
-        SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setPageNo(pageNo == null ? 1 : pageNo);
-        searchVO.setOrderBy("CREATE_DT DESC");
-        response.setHeader("X-Seek-Mode", seekMode);
-
-        // PC 에이전트 상태 목록 조회
-        // model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         return "analysis/agent-status";
     }
 
