@@ -226,18 +226,25 @@ requirements, please purchase a commercial license from placelink.
                             semicircleChartInfo2.fileOutboundStatus.sentFileCount += Number(event.data.data['totalFileCount'] || 0);
                             semicircleChartInfo2.fileOutboundStatus.sentFileSize += Number(event.data.data['totalFileSize'] || 0);
 
-                            // 전송 채널 현황
-                            const fileOutboundChannelInfo = pieChartInfo['fileOutboundChannelInfo'];
-                            const foundChannel = fileOutboundChannelInfo.find((item) => item.name === event.data.data['outboundChannelCcd']);
-                            if (foundChannel) {
-                                foundChannel.value++;
-                            } else {
-                                fileOutboundChannelInfo.push({
-                                    name: fileOutboundHistChannelInfo.outboundChannelCcd,
-                                    value: fileOutboundHistChannelInfo.outboundHistCount || 0
-                                });
+                            {
+                                // 전송 채널 현황
+                                const outboundChannelCcd = event.data.data['outboundChannelCcd'];
+                                const outboundFileCount = event.data.data['totalFileCount'] || 0;
+
+                                const fileOutboundChannelInfo = pieChartInfo['fileOutboundChannelInfo'];
+                                const foundChannel = fileOutboundChannelInfo.find((item) => item.name === outboundChannelCcd);
+
+                                if (foundChannel) {
+                                    foundChannel.value += outboundFileCount;
+                                } else {
+                                    fileOutboundChannelInfo.push({
+                                        name: outboundChannelCcd,
+                                        value: outboundFileCount
+                                    });
+                                }
+
+                                updatePieChart();
                             }
-                            updatePieChart();
                         } else {
                             semicircleChartInfo2.fileOutboundStatus.blockedCount++;
                             semicircleChartInfo2.fileOutboundStatus.blockedFileCount += Number(event.data.data['fileCount'] || 0);
@@ -390,14 +397,19 @@ requirements, please purchase a commercial license from placelink.
                                     if (!fileOutboundHistChannelInfo) {
                                         return;
                                     }
+
+                                    const outboundChannelCcd = fileOutboundHistChannelInfo.outboundChannelCcd;
+                                    const outboundFileCount = fileOutboundHistChannelInfo.outboundFileCount || 0;
+
                                     const fileOutboundChannelInfo = pieChartInfo['fileOutboundChannelInfo'];
-                                    const foundChannel = fileOutboundChannelInfo.find((item) => item.name === fileOutboundHistChannelInfo.outboundChannelCcd);
+                                    const foundChannel = fileOutboundChannelInfo.find((item) => item.name === outboundChannelCcd);
+
                                     if (foundChannel) {
-                                        foundChannel.value += fileOutboundHistChannelInfo.outboundHistCount || 0;
+                                        foundChannel.value += outboundFileCount;
                                     } else {
                                         fileOutboundChannelInfo.push({
-                                            name: fileOutboundHistChannelInfo.outboundChannelCcd,
-                                            value: fileOutboundHistChannelInfo.outboundHistCount || 0
+                                            name: outboundChannelCcd,
+                                            value: outboundFileCount
                                         });
                                     }
                                 }
@@ -1033,7 +1045,7 @@ requirements, please purchase a commercial license from placelink.
                             label: {
                                 show: true,
                                 position: 'inside',
-                                formatter: '{b}\n{c}%',
+                                formatter: '{b}\n{c}',
                                 fontSize: 10,
                                 color: '#fff',
                                 overflow: 'truncate',

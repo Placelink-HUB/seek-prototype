@@ -212,7 +212,9 @@ requirements, please purchase a commercial license from placelink.
         SELECT
             sfoh.OUTBOUND_CHANNEL_CCD,
             cc1.COM_CD_NM AS OUTBOUND_CHANNEL_CCD_NM,
-            COUNT(1) AS OUTBOUND_HIST_COUNT
+            COUNT(1) AS OUTBOUND_HIST_COUNT,
+            SUM(COALESCE(sfoh.TOTAL_FILE_COUNT, 0)) AS OUTBOUND_FILE_COUNT,
+            SUM(COALESCE(sfoh.TOTAL_FILE_SIZE, 0)) AS OUTBOUND_FILE_SIZE
         FROM SEEK_FILE_OUTBOUND_HIST sfoh
             LEFT JOIN SEEK_COM_CD cc1
                 ON sfoh.OUTBOUND_CHANNEL_CCD = cc1.COM_CD
