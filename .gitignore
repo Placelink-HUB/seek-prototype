@@ -1,49 +1,82 @@
-HELP.md
-.gradle
+#---------------------------------------------------
+# Git System
+#---------------------------------------------------
+.git/
+!.gitignore
+!.gitattributes
+
+#---------------------------------------------------
+# Build Tools (Gradle / Maven)
+#---------------------------------------------------
+.gradle/
 build/
+target/
 !gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-*.log
+!gradle/wrapper/gradle-wrapper.properties
 
-### Backup Files ###
-*~
+#---------------------------------------------------
+# IDE / Editors
+#---------------------------------------------------
+# IntelliJ / Eclipse / VSCode / NetBeans
+.idea/
+*.iws
+*.ipr
+*.iml
+.vscode/
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+bin/
+out/
+.nb-gradle/
+.nbbuild/
+.nbproject/
+dist/
+nbdist/
 
-### Node.js ###
+#---------------------------------------------------
+# Node / Frontend
+#---------------------------------------------------
 node_modules/
+
+# 아래 항목은 팀 환경에 따라 선택적으로 제외 (Node.js 사용 환경(패키지 버전, 빌드 설정, 코드 스타일) 공유가 필요하다면 주석 처리 또는 삭제)
 package.json
 package-lock.json
 eslint.config.mjs
 
-### VS Code ###
-.vscode/
+#---------------------------------------------------
+# Temp / Logs / Backups
+#---------------------------------------------------
+*.log
+*.bak
+*.tmp
+*~
+~*
+*.pid
+logs/**/*
+tmp/**/*
+temp/**/*
+*.war
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+#---------------------------------------------------
+# Deploy & Custom Work
+#---------------------------------------------------
+work/
+deploy/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+#---------------------------------------------------
+# System / Error Dumps
+#---------------------------------------------------
+hs_err_pid*.log
+.DS_Store
+Thumbs.db
+desktop.ini
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# -gitignor 가 포함된 모든 파일 및 디렉토리 제외
+**/*-gitignore*
 
-var/
+/var
