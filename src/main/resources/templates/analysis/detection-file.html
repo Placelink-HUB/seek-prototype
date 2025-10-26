@@ -117,7 +117,7 @@ requirements, please purchase a commercial license from placelink.
 
             function downloadFile(fileId) {
                 S2Util.fetch(
-                    `/file/image/view/${fileId}`,
+                    `/file/download/${fileId}`,
                     {
                         method: 'GET',
                         responseType: 'blob'

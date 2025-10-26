@@ -87,10 +87,26 @@ public class WildpathController {
         this.serviceWorkerService = serviceWorkerService;
         this.wildpathAnalysisService = wildpathAnalysisService;
         this.store = store;
+
+        this.systemPaths = new String[] {
+                "/public/dashboard/", // 종합 대시보드
+                "/public/analysis/detection-file", // 디지털 서명 현황
+                "/analysis/create-detection-file", // 디지털 서명 현황 - 검증 파일 등록
+                "/public/sample/test", // 데이터 암호화 현황
+                "/public/analysis/sensitive-access-hist", // 데이터 복호화 현황
+                "/public/analysis/agent-status", // PC 에이전트 상태
+                "/public/analysis/agent-status-list", // PC 에이전트 상태 목록 조회
+                "/public/analysis/file-blocking", // 파일전송 차단 현황
+                "/public/analysis/file-transfer", // 서명파일 전송 현황
+                "/public/analysis/system-transfer", // 시스템 파일 전송 현황
+                "/public/dashboard/anomaly_detection" // 이상 패턴 탐지 현황
+        };
     }
 
     @Value("${analysis.excluded-paths}")
     public String analysisExcludedPaths;
+
+    private String[] systemPaths;
 
     /**
      * 역방향 프록시 전처리 비동기 처리
@@ -208,7 +224,7 @@ public class WildpathController {
                 logger.error(e.getMessage(), e);
             }
 
-            if (!this.isExcludedPath(request, "/postprocess/", true)) {
+            if (!this.isExcludedPath(request, "/postprocess/", this.systemPaths)) {
                 String clientIp = S2ServletUtil.getClientIp(request);
                 payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_POST, payload, seekMode, clientIp);
             }
@@ -247,7 +263,7 @@ public class WildpathController {
      */
     @PostMapping(path = "/response/async/**")
     protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (this.isExcludedPath(request, "/response/async/", true)) {
+        if (this.isExcludedPath(request, "/response/async/", this.systemPaths)) {
             return;
         }
 
@@ -297,7 +313,7 @@ public class WildpathController {
      */
     @PostMapping(path = "/response/async2/**", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void onAfterPostprocess2(@RequestParam(value = "attachments", required = false) List<MultipartFile> attachments, @RequestParam(value = "url", required = false) String url, @RequestParam(value = "decrypted_body", required = false) String decryptedBody, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (this.isExcludedPath(request, "/response/async2/", true)) {
+        if (this.isExcludedPath(request, "/response/async2/")) {
             return;
         }
 
@@ -348,7 +364,7 @@ public class WildpathController {
      */
     @PostMapping(path = "/forward/response/async/**")
     public void forwardOnAfterPostprocess(@RequestParam MultiValueMap<String, String> params, HttpServletRequest request) {
-        if (this.isExcludedPath(request, "/forward/response/async/", true)) {
+        if (this.isExcludedPath(request, "/forward/response/async/")) {
             return;
         }
 
@@ -483,7 +499,7 @@ public class WildpathController {
      */
     @PostMapping(path = "/response/async3/**")
     protected void onAfterPostprocess3(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (this.isExcludedPath(request, "/response/async2/", true)) {
+        if (this.isExcludedPath(request, "/response/async2/")) {
             return;
         }
 
@@ -572,7 +588,7 @@ public class WildpathController {
      * @param additionalExcludedPaths 추가로 제외할 경로
      * @return
      */
-    private boolean isExcludedPath(HttpServletRequest request, String stdPath, boolean isStaticResourceExcluded, String... additionalExcludedPaths) {
+    private boolean isExcludedPath(HttpServletRequest request, String stdPath, String... additionalExcludedPaths) {
         String realPath = request.getServletPath().split(stdPath)[1];
         if (!realPath.startsWith("/")) {
             realPath = "/" + realPath;

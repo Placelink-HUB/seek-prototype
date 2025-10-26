@@ -34,13 +34,14 @@ public class FileController {
     }
 
     /**
-     * 이미지 보기
+     * 파일 다운로드
      *
      * @param fileId 파일 ID
+     * @param sortSn 정렬 순번
      * @param model  ModelMap
-     * @return 파일 뷰
+     * @return 다운로드 뷰
      */
-    @GetMapping(value = {"/file/image/view/{fileId}", "/file/image/view/{fileId}/{sortSn}"})
+    @GetMapping(value = {"/file/download/{fileId}", "/file/download/{fileId}/{sortSn}"})
     public String imageView(@PathVariable String fileId, @PathVariable(required = false) Integer sortSn, ModelMap model) {
         List<FileDetailVO> fileDetailList = sortSn != null ? fileService.selectFileDetailList(fileId, sortSn) : fileService.selectFileDetailList(fileId);
         if (fileDetailList != null && fileDetailList.size() == 1) {

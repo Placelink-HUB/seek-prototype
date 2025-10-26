@@ -8,7 +8,7 @@ analysis:
     enabled: true
     request:
       maxcnt: 2
-  excluded-paths: /dashboard/,/public/js/,/public/css/,/public/images/,/public/ico/,/forward/response/heartbeat
+  excluded-paths: /console/,/public/login,/login,/api/public/login,/api/check/login,/api/check/login,/public/js/,/public/css/,/public/images/,/public/ico/,/favicon.ico
 encryption:
   password: PL408@fnw96
 
