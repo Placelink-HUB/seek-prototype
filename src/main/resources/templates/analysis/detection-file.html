@@ -283,28 +283,28 @@ requirements, please purchase a commercial license from placelink.
                                 <div class="card-title">총 서명 완료 수</div>
                                 <div class="card-desc">디지털 서명 처리 수</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileAnalysisListStatus.fileCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
+                            <div class="card-content"><span th:text="${fileAnalysisListStatus != null ? #numbers.formatInteger(fileAnalysisListStatus.fileCount, 0, 'COMMA') : 0}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1">
                             <div class="title-box menu2-2">
                                 <div class="card-title">탐지 수</div>
                                 <div class="card-desc">LLM이 탐지한 민감정보 수</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileAnalysisListStatus.totalDetectionCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
+                            <div class="card-content"><span th:text="${fileAnalysisListStatus != null ? #numbers.formatInteger(fileAnalysisListStatus.totalDetectionCount, 0, 'COMMA') : 0}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1">
                             <div class="title-box menu2-3">
                                 <div class="card-title">분석 용량</div>
                                 <div class="card-desc">LLM이 분석한 전체 용량</div>
                             </div>
-                            <div class="card-content"><span th:text="${fileAnalysisListStatus.formattedTotalFileSize}" class="size">0</span> <span th:text="${fileAnalysisListStatus.formattedTotalFileSizeUnit}" class="size-unit">MB</span></div>
+                            <div class="card-content"><span th:text="${fileAnalysisListStatus != null ? fileAnalysisListStatus.formattedTotalFileSize : 0}" class="size">0</span> <span th:text="${fileAnalysisListStatus != null ? fileAnalysisListStatus.formattedTotalFileSizeUnit : 'B'}" class="size-unit">B</span></div>
                         </div>
                         <div class="card type1">
                             <div class="title-box menu2-4">
                                 <div class="card-title">다운로드 수</div>
                                 <div class="card-desc">서명파일 다운로드 수</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileAnalysisListStatus.downloadCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
+                            <div class="card-content"><span th:text="${fileAnalysisListStatus != null ? #numbers.formatInteger(fileAnalysisListStatus.downloadCount, 0, 'COMMA') : 0}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                     </div>
                     <h2 class="type1">디지털 서명 처리 현황</h2>

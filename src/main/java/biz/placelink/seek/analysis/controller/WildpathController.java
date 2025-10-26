@@ -38,10 +38,12 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -565,33 +567,23 @@ public class WildpathController {
     /**
      * 제외할 경로인지 확인한다.
      *
-     * @param request                  HttpServletRequest
-     * @param stdPath                  기준 경로 (기준 경로 뒤의 경로가 실제 경로)
-     * @param isStaticResourceExcluded 정적 리소스 제외 여부
+     * @param request                 HttpServletRequest
+     * @param stdPath                 기준 경로 (기준 경로 뒤의 경로가 실제 경로)
+     * @param additionalExcludedPaths 추가로 제외할 경로
      * @return
      */
-    private boolean isExcludedPath(HttpServletRequest request, String stdPath, boolean isStaticResourceExcluded) {
-        boolean result = false;
-
+    private boolean isExcludedPath(HttpServletRequest request, String stdPath, boolean isStaticResourceExcluded, String... additionalExcludedPaths) {
         String realPath = request.getServletPath().split(stdPath)[1];
         if (!realPath.startsWith("/")) {
             realPath = "/" + realPath;
         }
+        final String REAL_PATH = realPath;
 
         String[] analysisExcludedPathArray = S2Util.isNotEmpty(analysisExcludedPaths) ? analysisExcludedPaths.split(",") : null;
-        if (analysisExcludedPathArray != null) {
-            for (String analysisExcludedPath : analysisExcludedPathArray) {
-                if (realPath.startsWith(analysisExcludedPath)) {
-                    result = true;
-                }
+        Stream<String> analysisExcludedStream = analysisExcludedPathArray != null ? Arrays.stream(analysisExcludedPathArray) : Stream.empty();
+        Stream<String> userExcludedStream = (additionalExcludedPaths != null && additionalExcludedPaths.length > 0) ? Arrays.stream(additionalExcludedPaths) : Stream.empty();
 
-                if (result) {
-                    break;
-                }
-            }
-        }
-
-        return result;
+        return Stream.concat(analysisExcludedStream, userExcludedStream).anyMatch(path -> REAL_PATH.startsWith(path));
     }
 
     /**
