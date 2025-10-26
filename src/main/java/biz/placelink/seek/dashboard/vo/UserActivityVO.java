@@ -140,7 +140,7 @@ public class UserActivityVO extends DefaultVO {
      * @param inspectThresholdMinutes 점검으로 간주되는 최대 시간 임계값 (분 단위)
      * @return 상태 코드 (Constants.CD_CONDITION_LEVEL_NORMAL, CD_CONDITION_LEVEL_INSPECT, CD_CONDITION_LEVEL_WARNING, CD_CONDITION_LEVEL_UNKNOWN 중 하나)
      */
-    private String getDurationStatus(Double durationSeconds, int normalThresholdMinutes, int inspectThresholdMinutes) {
+    private String getDurationConditionLevel(Double durationSeconds, int normalThresholdMinutes, int inspectThresholdMinutes) {
         if (durationSeconds == null) {
             return Constants.CD_CONDITION_LEVEL_UNKNOWN;
         } else {
@@ -162,8 +162,8 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 상태 코드
      */
-    public String getAllFunctionalMaxDisconnectDurationStatus() {
-        return this.getDurationStatus(Optional.ofNullable(this.allFunctionalRealCount).orElse(0) > 0 ? this.allFunctionalMaxDisconnectDuration : null, 5, 10);
+    public String getAllFunctionalMaxDisconnectDurationConditionLevel() {
+        return this.getDurationConditionLevel(Optional.ofNullable(this.allFunctionalRealCount).orElse(0) > 0 ? this.allFunctionalMaxDisconnectDuration : null, 5, 10);
     }
 
     /**
@@ -171,8 +171,8 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 상태 코드
      */
-    public String getAllFunctionalMaxBusinessDisconnectDurationStatus() {
-        return this.getDurationStatus(Optional.ofNullable(this.allFunctionalRealCount).orElse(0) > 0 ? this.allFunctionalMaxBusinessDisconnectDuration : null, 5, 10);
+    public String getAllFunctionalMaxBusinessDisconnectDurationConditionLevel() {
+        return this.getDurationConditionLevel(Optional.ofNullable(this.allFunctionalRealCount).orElse(0) > 0 ? this.allFunctionalMaxBusinessDisconnectDuration : null, 5, 10);
     }
 
     /**
@@ -180,8 +180,8 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 상태 코드
      */
-    public String getAnyFunctionalMaxDisconnectDurationStatus() {
-        return this.getDurationStatus(Optional.ofNullable(this.anyFunctionalRealCount).orElse(0) > 0 ? this.anyFunctionalMaxDisconnectDuration : null, 5, 10);
+    public String getAnyFunctionalMaxDisconnectDurationConditionLevel() {
+        return this.getDurationConditionLevel(Optional.ofNullable(this.anyFunctionalRealCount).orElse(0) > 0 ? this.anyFunctionalMaxDisconnectDuration : null, 5, 10);
     }
 
     /**
@@ -202,7 +202,7 @@ public class UserActivityVO extends DefaultVO {
      * @param inspectThreshold 점검으로 간주되는 최대 시간 임계값
      * @return 상태 코드 (Constants.CD_CONDITION_LEVEL_NORMAL, CD_CONDITION_LEVEL_INSPECT, CD_CONDITION_LEVEL_WARNING, CD_CONDITION_LEVEL_UNKNOWN 중 하나)
      */
-    private String getCountStatus(Long count, int normalThreshold, int inspectThreshold) {
+    private String getCountConditionLevel(Long count, int normalThreshold, int inspectThreshold) {
         if (count == null) {
             return Constants.CD_CONDITION_LEVEL_UNKNOWN;
         } else if (count < normalThreshold) {
@@ -219,8 +219,8 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 상태 코드
      */
-    public String getUnmaskNonBusinessCountStatus() {
-        return this.getCountStatus(Optional.ofNullable(this.unmaskNonBusinessCount).orElse(0L), 5, 10);
+    public String getUnmaskNonBusinessCountConditionLevel() {
+        return this.getCountConditionLevel(Optional.ofNullable(this.unmaskNonBusinessCount).orElse(0L), 5, 10);
     }
 
     /**
@@ -228,8 +228,8 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 상태 코드
      */
-    public String getUnmaskItemCountStatus() {
-        return this.getCountStatus(Optional.ofNullable(this.unmaskItemCount).orElse(0L), 5, 10);
+    public String getUnmaskItemCountConditionLevel() {
+        return this.getCountConditionLevel(Optional.ofNullable(this.unmaskItemCount).orElse(0L), 5, 10);
     }
 
     /**
@@ -237,8 +237,8 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 상태 코드
      */
-    public String getFileOutboundNonBusinessTotalCountStatus() {
-        return this.getCountStatus(Optional.ofNullable(this.fileOutboundNonBusinessTotalCount).orElse(0L), 5, 10);
+    public String getFileOutboundNonBusinessTotalCountConditionLevel() {
+        return this.getCountConditionLevel(Optional.ofNullable(this.fileOutboundNonBusinessTotalCount).orElse(0L), 5, 10);
     }
 
     /**
@@ -246,8 +246,8 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 상태 코드
      */
-    public String getFileOutboundMaxDuplicateFileCountStatus() {
-        return this.getCountStatus(Optional.ofNullable(this.fileOutboundMaxDuplicateFileCount).orElse(0L), 5, 10);
+    public String getFileOutboundMaxDuplicateFileCountConditionLevel() {
+        return this.getCountConditionLevel(Optional.ofNullable(this.fileOutboundMaxDuplicateFileCount).orElse(0L), 5, 10);
     }
 
     /**
@@ -255,8 +255,8 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 상태 코드
      */
-    public String getFileOutboundTotalCountStatus() {
-        return this.getCountStatus(Optional.ofNullable(this.fileOutboundTotalCount).orElse(0L), 5, 10);
+    public String getFileOutboundTotalCountConditionLevel() {
+        return this.getCountConditionLevel(Optional.ofNullable(this.fileOutboundTotalCount).orElse(0L), 5, 10);
     }
 
     /**
@@ -266,14 +266,14 @@ public class UserActivityVO extends DefaultVO {
      */
     private List<Supplier<String>> statusSupplierList() {
         return Arrays.asList(
-                this::getAllFunctionalMaxDisconnectDurationStatus,
-                this::getAllFunctionalMaxBusinessDisconnectDurationStatus,
-                this::getAnyFunctionalMaxDisconnectDurationStatus,
-                this::getUnmaskNonBusinessCountStatus,
-                this::getUnmaskItemCountStatus,
-                this::getFileOutboundNonBusinessTotalCountStatus,
-                this::getFileOutboundMaxDuplicateFileCountStatus,
-                this::getFileOutboundTotalCountStatus);
+                this::getAllFunctionalMaxDisconnectDurationConditionLevel,
+                this::getAllFunctionalMaxBusinessDisconnectDurationConditionLevel,
+                this::getAnyFunctionalMaxDisconnectDurationConditionLevel,
+                this::getUnmaskNonBusinessCountConditionLevel,
+                this::getUnmaskItemCountConditionLevel,
+                this::getFileOutboundNonBusinessTotalCountConditionLevel,
+                this::getFileOutboundMaxDuplicateFileCountConditionLevel,
+                this::getFileOutboundTotalCountConditionLevel);
     }
 
     /**
@@ -307,7 +307,7 @@ public class UserActivityVO extends DefaultVO {
      *
      * @return 최고 위험 상태 코드
      */
-    public String getHighestStatus() {
+    public String getHighestConditionLevel() {
         String higherRiskStatus = "";
         for (Supplier<String> statusSupplier : this.statusSupplierList()) {
             higherRiskStatus = this.getHigherRiskStatus(higherRiskStatus, statusSupplier.get());
