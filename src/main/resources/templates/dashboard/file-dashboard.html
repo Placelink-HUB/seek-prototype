@@ -429,9 +429,9 @@ requirements, please purchase a commercial license from placelink.
 
                         {
                             // 유출 위험도 분석
-                            document.querySelector('.blocking-active-count').textContent = response.fileOutboundBlockingStatus.activeCount;
-                            document.querySelector('.blocking-check-count').textContent = response.fileOutboundBlockingStatus.checkCount;
-                            document.querySelector('.blocking-alert-count').textContent = response.fileOutboundBlockingStatus.alertCount;
+                            document.querySelector('.blocking-active-count').textContent = response.fileOutboundBlockingStatus.normalCount;
+                            document.querySelector('.blocking-check-count').textContent = response.fileOutboundBlockingStatus.inspectCount;
+                            document.querySelector('.blocking-alert-count').textContent = response.fileOutboundBlockingStatus.warningCount;
                         }
                     }
                 );

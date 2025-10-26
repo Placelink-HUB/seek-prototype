@@ -127,52 +127,52 @@ requirements, please purchase a commercial license from placelink.
                                 <tr th:unless="${#lists.isEmpty(userIntegratedActivity.userActivityList)}" th:each="userActivity : ${userIntegratedActivity.userActivityList}">
                                     <td th:text="${userActivity.userId}"></td>
                                     <td class="status-td">
-                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.allFunctionalMaxDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.allFunctionalMaxBusinessDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.anyFunctionalMaxDisconnectDurationStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.unmaskNonBusinessCountStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.unmaskItemCountStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.fileOutboundNonBusinessTotalCountStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.fileOutboundMaxDuplicateFileCountStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td class="status-td">
-                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_WARNING}" class="status-icon warning">경고</div>
-                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_INSPECT}" class="status-icon inspect">점검</div>
-                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_STATUS_NORMAL}" class="status-icon normal">정상</div>
+                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status-icon warning">경고</div>
+                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status-icon inspect">점검</div>
+                                        <div th:if="${userActivity.fileOutboundTotalCountStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status-icon normal">정상</div>
                                     </td>
                                     <td>
-                                        <span th:if="${userActivity.highestStatus == @Constants.CD_STATUS_WARNING}" class="status warning">경고</span>
-                                        <span th:if="${userActivity.highestStatus == @Constants.CD_STATUS_INSPECT}" class="status inspect">점검</span>
-                                        <span th:if="${userActivity.highestStatus == @Constants.CD_STATUS_NORMAL}" class="status normal">정상</span>
+                                        <span th:if="${userActivity.highestStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="status warning">경고</span>
+                                        <span th:if="${userActivity.highestStatus == @Constants.CD_CONDITION_LEVEL_INSPECT}" class="status inspect">점검</span>
+                                        <span th:if="${userActivity.highestStatus == @Constants.CD_CONDITION_LEVEL_NORMAL}" class="status normal">정상</span>
                                     </td>
                                     <td>
-                                        <button th:if="${userActivity.highestStatus == @Constants.CD_STATUS_INSPECT or userActivity.highestStatus == @Constants.CD_STATUS_WARNING}" class="table-btn-sty01 btn-coming-soon">전송</button>
+                                        <button th:if="${userActivity.highestStatus == @Constants.CD_CONDITION_LEVEL_INSPECT or userActivity.highestStatus == @Constants.CD_CONDITION_LEVEL_WARNING}" class="table-btn-sty01 btn-coming-soon">전송</button>
                                     </td>
                                 </tr>
                             </tbody>

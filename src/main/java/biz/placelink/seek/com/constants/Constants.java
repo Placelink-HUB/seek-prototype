@@ -269,15 +269,19 @@ public class Constants {
     /**
      * 상태_수준_공통코드 - 정상
      */
-    public static final String CD_CONDITION_LEVEL_ACTIVE = "ACTIVE";
+    public static final String CD_CONDITION_LEVEL_NORMAL = "normal";
     /**
      * 상태_수준_공통코드 - 점검
      */
-    public static final String CD_CONDITION_LEVEL_CHECK = "CHECK";
+    public static final String CD_CONDITION_LEVEL_INSPECT = "inspect";
     /**
      * 상태_수준_공통코드 - 경고
      */
-    public static final String CD_CONDITION_LEVEL_ALERT = "ALERT";
+    public static final String CD_CONDITION_LEVEL_WARNING = "warning";
+    /**
+     * 상태_수준_공통코드 - 경고
+     */
+    public static final String CD_CONDITION_LEVEL_UNKNOWN = "unknown";
 
     /**
      * 파일 확장자 상태 - 전체 일반 파일
@@ -291,22 +295,5 @@ public class Constants {
      * 파일 확장자 상태 - 전체 비일반 파일
      */
     public static final String CD_FILE_EXTENSION_STATUS_NONE_NORMAL = "NONE_NORMAL";
-
-    /**
-     * 상태 - 정상
-     */
-    public static final String CD_STATUS_NORMAL = "normal";
-    /**
-     * 상태 - 점검
-     */
-    public static final String CD_STATUS_INSPECT = "inspect";
-    /**
-     * 상태 - 경고
-     */
-    public static final String CD_STATUS_WARNING = "warning";
-    /**
-     * 상태 - 미확인/알 수 없음
-     */
-    public static final String CD_STATUS_UNKNOWN = "unknown";
 
 }

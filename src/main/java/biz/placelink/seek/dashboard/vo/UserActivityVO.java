@@ -129,30 +129,30 @@ public class UserActivityVO extends DefaultVO {
      * 상태 결정 로직은 다음과 같다:
      * </p>
      * <ul>
-     * <li>{@code durationSeconds} < {@code normalThresholdMinutes}분: {@code CD_STATUS_NORMAL} (정상)</li>
-     * <li>{@code normalThresholdMinutes}분 <= {@code durationSeconds} < {@code inspectThresholdMinutes}분: {@code CD_STATUS_INSPECT} (점검)</li>
-     * <li>{@code durationSeconds} >= {@code inspectThresholdMinutes}분: {@code CD_STATUS_WARNING} (경고)</li>
-     * <li>{@code durationSeconds}가 null일 경우: {@code CD_STATUS_UNKNOWN} (미확인/정보 없음)</li>
+     * <li>{@code durationSeconds} < {@code normalThresholdMinutes}분: {@code CD_CONDITION_LEVEL_NORMAL} (정상)</li>
+     * <li>{@code normalThresholdMinutes}분 <= {@code durationSeconds} < {@code inspectThresholdMinutes}분: {@code CD_CONDITION_LEVEL_INSPECT} (점검)</li>
+     * <li>{@code durationSeconds} >= {@code inspectThresholdMinutes}분: {@code CD_CONDITION_LEVEL_WARNING} (경고)</li>
+     * <li>{@code durationSeconds}가 null일 경우: {@code CD_CONDITION_LEVEL_UNKNOWN} (미확인/정보 없음)</li>
      * </ul>
      *
      * @param durationSeconds         측정된 시간 간격 (PostgreSQL INTERVAL에서 변환된 Double 형태의 총 초)
      * @param normalThresholdMinutes  정상으로 간주되는 최대 시간 임계값 (분 단위)
      * @param inspectThresholdMinutes 점검으로 간주되는 최대 시간 임계값 (분 단위)
-     * @return 상태 코드 (Constants.CD_STATUS_NORMAL, CD_STATUS_INSPECT, CD_STATUS_WARNING, CD_STATUS_UNKNOWN 중 하나)
+     * @return 상태 코드 (Constants.CD_CONDITION_LEVEL_NORMAL, CD_CONDITION_LEVEL_INSPECT, CD_CONDITION_LEVEL_WARNING, CD_CONDITION_LEVEL_UNKNOWN 중 하나)
      */
     private String getDurationStatus(Double durationSeconds, int normalThresholdMinutes, int inspectThresholdMinutes) {
         if (durationSeconds == null) {
-            return Constants.CD_STATUS_UNKNOWN;
+            return Constants.CD_CONDITION_LEVEL_UNKNOWN;
         } else {
             long durationMillis = Math.round(durationSeconds * 1000);
             Duration duration = Duration.ofMillis(durationMillis);
 
             if (duration.compareTo(Duration.ofMinutes(inspectThresholdMinutes)) >= 0) {
-                return Constants.CD_STATUS_WARNING;
+                return Constants.CD_CONDITION_LEVEL_WARNING;
             } else if (duration.compareTo(Duration.ofMinutes(normalThresholdMinutes)) >= 0) {
-                return Constants.CD_STATUS_INSPECT;
+                return Constants.CD_CONDITION_LEVEL_INSPECT;
             } else {
-                return Constants.CD_STATUS_NORMAL;
+                return Constants.CD_CONDITION_LEVEL_NORMAL;
             }
         }
     }
@@ -191,26 +191,26 @@ public class UserActivityVO extends DefaultVO {
      * 상태 결정 로직은 다음과 같다:
      * </p>
      * <ul>
-     * <li>{@code count} < {@code normalThreshold}: {@code CD_STATUS_NORMAL} (정상)</li>
-     * <li>{@code normalThreshold} <= {@code count} < {@code inspectThreshold}: {@code CD_STATUS_INSPECT} (점검)</li>
-     * <li>{@code count} >= {@code inspectThreshold}: {@code CD_STATUS_WARNING} (경고)</li>
-     * <li>{@code count}가 null일 경우: {@code CD_STATUS_UNKNOWN} (미확인/정보 없음)</li>
+     * <li>{@code count} < {@code normalThreshold}: {@code CD_CONDITION_LEVEL_NORMAL} (정상)</li>
+     * <li>{@code normalThreshold} <= {@code count} < {@code inspectThreshold}: {@code CD_CONDITION_LEVEL_INSPECT} (점검)</li>
+     * <li>{@code count} >= {@code inspectThreshold}: {@code CD_CONDITION_LEVEL_WARNING} (경고)</li>
+     * <li>{@code count}가 null일 경우: {@code CD_CONDITION_LEVEL_UNKNOWN} (미확인/정보 없음)</li>
      * </ul>
      *
      * @param count            대상 개수
      * @param normalThreshold  정상으로 간주되는 최대 시간 임계값
      * @param inspectThreshold 점검으로 간주되는 최대 시간 임계값
-     * @return 상태 코드 (Constants.CD_STATUS_NORMAL, CD_STATUS_INSPECT, CD_STATUS_WARNING, CD_STATUS_UNKNOWN 중 하나)
+     * @return 상태 코드 (Constants.CD_CONDITION_LEVEL_NORMAL, CD_CONDITION_LEVEL_INSPECT, CD_CONDITION_LEVEL_WARNING, CD_CONDITION_LEVEL_UNKNOWN 중 하나)
      */
     private String getCountStatus(Long count, int normalThreshold, int inspectThreshold) {
         if (count == null) {
-            return Constants.CD_STATUS_UNKNOWN;
+            return Constants.CD_CONDITION_LEVEL_UNKNOWN;
         } else if (count < normalThreshold) {
-            return Constants.CD_STATUS_NORMAL;
+            return Constants.CD_CONDITION_LEVEL_NORMAL;
         } else if (count < inspectThreshold) {
-            return Constants.CD_STATUS_INSPECT;
+            return Constants.CD_CONDITION_LEVEL_INSPECT;
         } else {
-            return Constants.CD_STATUS_WARNING;
+            return Constants.CD_CONDITION_LEVEL_WARNING;
         }
     }
 
@@ -284,9 +284,9 @@ public class UserActivityVO extends DefaultVO {
      */
     private int getNumericStatus(String status) {
         return switch (status) {
-            case Constants.CD_STATUS_WARNING -> 3;
-            case Constants.CD_STATUS_INSPECT -> 2;
-            case Constants.CD_STATUS_NORMAL -> 1;
+            case Constants.CD_CONDITION_LEVEL_WARNING -> 3;
+            case Constants.CD_CONDITION_LEVEL_INSPECT -> 2;
+            case Constants.CD_CONDITION_LEVEL_NORMAL -> 1;
             default -> 0;
         };
     }

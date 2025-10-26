@@ -224,7 +224,7 @@ public class WildpathController {
                 logger.error(e.getMessage(), e);
             }
 
-            if (!this.isExcludedPath(request, "/postprocess/", this.systemPaths)) {
+            if (S2ServletUtil.isResponseSuccess(response) && !this.isExcludedPath(request, "/postprocess/", this.systemPaths)) {
                 String clientIp = S2ServletUtil.getClientIp(request);
                 payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_POST, payload, seekMode, clientIp);
             }
@@ -263,7 +263,7 @@ public class WildpathController {
      */
     @PostMapping(path = "/response/async/**")
     protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (this.isExcludedPath(request, "/response/async/", this.systemPaths)) {
+        if (!S2ServletUtil.isResponseSuccess(response) || this.isExcludedPath(request, "/response/async/", this.systemPaths)) {
             return;
         }
 

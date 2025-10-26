@@ -84,21 +84,21 @@ requirements, please purchase a commercial license from placelink.
                                 <div class="card-title">정상</div>
                                 <div class="card-desc">파일 전송 차단 이상 없음</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.activeCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.normalCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 many-on-many tangerine">
                             <div class="title-box menu6-4">
                                 <div class="card-title">점검</div>
                                 <div class="card-desc">대량 차단 및 비 업무시간 차단</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.checkCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.inspectCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                         <div class="card type1 many-on-many red">
                             <div class="title-box menu6-5">
                                 <div class="card-title">경고</div>
                                 <div class="card-desc">시간/패턴 이상 탐지</div>
                             </div>
-                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.alertCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
+                            <div class="card-content"><span th:text="${#numbers.formatInteger(fileOutboundHistListStatus.warningCount, 0, 'COMMA')}" class="size">0</span> <span class="size-unit">건</span></div>
                         </div>
                     </div>
                     <h2 class="type1 c-dp-inline-block">PC 별 파일 전송 차단 현황</h2>

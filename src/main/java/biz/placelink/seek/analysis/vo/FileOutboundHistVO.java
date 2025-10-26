@@ -76,11 +76,11 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
     private Integer workingHourStatusAbnormalCount;
 
     /** 정상 개수 */
-    private Integer activeCount;
+    private Integer normalCount;
     /** 점검 개수 */
-    private Integer checkCount;
+    private Integer inspectCount;
     /** 경고 개수 */
-    private Integer alertCount;
+    private Integer warningCount;
 
     /** HTTPS 채널 전송 수 */
     private Integer channelHttpsCount;
@@ -284,28 +284,28 @@ public class FileOutboundHistVO extends AnalysisDetailVO {
         }
     }
 
-    public Integer getActiveCount() {
-        return activeCount;
+    public Integer getNormalCount() {
+        return normalCount;
     }
 
-    public void setActiveCount(Integer activeCount) {
-        this.activeCount = activeCount;
+    public void setNormalCount(Integer normalCount) {
+        this.normalCount = normalCount;
     }
 
-    public Integer getCheckCount() {
-        return checkCount;
+    public Integer getInspectCount() {
+        return inspectCount;
     }
 
-    public void setCheckCount(Integer checkCount) {
-        this.checkCount = checkCount;
+    public void setInspectCount(Integer inspectCount) {
+        this.inspectCount = inspectCount;
     }
 
-    public Integer getAlertCount() {
-        return alertCount;
+    public Integer getWarningCount() {
+        return warningCount;
     }
 
-    public void setAlertCount(Integer alertCount) {
-        this.alertCount = alertCount;
+    public void setWarningCount(Integer warningCount) {
+        this.warningCount = warningCount;
     }
 
     public Integer getChannelHttpsCount() {

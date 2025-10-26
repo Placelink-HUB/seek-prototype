@@ -190,13 +190,13 @@ public class AgentVO extends DefaultVO {
     public String getConditionLevel() {
         String conditionLevel = "";
         switch (Optional.ofNullable(conditionLevelCcd).orElse("")) {
-            case "ACTIVE":
+            case "normal":
                 conditionLevel = "정상";
                 break;
-            case "CHECK":
+            case "inspect":
                 conditionLevel = "점검";
                 break;
-            case "ALERT":
+            case "warning":
                 conditionLevel = "경고";
                 break;
         }

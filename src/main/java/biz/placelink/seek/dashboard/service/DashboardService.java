@@ -172,9 +172,9 @@ public class DashboardService {
 
             for (UserActivityVO userActivity : userActivityList) {
                 if (userActivity != null) {
-                    normalCount += userActivity.getStatusCount(Constants.CD_STATUS_NORMAL);
-                    inspectCount += userActivity.getStatusCount(Constants.CD_STATUS_INSPECT);
-                    warningCount += userActivity.getStatusCount(Constants.CD_STATUS_WARNING);
+                    normalCount += userActivity.getStatusCount(Constants.CD_CONDITION_LEVEL_NORMAL);
+                    inspectCount += userActivity.getStatusCount(Constants.CD_CONDITION_LEVEL_INSPECT);
+                    warningCount += userActivity.getStatusCount(Constants.CD_CONDITION_LEVEL_WARNING);
 
                     totalAnomalyCount += inspectCount + warningCount +
                             Optional.ofNullable(userActivity.getAllFunctionalCountBusinessDisconnectDurationOver()).orElse(0L) +

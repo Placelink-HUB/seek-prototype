@@ -164,15 +164,15 @@ requirements, please purchase a commercial license from placelink.
         SELECT
             sd.*,
             CASE
-                WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 'ACTIVE'
+                WHEN MINISPY_SYS_YN = 'Y' AND MSPY_USER_EXE_YN = 'Y' AND WFP_BLOCKER_EXE_YN = 'Y' AND CLICK_DOMAIN_AGENT_EXE_YN = 'Y' THEN 'normal'
                 /* 평일 업무시간(09:00~18:00)에 모든 에이전트가 비활성화 일때 */
                 WHEN sd.MINISPY_SYS_YN != 'Y' AND sd.MSPY_USER_EXE_YN != 'Y' AND sd.WFP_BLOCKER_EXE_YN != 'Y' AND sd.CLICK_DOMAIN_AGENT_EXE_YN != 'Y'
                     /* 평일 조건: 월요일(1) ~ 금요일(5) */
                     AND EXTRACT(DOW FROM NOW()) BETWEEN 1 AND 5
                     /* 업무 시간 조건: 09:00 ~ 18:00 */
                     AND NOW()::time >= '09:00:00' AND '18:00:00' >= NOW()::time
-                THEN 'ALERT'
-                ELSE 'CHECK'
+                THEN 'warning'
+                ELSE 'inspect'
             END AS CONDITION_LEVEL_CCD
         FROM AGENT_STATUS_DETAIL sd
     </sql>
@@ -186,9 +186,9 @@ requirements, please purchase a commercial license from placelink.
     <select id="selectAgentStatusListStatus" resultType="agentStatusVO">
         /** selectAgentStatusListStatus : 에이전트 상태 목록 현황을 조회한다. */
         SELECT
-            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'ACTIVE' THEN 1 ELSE 0 END), 0) AS ACTIVE_COUNT,
-            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'CHECK' THEN 1 ELSE 0 END), 0) AS CHECK_COUNT,
-            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'ALERT' THEN 1 ELSE 0 END), 0) AS ALERT_COUNT
+            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'normal' THEN 1 ELSE 0 END), 0) AS NORMAL_COUNT,
+            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'inspect' THEN 1 ELSE 0 END), 0) AS INSPECT_COUNT,
+            COALESCE(SUM(CASE WHEN CONDITION_LEVEL_CCD = 'warning' THEN 1 ELSE 0 END), 0) AS WARNING_COUNT
         FROM (
             <include refid="sqlAgentAgentStatusList"/>
         ) x

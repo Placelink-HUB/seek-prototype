@@ -65,62 +65,72 @@ requirements, please purchase a commercial license from placelink.
     </insert>
 
     <sql id="sqlFileOutboundHist">
+        WITH OUTBOUND_HIST AS (
+            SELECT
+                sfoh.OUTBOUND_ID,
+                sfoh.OUTBOUND_STATUS_CCD,
+                sfoh.OUTBOUND_CHANNEL_CCD,
+                sfoh.OUTBOUND_REASON_CCD,
+                sfoh.USER_ID,
+                sfoh.CLIENT_IP,
+                sfoh.FILE_NM,
+                sfoh.ORG_CD,
+                sfoh.MAC_ADDR,
+                sfoh.DEST_HOST,
+                COALESCE(sfoh.TOTAL_FILE_COUNT, 0) AS TOTAL_FILE_COUNT,
+                COALESCE(sfoh.TOTAL_FILE_SIZE, 0) AS TOTAL_FILE_SIZE,
+                sfoh.FILE_EXTENSION_STATUS_CCD,
+                sfoh.EVENT_DT,
+                CASE
+                    /* NORMAL 조건: 09:00 ~ 18:00 이면서 평일(월~금)인 경우 */
+                    WHEN sfoh.EVENT_DT::TIME >= '09:00:00'
+                        AND '18:00:00' >= sfoh.EVENT_DT::TIME
+                        /* 평일(월요일=1, 금요일=5) 조건 추가 */
+                        AND EXTRACT(DOW FROM sfoh.EVENT_DT) BETWEEN 1 AND 5
+                    THEN 'NORMAL'
+                    /* 그 외 (야간 또는 주말) */
+                    ELSE 'ABNORMAL'
+                END AS WORKING_HOUR_STATUS_CCD,
+                sfoh.CREATE_DT
+            FROM SEEK_FILE_OUTBOUND_HIST sfoh
+            <where>
+                <if test='searchOutboundStatusCcd neq null and searchOutboundStatusCcd neq ""'>
+                    AND sfoh.OUTBOUND_STATUS_CCD = #{searchOutboundStatusCcd}
+                </if>
+                <if test='searchStartDate neq null'>
+                    AND sfoh.EVENT_DT >= #{searchStartDate}
+                </if>
+                <if test='searchEndDate neq null'>
+                    AND #{searchEndDateExclusive} > sfoh.EVENT_DT
+                </if>
+                <if test='searchFileExtensionStatusCcd neq null and searchFileExtensionStatusCcd neq ""'>
+                    AND sfoh.FILE_EXTENSION_STATUS_CCD = #{searchFileExtensionStatusCcd}
+                </if>
+            </where>
+        )
         SELECT
-            sfoh.OUTBOUND_ID,
-            sfoh.OUTBOUND_STATUS_CCD,
-            sfoh.OUTBOUND_CHANNEL_CCD,
-            sfoh.OUTBOUND_REASON_CCD,
-            sfoh.USER_ID,
-            sfoh.CLIENT_IP,
-            sfoh.FILE_NM,
-            sfoh.ORG_CD,
-            sfoh.MAC_ADDR,
-            sfoh.DEST_HOST,
-            sfoh.TOTAL_FILE_COUNT,
-            sfoh.TOTAL_FILE_SIZE,
-            sfoh.FILE_EXTENSION_STATUS_CCD,
-            sfoh.EVENT_DT,
+            oh.*,
             CASE
-                /* NORMAL 조건: 09:00 ~ 18:00 이면서 평일(월~금)인 경우 */
-                WHEN sfoh.EVENT_DT::TIME >= '09:00:00'
-                    AND '18:00:00' >= sfoh.EVENT_DT::TIME
-                    /* 평일(월요일=1, 금요일=5) 조건 추가 */
-                    AND EXTRACT(DOW FROM sfoh.EVENT_DT) BETWEEN 1 AND 5
-                THEN 'NORMAL'
-                /* 그 외 (야간 또는 주말) */
-                ELSE 'ABNORMAL'
-            END AS WORKING_HOUR_STATUS_CCD,
-            sfoh.CREATE_DT
-        FROM SEEK_FILE_OUTBOUND_HIST sfoh
-        <where>
-            <if test='searchOutboundStatusCcd neq null and searchOutboundStatusCcd neq ""'>
-                AND sfoh.OUTBOUND_STATUS_CCD = #{searchOutboundStatusCcd}
-            </if>
-            <if test='searchStartDate neq null'>
-                AND sfoh.EVENT_DT >= #{searchStartDate}
-            </if>
-            <if test='searchEndDate neq null'>
-                AND #{searchEndDateExclusive} > sfoh.EVENT_DT
-            </if>
-            <if test='searchFileExtensionStatusCcd neq null and searchFileExtensionStatusCcd neq ""'>
-                AND sfoh.FILE_EXTENSION_STATUS_CCD = #{searchFileExtensionStatusCcd}
-            </if>
-        </where>
+                WHEN 5 > oh.TOTAL_FILE_COUNT AND oh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 'normal'
+                WHEN oh.TOTAL_FILE_COUNT >= 5 OR oh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 'inspect'
+                ELSE 'warning'
+            END AS DETECTION_CONDITION_LEVEL
+        FROM OUTBOUND_HIST oh
     </sql>
 
     <select id="selectFileOutboundHistListStatus" parameterType="schFileOutboundHistVO" resultType="fileOutboundHistVO">
         /** selectFileOutboundHistListStatus : 파일 외부전송 이력 목록 현황을 조회한다. */
         SELECT
             COUNT(1) AS ACTION_COUNT,
-            COALESCE(SUM(COALESCE(foh.TOTAL_FILE_COUNT, 0)), 0) AS TOTAL_FILE_COUNT,
-            COALESCE(SUM(COALESCE(foh.TOTAL_FILE_SIZE, 0)), 0) AS TOTAL_FILE_SIZE,
-            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'NORMAL' THEN 1 ELSE 0 END), 0) AS ACTIVE_COUNT,
-            COALESCE(SUM(CASE WHEN foh.WORKING_HOUR_STATUS_CCD = 'ABNORMAL' THEN 1 ELSE 0 END), 0) AS CHECK_COUNT,
-            0 AS ALERT_COUNT,
-            COALESCE(SUM(CASE WHEN foh.outbound_channel_ccd = 'https' THEN 1 ELSE 0 END), 0) AS CHANNEL_HTTPS_COUNT,
-            COALESCE(SUM(CASE WHEN foh.outbound_channel_ccd = 'usb' THEN 1 ELSE 0 END), 0) AS CHANNEL_USB_COUNT,
-            COALESCE(SUM(CASE WHEN foh.outbound_channel_ccd = 'messenger' THEN 1 ELSE 0 END), 0) AS CHANNEL_MESSENGER_COUNT,
-            COALESCE(SUM(CASE WHEN foh.outbound_channel_ccd = 'print' THEN 1 ELSE 0 END), 0) AS CHANNEL_PRINT_COUNT
+            COALESCE(SUM(foh.TOTAL_FILE_COUNT), 0) AS TOTAL_FILE_COUNT,
+            COALESCE(SUM(foh.TOTAL_FILE_SIZE), 0) AS TOTAL_FILE_SIZE,
+            COALESCE(SUM(CASE WHEN foh.DETECTION_CONDITION_LEVEL = 'normal' THEN 1 ELSE 0 END), 0) AS NORMAL_COUNT,
+            COALESCE(SUM(CASE WHEN foh.DETECTION_CONDITION_LEVEL = 'inspect' THEN 1 ELSE 0 END), 0) AS INSPECT_COUNT,
+            COALESCE(SUM(CASE WHEN foh.DETECTION_CONDITION_LEVEL = 'warning' THEN 1 ELSE 0 END), 0) AS WARNING_COUNT,
+            COALESCE(SUM(CASE WHEN foh.OUTBOUND_CHANNEL_CCD = 'https' THEN 1 ELSE 0 END), 0) AS CHANNEL_HTTPS_COUNT,
+            COALESCE(SUM(CASE WHEN foh.OUTBOUND_CHANNEL_CCD = 'usb' THEN 1 ELSE 0 END), 0) AS CHANNEL_USB_COUNT,
+            COALESCE(SUM(CASE WHEN foh.OUTBOUND_CHANNEL_CCD = 'messenger' THEN 1 ELSE 0 END), 0) AS CHANNEL_MESSENGER_COUNT,
+            COALESCE(SUM(CASE WHEN foh.OUTBOUND_CHANNEL_CCD = 'print' THEN 1 ELSE 0 END), 0) AS CHANNEL_PRINT_COUNT
         FROM (
             <include refid="sqlFileOutboundHist"/>
         ) foh

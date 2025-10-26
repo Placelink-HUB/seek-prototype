@@ -30,34 +30,34 @@ import biz.placelink.seek.com.vo.DefaultVO;
 public class AgentStatusVO extends DefaultVO {
 
     /** 정상 개수 */
-    private Integer activeCount;
+    private Integer normalCount;
     /** 점검 개수 */
-    private Integer checkCount;
+    private Integer inspectCount;
     /** 경고 개수 */
-    private Integer alertCount;
+    private Integer warningCount;
 
-    public Integer getActiveCount() {
-        return activeCount;
+    public Integer getNormalCount() {
+        return normalCount;
     }
 
-    public void setActiveCount(Integer activeCount) {
-        this.activeCount = activeCount;
+    public void setNormalCount(Integer normalCount) {
+        this.normalCount = normalCount;
     }
 
-    public Integer getCheckCount() {
-        return checkCount;
+    public Integer getInspectCount() {
+        return inspectCount;
     }
 
-    public void setCheckCount(Integer checkCount) {
-        this.checkCount = checkCount;
+    public void setInspectCount(Integer inspectCount) {
+        this.inspectCount = inspectCount;
     }
 
-    public Integer getAlertCount() {
-        return alertCount;
+    public Integer getWarningCount() {
+        return warningCount;
     }
 
-    public void setAlertCount(Integer alertCount) {
-        this.alertCount = alertCount;
+    public void setWarningCount(Integer warningCount) {
+        this.warningCount = warningCount;
     }
 
 }
