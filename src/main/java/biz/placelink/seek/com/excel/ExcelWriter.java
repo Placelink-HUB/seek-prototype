@@ -223,6 +223,8 @@ public class ExcelWriter {
         styleBody.setAlignment(HorizontalAlignment.CENTER);
         styleBody.setVerticalAlignment(VerticalAlignment.CENTER);
 
+        styleBody.setWrapText(true); // 줄 바꿈 설정 추가 (텍스트가 여러 줄에 걸쳐 표시되고 셀 높이가 자동으로 늘어나도록 설정)
+
         // 테두리 라인
         styleBody.setBorderRight(BorderStyle.THIN);
         styleBody.setBorderLeft(BorderStyle.THIN);
@@ -231,6 +233,7 @@ public class ExcelWriter {
 
         int size = cellList.size();
         Row row = sheet.createRow(rowNum);
+        row.setHeight((short) 510);
 
         for (int i = 0; i < size; i++) {
             Cell cell = row.createCell(i + startCol);
@@ -255,6 +258,7 @@ public class ExcelWriter {
 
         int size = cellList.size();
         Row row = sheet.createRow(rowNum);
+        row.setHeight((short) 510);
 
         for (int i = 0; i < size; i++) {
 
@@ -262,6 +266,7 @@ public class ExcelWriter {
             styleBody.setFont(font);
             styleBody.setAlignment(HorizontalAlignment.CENTER);
             styleBody.setVerticalAlignment(VerticalAlignment.CENTER);
+            styleBody.setWrapText(true); // 줄 바꿈 설정 추가 (텍스트가 여러 줄에 걸쳐 표시되고 셀 높이가 자동으로 늘어나도록 설정)
             // 테두리 라인
             styleBody.setBorderRight(BorderStyle.THIN);
             styleBody.setBorderLeft(BorderStyle.THIN);

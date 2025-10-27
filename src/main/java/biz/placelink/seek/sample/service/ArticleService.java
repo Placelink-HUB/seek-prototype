@@ -36,6 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.PaginationInfo;
+import biz.placelink.seek.com.util.SessionUtil;
 import biz.placelink.seek.sample.vo.ArticleVO;
 import biz.placelink.seek.sample.vo.SchArticleVO;
 import biz.placelink.seek.system.file.service.FileService;
@@ -72,6 +73,16 @@ public class ArticleService {
      *
      * @param searchVO 조회 조건
      * @return 게시글 목록
+     */
+    public List<ArticleVO> selectArticleList(SchArticleVO searchVO) {
+        return articleMapper.selectArticleList(searchVO);
+    }
+
+    /**
+     * 페이지 정보를 포함한 게시글 목록을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 페이지 정보를 포함한 게시글 목록
      */
     public PaginationInfo selectArticleListWithPagination(SchArticleVO searchVO) {
         List<ArticleVO> list = articleMapper.selectArticleList(searchVO);
@@ -110,6 +121,7 @@ public class ArticleService {
     @Transactional
     public int createArticle(ArticleVO articleVO) {
         articleVO.setArticleId(UUID.randomUUID().toString());
+        articleVO.setUserId(SessionUtil.getSessionUserId());
         articleVO.setArticleTypeCcd(Constants.CD_ARTICLE_TYPE_TEXT);
         return articleMapper.createArticle(articleVO);
     }
@@ -128,6 +140,7 @@ public class ArticleService {
         if (successFileList != null && !successFileList.isEmpty()) {
             ArticleVO articleVO = new ArticleVO();
             articleVO.setArticleId(UUID.randomUUID().toString());
+            articleVO.setUserId(SessionUtil.getSessionUserId());
             articleVO.setFileId(successFileList.getFirst().getFileId());
             articleVO.setArticleTypeCcd(Constants.CD_ARTICLE_TYPE_FILE);
             result = articleMapper.createArticle(articleVO);

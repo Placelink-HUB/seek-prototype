@@ -27,6 +27,8 @@ package biz.placelink.seek.sample.controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -110,6 +112,52 @@ public class ArticleController {
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "sample/test";
+    }
+
+    /**
+     * 게시글 목록 엑셀 다운로드
+     *
+     * @param searchStartDe 조회 시작 일자
+     * @param searchEndDe   조회 종료 일자
+     * @param model         모델 객체
+     */
+    @PostMapping(value = "/sample/article-list/download")
+    public String articleListDownload(@RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, ModelMap model) {
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setPagingYn("N");
+        searchVO.setOrderBy("MODIFY_DT DESC");
+
+        List<ArticleVO> articleList = articleService.selectArticleList(searchVO);
+        if (S2Util.isEmpty(articleList)) {
+            throw new S2RuntimeException("데이터가 존재하지 않습니다.");
+        }
+
+        ArrayList<String> headers = new ArrayList<String>();
+        headers.add("등록 일시");
+        headers.add("ID");
+        headers.add("게시글 타입");
+        headers.add("내용 보기");
+
+        ArrayList<ArrayList<Object>> bodyList = new ArrayList<ArrayList<Object>>();
+        for (ArticleVO article : articleList) {
+            ArrayList<Object> body = new ArrayList<Object>();
+            body.add(article.getCreateDt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            body.add(article.getUserId());
+            body.add(article.getArticleTypeCcdNm());
+            body.add(article.getContent());
+            bodyList.add(body);
+        }
+
+        model.addAttribute("fileName", "article_list_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        model.addAttribute("head", headers);
+        model.addAttribute("body", bodyList);
+        model.addAttribute(Constants.RESULT_CODE, 1);
+        return "excelXlsxView";
     }
 
     /**

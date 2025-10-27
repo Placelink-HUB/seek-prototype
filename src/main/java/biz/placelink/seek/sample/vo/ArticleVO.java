@@ -31,6 +31,8 @@ public class ArticleVO extends DefaultVO {
 
     /* 게시글 ID */
     private String articleId;
+    /* 게시글 ID */
+    private String userId;
     /* 게시글 타입 공통코드 */
     private String articleTypeCcd;
     private String articleTypeCcdNm;
@@ -45,6 +47,14 @@ public class ArticleVO extends DefaultVO {
 
     public void setArticleId(String articleId) {
         this.articleId = articleId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getArticleTypeCcd() {

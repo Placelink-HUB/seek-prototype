@@ -30,6 +30,7 @@ requirements, please purchase a commercial license from placelink.
     <sql id="sqlArticle">
         SELECT
             a.ARTICLE_ID,
+            a.USER_ID,
             a.ARTICLE_TYPE_CCD,
             cc1.COM_CD_NM AS ARTICLE_TYPE_CCD_NM,
             a.CONTENT,
@@ -96,6 +97,7 @@ requirements, please purchase a commercial license from placelink.
         /** createArticle : 게시글을 등록한다. */
         INSERT INTO TB_ARTICLE (
             ARTICLE_ID,
+            USER_ID,
             ARTICLE_TYPE_CCD,
             CONTENT,
             FILE_ID,
@@ -103,6 +105,7 @@ requirements, please purchase a commercial license from placelink.
             MODIFY_DT
         ) VALUES (
             #{articleId},
+            #{userId},
             #{articleTypeCcd},
             #{content},
             #{fileId},
