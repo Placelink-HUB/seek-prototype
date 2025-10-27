@@ -36,7 +36,7 @@ requirements, please purchase a commercial license from placelink.
                 document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
                 document.querySelectorAll('.btn-download-signed-file')?.forEach((btn) => btn.addEventListener('click', (event) => downloadFile(event.currentTarget.dataset.signedFileId)));
 
-                document.querySelector('.btn-download-detection-file-list')?.addEventListener('click', () => {
+                document.querySelector('.btn-download-excel')?.addEventListener('click', () => {
                     S2Util.fetch(
                         '/analysis/detection-file-list/download',
                         {
@@ -46,7 +46,7 @@ requirements, please purchase a commercial license from placelink.
                             searchEndDe: '[[${searchEndDe}]]'
                         },
                         function () {
-                            S2Util.toasts('다운로드 성공');
+                            S2Util.showToast('다운로드 성공');
                         }
                     );
                 });
@@ -280,7 +280,7 @@ requirements, please purchase a commercial license from placelink.
                 <span class="btn-group">
                     <button class="btn-type1 btn-open-validate-file">파일 검증</button>
                     <button class="btn-type1 btn-coming-soon">기간 검색</button>
-                    <button class="btn-type1 btn-download-detection-file-list">전체 현황 다운로드</button>
+                    <button class="btn-type1 btn-download-excel">전체 현황 다운로드</button>
                 </span>
             </div>
             <div class="wrap-contents">

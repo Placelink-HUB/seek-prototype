@@ -93,6 +93,16 @@ public class SensitiveInformationUnmaskHistService {
      * @param searchVO 조회 조건
      * @return 민감 정보 언마스크 이력 목록
      */
+    public List<SensitiveInformationUnmaskHistVO> selectSensitiveInformationUnmaskHistList(SearchVO searchVO) {
+        return sensitiveInformationUnmaskHistMapper.selectSensitiveInformationUnmaskHistList(searchVO);
+    }
+
+    /**
+     * 페이지 정보를 포함한 민감 정보 언마스크 이력 목록을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 민감 정보 언마스크 이력 목록
+     */
     public PaginationInfo selectSensitiveInformationUnmaskHistListWithPagination(SearchVO searchVO) {
         List<SensitiveInformationUnmaskHistVO> list = sensitiveInformationUnmaskHistMapper.selectSensitiveInformationUnmaskHistList(searchVO);
         int count = sensitiveInformationUnmaskHistMapper.selectSensitiveInformationUnmaskHistListCount(searchVO);

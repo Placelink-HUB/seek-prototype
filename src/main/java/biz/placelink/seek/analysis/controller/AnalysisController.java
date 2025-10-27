@@ -60,6 +60,7 @@ import biz.placelink.seek.analysis.service.FileOutboundHistService;
 import biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistService;
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.SchFileOutboundHistVO;
+import biz.placelink.seek.analysis.vo.SensitiveInformationUnmaskHistVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
 import biz.placelink.seek.sample.vo.SchArticleVO;
@@ -311,6 +312,57 @@ public class AnalysisController {
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/sensitive-access-hist";
+    }
+
+    /**
+     * 데이터 복호화 현황(민감정보 처리 이력) 목록 엑셀 다운로드
+     *
+     * @param searchStartDe 조회 시작 일자
+     * @param searchEndDe   조회 종료 일자
+     * @param model         모델 객체
+     * @return ExcelXlsxView
+     */
+    @PostMapping(value = "/analysis/sensitive-access-hist/download")
+    public String sensitiveAccessHistDownload(@RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, ModelMap model) {
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setPagingYn("N");
+        searchVO.setOrderBy("LAST_REQUEST_DT DESC");
+
+        List<SensitiveInformationUnmaskHistVO> sensitiveInformationUnmaskHistList = sensitiveInformationUnmaskHistService.selectSensitiveInformationUnmaskHistList(searchVO);
+        if (S2Util.isEmpty(sensitiveInformationUnmaskHistList)) {
+            throw new S2RuntimeException("데이터가 존재하지 않습니다.");
+        }
+
+        ArrayList<String> headers = new ArrayList<String>();
+        headers.add("ID");
+        headers.add("복호화 요청 수");
+        headers.add("유형");
+        headers.add("업무시간 요청 수");
+        headers.add("비업무시간 요청 수");
+        headers.add("탐지 결과");
+
+        ArrayList<ArrayList<Object>> bodyList = new ArrayList<ArrayList<Object>>();
+        for (SensitiveInformationUnmaskHistVO sensitiveInformationUnmaskHist : sensitiveInformationUnmaskHistList) {
+            ArrayList<Object> body = new ArrayList<Object>();
+            body.add(Optional.ofNullable(sensitiveInformationUnmaskHist.getUserId()).orElse("-"));
+            body.add(new DecimalFormat("###,###").format(sensitiveInformationUnmaskHist.getTotalRequestCount()));
+            body.add("DB");
+            body.add(new DecimalFormat("###,###").format(sensitiveInformationUnmaskHist.getNormalRequestCount()));
+            body.add(new DecimalFormat("###,###").format(sensitiveInformationUnmaskHist.getAbnormalRequestCount()));
+            body.add(sensitiveInformationUnmaskHist.getConditionLevel());
+            bodyList.add(body);
+        }
+
+        model.addAttribute("fileName", "article_list_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        model.addAttribute("head", headers);
+        model.addAttribute("body", bodyList);
+        model.addAttribute(Constants.RESULT_CODE, 1);
+        return "excelXlsxView";
     }
 
     /**

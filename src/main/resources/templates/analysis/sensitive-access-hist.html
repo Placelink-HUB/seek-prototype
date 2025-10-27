@@ -36,6 +36,21 @@ requirements, please purchase a commercial license from placelink.
 
             window.goPage = (pageNo) => {
                 location.href = `/public/analysis/sensitive-access-hist?pageNo=${pageNo}`;
+
+                document.querySelector('.btn-download-excel')?.addEventListener('click', () => {
+                    S2Util.fetch(
+                        '/analysis/sensitive-access-hist/download',
+                        {
+                            method: 'post',
+                            responseType: 'blob',
+                            searchStartDe: '[[${searchStartDe}]]',
+                            searchEndDe: '[[${searchEndDe}]]'
+                        },
+                        function () {
+                            S2Util.showToast('다운로드 성공');
+                        }
+                    );
+                });
             };
         </script>
     </th:block>
@@ -48,7 +63,7 @@ requirements, please purchase a commercial license from placelink.
                 </h1>
                 <span class="btn-group">
                     <button class="btn-type1 btn-coming-soon">기간 검색</button>
-                    <button class="btn-type1 btn-coming-soon">전체 현황 다운로드</button>
+                    <button class="btn-type1 btn-download-excel">전체 현황 다운로드</button>
                 </span>
             </div>
             <div class="wrap-contents">
