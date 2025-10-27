@@ -120,6 +120,7 @@ public class ArticleController {
      * @param searchStartDe 조회 시작 일자
      * @param searchEndDe   조회 종료 일자
      * @param model         모델 객체
+     * @return ExcelXlsxView
      */
     @PostMapping(value = "/sample/article-list/download")
     public String articleListDownload(@RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, ModelMap model) {

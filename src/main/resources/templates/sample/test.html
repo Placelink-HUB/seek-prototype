@@ -60,22 +60,20 @@ requirements, please purchase a commercial license from placelink.
                     })
                 );
 
-                document.querySelectorAll('.btn-download-article-list')?.forEach((btn) =>
-                    btn.addEventListener('click', () => {
-                        S2Util.fetch(
-                            '/sample/article-list/download',
-                            {
-                                method: 'post',
-                                responseType: 'blob',
-                                searchStartDe: '[[${searchStartDe}]]',
-                                searchEndDe: '[[${searchEndDe}]]'
-                            },
-                            function () {
-                                S2Util.toasts('다운로드 성공');
-                            }
-                        );
-                    })
-                );
+                document.querySelector('.btn-download-article-list')?.addEventListener('click', () => {
+                    S2Util.fetch(
+                        '/sample/article-list/download',
+                        {
+                            method: 'post',
+                            responseType: 'blob',
+                            searchStartDe: '[[${searchStartDe}]]',
+                            searchEndDe: '[[${searchEndDe}]]'
+                        },
+                        function () {
+                            S2Util.toasts('다운로드 성공');
+                        }
+                    );
+                });
             };
 
             window.goPage = (pageNo) => {

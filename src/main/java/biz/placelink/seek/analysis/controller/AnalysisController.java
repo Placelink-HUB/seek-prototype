@@ -28,8 +28,11 @@ package biz.placelink.seek.analysis.controller;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +58,7 @@ import biz.placelink.seek.analysis.service.AnalysisDetailService;
 import biz.placelink.seek.analysis.service.AnalysisService;
 import biz.placelink.seek.analysis.service.FileOutboundHistService;
 import biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistService;
+import biz.placelink.seek.analysis.vo.AnalysisResultVO;
 import biz.placelink.seek.analysis.vo.SchFileOutboundHistVO;
 import biz.placelink.seek.com.constants.Constants;
 import biz.placelink.seek.com.util.FileUtils;
@@ -62,6 +66,7 @@ import biz.placelink.seek.sample.vo.SchArticleVO;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.s2.ext.exception.S2RuntimeException;
 import kr.s2.ext.file.FileManager;
 import kr.s2.ext.util.S2DateUtil;
 import kr.s2.ext.util.S2JsonUtil;
@@ -180,6 +185,59 @@ public class AnalysisController {
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/detection-file";
+    }
+
+    /**
+     * 검증 파일 목록 엑셀 다운로드
+     *
+     * @param searchStartDe 조회 시작 일자
+     * @param searchEndDe   조회 종료 일자
+     * @param model         모델 객체
+     * @return ExcelXlsxView
+     */
+    @PostMapping(value = "/analysis/detection-file-list/download")
+    public String detectionFileListDownload(@RequestParam(name = "searchStartDe", defaultValue = "") String searchStartDe, @RequestParam(name = "searchEndDe", defaultValue = "") String searchEndDe, ModelMap model) {
+        String pattern = "yyyyMMdd";
+        SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
+
+        SchArticleVO searchVO = new SchArticleVO();
+        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
+        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setPagingYn("N");
+        searchVO.setOrderBy("CREATE_DT DESC");
+
+        List<AnalysisResultVO> fileAnalysisList = analysisDetailService.selectFileAnalysisList(searchVO);
+        if (S2Util.isEmpty(fileAnalysisList)) {
+            throw new S2RuntimeException("데이터가 존재하지 않습니다.");
+        }
+
+        ArrayList<String> headers = new ArrayList<String>();
+        headers.add("파일명");
+        headers.add("등록 일시");
+        headers.add("상태");
+        headers.add("파일용량");
+        headers.add("민감정보개수");
+        headers.add("민감정보등급");
+        headers.add("다운로드 수");
+
+        ArrayList<ArrayList<Object>> bodyList = new ArrayList<ArrayList<Object>>();
+        for (AnalysisResultVO fileAnalysis : fileAnalysisList) {
+            ArrayList<Object> body = new ArrayList<Object>();
+            body.add(fileAnalysis.getDetectionFileName());
+            body.add(fileAnalysis.getCreateDt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            body.add(fileAnalysis.getAnalysisStatusCcdNm());
+            body.add(fileAnalysis.getFormattedTotalFileSize() + " " + fileAnalysis.getFormattedTotalFileSizeUnit());
+            body.add(new DecimalFormat("###,###").format(fileAnalysis.getTotalDetectionCount()));
+            body.add(fileAnalysis.getMaxDetectionTypeCcdNm());
+            body.add(new DecimalFormat("###,###").format(fileAnalysis.getDownloadCount()));
+            bodyList.add(body);
+        }
+
+        model.addAttribute("fileName", "article_list_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        model.addAttribute("head", headers);
+        model.addAttribute("body", bodyList);
+        model.addAttribute(Constants.RESULT_CODE, 1);
+        return "excelXlsxView";
     }
 
     /**

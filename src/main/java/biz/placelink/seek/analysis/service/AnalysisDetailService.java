@@ -124,6 +124,16 @@ public class AnalysisDetailService {
      * @param searchVO 조회 조건
      * @return 파일 분석 목록
      */
+    public List<AnalysisResultVO> selectFileAnalysisList(SearchVO searchVO) {
+        return analysisDetailMapper.selectFileAnalysisList(searchVO);
+    }
+
+    /**
+     * 페이지 정보가 포함된 파일 분석 목록을 조회한다.
+     *
+     * @param searchVO 조회 조건
+     * @return 파일 분석 목록
+     */
     public PaginationInfo selectFileAnalysisListWithPagination(SearchVO searchVO) {
         List<AnalysisResultVO> list = analysisDetailMapper.selectFileAnalysisList(searchVO);
         int count = analysisDetailMapper.selectFileAnalysisListCount(searchVO);
