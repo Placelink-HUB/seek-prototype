@@ -247,7 +247,7 @@ requirements, please purchase a commercial license from placelink.
                             }
                         } else {
                             semicircleChartInfo2.fileOutboundStatus.blockedCount++;
-                            semicircleChartInfo2.fileOutboundStatus.blockedFileCount += Number(event.data.data['fileCount'] || 0);
+                            semicircleChartInfo2.fileOutboundStatus.blockedFileCount += Number(event.data.data['totalFileCount'] || 0);
                             semicircleChartInfo2.fileOutboundStatus.blockedFileSize += Number(event.data.data['totalFileSize'] || 0);
                         }
 

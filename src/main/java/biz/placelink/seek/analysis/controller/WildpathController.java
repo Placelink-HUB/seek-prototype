@@ -99,7 +99,9 @@ public class WildpathController {
                 "/public/analysis/file-blocking", // 파일전송 차단 현황
                 "/public/analysis/file-transfer", // 서명파일 전송 현황
                 "/public/analysis/system-transfer", // 시스템 파일 전송 현황
-                "/public/dashboard/anomaly_detection" // 이상 패턴 탐지 현황
+                "/public/dashboard/anomaly_detection", // 이상 패턴 탐지 현황
+                // "/console/forward/response/async/test",
+                // "/console/forward/response/heartbeat",
         };
     }
 
@@ -224,7 +226,7 @@ public class WildpathController {
                 logger.error(e.getMessage(), e);
             }
 
-            if (S2ServletUtil.isResponseSuccess(response) && !this.isExcludedPath(request, "/postprocess/", this.systemPaths)) {
+            if (!this.isExcludedPath(request, "/postprocess/", this.systemPaths)) {
                 String clientIp = S2ServletUtil.getClientIp(request);
                 payload = wildpathAnalysisService.maskSensitiveInformation(requestId, Constants.CD_ANALYSIS_MODE_PROXY_REVERSE_POST, payload, seekMode, clientIp);
             }
@@ -263,7 +265,7 @@ public class WildpathController {
      */
     @PostMapping(path = "/response/async/**")
     protected void onAfterPostprocess(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (!S2ServletUtil.isResponseSuccess(response) || this.isExcludedPath(request, "/response/async/", this.systemPaths)) {
+        if (this.isExcludedPath(request, "/response/async/", this.systemPaths)) {
             return;
         }
 
