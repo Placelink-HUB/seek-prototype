@@ -32,10 +32,6 @@ requirements, please purchase a commercial license from placelink.
 
             window.initPage = () => {
                 document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
-            };
-
-            window.goPage = (pageNo) => {
-                location.href = `/public/analysis/sensitive-access-hist?pageNo=${pageNo}`;
 
                 document.querySelector('.btn-download-excel')?.addEventListener('click', () => {
                     S2Util.fetch(
@@ -51,6 +47,10 @@ requirements, please purchase a commercial license from placelink.
                         }
                     );
                 });
+            };
+
+            window.goPage = (pageNo) => {
+                location.href = `/public/analysis/sensitive-access-hist?pageNo=${pageNo}`;
             };
         </script>
     </th:block>

@@ -2146,7 +2146,7 @@ export const S2Util = {
             () => {
                 S2Util.hideToast(toastId);
             },
-            option && !isNaN(option.delay) ? option.delay : 30000
+            option && !isNaN(option.delay) ? option.delay : 3_000
         );
     },
     /**
