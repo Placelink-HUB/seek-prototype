@@ -2033,6 +2033,7 @@ export const S2Util = {
      * @param {string} content - 모달 본문(modal-body)에 들어갈 HTML 콘텐츠.
      * @param {object} [option] - 모달 설정 옵션 객체.
      * @param {string} [option.width='80%'] - 모달 창의 너비 (CSS 값).
+     * @param {string} [option.height='auto'] - 모달 창의 높이 (CSS 값).
      * @param {string} [option.title=''] - 모달 헤더에 표시될 제목.
      * @param {string} [option.titleAlign='center'] - 제목의 텍스트 정렬 (CSS 값).
      * @param {string} [option.titleSize='1.125rem'] - 제목의 폰트 크기 (CSS 값).
@@ -2057,7 +2058,7 @@ export const S2Util = {
             document.body,
             `
                 <div id="s2-modal-${modelNo}" class="s2-modal" role="dialog" aria-modal="true" aria-labelledby="s2-modal-title-${modelNo}" aria-describedby="s2-modal-description-${modelNo}">
-                    <div class="modal-content" style="width: ${option.width ? option.width : '80%'}">
+                    <div class="modal-content" style="width: ${option.width ? option.width : '80%'}; height: ${option.height ? option.height : 'auto'}">
                         <div class="modal-header">
                             <h2 class="modal-title" id="s2-modal-title-${modelNo}" style="text-align: ${option.titleAlign ? option.titleAlign : 'center'}; font-size: ${option.titleSize ? option.titleSize : '1.125rem'}">${option.title || ''}&nbsp;</h2>
                             ${option.headerHtml ? option.headerHtml : ''}

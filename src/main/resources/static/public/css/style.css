@@ -416,6 +416,20 @@ table caption {
   display: block;
 }
 
+.modal.date-range .contents {
+  text-align: center;
+}
+
+.modal.date-range .contents .datepicker {
+  width: 7.5rem;
+  height: 1.75rem;
+  text-align: center;
+}
+
+.modal.date-range .button-wrap {
+  padding: 0;
+}
+
 /* ===================================================================================================
     Alert / Confirm
 =================================================================================================== */
@@ -848,7 +862,7 @@ table caption {
 .file-upload-ok .file-info {
   display: flex;
   width: 100%;
-  height: 1.5625rem;
+  height: 2.875rem;
   float: left;
   padding: 0.625rem 1.25rem;
   background-color: #fff;

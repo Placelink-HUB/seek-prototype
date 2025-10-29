@@ -35,7 +35,12 @@ requirements, please purchase a commercial license from placelink.
 
             window.initPage = () => {
                 document.querySelector('.btn-open-create-article')?.addEventListener('click', openCreateArticle);
-                document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
+
+                document.querySelector('.btn-date-range')?.addEventListener('click', () => {
+                    openDateRange((searchStartDe, searchEndDe) => {
+                        goPage(1, searchStartDe, searchEndDe);
+                    });
+                });
 
                 document.querySelectorAll('.btn-open-modal-article-contents')?.forEach((btn) =>
                     btn.addEventListener('click', (event) => {
@@ -76,8 +81,8 @@ requirements, please purchase a commercial license from placelink.
                 });
             };
 
-            window.goPage = (pageNo) => {
-                location.href = `/public/sample/test?pageNo=${pageNo}`;
+            window.goPage = (pageNo, searchStartDe, searchEndDe) => {
+                location.href = `/public/sample/test?pageNo=${pageNo}&searchStartDe=${searchStartDe}&searchEndDe=${searchEndDe}`;
             };
 
             function openCreateArticle() {
@@ -398,7 +403,7 @@ requirements, please purchase a commercial license from placelink.
                 </h1>
                 <span class="btn-group">
                     <button class="btn-type1 btn-open-create-article">데이터 등록</button>
-                    <button class="btn-type1 btn-coming-soon">기간 검색</button>
+                    <button class="btn-type1 btn-date-range">기간 검색</button>
                     <button class="btn-type1 btn-download-excel">전체 현황 다운로드</button>
                 </span>
             </div>

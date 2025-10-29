@@ -35,8 +35,10 @@ requirements, please purchase a commercial license from placelink.
                 document.querySelector('.btn-open-validate-file')?.addEventListener('click', openValidateFile);
                 document.querySelectorAll('.btn-download-signed-file')?.forEach((btn) => btn.addEventListener('click', (event) => downloadFile(event.currentTarget.dataset.signedFileId)));
 
-                document.querySelector('.btn-coming-soon')?.addEventListener('click', () => {
-                    document.querySelector('[name=schDe]').click();
+                document.querySelector('.btn-date-range')?.addEventListener('click', () => {
+                    openDateRange((searchStartDe, searchEndDe) => {
+                        goPage(1, searchStartDe, searchEndDe);
+                    });
                 });
 
                 document.querySelector('.btn-download-excel')?.addEventListener('click', () => {
@@ -55,8 +57,8 @@ requirements, please purchase a commercial license from placelink.
                 });
             };
 
-            window.goPage = (pageNo) => {
-                location.href = `/public/analysis/detection-file?pageNo=${pageNo}`;
+            window.goPage = (pageNo, searchStartDe, searchEndDe) => {
+                location.href = `/public/analysis/detection-file?pageNo=${pageNo}&searchStartDe=${searchStartDe}&searchEndDe=${searchEndDe}`;
             };
 
             let isRegistering = false;
@@ -282,7 +284,7 @@ requirements, please purchase a commercial license from placelink.
                 </h1>
                 <span class="btn-group">
                     <button class="btn-type1 btn-open-validate-file">파일 검증</button>
-                    <button class="btn-type1 btn-coming-soon">기간 검색</button>
+                    <button class="btn-type1 btn-date-range">기간 검색</button>
                     <button class="btn-type1 btn-download-excel">전체 현황 다운로드</button>
                 </span>
             </div>
