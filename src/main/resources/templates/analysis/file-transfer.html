@@ -32,6 +32,23 @@ requirements, please purchase a commercial license from placelink.
 
             window.initPage = () => {
                 document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
+
+                document.querySelector('.btn-download-excel')?.addEventListener('click', () => {
+                    const searchGroupingType = document.querySelector('input[name="searchGroupingType"]:checked').value;
+
+                    S2Util.fetch(
+                        '/public/analysis/file-transfer/download',
+                        {
+                            method: 'post',
+                            responseType: 'blob',
+                            schDe: '[[${schDe}]]',
+                            searchGroupingType: searchGroupingType
+                        },
+                        function () {
+                            S2Util.showToast('다운로드 성공');
+                        }
+                    );
+                });
             };
 
             window.goPage = () => {
@@ -48,7 +65,7 @@ requirements, please purchase a commercial license from placelink.
                     <span class="sub-title">서명 파일의 외부 전송 처리 현황</span>
                 </h1>
                 <span class="btn-group">
-                    <button class="btn-type1 btn-coming-soon">전체 현황 다운로드</button>
+                    <button class="btn-type1 btn-download-excel">전체 현황 다운로드</button>
                 </span>
             </div>
             <div class="wrap-contents">

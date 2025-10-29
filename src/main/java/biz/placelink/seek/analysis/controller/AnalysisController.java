@@ -59,6 +59,7 @@ import biz.placelink.seek.analysis.service.AnalysisService;
 import biz.placelink.seek.analysis.service.FileOutboundHistService;
 import biz.placelink.seek.analysis.service.SensitiveInformationUnmaskHistService;
 import biz.placelink.seek.analysis.vo.AnalysisResultVO;
+import biz.placelink.seek.analysis.vo.FileOutboundHistVO;
 import biz.placelink.seek.analysis.vo.SchFileOutboundHistVO;
 import biz.placelink.seek.analysis.vo.SensitiveInformationUnmaskHistVO;
 import biz.placelink.seek.com.constants.Constants;
@@ -234,7 +235,7 @@ public class AnalysisController {
             bodyList.add(body);
         }
 
-        model.addAttribute("fileName", "article_list_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        model.addAttribute("fileName", "detection-file-list_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
         model.addAttribute("head", headers);
         model.addAttribute("body", bodyList);
         model.addAttribute(Constants.RESULT_CODE, 1);
@@ -358,7 +359,7 @@ public class AnalysisController {
             bodyList.add(body);
         }
 
-        model.addAttribute("fileName", "article_list_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        model.addAttribute("fileName", "sensitive-access-hist_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
         model.addAttribute("head", headers);
         model.addAttribute("body", bodyList);
         model.addAttribute(Constants.RESULT_CODE, 1);
@@ -395,6 +396,7 @@ public class AnalysisController {
     /**
      * 파일전송 차단 현황
      *
+     * @param schDe 조회일자
      * @param model ModelMap
      * @return 파일전송 차단 현황 화면
      */
@@ -419,6 +421,60 @@ public class AnalysisController {
         model.addAttribute("schDe", vSchDe);
         model.addAttribute("searchGroupingType", searchGroupingType);
         return "analysis/file-blocking";
+    }
+
+    /**
+     * 파일전송 차단 현황 엑셀 다운로드
+     *
+     * @param schDe 조회일자
+     * @param model 모델 객체
+     * @return ExcelXlsxView
+     */
+    @PostMapping(value = "/public/analysis/file-blocking/download")
+    public String fileBlockingDownload(@RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType, ModelMap model) {
+        String pattern = "yyyyMMdd";
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), pattern, LocalDate.now());
+
+        SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
+        searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_BLOCKED);
+        searchVO.setSearchStartDate(vSchDe, pattern);
+        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchGroupingType(searchGroupingType);
+        searchVO.setPagingYn("N");
+        searchVO.setOrderBy("LAST_EVENT_DT DESC");
+
+        List<FileOutboundHistVO> fileOutboundHistList = fileOutboundHistService.selectFileOutboundHistList(searchVO);
+        if (S2Util.isEmpty(fileOutboundHistList)) {
+            throw new S2RuntimeException("데이터가 존재하지 않습니다.");
+        }
+
+        ArrayList<String> headers = new ArrayList<String>();
+        headers.add("user".equals(searchGroupingType) ? "사용자 ID" : "채널");
+        headers.add("차단 건수");
+        headers.add("차단 용량");
+        headers.add("차단 파일 개수");
+        headers.add("업무시간 차단 수");
+        headers.add("비업무시간 차단 수");
+        headers.add("탐지 결과");
+
+        ArrayList<ArrayList<Object>> bodyList = new ArrayList<ArrayList<Object>>();
+        for (FileOutboundHistVO fileOutboundHist : fileOutboundHistList) {
+            ArrayList<Object> body = new ArrayList<Object>();
+            body.add("user".equals(searchGroupingType) ? Optional.ofNullable(fileOutboundHist.getUserId()).orElse("-") : fileOutboundHist.getOutboundChannelCcd());
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getActionCount()));
+            body.add(fileOutboundHist.getFormattedTotalFileSize() + " " + fileOutboundHist.getFormattedTotalFileSizeUnit());
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getTotalFileCount()));
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getWorkingHourStatusNormalCount()));
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getWorkingHourStatusAbnormalCount()));
+            body.add(fileOutboundHist.getConditionLevel());
+            bodyList.add(body);
+        }
+
+        model.addAttribute("fileName", "file-blocking_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        model.addAttribute("head", headers);
+        model.addAttribute("body", bodyList);
+        model.addAttribute(Constants.RESULT_CODE, 1);
+        return "excelXlsxView";
     }
 
     /**
@@ -452,6 +508,59 @@ public class AnalysisController {
     }
 
     /**
+     * 서명파일 전송 현황 다운로드
+     *
+     * @param schDe 조회일자
+     * @param model 모델 객체
+     * @return ExcelXlsxView
+     */
+    @PostMapping(value = "/public/analysis/file-transfer/download")
+    public String fileTransferDownload(@RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType, ModelMap model) {
+        String pattern = "yyyyMMdd";
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), pattern, LocalDate.now());
+
+        SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
+        searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
+        searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_ALL_NORMAL);
+        searchVO.setSearchStartDate(vSchDe, pattern);
+        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchGroupingType(searchGroupingType);
+        searchVO.setPagingYn("N");
+        searchVO.setOrderBy("LAST_EVENT_DT DESC");
+
+        List<FileOutboundHistVO> fileOutboundHistList = fileOutboundHistService.selectFileOutboundHistList(searchVO);
+        if (S2Util.isEmpty(fileOutboundHistList)) {
+            throw new S2RuntimeException("데이터가 존재하지 않습니다.");
+        }
+
+        ArrayList<String> headers = new ArrayList<String>();
+        headers.add("user".equals(searchGroupingType) ? "사용자 ID" : "채널");
+        headers.add("전송 건수");
+        headers.add("전송 용량");
+        headers.add("전송 파일 개수");
+        headers.add("업무시간 전송 수");
+        headers.add("비업무시간 전송 수");
+
+        ArrayList<ArrayList<Object>> bodyList = new ArrayList<ArrayList<Object>>();
+        for (FileOutboundHistVO fileOutboundHist : fileOutboundHistList) {
+            ArrayList<Object> body = new ArrayList<Object>();
+            body.add("user".equals(searchGroupingType) ? Optional.ofNullable(fileOutboundHist.getUserId()).orElse("-") : fileOutboundHist.getOutboundChannelCcd());
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getActionCount()));
+            body.add(fileOutboundHist.getFormattedTotalFileSize() + " " + fileOutboundHist.getFormattedTotalFileSizeUnit());
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getTotalFileCount()));
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getWorkingHourStatusNormalCount()));
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getWorkingHourStatusAbnormalCount()));
+            bodyList.add(body);
+        }
+
+        model.addAttribute("fileName", "file-transfer_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        model.addAttribute("head", headers);
+        model.addAttribute("body", bodyList);
+        model.addAttribute(Constants.RESULT_CODE, 1);
+        return "excelXlsxView";
+    }
+
+    /**
      * 시스템 파일 전송 현황
      *
      * @param model ModelMap
@@ -479,6 +588,61 @@ public class AnalysisController {
         model.addAttribute("schDe", vSchDe);
         model.addAttribute("searchGroupingType", searchGroupingType);
         return "analysis/system-transfer";
+    }
+
+    /**
+     * 시스템 파일 전송 현황 다운로드
+     *
+     * @param schDe 조회일자
+     * @param model 모델 객체
+     * @return ExcelXlsxView
+     */
+    @PostMapping(value = "/public/analysis/system-transfer/download")
+    public String systemTransferDownload(@RequestParam(name = "schDe", defaultValue = "") String schDe, @RequestParam(name = "searchGroupingType", defaultValue = "user") String searchGroupingType, ModelMap model) {
+        String pattern = "yyyyMMdd";
+        String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), pattern, LocalDate.now());
+
+        SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
+        searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
+        searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_NONE_NORMAL);
+        searchVO.setSearchStartDate(vSchDe, pattern);
+        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchGroupingType(searchGroupingType);
+        searchVO.setPagingYn("N");
+        searchVO.setOrderBy("LAST_EVENT_DT DESC");
+
+        List<FileOutboundHistVO> fileOutboundHistList = fileOutboundHistService.selectFileOutboundHistList(searchVO);
+        if (S2Util.isEmpty(fileOutboundHistList)) {
+            throw new S2RuntimeException("데이터가 존재하지 않습니다.");
+        }
+
+        ArrayList<String> headers = new ArrayList<String>();
+        headers.add("user".equals(searchGroupingType) ? "사용자 ID" : "채널");
+        headers.add("전송 건수");
+        headers.add("전송 용량");
+        headers.add("전송 파일 개수");
+        headers.add("업무시간 전송 수");
+        headers.add("비업무시간 전송 수");
+        headers.add("탐지 결과");
+
+        ArrayList<ArrayList<Object>> bodyList = new ArrayList<ArrayList<Object>>();
+        for (FileOutboundHistVO fileOutboundHist : fileOutboundHistList) {
+            ArrayList<Object> body = new ArrayList<Object>();
+            body.add("user".equals(searchGroupingType) ? Optional.ofNullable(fileOutboundHist.getUserId()).orElse("-") : fileOutboundHist.getOutboundChannelCcd());
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getActionCount()));
+            body.add(fileOutboundHist.getFormattedTotalFileSize() + " " + fileOutboundHist.getFormattedTotalFileSizeUnit());
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getTotalFileCount()));
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getWorkingHourStatusNormalCount()));
+            body.add(new DecimalFormat("###,###").format(fileOutboundHist.getWorkingHourStatusAbnormalCount()));
+            body.add(fileOutboundHist.getConditionLevel());
+            bodyList.add(body);
+        }
+
+        model.addAttribute("fileName", "system-transfer_" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+        model.addAttribute("head", headers);
+        model.addAttribute("body", bodyList);
+        model.addAttribute(Constants.RESULT_CODE, 1);
+        return "excelXlsxView";
     }
 
     public record SearchPeriod(LocalDate searchStartDate, LocalDate searchEndDate) {
