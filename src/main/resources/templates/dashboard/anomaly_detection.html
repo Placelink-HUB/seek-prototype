@@ -32,6 +32,19 @@ requirements, please purchase a commercial license from placelink.
 
             window.initPage = () => {
                 document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
+
+                // 기간 선택
+                document.querySelector('.btn-schDe')?.addEventListener('click', () => {
+                    document.querySelector('[name=schDe]').click();
+                });
+
+                // Datepicker 초기화
+                flatpickr('.datepicker', {
+                    locale: 'ko',
+                    onChange: function (selectedDates, dateStr) {
+                        location.href = `/public/dashboard/anomaly_detection?schDe=${dateStr.replace(/[^0-9]/g, '')}`;
+                    }
+                });
             };
         </script>
     </th:block>
@@ -42,13 +55,17 @@ requirements, please purchase a commercial license from placelink.
                     <span class="main-title menu9">이상 패턴 탐지 현황</span>
                     <span class="sub-title">정상 업무 패턴을 벗어난 의심 행위 탐지</span>
                 </h1>
+                <span class="btn-group">
+                    <button class="btn-type1 btn-schDe">기간 선택</button>
+                    <input type="hidden" class="datepicker s2-c-hidden" name="schDe" />
+                </span>
             </div>
             <div class="wrap-contents">
                 <div class="top">
-                    <div class="c-flex-sty01 targetDate-wrap">
+                    <div class="c-flex-sty01 targetDate-wrap" th:classappend="${#temporals.createDate(schDe, 'yyyyMMdd').isEqual(#temporals.createToday())} ? 'today' : ''">
                         <div class="arrow-left"></div>
                         <div class="data-date">
-                            <div class="date targetDate">0000년 00월 00일</div>
+                            <div class="date targetDate" th:text="${#temporals.format(#temporals.createDate(schDe, 'yyyyMMdd'), 'yyyy년 MM월 dd일')}">0000년 00월 00일</div>
                             <div class="icon-today">TODAY</div>
                         </div>
                         <div class="arrow-right"></div>

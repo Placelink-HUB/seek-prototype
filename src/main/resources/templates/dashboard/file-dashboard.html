@@ -42,6 +42,19 @@ requirements, please purchase a commercial license from placelink.
                 document.querySelector('.btn-download-report')?.addEventListener('click', () => downloadReport());
 
                 S2Util.subscribeServiceWorker('[[${pl_webpush_s2_key_public}]]');
+
+                // 기간 선택
+                document.querySelector('.btn-schDe')?.addEventListener('click', () => {
+                    document.querySelector('[name=schDe]').click();
+                });
+
+                // Datepicker 초기화
+                flatpickr('.datepicker', {
+                    locale: 'ko',
+                    onChange: function (selectedDates, dateStr) {
+                        location.href = `/public/dashboard/file?schDe=${dateStr.replace(/[^0-9]/g, '')}`;
+                    }
+                });
             };
 
             const doughnutChart = {};
@@ -1137,6 +1150,10 @@ requirements, please purchase a commercial license from placelink.
                     <span class="main-title menu1">종합 대시보드</span>
                     <span class="sub-title">기관 전체 보안 현황</span>
                 </h1>
+                <span class="btn-group">
+                    <button class="btn-type1 btn-schDe">기간 선택</button>
+                    <input type="hidden" class="datepicker s2-c-hidden" name="schDe" />
+                </span>
             </div>
             <div class="wrap-contents">
                 <div class="top">
@@ -1144,10 +1161,10 @@ requirements, please purchase a commercial license from placelink.
                         <div class="info inspection"><b>점검</b> (<span class="activityInspectCount">0</span>/<span class="activityTotalCount">0</span>)</div>
                         <div class="info warning"><b>경고</b> (<span class="activityWarningCount">0</span>/<span class="activityTotalCount">0</span>)</div>
                     </div>
-                    <div class="c-flex-sty01 targetDate-wrap">
+                    <div class="c-flex-sty01 targetDate-wrap" th:classappend="${#temporals.createDate(schDe, 'yyyyMMdd').isEqual(#temporals.createToday())} ? 'today' : ''">
                         <div class="arrow-left"></div>
                         <div class="data-date">
-                            <div class="date targetDate">0000년 00월 00일</div>
+                            <div class="date targetDate" th:text="${#temporals.format(#temporals.createDate(schDe, 'yyyyMMdd'), 'yyyy년 MM월 dd일')}">0000년 00월 00일</div>
                             <div class="icon-today">TODAY</div>
                         </div>
                         <div class="arrow-right"></div>

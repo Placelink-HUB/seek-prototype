@@ -1,27 +1,11 @@
 /*
- * SEEK
- * Copyright (C) 2025 placelink
+ * S2Util Library
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright (c) 2020 - 2025 devers2 (Daejeon, Korea)
+ * All rights reserved.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <https://www.gnu.org/licenses/>.
- *
- * =========================================================================
- *
- * 상업적 이용 또는 AGPL-3.0의 공개 의무를 면제받기
- * 위해서는, placelink로부터 별도의 상업용 라이선스(Commercial License)를 구매해야 합니다.
- * For commercial use or to obtain an exemption from the AGPL-3.0 license
- * requirements, please purchase a commercial license from placelink.
- * *** 문의처: help@placelink.shop (README.md 참조)
+ * This source code is the proprietary asset of devers2.
+ * Unauthorized copying, modification, or redistribution of this file is strictly prohibited.
  */
 
 /* Step 1: HTML 요소에 기본 박스 모델 설정 */
@@ -191,4 +175,20 @@ html {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+/* ===================================================================================================
+    Common
+=================================================================================================== */
+.s2-c-hidden {
+  /* 해당 요소는 화면에서 완전히 사라지지만 스크린 리더기는 읽을 수 있도록 설정 */
+  position: absolute !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: -0.125rem !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
 }

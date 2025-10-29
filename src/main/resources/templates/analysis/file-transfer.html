@@ -49,11 +49,27 @@ requirements, please purchase a commercial license from placelink.
                         }
                     );
                 });
+
+                // 기간 선택
+                document.querySelector('.btn-schDe')?.addEventListener('click', () => {
+                    document.querySelector('[name=schDe]').click();
+                });
+
+                // Datepicker 초기화
+                flatpickr('.datepicker', {
+                    locale: 'ko',
+                    onChange: function (selectedDates, dateStr) {
+                        goPage(dateStr.replace(/[^0-9]/g, ''));
+                    }
+                });
             };
 
-            window.goPage = () => {
+            window.goPage = (schDe) => {
                 const searchGroupingType = document.querySelector('input[name="searchGroupingType"]:checked').value;
-                location.href = `/public/analysis/file-transfer?schDe=[[${schDe}]]&searchGroupingType=${searchGroupingType}`;
+                if (!schDe) {
+                    schDe = '[[${schDe}]]';
+                }
+                location.href = `/public/analysis/file-transfer?schDe=${schDe}&searchGroupingType=${searchGroupingType}`;
             };
         </script>
     </th:block>
@@ -65,15 +81,17 @@ requirements, please purchase a commercial license from placelink.
                     <span class="sub-title">서명 파일의 외부 전송 처리 현황</span>
                 </h1>
                 <span class="btn-group">
+                    <button class="btn-type1 btn-schDe">기간 선택</button>
+                    <input type="hidden" class="datepicker s2-c-hidden" name="schDe" />
                     <button class="btn-type1 btn-download-excel">전체 현황 다운로드</button>
                 </span>
             </div>
             <div class="wrap-contents">
                 <div class="top">
-                    <div class="c-flex-sty01 targetDate-wrap">
+                    <div class="c-flex-sty01 targetDate-wrap" th:classappend="${#temporals.createDate(schDe, 'yyyyMMdd').isEqual(#temporals.createToday())} ? 'today' : ''">
                         <div class="arrow-left"></div>
                         <div class="data-date">
-                            <div class="date targetDate">0000년 00월 00일</div>
+                            <div class="date targetDate" th:text="${#temporals.format(#temporals.createDate(schDe, 'yyyyMMdd'), 'yyyy년 MM월 dd일')}">0000년 00월 00일</div>
                             <div class="icon-today">TODAY</div>
                         </div>
                         <div class="arrow-right"></div>
