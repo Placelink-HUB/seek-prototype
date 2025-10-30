@@ -29,6 +29,7 @@ requirements, please purchase a commercial license from placelink.
         <script th:src="@{/public/js/echarts.min.js}"></script>
         <script type="module">
             import {S2Util} from '[[@{/public/js/s2.util.js}]]';
+            import {S2Date} from '[[@{/public/js/s2.date.js}]]';
 
             window.initPage = () => {
                 initDoughnutChart();
@@ -365,7 +366,7 @@ requirements, please purchase a commercial license from placelink.
 
                             for (let i = 0; i < realtimeAnalysisStatus.xAxisSeriesMaxCount; i++) {
                                 // 현재부터 29분전까지
-                                const date = dayjs()
+                                const date = S2Date()
                                     .subtract(29 - i, 'minute')
                                     .format('YYYYMMDDHHmm');
                                 xAxisData.push(date);
@@ -856,7 +857,7 @@ requirements, please purchase a commercial license from placelink.
                         trigger: 'axis',
                         // axisPointer: { type: 'cross' },
                         formatter: function (params) {
-                            const date = dayjs(params[0].value[0]).format('YYYY-MM-DD HH:mm');
+                            const date = S2Date(params[0].value[0]).format('YYYY-MM-DD HH:mm');
                             const value = params[0].value[1];
                             return `${date}<br/>${value}건`;
                         }
@@ -874,7 +875,7 @@ requirements, please purchase a commercial license from placelink.
                             fontSize: 12,
                             margin: 10,
                             formatter: function (value) {
-                                return dayjs(value).format('HH:mm');
+                                return S2Date(value).format('HH:mm');
                             }
                         },
                         splitLine: {show: false}
@@ -974,10 +975,10 @@ requirements, please purchase a commercial license from placelink.
 
                 for (let i = 0; i < realtimeAnalysisStatus.xAxisSeriesMaxCount; i++) {
                     // 29분 전부터 현재까지 1분 간격으로 생성
-                    const date = dayjs()
+                    const date = S2Date()
                         .subtract(29 - i, 'minute')
                         .toDate();
-                    const dateKey = dayjs(date).format('YYYYMMDDHHmm');
+                    const dateKey = S2Date(date).format('YYYYMMDDHHmm');
                     const requestCount = realtimeAnalysisStatus.requestCountInfo[dateKey] || 0;
                     const completeCount = lastAnalysisCompleteDateTimeFlag ? realtimeAnalysisStatus.completeCountInfo[dateKey] || 0 : null;
 

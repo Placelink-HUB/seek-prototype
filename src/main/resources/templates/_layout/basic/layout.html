@@ -59,7 +59,6 @@ requirements, please purchase a commercial license from placelink.
             }
         </style>
 
-        <script th:src="@{/public/js/lib/dayjs.min.js}"></script>
         <script th:src="@{/public/js/lib/flatpickr/flatpickr.min.js}"></script>
         <script th:src="@{/public/js/lib/flatpickr/ko.js}"></script>
 
@@ -67,6 +66,7 @@ requirements, please purchase a commercial license from placelink.
         <script type="module">
             import {initializeS2DomEvents} from '[[@{/public/js/s2.util.js}]]';
             import {S2Util} from '[[@{/public/js/s2.util.js}]]';
+            import {S2Date} from '[[@{/public/js/s2.date.js}]]';
 
             document.addEventListener('DOMContentLoaded', () => {
                 initializeS2DomEvents();
@@ -84,7 +84,7 @@ requirements, please purchase a commercial license from placelink.
 
                 const targetDate = document.querySelector('.targetDate-wrap .targetDate');
                 if (targetDate) {
-                    const schDay = dayjs('[[${schDe}]]', 'YYYYMMDD');
+                    const schDay = S2Date('[[${schDe}]]', 'YYYYMMDD');
 
                     const arrowLeft = document.querySelector('.targetDate-wrap .arrow-left');
                     if (arrowLeft) {
@@ -141,7 +141,7 @@ requirements, please purchase a commercial license from placelink.
                         document.querySelector('.modal.date-range .btn-select-date-range').addEventListener('click', () => {
                             const searchStartDe = document.querySelector('.modal.date-range [name=searchStartDe]').value.replace(/[^0-9]/g, '');
                             const searchEndDe = document.querySelector('.modal.date-range [name=searchEndDe]').value.replace(/[^0-9]/g, '');
-                            const todayString = dayjs().format('YYYYMMDD');
+                            const todayString = S2Date().format('YYYYMMDD');
 
                             if (!searchStartDe) {
                                 S2Util.showToast('시작일을 선택하세요');
@@ -159,7 +159,7 @@ requirements, please purchase a commercial license from placelink.
                                 S2Util.showToast('시작일은 종료일 보다 늦은 날짜를 선택할 수 없습니다.');
                                 return;
                             }
-                            if (dayjs(searchEndDe, 'YYYYMMDD').diff(dayjs(searchStartDe, 'YYYYMMDD'), 'month', true) >= 1) {
+                            if (S2Date(searchEndDe, 'YYYYMMDD').diff(S2Date(searchStartDe, 'YYYYMMDD'), 'month', true) >= 1) {
                                 S2Util.showToast('기간은 1개월을 초과할 수 없습니다.');
                                 return;
                             }

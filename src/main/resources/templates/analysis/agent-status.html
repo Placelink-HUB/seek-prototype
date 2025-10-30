@@ -29,6 +29,7 @@ requirements, please purchase a commercial license from placelink.
     <th:block layout:fragment="bodyScript">
         <script type="module">
             import {S2Util} from '[[@{/public/js/s2.util.js}]]';
+            import {S2Date} from '[[@{/public/js/s2.date.js}]]';
 
             window.initPage = () => {
                 {
@@ -66,7 +67,7 @@ requirements, please purchase a commercial license from placelink.
                                 for (const agentStatus of response.agentStatusList) {
                                     let eventDateTimeStr = '';
                                     if (agentStatus.eventDateTime && Array.isArray(agentStatus.eventDateTime) && agentStatus.eventDateTime.length >= 6) {
-                                        eventDateTimeStr = dayjs(new Date(agentStatus.eventDateTime[0], agentStatus.eventDateTime[1] - 1, agentStatus.eventDateTime[2], agentStatus.eventDateTime[3], agentStatus.eventDateTime[4], agentStatus.eventDateTime[5])).format('YYYY-MM-DD HH:mm:ss');
+                                        eventDateTimeStr = S2Date(new Date(agentStatus.eventDateTime[0], agentStatus.eventDateTime[1] - 1, agentStatus.eventDateTime[2], agentStatus.eventDateTime[3], agentStatus.eventDateTime[4], agentStatus.eventDateTime[5])).format('YYYY-MM-DD HH:mm:ss');
                                     }
 
                                     agentStatusListHTML += `
