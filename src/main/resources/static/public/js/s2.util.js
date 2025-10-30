@@ -23,6 +23,7 @@
  * requirements, please purchase a commercial license from placelink.
  * *** 문의처: help@placelink.shop (README.md 참조)
  */
+import {S2Date} from './s2.date.js';
 import {hideS2Loading, showS2Loading} from './s2.loading.js';
 
 /**
@@ -64,14 +65,14 @@ String.prototype.dedent = function () {
  * @example
  * 1. S2Util 사용 예시:
  * <script type="module">
- *     import { S2Util } from './js/s2.util.js'; // Thymeleaf 는 '[[@{/js/s2.util.js}]]' 형태로 경로 지정
+ *     import { S2Util } from './js/s2.util.js'; // Thymeleaf: import { S2Util } from '[[@{/js/s2.util.js}]]'
  *     S2Util.alert('Hello, S2Util!');
  *     ...
  * </script>
  *
  * 2. initializeS2DomEvents 함수와 같이 사용 예시:
  * <script type="module">
- *     import { S2Util, initializeS2DomEvents } from './js/s2.util.js'; // Thymeleaf 는 '[[@{/js/s2.util.js}]]' 형태로 경로 지정
+ *     import { S2Util, initializeS2DomEvents } from './js/s2.util.js';
  *     document.addEventListener('DOMContentLoaded', initializeS2DomEvents);
  *     S2Util.alert('Hello, S2Util!');
  *     ...
@@ -839,42 +840,6 @@ export const S2Util = {
         return orderBy;
     },
     /**
-     * 주어진 문자열에서 숫자만 추출하여 지정된 구분 기호로 날짜 형식(YYYY-MM-DD)을 만든다.
-     *
-     * @param {string|number} dateStr - 포매팅할 날짜 문자열 또는 숫자 (예: '20251025', '2025/10/25').
-     * @param {string} [pDelimiter='-'] - 연, 월, 일을 구분할 기호. (선택적, 기본값: '-')
-     * @returns {string} - 포맷된 날짜 문자열 (예: '2025-10-25') 또는 유효하지 않을 경우 빈 문자열.
-     */
-    dateFormat(dateStr, pDelimiter) {
-        if (dateStr) {
-            dateStr = String(dateStr).replace(/[^0-9]/g, '');
-            const delimiter = pDelimiter ? pDelimiter : '-';
-
-            if (dateStr.length >= 8) {
-                dateStr = dateStr.substring(0, 8);
-                const errMsg = S2Util.validateDate(dateStr);
-
-                if (!errMsg) {
-                    dateStr = dateStr.replace(/(\d{4})(\d{2})(\d{2})/, `$1${delimiter}$2${delimiter}$3`);
-                } else {
-                    dateStr = '';
-                    if (document.getElementById('dialog-confirm') === null) {
-                        try {
-                            S2Util.alert(errMsg);
-                        } catch {
-                            alert(errMsg);
-                        }
-                    }
-                }
-            } else if (dateStr.length > 6) {
-                dateStr = dateStr.substring(0, 6).replace(/(\d{4})(\d{2})/, `$1${delimiter}$2`);
-            } else if (dateStr.length > 4) {
-                dateStr = dateStr.substring(0, 4);
-            }
-        }
-        return dateStr;
-    },
-    /**
      * 주어진 키와 값 쌍을 로컬 스토리지(localStorage)에 저장한다.
      * (로컬 스토리지 접근이 불가능하거나 실패할 경우 (예: 용량 초과, 사생활 보호 모드), 해당 데이터를 30일 만료 기한의 쿠키로 대체 저장한다.)
      *
@@ -1017,70 +982,14 @@ export const S2Util = {
         }
     },
     /**
-     * 주어진 문자열이 유효한 날짜 형식(YYYYMMDD 또는 YYYYMM)인지 확인한다.
-     * 문자열에서 숫자만 추출하여 검사하며, 유효하지 않을 경우 오류 메시지 문자열을 반환한다.
-     * 유효성 검사에는 연도의 유효 범위(현재로부터 100년 전까지)와 월/일의 범위 검사가 포함된다.
-     *
-     * @param {string|number} dateStr - 유효성을 검사할 날짜 문자열 또는 숫자 (예: '20251025', '2025/10/25').
-     * @returns {string} - 유효한 경우 빈 문자열(`''`), 유효하지 않을 경우 오류 메시지 문자열.
-     *
-     * @requires dayjs - 연도 범위 검사를 위해 dayjs 라이브러리에 의존한다.
-     */
-    validateDate(dateStr) {
-        let errMsg = '';
-
-        try {
-            if (dateStr) {
-                dateStr = String(dateStr).replace(/[^0-9]/g, '');
-                let year;
-                let month;
-                let day;
-
-                switch (dateStr.length) {
-                    case 8:
-                        year = parseInt(dateStr.substring(0, 4));
-                        month = parseInt(dateStr.substring(4, 6));
-                        day = parseInt(dateStr.substring(6, 8));
-
-                        if (year < dayjs().subtract(100, 'years').format('YYYY') || month < 1 || month > 12) {
-                            errMsg = '날짜형식이 올바르지 않습니다.';
-                        } else {
-                            const date = new Date(year, month, 0); // 다음달의 0일 (이달의 마지막일);
-                            const lastDay = date.getDate();
-
-                            if (day < 1 || day > lastDay) {
-                                errMsg = '잘못된 날짜입니다.';
-                            }
-                        }
-                        break;
-                    case 6:
-                        year = parseInt(dateStr.substring(0, 4));
-                        month = parseInt(dateStr.substring(4, 6));
-
-                        if (year < dayjs().subtract(100, 'years').format('YYYY') || month < 1 || month > 12) {
-                            errMsg = '날짜형식이 올바르지 않습니다.';
-                        }
-                        break;
-                    default:
-                        errMsg = '날짜형식이 올바르지 않습니다.';
-                        break;
-                }
-            }
-        } catch {
-            errMsg = '날짜형식이 올바르지 않습니다.';
-        }
-
-        return errMsg;
-    },
-    /**
      * 주어진 폼(form) 요소의 모든 입력 필드에 설정된 HTML 속성(required, length, dataType, mask 등)을 기반으로 유효성 검사를 수행한다.
      * 유효성 검사에서 문제가 발견되면 false를 반환하고, 오류 메시지 배열을 S2Util.alert를 통해 사용자에게 보여준다.
      *
      * @param {string|HTMLFormElement} form - 검사할 폼을 나타내는 CSS 선택자 문자열 또는 실제 form DOM 요소.
      * @returns {boolean} - 폼의 모든 필드가 유효하면 true, 하나라도 유효하지 않으면 false.
      *
+     * @requires S2Date
      * @requires S2Util.setFormErrorMessage
-     * @requires S2Util.validateDate
      * @requires S2Util.alert
      *
      * @example
@@ -1199,9 +1108,11 @@ export const S2Util = {
                                     switch (type) {
                                         case 'checkbox':
                                             break;
-                                        case 'radio':
-                                            value = formElement.find(`[type=radio][name="${element.name}"]:checked`).val();
+                                        case 'radio': {
+                                            const checkedRadio = formElement.querySelector(`[type=radio][name="${element.name}"]:checked`);
+                                            if (checkedRadio) value = checkedRadio.value;
                                             break;
+                                        }
                                         default:
                                             value = element.value;
                                             break;
@@ -1264,7 +1175,7 @@ export const S2Util = {
                                 }
 
                                 if (mask) {
-                                    if (!mask.test(value)) {
+                                    if (value && !mask.test(value)) {
                                         valid = false;
                                         checkMessage = `[${title}]${errMsaSuf2}`;
                                         S2Util.setFormErrorMessage(checkMessage, formElement.querySelector(`[data-form-error="${element.name}"]`), messageArr);
@@ -1284,19 +1195,50 @@ export const S2Util = {
                                             case 'radio':
                                                 break;
                                             default: {
-                                                const startDate = element.value;
-                                                const errMsg = S2Util.validateDate(startDate);
+                                                const startDateVal = element.value;
+                                                if (!startDateVal.trim()) {
+                                                    break; // 비어있으면 required가 처리
+                                                }
+
+                                                const startDateStr = String(startDateVal).replace(/[^0-9]/g, '');
+                                                let s2StartDate;
+                                                let errMsg = '';
+
+                                                // 길이에 따라 S2Date 객체 생성
+                                                if (startDateStr.length === 8) {
+                                                    s2StartDate = S2Date(startDateStr, 'YYYYMMDD');
+                                                } else if (startDateStr.length === 6) {
+                                                    s2StartDate = S2Date(startDateStr, 'YYYYMM');
+                                                } else {
+                                                    s2StartDate = S2Date(null); // Invalid Date 객체 생성 (NaN)
+                                                    errMsg = '날짜형식이 올바르지 않습니다.'; // 6자리 또는 8자리가 아님
+                                                }
+
+                                                // S2Date.isValid()로 오버플로우 등 모든 유효성 검사
+                                                if (errMsg === '' && !s2StartDate.isValid()) {
+                                                    errMsg = '잘못된 날짜입니다.'; // 예: 20250230
+                                                }
+
                                                 if (errMsg) {
                                                     checkValid = false;
                                                     checkMessage = `[${title}]은(는) ${errMsg}`;
                                                 } else {
+                                                    // 날짜 범위 (start/end) 검사
                                                     if (dataTypeInfo[1] && dataTypeInfo[1].indexOf('start') === 0) {
-                                                        const $endDateForm = formElement.find(`[dataType="date:end${dataTypeInfo[1].replace('start', '')}"]`);
-                                                        if ($endDateForm.length > 0) {
-                                                            const endDate = $endDateForm.val();
-                                                            if (startDate && endDate && S2Util.validateDate(endDate) && startDate > endDate) {
+                                                        const endDateElement = formElement.querySelector(`[dataType="date:end${dataTypeInfo[1].replace('start', '')}"]`);
+
+                                                        if (endDateElement) {
+                                                            const endDateValue = endDateElement.value;
+                                                            const endDateStr = String(endDateValue).replace(/[^0-9]/g, '');
+                                                            let s2EndDate;
+
+                                                            if (endDateStr.length === 8) s2EndDate = S2Date(endDateStr, 'YYYYMMDD');
+                                                            else if (endDateStr.length === 6) s2EndDate = S2Date(endDateStr, 'YYYYMM');
+
+                                                            // endDate가 비어있지 않고, (s2EndDate가 생성되었고) 유효하며, 시작일이 종료일보다 늦을 때
+                                                            if (endDateValue.trim() && s2EndDate && s2EndDate.isValid() && s2StartDate.toDate() > s2EndDate.toDate()) {
                                                                 checkValid = false;
-                                                                checkMessage = `[${$endDateForm.attr('title')}]은(는) [${title}]보다 빠를수 없습니다.`;
+                                                                checkMessage = `[${endDateElement.getAttribute('title')}]은(는) [${title}]보다 빠를수 없습니다.`;
                                                             }
                                                         }
                                                     }
@@ -1324,9 +1266,10 @@ export const S2Util = {
                                     emptyGroupNm = element.getAttribute('name');
                                 }
 
-                                for (const in_idx in groupNmList) {
-                                    const groupNm = groupNmList[in_idx];
-                                    const groupVal = formElement.find(`[name="${groupNm}"]`).val();
+                                for (const groupNm of groupNmList) {
+                                    const groupElement = formElement.querySelector(`[name="${groupNm}"]`);
+                                    const groupVal = groupElement ? groupElement.value : null;
+
                                     if (groupVal) {
                                         chkVal += groupVal;
                                     } else if (!emptyGroupNm) {
@@ -1337,8 +1280,9 @@ export const S2Util = {
 
                                 if (chkVal && !chkFlag) {
                                     valid = false;
-                                    checkMessage = `[${formElement.find(`[name="${emptyGroupNm}"]`).attr('title')}] 항목을 입력해주세요.`;
-                                    S2Util.setFormErrorMessage(checkMessage, formElement.querySelector(`[data-form-error="${element.name}"]`), messageArr);
+                                    const emptyElement = formElement.querySelector(`[name="${emptyGroupNm}"]`);
+                                    checkMessage = `[${emptyElement ? emptyElement.getAttribute('title') : ''}] 항목을 입력해주세요.`;
+                                    this.setFormErrorMessage(checkMessage, formElement.querySelector(`[data-form-error="${element.name}"]`), messageArr);
                                 }
                                 break;
                             }
@@ -2396,7 +2340,6 @@ export const S2Util = {
      * @requires S2Util.setLocalStorage
      * @requires S2Util.urlBase64ToUint8Array
      * @requires S2Util.confirm (선택적)
-     * @requires dayjs (날짜 비교용)
      *
      * @example
      * S2Util.subscribeServiceWorker('BObv3x9...');
@@ -2404,9 +2347,8 @@ export const S2Util = {
     async subscribeServiceWorker(publicKey, userId) {
         if ('PushManager' in window && 'serviceWorker' in navigator) {
             const SUBSCRIPTION_STORAGE_KEY = 's2-subscription-data';
-
             const lastSubscriptionData = S2Util.getLocalStorage(SUBSCRIPTION_STORAGE_KEY);
-            const subscriptionCacheKey = dayjs().format('YYYYMMDD') + (userId ? `-${userId}` : '');
+            const subscriptionCacheKey = S2Date().format('YYYYMMDD') + (userId ? `-${userId}` : '');
 
             // 알림 컨펌 사용 여부 ("구노에서 알림 받기를 수락하시겠습니까?")
             const isOpenNotificationConfirm = false;
