@@ -31,22 +31,30 @@ import {hideS2Loading, showS2Loading} from './s2.loading.js';
  *
  * @returns {string} 들여쓰기가 제거된 문자열
  */
-String.prototype.dedent = function () {
-    // !!s2!! this 가 문자열 객체(String Object)를 참조 하도록 정규 함수를 사용하여야 한다. (화살표 함수 사용시 this 바인딩 문제 발생)
-    const lines = this.split('\n');
-    const nonBlankLines = lines.filter((line) => line.trim());
+// 프로토타입 확장은 비열거(enumerable:false)로 등록하여 부작용 최소화
+if (typeof String.prototype.dedent !== 'function') {
+    Object.defineProperty(String.prototype, 'dedent', {
+        value: function () {
+            // !!s2!! this 가 문자열 객체(String Object)를 참조 하도록 정규 함수를 사용하여야 한다. (화살표 함수 사용시 this 바인딩 문제 발생)
+            const lines = this.split('\n');
+            const nonBlankLines = lines.filter((line) => line.trim());
 
-    if (nonBlankLines.length === 0) {
-        return this.trim(); // 전체 문자열을 trim하여 반환
-    }
+            if (nonBlankLines.length === 0) {
+                return this.trim();
+            }
 
-    const minIndent = Math.min(...nonBlankLines.map((line) => line.match(/^(\s*)/)[0].length));
+            const minIndent = Math.min(...nonBlankLines.map((line) => line.match(/^(\s*)/)[0].length));
 
-    return lines
-        .map((line) => line.slice(minIndent))
-        .join('\n')
-        .trim();
-};
+            return lines
+                .map((line) => line.slice(minIndent))
+                .join('\n')
+                .trim();
+        },
+        writable: true,
+        configurable: true,
+        enumerable: false
+    });
+}
 
 /**
  * @fileoverview S2Util은 클라이언트 측에서 자주 사용되는 다양한 유틸리티 함수(Utility Functions)를 제공하는 라이브러리 객체이다.
@@ -128,8 +136,8 @@ export const S2Util = {
                     // HTML 문자열이면 임시 컨테이너를 이용해 DOM 객체로 안전하게 변환한다
                     nodesToInsert.push(...S2Util.createNodeFragment(child));
                 } else {
-                    // 그 외 값(숫자 등)은 text node로 전달 가능하니 그대로 추가한다
-                    nodesToInsert.push(child);
+                    // 그 외 값(숫자 등)은 TextNode 로 변환하여 추가한다
+                    nodesToInsert.push(document.createTextNode(String(child)));
                 }
             });
         }
@@ -212,7 +220,8 @@ export const S2Util = {
         const container = parsedDocument.querySelector(extractionSelector);
 
         if (container) {
-            return Array.from(container.children);
+            // 텍스트 노드 포함하되, 공백만 있는 텍스트 노드는 제외
+            return Array.from(container.childNodes).filter((n) => !(n.nodeType === Node.TEXT_NODE && !n.textContent.trim()));
         }
 
         return [];
@@ -325,7 +334,7 @@ export const S2Util = {
         if (typeof AbortController !== 'undefined') {
             controller = new AbortController();
             option.signal = controller.signal;
-            timeoutId = timeoutId = setTimeout(() => controller.abort(), timeout && !isNaN(timeout) ? timeout : 600000);
+            timeoutId = setTimeout(() => controller.abort(), timeout && !isNaN(timeout) ? timeout : 600000);
         }
 
         switch (method) {
@@ -422,7 +431,11 @@ export const S2Util = {
                         }
 
                         result['data'] = response.blob();
-                        result['filename'] = decodeURIComponent(filename);
+                        try {
+                            result['filename'] = decodeURIComponent(filename);
+                        } catch {
+                            result['filename'] = filename;
+                        }
                         break;
                     }
                     case 'HTML':
@@ -454,14 +467,19 @@ export const S2Util = {
                 } else {
                     result.data.then((data) => {
                         if (S2Util.isJSON(data)) {
-                            if (!data.status) {
-                                const error = new Error('Result error!');
-                                error.message = data.message;
-                                throw error;
-                            } else if (data.status !== 'SUCCESS' && data.status.result !== 'SUCCESS') {
+                            let ok = true;
+                            if (Object.prototype.hasOwnProperty.call(data, 'status')) {
+                                if (typeof data.status === 'string') {
+                                    ok = data.status === 'SUCCESS';
+                                } else if (S2Util.isJSON(data.status)) {
+                                    ok = data.status.result === 'SUCCESS';
+                                }
+                            }
+
+                            if (!ok) {
                                 const error = new Error('Result error!');
                                 error.status = data.status;
-                                error.message = data.status.message ? data.status.message : data.message;
+                                error.message = S2Util.isJSON(data.status) && data.status.message ? data.status.message : data.message || '오류가 발생했습니다.';
                                 throw error;
                             }
                         }
