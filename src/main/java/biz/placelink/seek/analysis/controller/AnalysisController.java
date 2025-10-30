@@ -657,7 +657,8 @@ public class AnalysisController {
 
     /**
      * 검색 기간을 설정한다.
-     * 조회 시작일과 종료일이 유효하지 않으면 최근 1개월을 기본값으로 설정한다.
+     * 조회 시작일이 유효 하지 않으면 종료일 보다 한달전으로 설정한다. (종료일이 2월 2일 이라면 시작일은 1월 3일로 설정한다.)
+     * 조회 종료일이 유효하지 않으면 오늘로 설정한다.
      *
      * @param searchStartDe 조회 시작일 (yyyyMMdd 형식)
      * @param searchEndDe   조회 종료일 (yyyyMMdd 형식)
@@ -665,18 +666,13 @@ public class AnalysisController {
      * @return 설정된 조회 시작일과 종료일을 담은 Map
      */
     public static @Nonnull SearchPeriod setSearchPeriod(String searchStartDe, String searchEndDe, String pattern) {
-        LocalDate searchStartDate = null;
-        LocalDate searchEndDate = null;
+        LocalDate searchStartDate = S2DateUtil.isValidDate(searchStartDe, pattern, false) ? S2DateUtil.parseToLocalDate(searchStartDe, pattern, false) : null;
+        LocalDate searchEndDate = S2DateUtil.isValidDate(searchEndDe, pattern, false) ? S2DateUtil.parseToLocalDate(searchEndDe, pattern, false) : LocalDate.now();
 
-        if (!S2DateUtil.isValidDate(searchStartDe, pattern, false) && !S2DateUtil.isValidDate(searchStartDe, pattern, false)) {
-            // 조회 기간이 없다면 최근 1달을 기본으로 한다.
-            searchEndDate = LocalDate.now();
-            searchStartDate = searchEndDate.minusMonths(1).plusDays(1);
-        } else {
-            searchStartDate = S2DateUtil.parseToLocalDate(searchStartDe, pattern, false);
-            searchEndDate = S2DateUtil.parseToLocalDate(searchEndDe, pattern, false);
+        LocalDate stdStartDate = searchEndDate.minusMonths(1).plusDays(1);
+        if (searchStartDate == null || searchStartDate.isBefore(stdStartDate)) {
+            searchStartDate = stdStartDate;
         }
-
         return new SearchPeriod(searchStartDate, searchEndDate);
     }
 
