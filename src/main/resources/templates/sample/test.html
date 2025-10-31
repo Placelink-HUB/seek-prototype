@@ -37,9 +37,13 @@ requirements, please purchase a commercial license from placelink.
                 document.querySelector('.btn-open-create-article')?.addEventListener('click', openCreateArticle);
 
                 document.querySelector('.btn-date-range')?.addEventListener('click', () => {
-                    openDateRange((searchStartDe, searchEndDe) => {
-                        goPage(1, searchStartDe, searchEndDe);
-                    });
+                    openDateRange(
+                        (searchStartDe, searchEndDe) => {
+                            goPage(1, searchStartDe, searchEndDe);
+                        },
+                        '[[${searchStartDe}]]',
+                        '[[${searchEndDe}]]'
+                    );
                 });
 
                 document.querySelectorAll('.btn-open-modal-article-contents')?.forEach((btn) =>

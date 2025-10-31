@@ -109,7 +109,9 @@ public class ArticleController {
 
         model.addAttribute("articleListPagination", articleService.selectArticleListWithPagination(searchVO));
         model.addAttribute("articleListStatus", articleService.selectArticleListStatus(searchVO));
+        model.addAttribute("searchStartDe", searchPeriod.searchStartDe(null));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDe", searchPeriod.searchEndDe(null));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "sample/test";
     }

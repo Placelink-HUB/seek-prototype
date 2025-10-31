@@ -36,9 +36,13 @@ requirements, please purchase a commercial license from placelink.
                 document.querySelectorAll('.btn-download-signed-file')?.forEach((btn) => btn.addEventListener('click', (event) => downloadFile(event.currentTarget.dataset.signedFileId)));
 
                 document.querySelector('.btn-date-range')?.addEventListener('click', () => {
-                    openDateRange((searchStartDe, searchEndDe) => {
-                        goPage(1, searchStartDe, searchEndDe);
-                    });
+                    openDateRange(
+                        (searchStartDe, searchEndDe) => {
+                            goPage(1, searchStartDe, searchEndDe);
+                        },
+                        '[[${searchStartDe}]]',
+                        '[[${searchEndDe}]]'
+                    );
                 });
 
                 document.querySelector('.btn-download-excel')?.addEventListener('click', () => {

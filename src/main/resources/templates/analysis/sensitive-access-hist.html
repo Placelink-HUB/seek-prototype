@@ -34,9 +34,13 @@ requirements, please purchase a commercial license from placelink.
                 document.querySelectorAll('.btn-coming-soon')?.forEach((btn) => btn.addEventListener('click', () => S2Util.alert('준비 중입니다.')));
 
                 document.querySelector('.btn-date-range')?.addEventListener('click', () => {
-                    openDateRange((searchStartDe, searchEndDe) => {
-                        goPage(1, searchStartDe, searchEndDe);
-                    });
+                    openDateRange(
+                        (searchStartDe, searchEndDe) => {
+                            goPage(1, searchStartDe, searchEndDe);
+                        },
+                        '[[${searchStartDe}]]',
+                        '[[${searchEndDe}]]'
+                    );
                 });
 
                 document.querySelector('.btn-download-excel')?.addEventListener('click', () => {

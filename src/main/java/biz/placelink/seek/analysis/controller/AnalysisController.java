@@ -184,7 +184,9 @@ public class AnalysisController {
 
         model.addAttribute("fileAnalysisListPagination", analysisDetailService.selectFileAnalysisListWithPagination(searchVO));
         model.addAttribute("fileAnalysisListStatus", analysisDetailService.selectFileAnalysisListStatus(searchVO));
+        model.addAttribute("searchStartDe", searchPeriod.searchStartDe(null));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDe", searchPeriod.searchEndDe(null));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/detection-file";
     }
@@ -310,7 +312,9 @@ public class AnalysisController {
         // 민감정보 처리 이력 목록 조회
         model.addAttribute("sensitiveInformationUnmaskHistListStatus", sensitiveInformationUnmaskHistService.selectSensitiveInformationUnmaskHistListStatus(searchVO));
         model.addAttribute("sensitiveInformationUnmaskHistListPagination", sensitiveInformationUnmaskHistService.selectSensitiveInformationUnmaskHistListWithPagination(searchVO));
+        model.addAttribute("searchStartDe", searchPeriod.searchStartDe(null));
         model.addAttribute("searchStartDeStr", searchPeriod.searchStartDe("yyyy년 MM월 dd일"));
+        model.addAttribute("searchEndDe", searchPeriod.searchEndDe(null));
         model.addAttribute("searchEndDeStr", searchPeriod.searchEndDe("yyyy년 MM월 dd일"));
         return "analysis/sensitive-access-hist";
     }

@@ -112,18 +112,18 @@ requirements, please purchase a commercial license from placelink.
                 }
             });
 
-            window.openDateRange = (callback) => {
+            window.openDateRange = (callback, pSearchStartDe, pSearchEndDe) => {
                 S2Util.showModal(
                     `
                         <div class="modal date-range">
                             <div class="tab-container">
                                 <div class="contents">
-                                    <input type="text" class="datepicker" name="searchStartDe" placeholder="시작일" />
+                                    <input type="text" class="datepicker" name="searchStartDe" placeholder="시작일" value="${S2Date(pSearchStartDe, 'YYYYMMDD').format('YYYY-MM-DD', '', true)}" />
                                     ~
-                                    <input type="text" class="datepicker" name="searchEndDe" placeholder="종료일" />
+                                    <input type="text" class="datepicker" name="searchEndDe" placeholder="종료일" value="${S2Date(pSearchEndDe, 'YYYYMMDD').format('YYYY-MM-DD', '', true)}"/>
                                 </div>
                                 <div class="button-wrap c-ma-t30">
-                                    <button class="btn-sty-01 btn-select-date-range">선택</button>
+                                    <button class="btn-sty-01 btn-select-date-range">검색</button>
                                 </div>
                             </div>
                         </div>

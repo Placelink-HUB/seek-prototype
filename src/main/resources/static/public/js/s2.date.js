@@ -330,11 +330,14 @@ class S2Day {
      *
      * @param {string} [formatStr='YYYY/MM/DD HH:mm:ss'] - 포맷 문자열.
      * @param {string} [locale='ko'] - 로케일: 'ko' (기본, 한국어) | 'en' (영어)
+     * @param {boolean} [returnEmptyOnInvalid=false] - true일 경우, 유효하지 않은 날짜(isValid() === false)면 빈 문자열('')을 반환. false(기본)일 경우 기본 동작을 따름.
      * @returns {string} - 포맷된 날짜 문자열
      *
      * @example
      * S2Date().format('YYYY년 MM월 DD일'); // '2025년 10월 30일' (오늘 날짜 기준)
-     * S2Date('2025-10-30T15:30:00+09:00').format('YYYY-MM-DD HH:mm:ss', 'en'); // '2025-10-30 15:30:00'
+     * S2Date('2025-10-30T15:30:00+09:00').format('YYYY-MM-DD HH:mm:ss', 'ko'); // '2025-10-30 15:30:00'
+     * S2Date('2025-02-30', 'YYYY-MM-DD').format('YYYY-MM-DD HH:mm:ss', 'ko', true); // ''
+     * S2Date('2025-02-30', 'YYYY-MM-DD').format('YYYY-MM-DD HH:mm:ss', 'ko', false); // '2025-03-02 00:00:00'
      *
      * @description
      * ### 지원하는 포맷 토큰
@@ -366,7 +369,10 @@ class S2Day {
      * X: 유닉스 타임스탬프 (초, 1761858311)
      * x: 유닉스 타임스탬프 (밀리초, 1761858311123)
      */
-    format(formatStr = 'YYYY/MM/DD HH:mm:ss', locale = 'ko') {
+    format(formatStr = 'YYYY/MM/DD HH:mm:ss', locale = 'ko', returnEmptyOnInvalid = false) {
+        if (returnEmptyOnInvalid && !this.isValid()) {
+            return '';
+        }
         return _formatDate(this._date, formatStr, locale);
     }
 
