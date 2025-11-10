@@ -37,6 +37,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Base64;
@@ -141,7 +142,10 @@ public class WildpathController {
      */
     @RequestMapping(path = "/preprocess/**", consumes = "multipart/form-data")
     protected ResponseEntity<String> preprocess(@RequestParam("file") MultipartFile file) throws IOException {
-        file.transferTo(Paths.get("/Users/e01000/Downloads/requestHandle", file.getOriginalFilename()));
+        Path targetPath = Paths.get("/Users/e01000/Downloads/requestHandle", file.getOriginalFilename());
+        if (targetPath != null) {
+            file.transferTo(targetPath);
+        }
         return ResponseEntity.ok().body("");
     }
 

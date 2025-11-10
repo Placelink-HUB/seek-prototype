@@ -328,8 +328,8 @@ class S2Day {
      * 날짜를 포맷팅한다.
      * (문자열로 반환되기 때문에 체이닝의 마지막 단계에서 사용된다.)
      *
-     * @param {string} [formatStr='YYYY/MM/DD HH:mm:ss'] - 포맷 문자열.
-     * @param {string} [locale='ko'] - 로케일: 'ko' (기본, 한국어) | 'en' (영어)
+     * @param {string} [formatString = 'YYYY/MM/DD HH:mm:ss'] - 포맷 문자열.
+     * @param {string} [locale = 'ko'] - 로케일: 'ko' (기본, 한국어) | 'en' (영어)
      * @param {boolean} [returnEmptyOnInvalid=false] - true일 경우, 유효하지 않은 날짜(isValid() === false)면 빈 문자열('')을 반환. false(기본)일 경우 기본 동작을 따름.
      * @returns {string} - 포맷된 날짜 문자열
      *
@@ -369,11 +369,11 @@ class S2Day {
      * X: 유닉스 타임스탬프 (초, 1761858311)
      * x: 유닉스 타임스탬프 (밀리초, 1761858311123)
      */
-    format(formatStr = 'YYYY/MM/DD HH:mm:ss', locale = 'ko', returnEmptyOnInvalid = false) {
+    format(formatString = 'YYYY/MM/DD HH:mm:ss', locale = 'ko', returnEmptyOnInvalid = false) {
         if (returnEmptyOnInvalid && !this.isValid()) {
             return '';
         }
-        return _formatDate(this._date, formatStr, locale);
+        return _formatDate(this._date, formatString, locale);
     }
 
     /**
@@ -514,17 +514,17 @@ class S2Day {
      * 다른 날짜와의 차이를 지정된 단위로 반환한다. (내림 처리)
      *
      * @param {Date | string | number | S2Date} otherDate - 비교할 날짜
-     * @param {'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | 'ms'} [unit='ms'] - 반환할 단위 (복수형 허용, 단위를 생략하면 ms까지 비교)
-     * @param {boolean} [float=false] - 소수점까지 반환할지 여부 (true)
+     * @param {'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | 'ms'} [unit = 'ms'] - 반환할 단위 (복수형 허용, 단위를 생략하면 ms까지 비교)
+     * @param {boolean} [float = false] - 소수점까지 반환할지 여부 (true)
      * @param {{ tz?: 'local' | 'utc' | 'offset', offsetMinutes?: number }} [options] - 월/연 비교 시 타임존 기준 옵션
      * - tz: 'local' (기본) | 'utc' | 'offset'.
      * - offsetMinutes: tz가 'offset'일 때 사용되는 분 단위 오프셋(예: +09:00 → 540).
      * - 주의: 이 옵션은 'month'와 'year' 단위 계산에만 영향을 준다. ms/초/분/시간/일은 절대 시간(getTime) 기준으로 동일.
      *
      * 차이점:
-     * - tz='local' (기본): 시스템 로컬 타임존의 연/월 필드를 사용해 경계를 판단한다.
-     * - tz='utc': UTC 기준의 연/월 필드를 사용한다.
-     * - tz='offset': 주어진 고정 오프셋을 적용한 "그 지역의 달력" 기준으로 연/월 경계를 판단한다.
+     * - tz = 'local' (기본): 시스템 로컬 타임존의 연/월 필드를 사용해 경계를 판단한다.
+     * - tz = 'utc': UTC 기준의 연/월 필드를 사용한다.
+     * - tz = 'offset': 주어진 고정 오프셋을 적용한 "그 지역의 달력" 기준으로 연/월 경계를 판단한다.
      *
      * @example
      * S2Date('2025-10-31').diff('2025-10-30', 'day') // 1
@@ -695,7 +695,7 @@ class S2Day {
      * @param {'year' | 'month' | 'day' | 'hour' | 'minute' | 'second'} unit - 단위 (복수형 허용)
      * @param {{ tz?: 'local' | 'utc' | 'offset', offsetMinutes?: number }} [options]
      * - tz: 'local'(기본) | 'utc' | 'offset'.
-     * - offsetMinutes: tz='offset'일 때 사용되는 분 단위 오프셋(예: +09:00 → 540).
+     * - offsetMinutes: tz = 'offset'일 때 사용되는 분 단위 오프셋(예: +09:00 → 540).
      * - 동작: 지정된 달력 기준으로 경계를 00시 00분 00초.000 으로 내림(floor)한다.
      * @returns {S2Date}
      *
@@ -785,7 +785,7 @@ class S2Day {
      * @param {'year' | 'month' | 'day' | 'hour' | 'minute' | 'second'} unit - 단위 (복수형 허용)
      * @param {{ tz?: 'local' | 'utc' | 'offset', offsetMinutes?: number }} [options]
      * - tz: 'local'(기본) | 'utc' | 'offset'.
-     * - offsetMinutes: tz='offset'일 때 사용되는 분 단위 오프셋(예: +09:00 → 540).
+     * - offsetMinutes: tz = 'offset'일 때 사용되는 분 단위 오프셋(예: +09:00 → 540).
      * - 동작: 지정된 달력 기준으로 경계를 23시 59분 59초.999 으로 올림(ceil-ε)한다.
      * @returns {S2Date}
      *
@@ -948,12 +948,12 @@ class S2Day {
 /**
  * 날짜를 지정된 포맷 문자열로 변환 (헬퍼 함수)
  *
- * @param {Date} [date=new Date()] - 포맷할 Date 객체
- * @param {string} [formatStr='YYYY/MM/DD HH:mm:ss'] - Day.js 스타일 포맷 문자열
- * @param {string} [locale='ko'] - 로케일: 'ko' (기본, 한국어) | 'en' (영어)
+ * @param {Date} [date = new Date()] - 포맷할 Date 객체
+ * @param {string} [formatString = 'YYYY/MM/DD HH:mm:ss'] - Day.js 스타일 포맷 문자열
+ * @param {string} [locale = 'ko'] - 로케일: 'ko' (기본, 한국어) | 'en' (영어)
  * @returns {string} 포맷된 날짜 문자열
  */
-function _formatDate(date = new Date(), formatStr = 'YYYY/MM/DD HH:mm:ss', locale = 'ko') {
+function _formatDate(date = new Date(), formatString = 'YYYY/MM/DD HH:mm:ss', locale = 'ko') {
     if (!(date instanceof Date) || isNaN(date)) return '';
 
     const pad = (n, len = 2) => '0'.repeat(Math.max(0, len - String(n).length)) + n;
@@ -1013,7 +1013,7 @@ function _formatDate(date = new Date(), formatStr = 'YYYY/MM/DD HH:mm:ss', local
 
     const map = {YYYY, YY, MMMM, MMM, MM, M, DD, D, dddd, ddd, dd, d, A, a, HH, H, hh, h, mm, m, ss, s, SSS, Z, ZZ, X, x};
 
-    return formatStr.replace(/YYYY|YY|MMMM|MMM|MM|M|DD|D|dddd|ddd|dd|d|A|a|HH|H|hh|h|mm|m|ss|s|SSS|Z|ZZ|X|x/g, (m) => map[m]);
+    return formatString.replace(/YYYY|YY|MMMM|MMM|MM|M|DD|D|dddd|ddd|dd|d|A|a|HH|H|hh|h|mm|m|ss|s|SSS|Z|ZZ|X|x/g, (m) => map[m]);
 }
 
 /** 문자열을 정규식 리터럴로 이스케이프하는 헬퍼 */
@@ -1054,47 +1054,47 @@ const _parserCache = new Map();
 /**
  * 포맷 문자열(예: 'YYYY년MM월')을 기반으로 파서 객체 { regex, groups }를 동적으로 생성한다.
  */
-function _buildParser(formatStr) {
+function _buildParser(formatString) {
     // 1. 캐시 확인
-    if (_parserCache.has(formatStr)) {
-        return _parserCache.get(formatStr);
+    if (_parserCache.has(formatString)) {
+        return _parserCache.get(formatString);
     }
 
-    let finalRegexStr = '^';
+    let finalRegexString = '^';
     const groups = [];
     let lastIndex = 0;
 
     // 2. 포맷 문자열에서 토큰(YYYY 등)을 순회
     _parseTokenRegex.lastIndex = 0; // 정규식 인덱스 초기화
     let match;
-    while ((match = _parseTokenRegex.exec(formatStr)) !== null) {
+    while ((match = _parseTokenRegex.exec(formatString)) !== null) {
         // 3. 토큰 앞의 리터럴 문자(예: '년') 처리
         if (match.index > lastIndex) {
-            const literal = formatStr.substring(lastIndex, match.index);
-            finalRegexStr += _escapeRegex(literal); // 정규식으로 이스케이프
+            const literal = formatString.substring(lastIndex, match.index);
+            finalRegexString += _escapeRegex(literal); // 정규식으로 이스케이프
         }
 
         // 4. 토큰(예: 'YYYY')을 정규식 그룹(예: '(\d{4})')으로 변환
         const token = match[0];
-        finalRegexStr += _parseTokenMap[token];
+        finalRegexString += _parseTokenMap[token];
         groups.push(token); // 캡처 그룹 순서 저장
 
         lastIndex = _parseTokenRegex.lastIndex;
     }
 
     // 5. 마지막 토큰 뒤의 리터럴 문자(예: '월') 처리
-    if (lastIndex < formatStr.length) {
-        const literal = formatStr.substring(lastIndex);
-        finalRegexStr += _escapeRegex(literal);
+    if (lastIndex < formatString.length) {
+        const literal = formatString.substring(lastIndex);
+        finalRegexString += _escapeRegex(literal);
     }
 
-    finalRegexStr += '$'; // 문자열 끝 일치
+    finalRegexString += '$'; // 문자열 끝 일치
 
     // 6. 파서 객체 생성 및 캐시 저장
     const parser = {
-        regex: new RegExp(finalRegexStr),
+        regex: new RegExp(finalRegexString),
         groups: groups
     };
-    _parserCache.set(formatStr, parser);
+    _parserCache.set(formatString, parser);
     return parser;
 }

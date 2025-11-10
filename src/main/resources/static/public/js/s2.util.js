@@ -96,12 +96,12 @@ export const S2Util = {
      * * 두 번째 인자가 없고 options.isAppend를 true로 설정하지 않는다면, 기존 자식을 모두 삭제하여 안전하게 초기화하는 역할을 수행한다.
      *
      * @typedef {object} ReplaceChildrenOptions
-     * @property {boolean} [isAppend=false] - 기존 대상 요소의 자식 노드를 삭제하지 않고 유지할지 여부. true: 기존 자식 뒤에 새로운 노드가 추가(append 모드), false: 기존 자식을 모두 삭제하고 새로운 노드로 대체(replace 모드)
-     * @property {function(Node, number): void} [onNodeReady=null] - 각 새 노드(Node 객체)가 DocumentFragment에 추가되기 직전에 실행되는 콜백 함수 (주로 이벤트 리스너 바인딩, 속성 추가 등 DOM 삽입 전 최종 작업을 수행하는 데 사용된다.)
+     * @property {boolean} [isAppend = false] - 기존 대상 요소의 자식 노드를 삭제하지 않고 유지할지 여부. true: 기존 자식 뒤에 새로운 노드가 추가(append 모드), false: 기존 자식을 모두 삭제하고 새로운 노드로 대체(replace 모드)
+     * @property {function(Node, number): void} [onNodeReady = null] - 각 새 노드(Node 객체)가 DocumentFragment에 추가되기 직전에 실행되는 콜백 함수 (주로 이벤트 리스너 바인딩, 속성 추가 등 DOM 삽입 전 최종 작업을 수행하는 데 사용된다.)
      *
      * @param {Element|string} target - 자식을 대체할 대상 DOM 요소 또는 CSS 선택자 문자열.
-     * @param {Array<Element|string|DocumentFragment>|Element|string|DocumentFragment} [newChildren=[]] - 대상의 새로운 자식으로 삽입할 노드(Element), DocumentFragment, 또는 HTML 문자열/노드 배열.
-     * @param {ReplaceChildrenOptions} [options={}] - 옵션 객체
+     * @param {Array<Element|string|DocumentFragment>|Element|string|DocumentFragment} [newChildren = []] - 대상의 새로운 자식으로 삽입할 노드(Element), DocumentFragment, 또는 HTML 문자열/노드 배열.
+     * @param {ReplaceChildrenOptions} [options = {}] - 옵션 객체
      * @returns {Element|null} - 자식이 대체된 대상 DOM 요소 (target)를 반환한다.
      */
     replaceChildren(target, newChildren = [], options = {}) {
@@ -230,13 +230,13 @@ export const S2Util = {
      * 자바스크립트의 기본 fetch API를 활용하여 다양한 요청 처리
      *
      * @typedef {object} FetchConfig
-     * @property {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} [method='GET'] 요청 메소드
+     * @property {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} [method = 'GET'] 요청 메소드
      * @property {'JSON'|'FORM'} [dataType] 요청 본문(body) 데이터 타입. 'JSON'일 경우 Content-Type: application/json 설정 및 서버 Controller 에서 @RequestBody 로 처리.
-     * @property {'JSON'|'BLOB'|'HTML'} [responseType='JSON'] 응답 데이터 타입.
-     * @property {boolean} [disableDefaultErrorHandler=false] 오류 발생 시 기본 오류 핸들링 처리(alert, confirm 등) 비활성화 여부
-     * @property {number} [timeout=600000] 응답 대기 시간 (밀리초). 기본 10분(600000ms).
-     * @property {boolean} [showOverlay=false] 응답 대기 로딩 오버레이 표시 여부
-     * @property {boolean} [hideLoading=false] 응답 대기 로딩 표시 숨김 여부
+     * @property {'JSON'|'BLOB'|'HTML'} [responseType = 'JSON'] 응답 데이터 타입.
+     * @property {boolean} [disableDefaultErrorHandler = false] 오류 발생 시 기본 오류 핸들링 처리(alert, confirm 등) 비활성화 여부
+     * @property {number} [timeout = 600000] 응답 대기 시간 (밀리초). 기본 10분(600000ms).
+     * @property {boolean} [showOverlay = false] 응답 대기 로딩 오버레이 표시 여부
+     * @property {boolean} [hideLoading = false] 응답 대기 로딩 표시 숨김 여부
      *
      * @param {string} url 요청을 보낼 서버 엔드포인트 URL
      * @param {object|FormData|string} param 요청 설정값(FetchConfig의 속성)과 서버로 전송할 데이터가 담긴 객체 (JSON, FormData, 또는 QueryString 형태)
@@ -641,7 +641,7 @@ export const S2Util = {
      * @property {string} itemValue - <option>의 `value` 속성으로 사용될 데이터 필드 이름 또는 템플릿 문자열 (예: 'fieldNm' 또는 '{{=fieldNm1}}.{{=fieldNm2}}'). (필수)
      * @property {string} [itemLabel] - <option>의 표시 텍스트로 사용될 데이터 필드 이름 또는 템플릿 문자열. (생략 가능)
      * @property {string|number|null} [initVal] - 생성 후 <select>에 초기 값으로 설정할 값. (생략 가능)
-     * @property {string|null} [clear=null] - <option>을 제거하는 기준. null이면 모든 <option> 제거, 문자열이면 해당 CSS 선택자(selector)에 해당하는 <option>만 제거. (기본값: null)
+     * @property {string|null} [clear = null] - <option>을 제거하는 기준. null이면 모든 <option> 제거, 문자열이면 해당 CSS 선택자(selector)에 해당하는 <option>만 제거. (기본값: null)
      *
      * @param {OptionConfig} option - 옵션 설정을 담고 있는 객체.
      * @returns {void}
@@ -749,7 +749,7 @@ export const S2Util = {
      */
     pagination(paginationInfo, jsFunction, jsParams) {
         let pagination = '';
-        let functionParamStr = '';
+        let functionParamString = '';
 
         if (jsParams || jsParams === 0) {
             if (!Array.isArray(jsParams)) {
@@ -758,9 +758,9 @@ export const S2Util = {
             for (const idx in jsParams) {
                 const param = jsParams[idx];
                 if (typeof param === 'string') {
-                    functionParamStr += `'${param}', `;
+                    functionParamString += `'${param}', `;
                 } else {
-                    functionParamStr += `${param}, `;
+                    functionParamString += `${param}, `;
                 }
             }
         }
@@ -769,17 +769,17 @@ export const S2Util = {
         const lastPageNoOnPageList = paginationInfo['lastPageNoOnPageList'];
 
         if (firstPageNoOnPageList > 1) {
-            pagination += `<li class="paginate_button prev"><a href="#" onclick="${jsFunction}(${functionParamStr + (firstPageNoOnPageList - 1)}); return false;"><i class="fa fa-chevron-left"></i></a></li>`;
+            pagination += `<li class="paginate_button prev"><a href="#" onclick="${jsFunction}(${functionParamString + (firstPageNoOnPageList - 1)}); return false;"><i class="fa fa-chevron-left"></i></a></li>`;
         }
         for (let pageNo = firstPageNoOnPageList; pageNo <= lastPageNoOnPageList; pageNo++) {
             if (pageNo === paginationInfo.pageNo) {
                 pagination += `<li class="paginate_button active"><a href="#">${pageNo}</a></li>`;
             } else {
-                pagination += `<li class="paginate_button"><a href="#" onclick="${jsFunction}(${functionParamStr + pageNo}); return false;">${pageNo}</a></li>`;
+                pagination += `<li class="paginate_button"><a href="#" onclick="${jsFunction}(${functionParamString + pageNo}); return false;">${pageNo}</a></li>`;
             }
         }
         if (lastPageNoOnPageList < paginationInfo['lastPageNo']) {
-            pagination += `<li class="paginate_button next"><a href="#" onclick="${jsFunction}(${functionParamStr + (lastPageNoOnPageList + 1)}); return false;"><i class="fa fa-chevron-right"></i></a></li>`;
+            pagination += `<li class="paginate_button next"><a href="#" onclick="${jsFunction}(${functionParamString + (lastPageNoOnPageList + 1)}); return false;"><i class="fa fa-chevron-right"></i></a></li>`;
         }
 
         return `<ul class="pagination pagination-xs">${pagination}</ul>`;
@@ -795,7 +795,7 @@ export const S2Util = {
      *
      * @param {PaginationRecordInfo} paginationInfo - 레코드 순번 계산에 필요한 정보 객체.
      * @param {number} recordNoPerPage - 현재 페이지 목록 내에서의 레코드 순번 (1부터 시작).
-     * @param {'ASC'|'DESC'} [order='ASC'] - 정렬 순서. 'ASC' (오름차순) 또는 'DESC' (내림차순).
+     * @param {'ASC'|'DESC'} [order = 'ASC'] - 정렬 순서. 'ASC' (오름차순) 또는 'DESC' (내림차순).
      * @returns {number} - 전체 목록을 기준으로 계산된 레코드의 실제 순번.
      */
     paginationRecordNo(paginationInfo, recordNoPerPage, order) {
@@ -978,7 +978,7 @@ export const S2Util = {
      *
      * @param {string} url - 이동할 대상 URL. URL에 포함된 커스텀 인코딩 문자열(!q, !n, !e)을 표준 URL 문자열(?, &, =)로 복원하여 적용한다.
      * @param {object} [param] - 폼에 hidden 필드로 추가될 매개변수 객체.
-     * @param {Window} [pTarget=window] - 폼 전송이 일어날 대상 window 객체 (예: iframe의 window 객체). 생략 시 현재 window를 대상으로 한다.
+     * @param {Window} [pTarget = window] - 폼 전송이 일어날 대상 window 객체 (예: iframe의 window 객체). 생략 시 현재 window를 대상으로 한다.
      * @returns {void}
      */
     goPage(url, param, pTarget) {
@@ -1218,15 +1218,15 @@ export const S2Util = {
                                                     break; // 비어있으면 required가 처리
                                                 }
 
-                                                const startDateStr = String(startDateVal).replace(/[^0-9]/g, '');
+                                                const startDateString = String(startDateVal).replace(/[^0-9]/g, '');
                                                 let s2StartDate;
                                                 let errMsg = '';
 
                                                 // 길이에 따라 S2Date 객체 생성
-                                                if (startDateStr.length === 8) {
-                                                    s2StartDate = S2Date(startDateStr, 'YYYYMMDD');
-                                                } else if (startDateStr.length === 6) {
-                                                    s2StartDate = S2Date(startDateStr, 'YYYYMM');
+                                                if (startDateString.length === 8) {
+                                                    s2StartDate = S2Date(startDateString, 'YYYYMMDD');
+                                                } else if (startDateString.length === 6) {
+                                                    s2StartDate = S2Date(startDateString, 'YYYYMM');
                                                 } else {
                                                     s2StartDate = S2Date(null); // Invalid Date 객체 생성 (NaN)
                                                     errMsg = '날짜형식이 올바르지 않습니다.'; // 6자리 또는 8자리가 아님
@@ -1247,11 +1247,11 @@ export const S2Util = {
 
                                                         if (endDateElement) {
                                                             const endDateValue = endDateElement.value;
-                                                            const endDateStr = String(endDateValue).replace(/[^0-9]/g, '');
+                                                            const endDateString = String(endDateValue).replace(/[^0-9]/g, '');
                                                             let s2EndDate;
 
-                                                            if (endDateStr.length === 8) s2EndDate = S2Date(endDateStr, 'YYYYMMDD');
-                                                            else if (endDateStr.length === 6) s2EndDate = S2Date(endDateStr, 'YYYYMM');
+                                                            if (endDateString.length === 8) s2EndDate = S2Date(endDateString, 'YYYYMMDD');
+                                                            else if (endDateString.length === 6) s2EndDate = S2Date(endDateString, 'YYYYMM');
 
                                                             // endDate가 비어있지 않고, (s2EndDate가 생성되었고) 유효하며, 시작일이 종료일보다 늦을 때
                                                             if (endDateValue.trim() && s2EndDate && s2EndDate.isValid() && s2StartDate.toDate() > s2EndDate.toDate()) {
@@ -1738,7 +1738,7 @@ export const S2Util = {
      * 'defaultValue'로 치환하여 반환한다.
      *
      * @param {*} value - 치환할 대상 값.
-     * @param {*} [defaultValue=''] - value가 falsy일 경우 반환할 기본값. 기본값은 빈 문자열('')이다.
+     * @param {*} [defaultValue = ''] - value가 falsy일 경우 반환할 기본값. 기본값은 빈 문자열('')이다.
      * @returns {*} - value가 truthy이면 value를, falsy이면 defaultValue를 반환한다.
      *
      * @example
@@ -1994,12 +1994,12 @@ export const S2Util = {
      *
      * @param {string} content - 모달 본문(modal-body)에 들어갈 HTML 콘텐츠.
      * @param {object} [option] - 모달 설정 옵션 객체.
-     * @param {string} [option.width='80%'] - 모달 창의 너비 (CSS 값).
-     * @param {string} [option.height='auto'] - 모달 창의 높이 (CSS 값).
-     * @param {string} [option.title=''] - 모달 헤더에 표시될 제목.
-     * @param {string} [option.titleAlign='center'] - 제목의 텍스트 정렬 (CSS 값).
-     * @param {string} [option.titleSize='1.125rem'] - 제목의 폰트 크기 (CSS 값).
-     * @param {string} [option.headerHtml=''] - 제목 외에 헤더에 추가될 HTML 콘텐츠.
+     * @param {string} [option.width = '80%'] - 모달 창의 너비 (CSS 값).
+     * @param {string} [option.height = 'auto'] - 모달 창의 높이 (CSS 값).
+     * @param {string} [option.title = ''] - 모달 헤더에 표시될 제목.
+     * @param {string} [option.titleAlign = 'center'] - 제목의 텍스트 정렬 (CSS 값).
+     * @param {string} [option.titleSize = '1.125rem'] - 제목의 폰트 크기 (CSS 값).
+     * @param {string} [option.headerHtml = ''] - 제목 외에 헤더에 추가될 HTML 콘텐츠.
      * @param {function} [callback] - 모달이 DOM에 추가된 후 실행될 콜백 함수. 첫 번째 인자로 모달의 셀렉터(#s2-modal-N)를 전달한다.
      * @returns {string} - 생성된 모달의 CSS 셀렉터 문자열 (예: '#s2-modal-1').
      *
@@ -2071,8 +2071,8 @@ export const S2Util = {
      *
      * @param {string} message - 토스트 본문에 표시할 메시지.
      * @param {object} [option] - 토스트 설정 옵션 객체.
-     * @param {string} [option.title='알림'] - 토스트 상단에 표시될 제목.
-     * @param {number} [option.delay=30000] - 토스트가 화면에 표시될 시간(밀리초).
+     * @param {string} [option.title = '알림'] - 토스트 상단에 표시될 제목.
+     * @param {number} [option.delay = 30000] - 토스트가 화면에 표시될 시간(밀리초).
      * @returns {void}
      *
      * @requires S2Util.uuid
@@ -2242,8 +2242,8 @@ export const S2Util = {
      * 지정된 요소(들)의 숫자를 애니메이션으로 카운트업하는 함수
      * @param {HTMLElement | HTMLElement[] | NodeList} elements - 숫자가 표시될 HTML 요소(들)
      * @param {Object} [options] - 설정 옵션
-     * @param {number} [options.duration=2000] - 애니메이션 지속 시간 (밀리초)
-     * @param {string} [options.locale='ko-KR'] - 'ko-KR': 한국식(1,234,567), 'de-DE' 유럽식(1.234.567), 지정하지 않음: 숫자만 표시
+     * @param {number} [options.duration = 2000] - 애니메이션 지속 시간 (밀리초)
+     * @param {string} [options.locale = 'ko-KR'] - 'ko-KR': 한국식(1,234,567), 'de-DE' 유럽식(1.234.567), 지정하지 않음: 숫자만 표시
      * @returns {Object} - 애니메이션 제어 객체 { stop: (index) => void, stopAll: () => void }
      *   - stop(index): 지정된 인덱스의 요소 애니메이션 중지
      *   - stopAll(): 모든 요소의 애니메이션 중지
@@ -2533,11 +2533,11 @@ export const initializeS2DomEvents = () => {
 
                     if (window[functionName] && typeof window[functionName] === 'function') {
                         if (optionArr.length > 1) {
-                            let actionStr = `window["${functionName}"](${optionArr
+                            let actionString = `window["${functionName}"](${optionArr
                                 .slice(1)
                                 .map((param) => `"${param}"`)
                                 .join(', ')});`;
-                            new Function(actionStr)();
+                            new Function(actionString)();
                         } else {
                             window[functionName]();
                         }
@@ -2613,12 +2613,12 @@ export const initializeS2DomEvents = () => {
         element.addEventListener('keyup', () => {
             const maxByte = Number(element.getAttribute('maxByte'));
             if (maxByte && !isNaN(maxByte) && maxByte > 0) {
-                const str = element.value;
+                const stringValue = element.value;
                 let byteLength = 0;
-                for (let i = 0; i < str.length; i++) {
-                    byteLength += str.charCodeAt(i) > 127 ? 2 : 1;
+                for (let i = 0; i < stringValue.length; i++) {
+                    byteLength += stringValue.charCodeAt(i) > 127 ? 2 : 1;
                     if (byteLength > maxByte) {
-                        element.value = str.slice(0, i);
+                        element.value = stringValue.slice(0, i);
                         break;
                     }
                 }
