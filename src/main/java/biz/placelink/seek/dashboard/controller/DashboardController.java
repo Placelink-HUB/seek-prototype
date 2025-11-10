@@ -155,8 +155,8 @@ public class DashboardController {
             String pattern = "yyyyMMdd";
             SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
             searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_BLOCKED);
-            searchVO.setSearchStartDate(vSchDe, pattern);
-            searchVO.setSearchEndDate(vSchDe, pattern);
+            searchVO.setSearchStartLocalDate(vSchDe, pattern);
+            searchVO.setSearchEndLocalDate(vSchDe, pattern);
             searchVO.setPagingYn("N");
 
             response.put("fileOutboundBlockingStatus", fileOutboundHistService.selectFileOutboundHistListStatus(searchVO));
@@ -178,8 +178,8 @@ public class DashboardController {
         String vSchDe = S2DateUtil.getValidatedOrMaximumDateString(Optional.ofNullable(schDe).map(s -> s.replaceAll("-", "")).orElse(""), pattern, LocalDate.now());
 
         SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDate(vSchDe, pattern);
-        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchStartLocalDate(vSchDe, pattern);
+        searchVO.setSearchEndLocalDate(vSchDe, pattern);
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);

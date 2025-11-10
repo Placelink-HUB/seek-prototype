@@ -45,11 +45,11 @@ requirements, please purchase a commercial license from placelink.
             <if test='schArticleId neq null and schArticleId neq ""'>
                 AND a.ARTICLE_ID = #{schArticleId}
             </if>
-            <if test='searchStartDate neq null'>
-                AND a.CREATE_DT >= #{searchStartDate}
+            <if test='searchStartLocalDate neq null'>
+                AND a.CREATE_DT >= #{searchStartLocalDate}
             </if>
-            <if test='searchEndDate neq null'>
-                AND #{searchEndDateExclusive} > a.CREATE_DT
+            <if test='searchEndLocalDate neq null'>
+                AND #{searchEndLocalDateExclusive} > a.CREATE_DT
             </if>
         </where>
     </sql>

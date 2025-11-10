@@ -97,11 +97,11 @@ requirements, please purchase a commercial license from placelink.
                 <if test='searchOutboundStatusCcd neq null and searchOutboundStatusCcd neq ""'>
                     AND sfoh.OUTBOUND_STATUS_CCD = #{searchOutboundStatusCcd}
                 </if>
-                <if test='searchStartDate neq null'>
-                    AND sfoh.EVENT_DT >= #{searchStartDate}
+                <if test='searchStartLocalDate neq null'>
+                    AND sfoh.EVENT_DT >= #{searchStartLocalDate}
                 </if>
-                <if test='searchEndDate neq null'>
-                    AND #{searchEndDateExclusive} > sfoh.EVENT_DT
+                <if test='searchEndLocalDate neq null'>
+                    AND #{searchEndLocalDateExclusive} > sfoh.EVENT_DT
                 </if>
                 <if test='searchFileExtensionStatusCcd neq null and searchFileExtensionStatusCcd neq ""'>
                     AND sfoh.FILE_EXTENSION_STATUS_CCD = #{searchFileExtensionStatusCcd}

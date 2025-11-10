@@ -135,11 +135,11 @@ requirements, please purchase a commercial license from placelink.
                 ON sar.MAX_DETECTION_TYPE_CCD = cc2.COM_CD
                 AND cc2.GROUP_CD = 'DETECTION_TYPE_CCD'
             <where>
-                <if test='searchStartDate neq null'>
-                    AND sa.CREATE_DT >= #{searchStartDate}
+                <if test='searchStartLocalDate neq null'>
+                    AND sa.CREATE_DT >= #{searchStartLocalDate}
                 </if>
-                <if test='searchEndDate neq null'>
-                    AND #{searchEndDateExclusive} > sa.CREATE_DT
+                <if test='searchEndLocalDate neq null'>
+                    AND #{searchEndLocalDateExclusive} > sa.CREATE_DT
                 </if>
             </where>
     </sql>

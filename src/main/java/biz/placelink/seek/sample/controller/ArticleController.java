@@ -101,8 +101,8 @@ public class ArticleController {
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
         SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartLocalDate(searchPeriod.searchStartLocalDate());
+        searchVO.setSearchEndLocalDate(searchPeriod.searchEndLocalDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("MODIFY_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
@@ -130,8 +130,8 @@ public class ArticleController {
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
         SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartLocalDate(searchPeriod.searchStartLocalDate());
+        searchVO.setSearchEndLocalDate(searchPeriod.searchEndLocalDate());
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("MODIFY_DT DESC");
 

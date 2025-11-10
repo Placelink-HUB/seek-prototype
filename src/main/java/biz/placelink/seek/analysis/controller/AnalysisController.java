@@ -176,8 +176,8 @@ public class AnalysisController {
         SearchPeriod searchPeriod = setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
         SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartLocalDate(searchPeriod.searchStartLocalDate());
+        searchVO.setSearchEndLocalDate(searchPeriod.searchEndLocalDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("CREATE_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
@@ -205,8 +205,8 @@ public class AnalysisController {
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
         SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartLocalDate(searchPeriod.searchStartLocalDate());
+        searchVO.setSearchEndLocalDate(searchPeriod.searchEndLocalDate());
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("CREATE_DT DESC");
 
@@ -303,8 +303,8 @@ public class AnalysisController {
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
         SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartLocalDate(searchPeriod.searchStartLocalDate());
+        searchVO.setSearchEndLocalDate(searchPeriod.searchEndLocalDate());
         searchVO.setPageNo(pageNo == null ? 1 : pageNo);
         searchVO.setOrderBy("LAST_REQUEST_DT DESC");
         response.setHeader("X-Seek-Mode", seekMode);
@@ -333,8 +333,8 @@ public class AnalysisController {
         SearchPeriod searchPeriod = AnalysisController.setSearchPeriod(searchStartDe, searchEndDe, pattern);
 
         SchArticleVO searchVO = new SchArticleVO();
-        searchVO.setSearchStartDate(searchPeriod.searchStartDate());
-        searchVO.setSearchEndDate(searchPeriod.searchEndDate());
+        searchVO.setSearchStartLocalDate(searchPeriod.searchStartLocalDate());
+        searchVO.setSearchEndLocalDate(searchPeriod.searchEndLocalDate());
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_REQUEST_DT DESC");
 
@@ -412,8 +412,8 @@ public class AnalysisController {
 
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_BLOCKED);
-        searchVO.setSearchStartDate(vSchDe, pattern);
-        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchStartLocalDate(vSchDe, pattern);
+        searchVO.setSearchEndLocalDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
@@ -441,8 +441,8 @@ public class AnalysisController {
 
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_BLOCKED);
-        searchVO.setSearchStartDate(vSchDe, pattern);
-        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchStartLocalDate(vSchDe, pattern);
+        searchVO.setSearchEndLocalDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
@@ -496,8 +496,8 @@ public class AnalysisController {
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
         searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_ALL_NORMAL);
-        searchVO.setSearchStartDate(vSchDe, pattern);
-        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchStartLocalDate(vSchDe, pattern);
+        searchVO.setSearchEndLocalDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
@@ -526,8 +526,8 @@ public class AnalysisController {
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
         searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_ALL_NORMAL);
-        searchVO.setSearchStartDate(vSchDe, pattern);
-        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchStartLocalDate(vSchDe, pattern);
+        searchVO.setSearchEndLocalDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
@@ -579,8 +579,8 @@ public class AnalysisController {
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
         searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_NONE_NORMAL);
-        searchVO.setSearchStartDate(vSchDe, pattern);
-        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchStartLocalDate(vSchDe, pattern);
+        searchVO.setSearchEndLocalDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
@@ -609,8 +609,8 @@ public class AnalysisController {
         SchFileOutboundHistVO searchVO = new SchFileOutboundHistVO();
         searchVO.setSearchOutboundStatusCcd(Constants.CD_OUTBOUND_STATUS_SENT);
         searchVO.setSearchFileExtensionStatusCcd(Constants.CD_FILE_EXTENSION_STATUS_NONE_NORMAL);
-        searchVO.setSearchStartDate(vSchDe, pattern);
-        searchVO.setSearchEndDate(vSchDe, pattern);
+        searchVO.setSearchStartLocalDate(vSchDe, pattern);
+        searchVO.setSearchEndLocalDate(vSchDe, pattern);
         searchVO.setSearchGroupingType(searchGroupingType);
         searchVO.setPagingYn("N");
         searchVO.setOrderBy("LAST_EVENT_DT DESC");
@@ -649,13 +649,13 @@ public class AnalysisController {
         return "excelXlsxView";
     }
 
-    public record SearchPeriod(LocalDate searchStartDate, LocalDate searchEndDate) {
+    public record SearchPeriod(LocalDate searchStartLocalDate, LocalDate searchEndLocalDate) {
         public String searchStartDe(String pattern) {
-            return this.searchStartDate() != null ? this.searchStartDate().format(DateTimeFormatter.ofPattern(S2Util.isNotEmpty(pattern) ? pattern : "yyyyMMdd")) : null;
+            return this.searchStartLocalDate() != null ? this.searchStartLocalDate().format(DateTimeFormatter.ofPattern(S2Util.isNotEmpty(pattern) ? pattern : "yyyyMMdd")) : null;
         }
 
         public String searchEndDe(String pattern) {
-            return this.searchEndDate() != null ? this.searchEndDate().format(DateTimeFormatter.ofPattern(S2Util.isNotEmpty(pattern) ? pattern : "yyyyMMdd")) : null;
+            return this.searchEndLocalDate() != null ? this.searchEndLocalDate().format(DateTimeFormatter.ofPattern(S2Util.isNotEmpty(pattern) ? pattern : "yyyyMMdd")) : null;
         }
     }
 
@@ -670,14 +670,14 @@ public class AnalysisController {
      * @return 설정된 조회 시작일과 종료일을 담은 Map
      */
     public static @Nonnull SearchPeriod setSearchPeriod(String searchStartDe, String searchEndDe, String pattern) {
-        LocalDate searchStartDate = S2DateUtil.isValidDate(searchStartDe, pattern, false) ? S2DateUtil.parseToLocalDate(searchStartDe, pattern, false) : null;
-        LocalDate searchEndDate = S2DateUtil.isValidDate(searchEndDe, pattern, false) ? S2DateUtil.parseToLocalDate(searchEndDe, pattern, false) : LocalDate.now();
+        LocalDate searchStartLocalDate = S2DateUtil.isValidDate(searchStartDe, pattern, false) ? S2DateUtil.parseToLocalDate(searchStartDe, pattern, false) : null;
+        LocalDate searchEndLocalDate = S2DateUtil.isValidDate(searchEndDe, pattern, false) ? S2DateUtil.parseToLocalDate(searchEndDe, pattern, false) : LocalDate.now();
 
-        LocalDate stdStartDate = searchEndDate.minusMonths(1).plusDays(1);
-        if (searchStartDate == null || searchStartDate.isBefore(stdStartDate)) {
-            searchStartDate = stdStartDate;
+        LocalDate stdStartDate = searchEndLocalDate.minusMonths(1).plusDays(1);
+        if (searchStartLocalDate == null || searchStartLocalDate.isBefore(stdStartDate)) {
+            searchStartLocalDate = stdStartDate;
         }
-        return new SearchPeriod(searchStartDate, searchEndDate);
+        return new SearchPeriod(searchStartLocalDate, searchEndLocalDate);
     }
 
 }
