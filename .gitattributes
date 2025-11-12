@@ -22,7 +22,7 @@
 *.htm     text eol=lf
 *.vue     text eol=lf
 *.svelte  text eol=lf
-*.styl    text eol=lf # Stylus files
+*.styl    text eol=lf
 
 # Markup & Data
 *.md      text eol=lf
