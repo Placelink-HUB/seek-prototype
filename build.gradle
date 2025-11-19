@@ -162,6 +162,7 @@ gradle.startParameter.warningMode = WarningMode.All
 
 tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << "-Xlint:all"
+    options.compilerArgs << "-parameters"
     options.encoding = "UTF-8"
 //    options.release.set(versions["java"] as int) // Java 버전 호환 강제
 }
