@@ -173,7 +173,7 @@ public class ArticleController {
     public ResponseEntity<Map<String, Object>> createArticle(ArticleVO articleVO) {
         Map<String, Object> response = new HashMap<>();
 
-        S2Util.validate(articleVO, new S2Field("content", "내용"));
+        S2Util.validate(articleVO, S2Field.of("content", "내용"));
         response.put(Constants.RESULT_CODE, articleService.createArticle(articleVO));
         return ResponseEntity.ok(response);
     }

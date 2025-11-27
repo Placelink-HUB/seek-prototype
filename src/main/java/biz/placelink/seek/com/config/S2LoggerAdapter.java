@@ -53,7 +53,7 @@ public class S2LoggerAdapter {
         // SLF4J 로거를 사용하는 커스텀 로거 팩토리 설정
         S2LogManager.setLoggerFactory(new S2LoggerFactory() {
             @Override
-            public S2Logger getLogger(Class<?> clazz) {
+            public <T> S2Logger getLogger(Class<T> clazz) {
                 final Logger logger = LoggerFactory.getLogger(clazz);
                 return createSlf4jAdapter(logger);
             }
