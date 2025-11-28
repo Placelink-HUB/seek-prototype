@@ -262,6 +262,14 @@ repositories {
         name = developmentRepositoryName
         url = developmentRepositoryUrl
     }
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/devers2/s2-util-release")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 configurations {
@@ -447,6 +455,8 @@ dependencies {
     //Java API To Access Microsoft Format Files start
     implementation("org.apache.poi:poi:5.2.3")
     implementation("org.apache.poi:poi-ooxml:5.2.3")
+
+    implementation("kr.s2:s2-util:25.8")
 
     if (versions["jakarta-ee"] <= 8 && project.configurations.annotationProcessor.dependencies.find {it.group == "jakarta.annotation" && it.name == "jakarta.annotation-api"} != null) {
         /* javax.annotation.Nonnull support */
